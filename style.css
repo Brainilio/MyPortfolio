@@ -18,7 +18,6 @@ body {
 #landingText { 
     color: white; 
     position: absolute; 
-    padding: 10px; 
     left: 40%; 
     top: 50%; 
     transform: translate(-50%, -50%);
@@ -32,25 +31,48 @@ body {
 
 #projectText { 
     color: white;
-    padding: 45px; 
-    margin-left: 15%;
-    
+    margin-left: 14.5%;
+    padding-bottom: 45px; 
 }
-
 
 
 #colProjects { 
-    padding: 45px; 
     display: flex; 
-    flex-wrap: wrap;
-    justify-content: space-evenly;
+    justify-content: center;
+    margin-left: 50px;
+    margin-right: 50px;
     margin-bottom: 250px;
 }
 
-#bioText { 
+#singleCard { 
+    margin: 10px;  
+}
+
+#bioFlex { 
     display: flex;
-    margin-left: 15%; 
-    color: white; 
+    align-items: center;
+    justify-content: space-evenly;
+    margin-bottom: 210px; 
+}
+
+#bioChild1 { 
+    width: 31vw;
     text-align: justify;
     text-justify: inter-word;
+}
+
+#contactMe { 
+    color: white; 
+}
+
+#contactCol { 
+    display: flex; 
+    justify-content: center;
+    text-align: center;
+    margin: auto; 
+}
+
+#contactChild { 
+    margin: 10%;
+
 }
