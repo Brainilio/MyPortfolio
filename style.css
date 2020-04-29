@@ -1,0 +1,56 @@
+* {
+     margin: 0; 
+     padding: 0;
+     scroll-behavior: smooth;
+    }
+
+body { 
+    background-color: #4d3061; 
+    background-image: linear-gradient(#785573, #3E2B3E); 
+    }
+
+#landingPage { 
+    height: 100vh;
+    overflow-wrap: break-word;
+    overflow: hidden; 
+}
+
+#landingText { 
+    color: white; 
+    position: absolute; 
+    padding: 10px; 
+    left: 40%; 
+    top: 50%; 
+    transform: translate(-50%, -50%);
+}
+
+#viewMore { 
+    left: 50%; 
+    top: 85%; 
+    transform: translate(-50%, -50%); 
+}
+
+#projectText { 
+    color: white;
+    padding: 45px; 
+    margin-left: 15%;
+    
+}
+
+
+
+#colProjects { 
+    padding: 45px; 
+    display: flex; 
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    margin-bottom: 250px;
+}
+
+#bioText { 
+    display: flex;
+    margin-left: 15%; 
+    color: white; 
+    text-align: justify;
+    text-justify: inter-word;
+}
