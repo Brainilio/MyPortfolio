@@ -116,11 +116,23 @@ body {
   #headTitle { 
     font-family: regularRoboto;
     font-size: 50px; 
+    position: absolute;
+    width: 100%; 
+    text-align: center;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
   }
 
   #subTitle { 
     font-family: italicRoboto;
     font-size: 30px;
+    position: absolute;
+    width: 100%; 
+    text-align: center;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
   }
 
     #landingPage {
@@ -132,6 +144,7 @@ body {
       #landingText {
         color: white;
         position: absolute;
+        width: 100%; 
         text-align: center;
         left: 50%;
         top: 50%;
@@ -173,7 +186,6 @@ body {
       }
       
       #bioChild1 {
-        min-width: 100%;
         align-content: center;
         text-align: justify;
         text-justify: inter-word;
