@@ -10,8 +10,8 @@ import Skill from "./sections/skill/skill"
 function App() {
 	return (
 		<>
-			<DecorativeLine />
 			<Contact />
+			<DecorativeLine />
 			<Landing />
 			<Projects />
 			<About />

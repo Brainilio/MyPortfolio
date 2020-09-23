@@ -1,6 +1,7 @@
 @import "../../styles/responsive/breakpoints.scss";
 
 .fixed-navigation {
+	z-index: 20;
 	position: fixed;
 	top: 50%;
 	transform: translate(0, -50%);
@@ -12,9 +13,30 @@
 		flex-direction: column;
 
 		.icon {
-			margin: 1em 1rem;
-			width: 30px;
-			height: 30px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			margin: 15px 10px;
+			transition: all 0.3s ease-in;
+
+			&:hover {
+				animation: hoverButton 1s ease-in-out;
+			}
+
+			@keyframes hoverButton {
+				0% {
+					// transform: rotateX(10deg);
+					transform: rotateY(0deg);
+				}
+				50% {
+					// transform: rotateX(45deg);
+					transform: rotateY(180deg);
+				}
+				100% {
+					// transform: rotateX(0deg);
+					transform: rotateY(0deg);
+				}
+			}
 		}
 	}
 
