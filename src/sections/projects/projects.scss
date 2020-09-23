@@ -24,8 +24,13 @@
 		}
 	}
 
+	p {
+		margin-left: 12em;
+		width: 25%;
+	}
+
 	.project-cards {
-		margin-top: 10em;
+		margin-top: 6em;
 		margin-left: 12em;
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr;

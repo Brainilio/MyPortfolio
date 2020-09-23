@@ -1,0 +1,45 @@
+@import "../../styles/responsive/breakpoints.scss";
+
+.my-skills {
+	display: flex;
+	flex-direction: column;
+	margin-top: 2em;
+
+	.skills-title {
+		display: flex;
+		align-items: center;
+		margin-top: 5em;
+		margin-left: 12em;
+
+		.skills-title-block {
+			width: 30px;
+			height: 30px;
+			background-color: rgb(224, 224, 224);
+		}
+
+		.skills-title-title {
+			font-size: 20px;
+			margin-left: 10px;
+		}
+	}
+
+	p {
+		margin-left: 12em;
+		width: 25%;
+	}
+
+	.skills-column {
+		margin-top: 5em;
+		display: grid;
+		justify-items: center;
+		grid-template-columns: 1fr 1fr 1fr 1fr;
+
+		div {
+			margin: 1rem;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+		}
+	}
+}
