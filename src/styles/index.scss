@@ -4,7 +4,7 @@ body {
 	height: 100%;
 	color: #ffffffd8;
 	height: 100%;
-	width: 100vw;
+	width: 100%;
 	box-sizing: border-box;
 	background-color: rgb(17, 17, 17);
 	font-family: "Courier New", Courier, monospace;
@@ -12,4 +12,5 @@ body {
 
 section {
 	height: 100vh;
+	width: 100vw;
 }
