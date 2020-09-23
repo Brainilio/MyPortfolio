@@ -1,0 +1,27 @@
+@import "../../styles/responsive/breakpoints.scss";
+
+.fixed-navigation {
+	position: fixed;
+	top: 50%;
+	transform: translate(0, -50%);
+	height: 100px auto;
+	display: flex;
+
+	.icons {
+		display: flex;
+		flex-direction: column;
+		div {
+			cursor: pointer;
+			margin: 1em 1rem;
+			width: 30px;
+			height: 30px;
+			background: red;
+		}
+	}
+
+	.separator-line {
+		width: 1px;
+		height: inherit;
+		background-color: white;
+	}
+}
