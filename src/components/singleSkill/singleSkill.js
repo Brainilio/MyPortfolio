@@ -5,7 +5,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 const SingleSkill = (props) => {
 	return (
 		<div>
-			<FontAwesomeIcon icon={["fab", `${props.iconName}`]} size="3x" />
+			<FontAwesomeIcon
+				icon={[`${props.type}`, `${props.iconName}`]}
+				size="3x"
+			/>
 			<span>{props.name}</span>
 		</div>
 	)

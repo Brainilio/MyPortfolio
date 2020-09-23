@@ -2,76 +2,129 @@ import React, { useState, useEffect } from "react"
 import SingleSkill from "../../components/singleSkill/singleSkill"
 import "./skill.scss"
 import { library } from "@fortawesome/fontawesome-svg-core"
-import { faAdobe, fab, faJs, faReact } from "@fortawesome/free-brands-svg-icons"
-import { faMarker, faPen, faPenFancy } from "@fortawesome/free-solid-svg-icons"
+import {
+	fab,
+	faJs,
+	faReact,
+	faNodeJs,
+	faPhp,
+} from "@fortawesome/free-brands-svg-icons"
+import {
+	faPen,
+	faObjectGroup,
+	faDatabase,
+	faFileCode,
+	faBrain,
+	faVial,
+	faProjectDiagram,
+	faRocket,
+	faNetworkWired,
+	faSuitcase,
+	faCube,
+	faShoePrints,
+} from "@fortawesome/free-solid-svg-icons"
 
 const Skill = () => {
-	library.add(fab, faReact, faJs, faMarker, faPen)
+	library.add(
+		fab,
+		faReact,
+		faJs,
+		faPen,
+		faNodeJs,
+		faDatabase,
+		faObjectGroup,
+		faPhp,
+		faFileCode,
+		faBrain,
+		faVial,
+		faProjectDiagram,
+		faRocket,
+		faNetworkWired,
+		faSuitcase,
+		faCube,
+		faShoePrints
+	)
 
 	const [iconSkills] = useState([
 		{
 			name: "REACTJS",
 			icon: "react",
+			type: "fab",
 		},
 		{
 			name: "TYPESCRIPT",
 			icon: "js",
+			type: "fab",
 		},
 		{
 			name: "JAVASCRIPT",
 			icon: "js",
+			type: "fab",
 		},
 		{
 			name: "UX/UI",
-			icon: "adobe",
+			icon: "pen",
+			type: "fa",
 		},
 		{
 			name: "NODEJS/EXPRESS",
-			icon: "FaJavascript",
+			icon: "node-js",
+			type: "fab",
 		},
 		{
 			name: "MONGODB/MONGOOSE",
-			icon: "FaJavascript",
+			icon: "database",
+			type: "fa",
 		},
 		{
 			name: "OBJECT-ORIENTED PROGRAMMING",
-			icon: "FaJavascript",
+			icon: "object-group",
+			type: "fa",
 		},
 		{
 			name: "DATASTRUCTURES & ALGORITHMS",
-			icon: "FaJavascript",
-		},
-		{
-			name: "JAVASCRIPT",
-			icon: "FaJavascript",
+			icon: "brain",
+			type: "fa",
 		},
 		{
 			name: "AGILE & SCRUM METHODOLOGIES",
-			icon: "FaJavascript",
+			icon: "project-diagram",
+			type: "fa",
 		},
 		{
 			name: "PHP & LARAVEL",
-			icon: "FaJavascript",
+			icon: "php",
+			type: "fab",
 		},
 		{
 			name: "USABILITY TESTING AND UX RESEARCH",
-			icon: "FaJavascript",
+			icon: "vial",
+			type: "fa",
 		},
 		{
 			name: "HTML/CSS",
-			icon: "FaJavascript",
+			icon: "file-code",
+			type: "fa",
 		},
 		{
 			name: "REST API AND WEBSERVICES",
-			icon: "FaJavascript",
+			icon: "network-wired",
+			type: "fa",
 		},
 		{
 			name: "UNIT TESTING",
-			icon: "FaJavascript",
+			icon: "suitcase",
+			type: "fa",
 		},
 		{
 			name: "THREEJS",
-			icon: "FaJavascript",
+			icon: "cube",
+			type: "fa",
+		},
+		{
+			name: "DESIGN PATTERNS",
+			icon: "shoe-prints",
+			type: "fa",
 		},
 	])
 
@@ -93,7 +146,7 @@ const Skill = () => {
 
 			<div className="skills-column">
 				{iconSkills.map((icon) => (
-					<SingleSkill iconName={icon.icon} name={icon.name} />
+					<SingleSkill type={icon.type} iconName={icon.icon} name={icon.name} />
 				))}
 			</div>
 		</section>

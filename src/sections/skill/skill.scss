@@ -30,11 +30,10 @@
 
 	.skills-column {
 		margin-top: 5em;
-		
+
 		display: grid;
 		justify-items: center;
 		grid-template-columns: 1fr 1fr 1fr 1fr;
-	
 
 		div {
 			margin: 25px;
@@ -42,6 +41,10 @@
 			flex-direction: column;
 			justify-content: center;
 			align-items: center;
+
+			span {
+				margin-top: 15px;
+			}
 		}
 	}
 }
