@@ -1,0 +1,11 @@
+@import "../../styles/responsive/breakpoints.scss";
+
+.public-message {
+	position: absolute;
+	background-color: rgb(232, 232, 232);
+	padding: 1rem;
+	color: black;
+	left: 50%;
+	transform: translate(-50%);
+	text-align: center;
+}

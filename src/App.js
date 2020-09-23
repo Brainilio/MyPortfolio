@@ -5,11 +5,13 @@ import About from "./sections/about/about"
 import Contact from "./sections/contact/contact"
 import Landing from "./sections/landing/landing"
 import Projects from "./sections/projects/projects"
+import Publicmessage from "./sections/publicmessage/publicmessage"
 import Skill from "./sections/skill/skill"
 
 function App() {
 	return (
 		<>
+			<Publicmessage />
 			<Contact />
 			<DecorativeLine />
 			<Landing />
