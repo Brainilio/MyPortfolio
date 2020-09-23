@@ -2,28 +2,28 @@ import React, { useState, useEffect } from "react"
 import SingleSkill from "../../components/singleSkill/singleSkill"
 import "./skill.scss"
 import { library } from "@fortawesome/fontawesome-svg-core"
-import { fab } from "@fortawesome/free-brands-svg-icons"
-import { FaReact } from "@fortawesome/free-solid-svg-icons"
+import { faAdobe, fab, faJs, faReact } from "@fortawesome/free-brands-svg-icons"
+import { faMarker, faPen, faPenFancy } from "@fortawesome/free-solid-svg-icons"
 
 const Skill = () => {
-	library.add(fab, FaReact)
+	library.add(fab, faReact, faJs, faMarker, faPen)
 
 	const [iconSkills] = useState([
 		{
 			name: "REACTJS",
-			icon: "faReact",
+			icon: "react",
 		},
 		{
 			name: "TYPESCRIPT",
-			icon: "FaTypescript",
+			icon: "js",
 		},
 		{
 			name: "JAVASCRIPT",
-			icon: "FaJavascript",
+			icon: "js",
 		},
 		{
 			name: "UX/UI",
-			icon: "FaJavascript",
+			icon: "adobe",
 		},
 		{
 			name: "NODEJS/EXPRESS",

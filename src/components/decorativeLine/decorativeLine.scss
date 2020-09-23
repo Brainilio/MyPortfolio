@@ -1,0 +1,21 @@
+@import "../../styles/responsive/breakpoints.scss";
+
+.deco-line-left {
+	z-index: -1;
+	position: absolute;
+	width: 1px;
+	height: 800px;
+	background-color: white;
+	left: 5%;
+	top: 100%;
+}
+
+.deco-line-right {
+	z-index: -1;
+	position: absolute;
+	width: 1px;
+	height: 800px;
+	background-color: white;
+	right: 5%;
+	top: 150%;
+}
