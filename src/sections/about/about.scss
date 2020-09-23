@@ -1,0 +1,52 @@
+@import "../../styles/responsive/breakpoints.scss";
+
+.about {
+	display: flex;
+	height: auto;
+	flex-direction: column;
+
+	.about-title {
+		display: flex;
+		align-items: center;
+		margin-top: 5em;
+		margin-left: 12em;
+
+		.about-title-block {
+			width: 30px;
+			height: 30px;
+			background-color: rgb(224, 224, 224);
+		}
+		.about-title-title {
+			font-size: 20px;
+			margin-left: 10px;
+		}
+	}
+
+	.about-block {
+		display: flex;
+		align-items: center;
+		justify-content: space-around;
+		margin-top: 10em;
+		.about-text {
+			text-align: justify;
+			width: 40%;
+		}
+
+		.about-image {
+			margin-right: 8em;
+			.about-border-style-image {
+				transform: translate(50px, -50px);
+				z-index: -1;
+				position: absolute;
+				width: 200px;
+				height: 200px;
+				border: 1px solid white;
+			}
+			.about-image-image {
+				width: 200px;
+				height: 200px;
+				background: red;
+			}
+		}
+	}
+}
