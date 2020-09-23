@@ -2,6 +2,7 @@
 
 .public-message {
 	position: absolute;
+	z-index: 20; 
 	background-color: rgb(232, 232, 232);
 	padding: 1rem;
 	color: black;
