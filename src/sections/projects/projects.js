@@ -2,7 +2,7 @@ import React from "react"
 import ProjectCard from "../../components/project-card/projectCard"
 import "./projects.scss"
 
-const projects = () => {
+const Projects = () => {
 	return (
 		<section className="projects">
 			<div className="projects-title">
@@ -33,4 +33,4 @@ const projects = () => {
 	)
 }
 
-export default projects
+export default Projects

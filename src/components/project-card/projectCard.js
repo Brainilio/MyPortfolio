@@ -1,7 +1,7 @@
 import React from "react"
 import "./projectCard.scss"
 
-const projectCard = () => {
+const ProjectCard = (props) => {
 	return (
 		<div className="project-cards-single-card">
 			<div className="project-cards-image"></div>
@@ -18,4 +18,4 @@ const projectCard = () => {
 	)
 }
 
-export default projectCard
+export default ProjectCard

@@ -12,7 +12,7 @@ const about = () => {
 			</div>
 			<div className="about-block">
 				<div className="about-text">
-					<p>
+					<p aria-hidden>
 						Hi there 👋🏽, Lorem ipsum dolor sit amet, consectetur adipiscing
 						elit. In dapibus vehicula odio ut condimentum. Fusce vel libero quis
 						nisl malesuada sollicitudin. Fusce pharetra, neque id lacinia

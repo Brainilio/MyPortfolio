@@ -1,50 +1,8 @@
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import SingleSkill from "../../components/singleSkill/singleSkill"
 import "./skill.scss"
-import { library } from "@fortawesome/fontawesome-svg-core"
-import {
-	fab,
-	faJs,
-	faReact,
-	faNodeJs,
-	faPhp,
-} from "@fortawesome/free-brands-svg-icons"
-import {
-	faPen,
-	faObjectGroup,
-	faDatabase,
-	faFileCode,
-	faBrain,
-	faVial,
-	faProjectDiagram,
-	faRocket,
-	faNetworkWired,
-	faSuitcase,
-	faCube,
-	faShoePrints,
-} from "@fortawesome/free-solid-svg-icons"
 
 const Skill = () => {
-	library.add(
-		fab,
-		faReact,
-		faJs,
-		faPen,
-		faNodeJs,
-		faDatabase,
-		faObjectGroup,
-		faPhp,
-		faFileCode,
-		faBrain,
-		faVial,
-		faProjectDiagram,
-		faRocket,
-		faNetworkWired,
-		faSuitcase,
-		faCube,
-		faShoePrints
-	)
-
 	const [iconSkills] = useState([
 		{
 			name: "REACTJS",
