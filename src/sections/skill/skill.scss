@@ -30,12 +30,14 @@
 
 	.skills-column {
 		margin-top: 5em;
+		
 		display: grid;
 		justify-items: center;
 		grid-template-columns: 1fr 1fr 1fr 1fr;
+	
 
 		div {
-			margin: 1rem;
+			margin: 25px;
 			display: flex;
 			flex-direction: column;
 			justify-content: center;

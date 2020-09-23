@@ -1,7 +1,80 @@
-import React from "react"
+import React, { useState, useEffect } from "react"
+import SingleSkill from "../../components/singleSkill/singleSkill"
 import "./skill.scss"
+import { library } from "@fortawesome/fontawesome-svg-core"
+import { fab } from "@fortawesome/free-brands-svg-icons"
+import { FaReact } from "@fortawesome/free-solid-svg-icons"
 
-const skill = () => {
+const Skill = () => {
+	library.add(fab, FaReact)
+
+	const [iconSkills] = useState([
+		{
+			name: "REACTJS",
+			icon: "faReact",
+		},
+		{
+			name: "TYPESCRIPT",
+			icon: "FaTypescript",
+		},
+		{
+			name: "JAVASCRIPT",
+			icon: "FaJavascript",
+		},
+		{
+			name: "UX/UI",
+			icon: "FaJavascript",
+		},
+		{
+			name: "NODEJS/EXPRESS",
+			icon: "FaJavascript",
+		},
+		{
+			name: "MONGODB/MONGOOSE",
+			icon: "FaJavascript",
+		},
+		{
+			name: "OBJECT-ORIENTED PROGRAMMING",
+			icon: "FaJavascript",
+		},
+		{
+			name: "DATASTRUCTURES & ALGORITHMS",
+			icon: "FaJavascript",
+		},
+		{
+			name: "JAVASCRIPT",
+			icon: "FaJavascript",
+		},
+		{
+			name: "AGILE & SCRUM METHODOLOGIES",
+			icon: "FaJavascript",
+		},
+		{
+			name: "PHP & LARAVEL",
+			icon: "FaJavascript",
+		},
+		{
+			name: "USABILITY TESTING AND UX RESEARCH",
+			icon: "FaJavascript",
+		},
+		{
+			name: "HTML/CSS",
+			icon: "FaJavascript",
+		},
+		{
+			name: "REST API AND WEBSERVICES",
+			icon: "FaJavascript",
+		},
+		{
+			name: "UNIT TESTING",
+			icon: "FaJavascript",
+		},
+		{
+			name: "THREEJS",
+			icon: "FaJavascript",
+		},
+	])
+
 	return (
 		<section className="my-skills">
 			<div className="skills-title">
@@ -19,73 +92,12 @@ const skill = () => {
 			</p>
 
 			<div className="skills-column">
-				<div>
-					<div>@</div>
-					<span> REACTJS </span>
-				</div>
-				<div>
-					<div>@</div>
-					<span> REACTJS </span>
-				</div>
-				<div>
-					<div>@</div>
-					<span> REACTJS </span>
-				</div>
-				<div>
-					<div>@</div>
-					<span> REACTJS </span>
-				</div>
-				<div>
-					<div>@</div>
-					<span> REACTJS </span>
-				</div>
-				<div>
-					<div>@</div>
-					<span> REACTJS </span>
-				</div>
-				<div>
-					<div>@</div>
-					<span> REACTJS </span>
-				</div>
-				<div>
-					<div>@</div>
-					<span> REACTJS </span>
-				</div>
-				<div>
-					<div>@</div>
-					<span> REACTJS </span>
-				</div>
-				<div>
-					<div>@</div>
-					<span> REACTJS </span>
-				</div>
-				<div>
-					<div>@</div>
-					<span> REACTJS </span>
-				</div>
-				<div>
-					<div>@</div>
-					<span> REACTJS </span>
-				</div>
-				<div>
-					<div>@</div>
-					<span> REACTJS </span>
-				</div>
-				<div>
-					<div>@</div>
-					<span> REACTJS </span>
-				</div>
-				<div>
-					<div>@</div>
-					<span> REACTJS </span>
-				</div>
-				<div>
-					<div>@</div>
-					<span> REACTJS </span>
-				</div>
+				{iconSkills.map((icon) => (
+					<SingleSkill iconName={icon.icon} name={icon.name} />
+				))}
 			</div>
 		</section>
 	)
 }
 
-export default skill
+export default Skill
