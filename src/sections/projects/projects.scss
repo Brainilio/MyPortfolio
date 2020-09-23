@@ -1,4 +1,22 @@
 @import "../../styles/responsive/breakpoints.scss";
 
 .projects {
+	width: 85%;
+
+	.projects-title {
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+
+		.projects-title-block {
+			width: 30px;
+			height: 30px;
+			background-color: rgb(224, 224, 224);
+		}
+
+		.projects-title-title {
+			font-size: 20px;
+			margin-left: 10px;
+		}
+	}
 }

@@ -3,8 +3,8 @@
 .landing {
 	display: flex;
 	align-items: center;
+	min-height: 100vh;
 	justify-content: space-around;
-	height: 100vh;
 
 	.landing-title {
 		display: flex;
