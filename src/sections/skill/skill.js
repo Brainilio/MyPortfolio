@@ -104,7 +104,12 @@ const Skill = () => {
 
 			<div className="skills-column">
 				{iconSkills.map((icon) => (
-					<SingleSkill type={icon.type} iconName={icon.icon} name={icon.name} />
+					<SingleSkill
+						key={icon.name}
+						type={icon.type}
+						iconName={icon.icon}
+						name={icon.name}
+					/>
 				))}
 			</div>
 		</section>

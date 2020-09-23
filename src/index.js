@@ -9,6 +9,9 @@ import {
 	faReact,
 	faNodeJs,
 	faPhp,
+	faLinkedin,
+	faTwitter,
+	faGithub,
 } from "@fortawesome/free-brands-svg-icons"
 import {
 	faPen,
@@ -23,6 +26,7 @@ import {
 	faSuitcase,
 	faCube,
 	faShoePrints,
+	faPaperclip,
 } from "@fortawesome/free-solid-svg-icons"
 
 library.add(
@@ -42,7 +46,11 @@ library.add(
 	faNetworkWired,
 	faSuitcase,
 	faCube,
-	faShoePrints
+	faShoePrints,
+	faLinkedin,
+	faTwitter,
+	faPaperclip,
+	faGithub
 )
 
 ReactDOM.render(

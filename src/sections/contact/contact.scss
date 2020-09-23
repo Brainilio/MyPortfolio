@@ -10,12 +10,11 @@
 	.icons {
 		display: flex;
 		flex-direction: column;
-		div {
-			cursor: pointer;
+
+		.icon {
 			margin: 1em 1rem;
 			width: 30px;
 			height: 30px;
-			background: red;
 		}
 	}
 

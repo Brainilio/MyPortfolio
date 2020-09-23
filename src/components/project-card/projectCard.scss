@@ -3,26 +3,49 @@
 .project-cards-single-card {
 	display: flex;
 	flex-direction: column;
-	height: 450px;
+	margin-top: 25px;
+	height: 500px;
 	width: 325px;
+	background-color: white;
 
 	.project-cards-image {
-		height: 60%;
+		height: 50%;
 		width: 100%;
 		background-color: red;
 	}
 
+	.project-cards-description {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		color: black;
+		width: 100%;
+
+		.project-cards-description-title {
+			font-size: 25px;
+		}
+
+		.project-cards-description-paragraph {
+			width: 85%;
+			text-align: justify;
+		}
+	}
+
 	.project-cards-tags-row {
 		display: flex;
+		justify-content: center;
+		align-items: flex-end;
+		margin-top: 25px;
+		margin-bottom: 10px;
 		width: 100%;
-		margin-top: 15px;
 
 		.project-card-single-tag {
 			cursor: default;
 			min-width: auto;
 			width: 85px;
 			height: 30px;
-			background-color: rgba(255, 255, 255, 0.572);
+			background-color: rgba(162, 162, 162, 0.764);
 			color: black;
 			margin: 0 auto;
 			display: flex;
@@ -33,9 +56,9 @@
 	}
 
 	.project-cards-buttons {
-		margin-top: 25px;
+		margin-top: 15px;
 		display: flex;
-		justify-content: space-between;
+		justify-content: space-around;
 		align-items: center;
 
 		.project-cards-single-button {
@@ -43,16 +66,16 @@
 			display: flex;
 			justify-content: center;
 			align-items: center;
-			color: white;
+			color: black;
 			height: 35px;
 			width: 100px;
 			background: none;
-			border: 1px solid white;
+			border: 1px solid black;
 			transition: all 0.3s ease-in;
 
 			&:hover {
-				background-color: white;
-				color: black;
+				background-color: black;
+				color: white;
 			}
 		}
 	}

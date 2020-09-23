@@ -1,8 +1,23 @@
-import React from "react"
+import React, { useState } from "react"
 import ProjectCard from "../../components/project-card/projectCard"
 import "./projects.scss"
 
 const Projects = () => {
+	//project modelling
+	const [projects, setProjects] = useState([
+		{
+			name: "",
+			shortDescription: "",
+			previewImage: "",
+			livePreview: "",
+			gitHub: "",
+			tags: ["", "", ""],
+			longerDescription: "",
+			dateCreated: "",
+			fullImages: ["", "", ""],
+		},
+	])
+
 	return (
 		<section className="projects">
 			<div className="projects-title">
@@ -11,7 +26,7 @@ const Projects = () => {
 					MY WORK 💻
 				</span>
 			</div>
-			<p>
+			<p className="projects-paragraph">
 				Here are some of my projects.
 				<br />
 				To see more, visit my{" "}
