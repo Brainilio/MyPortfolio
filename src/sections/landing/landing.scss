@@ -6,9 +6,19 @@
 	min-height: 100vh;
 	justify-content: space-around;
 
+	@include screens {
+		flex-direction: column-reverse;
+		justify-content: center;
+		align-items: center;
+	}
+
 	.landing-title {
 		display: flex;
 		flex-direction: column;
+
+		@include screens {
+			text-align: center;
+		}
 
 		.landing-title-text {
 			display: flex;
@@ -28,6 +38,13 @@
 
 		.landing-title-cta-buttons {
 			margin-top: 1rem;
+
+			@include screens {
+				margin-top: 3em;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
 
 			.landing-title-cta-contact-me {
 				cursor: pointer;
@@ -49,6 +66,9 @@
 		}
 	}
 	.landing-icon {
+		@include screens {
+			margin-bottom: 2em;
+		}
 		.landing-icon-first {
 			transform: translate(-50px, -50px);
 			position: absolute;

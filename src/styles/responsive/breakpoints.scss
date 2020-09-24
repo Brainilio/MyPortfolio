@@ -8,43 +8,43 @@ $screenxl: 1200px;
 
 // Mixins
 @mixin screenxxs {
-	@media (min-width: #{$screenxxs}) {
+	@media (max-width: #{$screenxxs}) {
 		@content;
 	}
 }
 
 @mixin screenxs {
-	@media (min-width: #{$screenxs}) {
+	@media (max-width: #{$screenxs}) {
 		@content;
 	}
 }
 
 @mixin screens {
-	@media (min-width: #{$screens}) {
+	@media (max-width: #{$screens}) {
 		@content;
 	}
 }
 
 @mixin screenxs {
-	@media (min-width: #{$screenxs}) {
+	@media (max-width: #{$screenxs}) {
 		@content;
 	}
 }
 
 @mixin screenm {
-	@media (min-width: #{$screenm}) {
+	@media (max-width: #{$screenm}) {
 		@content;
 	}
 }
 
 @mixin screenl {
-	@media (min-width: #{$screenl}) {
+	@media (max-width: #{$screenl}) {
 		@content;
 	}
 }
 
 @mixin screenxl {
-	@media (min-width: #{$screenxl}) {
+	@media (max-width: #{$screenxl}) {
 		@content;
 	}
 }
