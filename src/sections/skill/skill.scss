@@ -11,6 +11,11 @@
 		margin-top: 5em;
 		margin-left: 12em;
 
+		@include screens {
+			margin: 5em 0 2em 0;
+			justify-content: center;
+		}
+
 		.skills-title-block {
 			width: 30px;
 			height: 30px;
@@ -26,14 +31,23 @@
 	p {
 		margin-left: 12em;
 		width: 25%;
+
+		@include screens {
+			width: 100%;
+			margin: 0;
+			text-align: center;
+		}
 	}
 
 	.skills-column {
 		margin-top: 5em;
-
 		display: grid;
 		justify-items: center;
 		grid-template-columns: 1fr 1fr 1fr 1fr;
+
+		@include screens {
+			grid-template-columns: 1fr 1fr;
+		}
 
 		div {
 			margin: 25px;

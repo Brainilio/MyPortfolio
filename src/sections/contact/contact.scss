@@ -9,9 +9,14 @@
 	display: flex;
 
 	@include screens {
-		top: 0%;
-		transform: translate(-50%, 0);
+		background-color: black;
+		width: 100%;
 		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		left: 50%;
+		top: 0%;
+		transform: translate(-50%);
 	}
 
 	.icons {
@@ -54,6 +59,9 @@
 		width: 2px;
 		height: inherit;
 		background-color: white;
-		transform: rotate(90);
+
+		@include screens {
+			display: none;
+		}
 	}
 }
