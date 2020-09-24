@@ -8,9 +8,19 @@
 	height: 100px auto;
 	display: flex;
 
+	@include screens {
+		top: 0%;
+		transform: translate(-50%, 0);
+		flex-direction: column;
+	}
+
 	.icons {
 		display: flex;
 		flex-direction: column;
+
+		@include screens {
+			flex-direction: row;
+		}
 
 		.icon {
 			display: flex;
@@ -44,5 +54,6 @@
 		width: 2px;
 		height: inherit;
 		background-color: white;
+		transform: rotate(90);
 	}
 }

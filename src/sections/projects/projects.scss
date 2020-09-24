@@ -5,12 +5,21 @@
 	display: flex;
 	flex-direction: column;
 
+	@include screens {
+		width: 100vw;
+	}
+
 	.projects-title {
 		display: flex;
 		align-items: center;
 		margin-top: 5em;
 		margin-left: 12em;
 		justify-content: flex-start;
+
+		@include screens {
+			margin: 5em 0 2em 0;
+			justify-content: center;
+		}
 
 		.projects-title-block {
 			width: 30px;
@@ -27,6 +36,12 @@
 	.projects-paragraph {
 		margin-left: 12em;
 		width: 25%;
+
+		@include screens {
+			margin: 0;
+			width: 100%;
+			text-align: center;
+		}
 	}
 
 	.project-cards {
@@ -34,5 +49,11 @@
 		margin-left: 12em;
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr;
+
+		@include screens {
+			display: flex;
+			margin: 0 auto;
+			flex-direction: column;
+		}
 	}
 }

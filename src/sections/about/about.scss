@@ -11,6 +11,16 @@
 		margin-top: 5em;
 		margin-left: 12em;
 
+		@include screens {
+			margin: 5em 0 0 0;
+			justify-content: center;
+		}
+
+		.about-title-title {
+			font-size: 20px;
+			margin-left: 10px;
+		}
+
 		.about-title-block {
 			width: 30px;
 			height: 30px;
@@ -27,13 +37,30 @@
 		align-items: center;
 		justify-content: space-around;
 		margin-top: 6em;
+
+		@include screens {
+			margin-top: 3em;
+			flex-direction: column;
+			justify-content: center;
+		}
+
 		.about-text {
 			text-align: justify;
 			width: 40%;
+
+			@include screens {
+				width: 90%;
+			}
 		}
 
 		.about-image {
 			margin-right: 8em;
+
+			@include screens {
+				margin-top: 5em;
+				margin-right: 0;
+			}
+
 			.about-border-style-image {
 				transform: translate(50px, -50px);
 				z-index: -1;

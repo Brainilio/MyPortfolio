@@ -8,6 +8,10 @@
 	background-color: white;
 	left: 5%;
 	top: 100%;
+
+	@include screens {
+		display: none;
+	}
 }
 
 .deco-line-right {
@@ -18,4 +22,7 @@
 	background-color: white;
 	right: 5%;
 	top: 150%;
+	@include screens {
+		display: none;
+	}
 }
