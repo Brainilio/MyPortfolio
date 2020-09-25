@@ -1,14 +1,36 @@
-import React from "react"
-import "./landing.scss"
+import React, { useEffect } from "react"
 
-const landing = () => {
+import "./landing.scss"
+import { gsap } from "gsap"
+
+const Landing = () => {
+	const titleRef = React.useRef(null)
+	const iconRef = React.useRef(null)
+
+	useEffect(() => {
+		gsap.from(titleRef.current.children, {
+			x: -200,
+			opacity: 0,
+			stagger: 0.5,
+			duration: 0.5,
+		})
+		gsap.from(iconRef.current.children, {
+			y: -500,
+			rotateZ: 360,
+			opacity: 0,
+			ease: "power3",
+			stagger: 0.5,
+			duration: 2,
+		})
+	}, [titleRef, iconRef])
+
 	return (
 		<section className="landing">
-			<div className="landing-title">
+			<div ref={titleRef} className="landing-title">
 				<div className="landing-title-text">
 					<span className="landing-title-text-name">
 						Brainilio{" "}
-						<span role="img" aria-hidden>
+						<span className="landing-emoji" role="img" aria-hidden>
 							👋🏽
 						</span>
 					</span>
@@ -21,7 +43,7 @@ const landing = () => {
 					<div className="landing-title-cta-contact-me">MY WORK</div>
 				</div>
 			</div>
-			<div className="landing-icon">
+			<div ref={iconRef} className="landing-icon">
 				<div className="landing-icon-first"></div>
 				<div className="landing-icon-second"></div>
 			</div>
@@ -34,4 +56,4 @@ const landing = () => {
 	)
 }
 
-export default landing
+export default Landing

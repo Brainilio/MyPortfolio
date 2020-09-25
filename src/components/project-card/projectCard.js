@@ -41,7 +41,9 @@ const ProjectCard = (props) => {
 
 			<div className="project-cards-tags-row">
 				{props.information.tags.map((tag) => (
-					<div className="project-card-single-tag">{tag}</div>
+					<div key={tag} className="project-card-single-tag">
+						{tag}
+					</div>
 				))}
 			</div>
 		</div>

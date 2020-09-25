@@ -1,11 +1,24 @@
-import React from "react"
+import React, { useEffect, useRef } from "react"
 import "./contact.scss"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { gsap } from "gsap"
 
-const contact = () => {
+const Contact = () => {
+	const icons = useRef(null)
+	const line = useRef(null)
+
+	useEffect(() => {
+		gsap.from(icons.current, {
+			y: -300,
+			duration: 0.8,
+			ease: "power",
+		})
+		gsap.from(line.current, { y: -300, duration: 0.8, ease: "power" })
+	})
+
 	return (
 		<div className="fixed-navigation">
-			<div className="icons">
+			<div ref={icons} className="icons">
 				<a
 					href="https://github.com/brainilio"
 					rel="noopener noreferrer"
@@ -52,9 +65,9 @@ const contact = () => {
 					/>
 				</a>
 			</div>
-			<span className="separator-line"></span>
+			<span ref={line} className="separator-line"></span>
 		</div>
 	)
 }
 
-export default contact
+export default Contact
