@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import DecorativeLine from "./components/decorativeLine/decorativeLine"
 import About from "./sections/about/about"
 import Contact from "./sections/contact/contact"
@@ -13,6 +13,10 @@ import CrescentMoon from "./components/crescentmoon/crescentMoon"
 import Rocketship from "./components/rocketship/rocketship"
 
 function App() {
+	const [show, setShow] = useState(true)
+
+	const togglePublicMessage = () => setShow((prevState) => !prevState)
+
 	return (
 		<>
 			<Rocketship />
@@ -33,17 +37,23 @@ function App() {
 								value_area: 2000,
 							},
 						},
+						move: {
+							direction: "none",
+							speed: 1,
+							random: false,
+							straight: false,
+						},
 						links: {
 							enable: false,
 						},
 					},
 				}}
 			/>
+
 			<CrescentMoon />
 			<DecorativeLine />
 			<FallingStars />
-
-			<Publicmessage />
+			{show ? <Publicmessage show={togglePublicMessage} /> : null}
 			<Contact />
 			<Landing />
 			<Projects />

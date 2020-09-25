@@ -5,9 +5,16 @@ body {
 	color: #ffffffd8;
 	height: 100%;
 	width: 100%;
-
+	background: rgb(77, 27, 70);
+	background: linear-gradient(
+		144deg,
+		rgb(35, 13, 32) 0%,
+		rgba(45, 27, 68, 1) 27%,
+		rgb(17, 17, 17) 58%,
+		rgba(63, 80, 82, 1) 120%
+	);
 	box-sizing: border-box;
-	background-color: rgb(17, 17, 17);
+
 	font-family: "Courier New", Courier, monospace;
 }
 
