@@ -1,0 +1,94 @@
+@import "../../styles/responsive/breakpoints.scss";
+
+.night {
+	position: absolute;
+	z-index: -1;
+	width: 50%;
+	height: auto;
+	transform: rotateZ(50deg);
+	top: 180%;
+	left: 40%;
+
+	.shooting-star {
+		position: absolute;
+		left: 50%;
+		top: 60%;
+		height: 2px;
+		background: linear-gradient(-45deg, #fcc893, rgba(255, 0, 0, 0));
+		border-radius: 999px;
+		filter: drop-shadow(0 0 6px #fcc893);
+		animation: tail 3000ms ease-in-out infinite,
+			shooting 3000ms ease-in-out infinite;
+
+		&::before,
+		::after {
+			content: "";
+			position: absolute;
+			top: calc(50% - 1px);
+			right: 0;
+			height: 0px;
+			background: linear-gradient(
+				-45deg,
+				rgba(0, 0, 255, 0),
+				#fcc893,
+				rgba(0, 0, 255, 0)
+			);
+			border-radius: 100%;
+			animation: shining 3000ms ease-in-out infinite;
+		}
+
+		&:nth-child(1) {
+			top: calc(50% - -20px);
+			left: calc(50% - 130px);
+			animation-delay: 4244ms;
+
+			&::before,
+			::after,
+			::after {
+				animation-delay: 4244ms;
+			}
+		}
+
+		@keyframes tail {
+			0% {
+				width: 0;
+			}
+			30% {
+				width: 100px;
+			}
+			100% {
+				width: 0;
+			}
+		}
+
+		@keyframes shining {
+			0% {
+				width: 0;
+			}
+			50% {
+				width: 30px;
+			}
+			100% {
+				width: 0;
+			}
+		}
+
+		@keyframes shooting {
+			0% {
+				transform: translateX(0);
+			}
+			100% {
+				transform: translateX(300px);
+			}
+		}
+
+		@keyframes sky {
+			0% {
+				transform: rotate(45deg);
+			}
+			100% {
+				transform: rotate(405deg);
+			}
+		}
+	}
+}

@@ -8,17 +8,43 @@ import Projects from "./sections/projects/projects"
 import Publicmessage from "./sections/publicmessage/publicmessage"
 import Skill from "./sections/skill/skill"
 import Particles from "react-particles-js"
+import FallingStars from "./components/falling-stars/fallingStars"
 
 function App() {
 	return (
 		<>
-			<Particles width="100%" />
+			<Particles
+				className="particles-background"
+				params={{
+					interactivity: {
+						detectsOn: "canvas",
+						events: {
+							resize: true,
+						},
+					},
+
+					particles: {
+						number: {
+							value: 100,
+							density: {
+								enable: true,
+								value_area: 2000,
+							},
+						},
+						links: {
+							enable: false,
+						},
+					},
+				}}
+			/>
 			<Publicmessage />
 			<Contact />
 			<DecorativeLine />
 			<Landing />
+
 			<Projects />
 			<About />
+			<FallingStars />
 			<Skill />
 		</>
 	)
