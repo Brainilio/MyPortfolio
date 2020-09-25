@@ -4,16 +4,30 @@
 	display: flex;
 	flex-direction: column;
 	margin-top: 25px;
-	height: 500px;
+	height: 535px;
 	width: 325px;
 	background-color: white;
+	box-shadow: 5px 5px 25px 3px black;
+	transition: all 0.8s ease;
 
-	
+	&:hover {
+		transform: rotateX(20deg) rotateZ(5deg) rotateY(-15deg);
+	}
+
+	@include screens {
+		transition: none;
+	}
+	@include screenm {
+		transiiton: none;
+	}
+	@include screenl {
+		transition: none;
+	}
 
 	.project-cards-image {
-		height: 100%;
+		height: 40%;
 		width: 100%;
-		background-color: red;
+		object-fit: cover;
 	}
 
 	.project-cards-description {
@@ -22,22 +36,22 @@
 		justify-content: center;
 		align-items: center;
 		color: black;
+		height: 40%;
 		width: 100%;
 
 		.project-cards-description-title {
-			font-size: 25px;
+			font-size: 18px;
+			margin-top: 1rem;
 
-			@include screens { 
-				margin-top: 1rem; 
-				font-size: 20px; 	
+			@include screens {
+				margin-top: 1rem;
+				font-size: 20px;
 			}
 		}
 
 		.project-cards-description-paragraph {
 			width: 85%;
 			text-align: justify;
-
-			
 		}
 	}
 
@@ -47,11 +61,11 @@
 		align-items: flex-end;
 		margin-top: 25px;
 		margin-bottom: 10px;
+		height: 10%;
 		width: 100%;
 
-
-		@include screens { 
-			height: 10%; 
+		@include screens {
+			height: 10%;
 		}
 
 		.project-card-single-tag {
@@ -74,9 +88,10 @@
 		display: flex;
 		justify-content: space-around;
 		align-items: center;
+		height: 10%;
 
-		@include screens { 
-			height: 15%; 
+		@include screens {
+			height: 15%;
 		}
 
 		.project-cards-single-button {
@@ -90,6 +105,7 @@
 			background: none;
 			border: 1px solid black;
 			transition: all 0.3s ease-in;
+			text-decoration: none;
 
 			&:hover {
 				background-color: black;

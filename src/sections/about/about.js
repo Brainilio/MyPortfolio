@@ -1,5 +1,6 @@
 import React from "react"
 import "./about.scss"
+import profile from "../../resources/profile.png"
 
 const about = () => {
 	return (
@@ -25,7 +26,11 @@ const about = () => {
 				</div>
 				<div className="about-image">
 					<div className="about-border-style-image"></div>
-					<div className="about-image-image"></div>
+					<img
+						className="about-image-image"
+						alt="an astronaut"
+						src={profile}
+					></img>
 				</div>
 			</div>
 		</section>

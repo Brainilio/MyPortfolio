@@ -4,25 +4,45 @@ import "./projectCard.scss"
 const ProjectCard = (props) => {
 	return (
 		<div className="project-cards-single-card">
-			<div className="project-cards-image"></div>
+			<img
+				className="project-cards-image"
+				src={props.information.previewImage}
+				alt="preview of project"
+			/>
 
 			<div className="project-cards-description">
-				<span className="project-cards-description-title">Salvame</span>
+				<span className="project-cards-description-title">
+					{props.information.name}
+				</span>
 				<p className="project-cards-description-paragraph">
-					In dapibus vehicula odio ut condimentum. Fusce vel libero quis nisl
-					malesuada sollicitudin. Fusce pharetra, neque id lacinia vehicula,
-					massa augue consectetur lorem,
+					{props.information.shortDescription}
 				</p>
 			</div>
 
 			<div className="project-cards-buttons">
-				<div className="project-cards-single-button">CODE</div>
-				<div className="project-cards-single-button">LIVE</div>
+				<a
+					rel="noopener noreferrer"
+					target="_blank"
+					href={props.information.gitHub}
+					className="project-cards-single-button"
+				>
+					CODE
+				</a>
+
+				<a
+					rel="noopener noreferrer"
+					target="_blank"
+					href={props.information.livePreview}
+					className="project-cards-single-button"
+				>
+					LIVE
+				</a>
 			</div>
+
 			<div className="project-cards-tags-row">
-				<div className="project-card-single-tag">REACT</div>
-				<div className="project-card-single-tag">FIREBASE</div>
-				<div className="project-card-single-tag">REDUX</div>
+				{props.information.tags.map((tag) => (
+					<div className="project-card-single-tag">{tag}</div>
+				))}
 			</div>
 		</div>
 	)
