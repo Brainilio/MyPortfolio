@@ -13,14 +13,17 @@
 		width: 100px;
 		top: 605%;
 		animation: none;
+		display: none;
 	}
 	@include screenm {
-		width: 150px;
-		top: 360%;
+		width: 20px;
+		display: none;
 	}
+
 	@include screenl {
 		width: 150px;
-		top: 435%;
+		right: 25%;
+		top: 380%;
 	}
 
 	@keyframes floating {
