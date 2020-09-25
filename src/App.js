@@ -7,10 +7,12 @@ import Landing from "./sections/landing/landing"
 import Projects from "./sections/projects/projects"
 import Publicmessage from "./sections/publicmessage/publicmessage"
 import Skill from "./sections/skill/skill"
+import Particles from "react-particles-js"
 
 function App() {
 	return (
 		<>
+			<Particles width="100%" />
 			<Publicmessage />
 			<Contact />
 			<DecorativeLine />
