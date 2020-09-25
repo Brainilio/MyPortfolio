@@ -9,6 +9,11 @@
 	top: 200%;
 	left: 30%;
 
+	@include screens {
+		top: 350%;
+		left: 5%;
+	}
+
 	.shooting-star {
 		position: absolute;
 		left: 50%;

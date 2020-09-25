@@ -5,9 +5,9 @@
 	position: absolute;
 	opacity: 0.5;
 	margin: auto;
-	margin-top: 10%;
+	margin-top: 5%;
 	right: 15%;
-	top: 95%;
+	top: 2%;
 	height: 20px;
 	width: 20px;
 	border-radius: 50%;
@@ -15,6 +15,18 @@
 	background: hsl(300, 44%, 79%);
 	box-shadow: 0 0 60px 20px rgb(207, 166, 232);
 	animation: moonshine 3s ease infinite;
+
+	@include screens {
+		top: 15%;
+	}
+
+	@include screenm {
+		top: 15%;
+	}
+
+	@include screenl {
+		top: 15%;
+	}
 
 	@keyframes moonshine {
 		0% {
