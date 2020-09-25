@@ -12,16 +12,16 @@
 
 	&:hover {
 		transform: rotateX(20deg) rotateZ(5deg) rotateY(-15deg);
-	}
 
-	@include screens {
-		transition: none;
-	}
-	@include screenm {
-		transiiton: none;
-	}
-	@include screenl {
-		transition: none;
+		@include screens {
+			transform: none;
+		}
+		@include screenm {
+			transform: none;
+		}
+		@include screenl {
+			transform: none;
+		}
 	}
 
 	.project-cards-image {
