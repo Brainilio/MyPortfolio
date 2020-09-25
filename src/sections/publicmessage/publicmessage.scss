@@ -13,4 +13,12 @@
 	@include screens {
 		display: none;
 	}
+
+	@include screenm {
+		display: none;
+	}
+
+	@include screenl {
+		display: none;
+	}
 }

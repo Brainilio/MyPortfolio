@@ -16,10 +16,22 @@
 			justify-content: center;
 		}
 
+		@include screenm {
+			margin: 5em 0 2em 0;
+			justify-content: center;
+		}
+
+		@include screenl {
+			margin: 5em 0 2em 0;
+			justify-content: center;
+		}
+
+
 		.skills-title-block {
 			width: 30px;
 			height: 30px;
 			background-color: rgb(224, 224, 224);
+		
 		}
 
 		.skills-title-title {
@@ -35,6 +47,20 @@
 		@include screens {
 			width: 100%;
 			margin: 0;
+			text-align: center;
+		}
+
+		@include screenm {
+		
+			width: 70%;
+			margin: 0 auto;
+			text-align: center;
+		}
+
+		@include screenl {
+		
+			width: 70%;
+			margin: 0 auto;
 			text-align: center;
 		}
 	}
@@ -58,6 +84,7 @@
 
 			span {
 				margin-top: 15px;
+				text-align: center; 
 			}
 		}
 	}

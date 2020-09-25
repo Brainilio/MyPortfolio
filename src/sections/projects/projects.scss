@@ -9,6 +9,14 @@
 		width: 100vw;
 	}
 
+	@include screenm {
+		width: 100vw;
+	}
+
+	@include screenl {
+		width: 100vw;
+	}
+
 	.projects-title {
 		display: flex;
 		align-items: center;
@@ -20,6 +28,17 @@
 			margin: 5em 0 2em 0;
 			justify-content: center;
 		}
+
+		@include screenm {
+			margin: 5em 0 2em 0;
+			justify-content: center;
+		}
+
+		@include screenl {
+			margin: 5em 0 2em 0;
+			justify-content: center;
+		}
+
 
 		.projects-title-block {
 			width: 30px;
@@ -42,6 +61,18 @@
 			width: 100%;
 			text-align: center;
 		}
+
+		@include screenm {
+			margin: 0 0 2em 0;
+			width: 100%;
+			text-align: center;
+		}
+
+		@include screenl {
+			margin: 0 0 2em 0;
+			width: 100%;
+			text-align: center;
+		}
 	}
 
 	.project-cards {
@@ -54,6 +85,24 @@
 			display: flex;
 			margin: 0 auto;
 			flex-direction: column;
+		}
+
+		@include screenm {
+			margin: 0 auto; 
+			grid-template-columns: 1fr 1fr;
+			grid-gap: 2em;
+		}
+
+		@include screenl {
+			margin: 0 auto; 
+			grid-template-columns: 1fr 1fr;
+			grid-gap: 2em;
+		}
+
+		@include screenxl {
+			margin: 0 auto; 
+			
+			grid-gap: 2em;
 		}
 	}
 }

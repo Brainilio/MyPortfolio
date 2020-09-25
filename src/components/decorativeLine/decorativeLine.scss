@@ -12,6 +12,18 @@
 	@include screens {
 		display: none;
 	}
+
+	@include screenm {
+		display: none;
+	}
+
+	@include screenl {
+		display: none;
+	}
+
+	@include screenxl {
+		display: none;
+	}
 }
 
 .deco-line-right {
@@ -23,6 +35,18 @@
 	right: 5%;
 	top: 150%;
 	@include screens {
+		display: none;
+	}
+
+	@include screenm {
+		display: none;
+	}
+
+	@include screenl {
+		display: none;
+	}
+
+	@include screenxl {
 		display: none;
 	}
 }

@@ -19,11 +19,41 @@
 		transform: translate(-50%);
 	}
 
+	@include screenm {
+		background-color: black;
+		width: 100%;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		left: 50%;
+		top: 0%;
+		transform: translate(-50%);
+	}
+
+	@include screenl {
+		background-color: black;
+		width: 100%;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		left: 50%;
+		top: 0%;
+		transform: translate(-50%);
+	}
+
 	.icons {
 		display: flex;
 		flex-direction: column;
 
 		@include screens {
+			flex-direction: row;
+		}
+
+		@include screenm {
+			flex-direction: row;
+		}
+
+		@include screenl {
 			flex-direction: row;
 		}
 
@@ -61,6 +91,14 @@
 		background-color: white;
 
 		@include screens {
+			display: none;
+		}
+
+		@include screenm {
+			display: none;
+		}
+		
+		@include screenl {
 			display: none;
 		}
 	}

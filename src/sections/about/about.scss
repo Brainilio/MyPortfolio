@@ -16,6 +16,16 @@
 			justify-content: center;
 		}
 
+		@include screenm {
+			margin: 5em 0 0 0;
+			justify-content: center;
+		}
+
+		@include screenl {
+			margin: 5em 0 0 0;
+			justify-content: center;
+		}
+
 		.about-title-title {
 			font-size: 20px;
 			margin-left: 10px;
@@ -44,6 +54,18 @@
 			justify-content: center;
 		}
 
+		@include screenm {
+			margin-top: 3em;
+			flex-direction: column;
+			justify-content: center;
+		}
+
+		@include screenl {
+			margin-top: 3em;
+			flex-direction: column;
+			justify-content: center;
+		}
+
 		.about-text {
 			text-align: justify;
 			width: 40%;
@@ -51,12 +73,31 @@
 			@include screens {
 				width: 90%;
 			}
+
+			@include screenm {
+				width: 70%;
+			}
+
+
+			@include screenl {
+				width: 70%;
+			}
 		}
 
 		.about-image {
 			margin-right: 8em;
 
 			@include screens {
+				margin-top: 5em;
+				margin-right: 0;
+			}
+
+			@include screenm {
+				margin-top: 5em;
+				margin-right: 0;
+			}
+
+			@include screenl {
 				margin-top: 5em;
 				margin-right: 0;
 			}
