@@ -1,0 +1,23 @@
+@import "../../styles/responsive/breakpoints.scss";
+
+.rocket-ship {
+	position: fixed;
+	width: 40px;
+	height: 40px;
+	opacity: 0.5;
+	top: 5%;
+	left: 5%;
+	transform: rotateZ(80deg);
+	animation: flying 15s ease-in-out infinite;
+
+	@keyframes flying {
+		0% {
+			left: -10%;
+			top: 0%;
+		}
+		100% {
+			left: 110%;
+			top: 90%;
+		}
+	}
+}

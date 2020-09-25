@@ -1,0 +1,33 @@
+@import "../../styles/responsive/breakpoints.scss";
+
+.moonshine {
+	z-index: -1;
+	position: absolute;
+	opacity: 0.5;
+	margin: auto;
+	margin-top: 10%;
+	right: 15%;
+	top: 95%;
+	height: 20px;
+	width: 20px;
+	border-radius: 50%;
+	border: none;
+	background: hsl(300, 44%, 79%);
+	box-shadow: 0 0 60px 20px rgb(207, 166, 232);
+	animation: moonshine 3s ease infinite;
+
+	@keyframes moonshine {
+		0% {
+			scale: 1;
+			box-shadow: 0 0 60px 20px rgb(207, 166, 232);
+		}
+		50% {
+			scale: 1.1;
+			box-shadow: 0 0 40px 20px rgb(194, 146, 224);
+		}
+		100% {
+			scale: 1;
+			box-shadow: 0 0 60px 20px rgb(207, 166, 232);
+		}
+	}
+}

@@ -6,8 +6,8 @@
 	width: 50%;
 	height: auto;
 	transform: rotateZ(50deg);
-	top: 180%;
-	left: 40%;
+	top: 200%;
+	left: 30%;
 
 	.shooting-star {
 		position: absolute;
@@ -46,6 +46,18 @@
 			::after,
 			::after {
 				animation-delay: 4244ms;
+			}
+		}
+
+		&:nth-child(2) {
+			top: calc(50% - -30px);
+			left: calc(50% - 140px);
+			animation-delay: 3233ms;
+
+			&::before,
+			::after,
+			::after {
+				animation-delay: 3233ms;
 			}
 		}
 

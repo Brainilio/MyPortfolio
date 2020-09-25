@@ -16,6 +16,7 @@
     "react-icons": "^3.11.0",
     "react-particles-js": "^3.3.0",
     "react-scripts": "3.4.1",
+    "react-svg": "^11.0.40",
     "react-transition-group": "^4.4.1"
   },
   "scripts": {
@@ -38,5 +39,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "devDependencies": {}
 }

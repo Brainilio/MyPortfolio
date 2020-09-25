@@ -9,10 +9,13 @@ import Publicmessage from "./sections/publicmessage/publicmessage"
 import Skill from "./sections/skill/skill"
 import Particles from "react-particles-js"
 import FallingStars from "./components/falling-stars/fallingStars"
+import CrescentMoon from "./components/crescentmoon/crescentMoon"
+import Rocketship from "./components/rocketship/rocketship"
 
 function App() {
 	return (
 		<>
+			<Rocketship />
 			<Particles
 				className="particles-background"
 				params={{
@@ -22,10 +25,9 @@ function App() {
 							resize: true,
 						},
 					},
-
 					particles: {
 						number: {
-							value: 100,
+							value: 150,
 							density: {
 								enable: true,
 								value_area: 2000,
@@ -40,8 +42,8 @@ function App() {
 			<Publicmessage />
 			<Contact />
 			<DecorativeLine />
+			<CrescentMoon />
 			<Landing />
-
 			<Projects />
 			<About />
 			<FallingStars />

@@ -7,7 +7,7 @@
 	height: 950px;
 	background-color: white;
 	left: 5%;
-	top: 100%;
+	top: 200%;
 
 	@include screens {
 		display: none;
@@ -33,7 +33,7 @@
 	height: 800px;
 	background-color: white;
 	right: 5%;
-	top: 150%;
+	top: 50%;
 	@include screens {
 		display: none;
 	}
