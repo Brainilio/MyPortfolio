@@ -6,6 +6,7 @@ import { gsap } from "gsap"
 const Landing = () => {
 	const titleRef = React.useRef(null)
 	const iconRef = React.useRef(null)
+	const readRef = React.useRef(null)
 
 	useEffect(() => {
 		gsap.from(titleRef.current.children, {
@@ -21,6 +22,12 @@ const Landing = () => {
 			ease: "power3",
 			stagger: 0.5,
 			duration: 2,
+		})
+		gsap.from(readRef.current, {
+			y: -500,
+			ease: "power",
+			opacity: 0,
+			duration: 5,
 		})
 	}, [titleRef, iconRef])
 
@@ -48,7 +55,7 @@ const Landing = () => {
 				<div className="landing-icon-second"></div>
 			</div>
 
-			<div className="read-more">
+			<div ref={readRef} className="read-more">
 				<span className="read-more-text">Read more</span>
 				<span className="read-more-line"></span>
 			</div>

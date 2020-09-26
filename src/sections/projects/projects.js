@@ -1,13 +1,29 @@
-import React, { useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import ProjectCard from "../../components/project-card/projectCard"
 import "./projects.scss"
 
-import BurgerBuilder from "../../resources/projects/burger-builder.png"
-import Salvame from "../../resources/projects/salvame.png"
-import Lolmfc from "../../resources/projects/lolmfc.png"
+import BurgerBuilder from "../../resources/projects/burger-builder.webp"
+import Salvame from "../../resources/projects/salvame.webp"
+import Lolmfc from "../../resources/projects/lolmfc.webp"
+import gsap from "gsap"
+import { ScrollTrigger } from "gsap/all"
 
 const Projects = () => {
 	//project modelling
+	const projectRef = useRef(null)
+	gsap.registerPlugin(ScrollTrigger)
+	useEffect(() => {
+		gsap.from(projectRef.current, {
+			scrollTrigger: {
+				trigger: projectRef.current,
+				toggleActions: "restart none none none",
+			},
+			x: -200,
+			opacity: 0,
+			ease: "power1",
+			duration: 1,
+		})
+	}, [])
 	const [projects] = useState([
 		{
 			name: "Burger Builder",
@@ -71,7 +87,7 @@ const Projects = () => {
 				</a>
 				.{" "}
 			</p>
-			<div className="project-cards">
+			<div ref={projectRef} className="project-cards">
 				{projects.map((project) => {
 					return <ProjectCard key={project.name} information={project} />
 				})}

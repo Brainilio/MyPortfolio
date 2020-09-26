@@ -4,10 +4,11 @@
 	z-index: -1;
 	position: absolute;
 	width: 1px;
-	height: 950px;
+	height: 0px;
 	background-color: white;
 	left: 5%;
 	top: 200%;
+	opacity: 0;
 
 	@include screens {
 		display: none;
@@ -30,7 +31,8 @@
 	z-index: -1;
 	position: absolute;
 	width: 1px;
-	height: 800px;
+	height: 0px;
+	opacity: 0;
 	background-color: white;
 	right: 5%;
 	top: 50%;

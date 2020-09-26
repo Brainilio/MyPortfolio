@@ -9,7 +9,8 @@
 	display: flex;
 
 	@include screens {
-		position: relative;
+		position: fixed;
+		margin-bottom: 30px;
 		background-color: black;
 		width: 100%;
 		flex-direction: column;
@@ -21,7 +22,8 @@
 	}
 
 	@include screenm {
-		position: relative;
+		position: fixed;
+		margin-bottom: 30px;
 		background-color: black;
 		width: 100%;
 		flex-direction: column;
@@ -33,7 +35,8 @@
 	}
 
 	@include screenl {
-		position: relative;
+		position: fixed;
+		margin-bottom: 30px;
 		background-color: black;
 		width: 100%;
 		flex-direction: column;

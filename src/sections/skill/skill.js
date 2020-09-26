@@ -1,8 +1,36 @@
-import React, { useState } from "react"
+import { ScrollTrigger } from "gsap/all"
+import gsap from "gsap/gsap-core"
+import React, { useEffect, useRef, useState } from "react"
 import SingleSkill from "../../components/singleSkill/singleSkill"
 import "./skill.scss"
 
 const Skill = () => {
+	const skillsRef = useRef(null)
+	const textRef = useRef(null)
+	gsap.registerPlugin(ScrollTrigger)
+	useEffect(() => {
+		gsap.from(skillsRef.current.children, {
+			scrollTrigger: {
+				trigger: skillsRef.current.children,
+				toggleActions: "play",
+				start: "top center",
+			},
+			duration: 0.8,
+			x: 300,
+			opacity: 0,
+			stagger: 0.5,
+		})
+		gsap.from(textRef.current, {
+			scrollTrigger: {
+				trigger: textRef.current,
+				toggleActions: "play",
+				start: "top center",
+			},
+			duration: 0.8,
+			x: -200,
+			opacity: 0,
+		})
+	}, [])
 	const [iconSkills] = useState([
 		{
 			name: "REACTJS",
@@ -94,7 +122,7 @@ const Skill = () => {
 					MY SKILLS 🛠
 				</span>
 			</div>
-			<p>
+			<p ref={textRef}>
 				Most of my skills would bring the assumption that I'm a Full-Stack or
 				UX/UI Developer.
 				<br />
@@ -102,7 +130,7 @@ const Skill = () => {
 				learning and adapting to whatever users need.{" "}
 			</p>
 
-			<div className="skills-column">
+			<div ref={skillsRef} className="skills-column">
 				{iconSkills.map((icon) => (
 					<SingleSkill
 						key={icon.name}
