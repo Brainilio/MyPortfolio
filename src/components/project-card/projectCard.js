@@ -1,6 +1,6 @@
 import React from "react"
 import "./projectCard.scss"
-import LazyLoad from "react-lazyload"
+// import LazyLoad from "react-lazyload"
 
 const ProjectCard = (props) => {
 	return (

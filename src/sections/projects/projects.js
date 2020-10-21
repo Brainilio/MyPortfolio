@@ -6,6 +6,9 @@ import BurgerBuilder from "../../resources/projects/burger-builder.webp"
 import Salvame from "../../resources/projects/salvame.webp"
 import Lolmfc from "../../resources/projects/lolmfc.webp"
 import gsap from "gsap"
+import Natours from "../../resources/projects/natours.webp"
+import Thanosrunner from "../../resources/projects/thanosrunner.webp"
+import Paperinvaders from "../../resources/projects/paperinvaders.webp"
 import { ScrollTrigger } from "gsap/all"
 
 const Projects = () => {
@@ -35,20 +38,20 @@ const Projects = () => {
 			tags: ["REACTJS", "FIREBASE", "REDUX"],
 			category: "Front-End",
 			longerDescription: "",
-			dateCreated: "AUGUST 5, 2020",
+			dateCreated: "AUGUST, 2020",
 			fullImages: ["", "", ""],
 		},
 		{
 			name: "Salvame",
 			shortDescription:
-				"Salvame is an art-initiative to engage the people of Boyle Heights with environmental racism. I developed a web-application using three-js to display local art, in a very abstract and symbolic way.",
+				"Salvame is an art-initiative to empower and inform the locals of Boyle Heights about environmental racism. I created a web-app using three-js to display local art in an abstract and symbolic way.",
 			previewImage: Salvame,
 			livePreview: "https://salvame-react.netlify.app/",
 			gitHub: "https://github.com/Brainilio/salvame-app",
-			tags: ["REACTJS", "THREEJS", "STARTUP"],
+			tags: ["REACTJS", "THREEJS", "GSAP"],
 			category: "Front-End",
 			longerDescription: "",
-			dateCreated: "JULY 30, 2020",
+			dateCreated: "JULY, 2020",
 			fullImages: ["", "", ""],
 		},
 		{
@@ -61,7 +64,46 @@ const Projects = () => {
 			tags: ["REACTJS", "NODEJS", "MONGODB"],
 			category: "Full-Stack",
 			longerDescription: "",
-			dateCreated: "AUGUST 30, 2020",
+			dateCreated: "AUGUST, 2020",
+			fullImages: ["", "", ""],
+		},
+		{
+			name: "Natours <Still in DEV>",
+			shortDescription:
+				"Natours is a full-stack web-application website for booking the most exciting tours ever! Features include CRUD operations for admins, payments using stripe, file upload handling, authentication etc!",
+			previewImage: Natours,
+			livePreview: "https://github.com/Brainilio/natours",
+			gitHub: "https://github.com/Brainilio/natours",
+			tags: ["MERN", "REDUX", "UX/UI"],
+			category: "Full-Stack",
+			longerDescription: "",
+			dateCreated: "OCTOBER, 2020",
+			fullImages: ["", "", ""],
+		},
+		{
+			name: "Thanos(?) Runner",
+			shortDescription:
+				"Thanos Runner is an endless runner game where you have to avoid getting hit by flying objects. In order to win the game you have to collect 6 infinity stones. The game gets harder the more stones you collect! Use AD to run and SPACE to jump.",
+			previewImage: Thanosrunner,
+			livePreview: "https://brainilio.github.io/ThanosRunner/",
+			gitHub: "https://github.com/Brainilio/ThanosRunner",
+			tags: ["TSCRIPT", "OOP", "GAME"],
+			category: "Games",
+			longerDescription: "",
+			dateCreated: "JULY, 2018",
+			fullImages: ["", "", ""],
+		},
+		{
+			name: "Paper Invaders",
+			shortDescription:
+				"Copy Invaders is a web-game that I developed in under 3 hours for my programming class. I’ve implemented the observer’s pattern, strategy pattern and the singleton pattern in this game.",
+			previewImage: Paperinvaders,
+			livePreview: "https://brainilio.github.io/Typescript_Design_Patterns/",
+			gitHub: "https://github.com/Brainilio/Typescript_Design_Patterns",
+			tags: ["TSCRIPT", "DPATTERNS", "OOP"],
+			category: "Games",
+			longerDescription: "",
+			dateCreated: "JULY, 2020",
 			fullImages: ["", "", ""],
 		},
 	])
@@ -75,7 +117,7 @@ const Projects = () => {
 				</span>
 			</div>
 			<p className="projects-paragraph">
-				Here are some of my projects.
+				Here are some of my best projects.
 				<br />
 				To see more, visit my{" "}
 				<a

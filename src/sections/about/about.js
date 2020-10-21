@@ -1,6 +1,6 @@
 import React, { useEffect } from "react"
 import "./about.scss"
-import profile from "../../resources/profile.webp"
+import profile from "../../resources/me.webp"
 import LazyLoad from "react-lazyload"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/all"
@@ -30,6 +30,7 @@ const About = () => {
 			opacity: 0,
 		})
 	}, [])
+
 	return (
 		<section className="about">
 			<div className="about-title">
@@ -41,20 +42,28 @@ const About = () => {
 			<div className="about-block">
 				<div ref={textRef} className="about-text">
 					<p aria-hidden>
-						Hi there 👋🏽, Lorem ipsum dolor sit amet, consectetur adipiscing
-						elit. In dapibus vehicula odio ut condimentum. Fusce vel libero quis
-						nisl malesuada sollicitudin. Fusce pharetra, neque id lacinia
-						vehicula, massa augue consectetur lorem, at venenatis eros libero ut
-						lectus. Curabitur commodo turpis id laoreet rhoncus. Nulla sed
-						dignissim neque. Suspendisse vel urna justo. Praesent sit amet risus
-						non velit commodo auctor eu ac ante. Sed sit amet est sed est
-						volutpat viverra nec nec felis.
+						Hi, I'm Brainilio and I'm known as a creative developer. I aim,
+						every single day, to combine both technology and creativity together
+						in order to create and develop excellent solutions to real life
+						problems. Applied creativity is reflected in my everyday life in
+						which I love to develop new recipes to cook, play around with
+						Arduino, draw my own comic book and be active when it comes to
+						playing instruments. My{" "}
+						<a href="https://drive.google.com/file/d/1-Tc6Kt-0-HnnJP0XjTz7SeSmw6u3IQ6E/view?usp=sharing">
+							strengths
+						</a>{" "}
+						reflect a desire in achieving, responsibility and developing with a
+						restorative and deliberative attitude. I am a strong believer in
+						values, ethics and empathy in the field of tech.{" "}
+						<a href="mailto: brainilioir@gmail.com">Let's connect!</a>
 					</p>
 				</div>
 				<div className="about-image">
 					<div ref={imgRef} className="about-border-style-image"></div>
 					<LazyLoad offset={100}>
 						<img
+							width="200"
+							height="200"
 							className="about-image-image"
 							alt="an astronaut"
 							src={profile}

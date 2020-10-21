@@ -123,11 +123,10 @@ const Skill = () => {
 				</span>
 			</div>
 			<p ref={textRef}>
-				Most of my skills would bring the assumption that I'm a Full-Stack or
-				UX/UI Developer.
-				<br />
-				However, I don't like limiting myself to a title. I am constantly
-				learning and adapting to whatever users need.{" "}
+				I am at my best when developing fullstack applications using Javascript
+				and UX/UI designing. However, I don't like limiting myself to a
+				particular stack. I am constantly learning and adapting to whatever
+				end-users need.{" "}
 			</p>
 
 			<div ref={skillsRef} className="skills-column">

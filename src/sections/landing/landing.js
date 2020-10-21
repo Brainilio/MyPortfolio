@@ -47,7 +47,10 @@ const Landing = () => {
 					</span>
 				</div>
 				<div className="landing-title-cta-buttons">
-					<div className="landing-title-cta-contact-me">MY WORK</div>
+					<div className="landing-title-cta-my-work">MY WORK</div>
+					<button className="landing-title-cta-contact-me">
+						<a href="mailto: brainilioir@gmail.com">CONTACT ME</a>
+					</button>
 				</div>
 			</div>
 			<div ref={iconRef} className="landing-icon">

@@ -4,8 +4,9 @@
 	display: flex;
 	flex-direction: column;
 	margin-top: 25px;
-	height: 535px;
-	width: 325px;
+	margin-bottom: 25px;
+	height: 550px;
+	width: 350px;
 	background-color: white;
 	box-shadow: 5px 5px 25px 3px black;
 	transition: all 0.8s ease;
@@ -59,7 +60,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: flex-end;
-		margin-top: 25px;
+		margin-top: 20px;
 		margin-bottom: 10px;
 		height: 10%;
 		width: 100%;
@@ -70,8 +71,8 @@
 
 		.project-card-single-tag {
 			cursor: default;
-			min-width: auto;
-			width: 85px;
+			min-width: 100px;
+			width: auto;
 			height: 30px;
 			background-color: rgba(162, 162, 162, 0.764);
 			color: black;
