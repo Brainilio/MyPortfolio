@@ -27,6 +27,7 @@ import {
 	faCube,
 	faShoePrints,
 	faPaperclip,
+	faEnvelope,
 } from "@fortawesome/free-solid-svg-icons"
 
 library.add(
@@ -50,7 +51,8 @@ library.add(
 	faLinkedin,
 	faTwitter,
 	faPaperclip,
-	faGithub
+	faGithub,
+	faEnvelope
 )
 
 ReactDOM.render(

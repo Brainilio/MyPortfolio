@@ -41,19 +41,19 @@ const Contact = () => {
 					/>
 				</a>
 				<a
-					href="https://twitter.com/brainilio"
+					href="mailto: brainilioir@gmail.com"
 					rel="noopener noreferrer"
 					target="_blank"
 					className="icon"
 				>
 					<FontAwesomeIcon
-						icon={["fab", "twitter"]}
+						icon={["fa", "envelope"]}
 						size="2x"
 						className="icon"
 					/>
 				</a>
 				<a
-					href="https://drive.google.com/file/d/1kToIu2ptUTsBf6aCcKfsWp22zjHYV_Gw/view?usp=sharing"
+					href="https://drive.google.com/file/d/1IyJzRLrdyABNqv6gAYI0zPRFz87TWgbi/view?usp=sharing"
 					rel="noopener noreferrer"
 					target="_blank"
 					className="icon"

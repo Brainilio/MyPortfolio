@@ -69,6 +69,7 @@
 		.about-text {
 			text-align: justify;
 			width: 40%;
+			margin-left: 2em;
 
 			@include screens {
 				width: 90%;
