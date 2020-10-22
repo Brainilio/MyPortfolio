@@ -29,6 +29,12 @@
 		height: 40%;
 		width: 100%;
 		object-fit: cover;
+		cursor: pointer;
+		transition: opacity 0.8s ease-in-out;
+
+		&:hover {
+			opacity: 50%;
+		}
 	}
 
 	.project-cards-description {

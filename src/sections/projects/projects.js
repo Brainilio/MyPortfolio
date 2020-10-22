@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 import ProjectCard from "../../components/project-card/projectCard"
 import "./projects.scss"
-
 import BurgerBuilder from "../../resources/projects/burger-builder.webp"
 import Salvame from "../../resources/projects/salvame.webp"
 import Lolmfc from "../../resources/projects/lolmfc.webp"
@@ -10,11 +9,50 @@ import Natours from "../../resources/projects/natours.webp"
 import Thanosrunner from "../../resources/projects/thanosrunner.webp"
 import Paperinvaders from "../../resources/projects/paperinvaders.webp"
 import { ScrollTrigger } from "gsap/all"
+import Modal from "../../components/Modal/Modal"
+import ProjectDetail from "./projectDetail"
+
+// pictures...
+import bb1 from "../../resources/projects/burger-builder/1.webp"
+import bb2 from "../../resources/projects/burger-builder/2.webp"
+import bb3 from "../../resources/projects/burger-builder/3.webp"
+
+import lol1 from "../../resources/projects/lolmyfav/1.webp"
+import lol2 from "../../resources/projects/lolmyfav/2.webp"
+import lol3 from "../../resources/projects/lolmyfav/3.webp"
+import lol4 from "../../resources/projects/lolmyfav/4.webp"
+import lol5 from "../../resources/projects/lolmyfav/5.webp"
+
+import n1 from "../../resources/projects/natours/1.webp"
+import n2 from "../../resources/projects/natours/2.webp"
+import n3 from "../../resources/projects/natours/3.webp"
+import n4 from "../../resources/projects/natours/4.webp"
+import n5 from "../../resources/projects/natours/5.webp"
+import n6 from "../../resources/projects/natours/6.webp"
+import n7 from "../../resources/projects/natours/7.webp"
+
+import p1 from "../../resources/projects/paperinvader/1.webp"
+import p2 from "../../resources/projects/paperinvader/2.webp"
+
+import s1 from "../../resources/projects/salvame/1.webp"
+import s2 from "../../resources/projects/salvame/2.webp"
+import s3 from "../../resources/projects/salvame/3.webp"
+import s4 from "../../resources/projects/salvame/4.webp"
+import s5 from "../../resources/projects/salvame/5.webp"
+import s6 from "../../resources/projects/salvame/6.webp"
+import s7 from "../../resources/projects/salvame/7.webp"
+import s8 from "../../resources/projects/salvame/8.webp"
+
+import t1 from "../../resources/projects/thanosrunner/1.webp"
+import t2 from "../../resources/projects/thanosrunner/2.webp"
+import t3 from "../../resources/projects/thanosrunner/3.webp"
+import t4 from "../../resources/projects/thanosrunner/4.webp"
 
 const Projects = () => {
 	//project modelling
 	const projectRef = useRef(null)
 	gsap.registerPlugin(ScrollTrigger)
+
 	useEffect(() => {
 		gsap.from(projectRef.current, {
 			scrollTrigger: {
@@ -29,19 +67,6 @@ const Projects = () => {
 	}, [])
 	const [projects] = useState([
 		{
-			name: "Burger Builder",
-			shortDescription:
-				"The burger builder is an app that I developed to train my React competencies. Build your burger, sign/log in and review your orders. React Hooks, Redux, Jest/Enzyme, JWT token based Auth.",
-			previewImage: BurgerBuilder,
-			livePreview: "https://react-my-burger-builder-d060b.web.app/",
-			gitHub: "https://github.com/Brainilio/burger-builder",
-			tags: ["REACTJS", "FIREBASE", "REDUX"],
-			category: "Front-End",
-			longerDescription: "",
-			dateCreated: "AUGUST, 2020",
-			fullImages: ["", "", ""],
-		},
-		{
 			name: "Salvame",
 			shortDescription:
 				"Salvame is an art-initiative to empower and inform the locals of Boyle Heights about environmental racism. I created a web-app using three-js to display local art in an abstract and symbolic way.",
@@ -52,8 +77,22 @@ const Projects = () => {
 			category: "Front-End",
 			longerDescription: "",
 			dateCreated: "JULY, 2020",
-			fullImages: ["", "", ""],
+			fullImages: [s1, s2, s3, s4, s5, s6, s7, s8],
 		},
+		{
+			name: "Burger Builder",
+			shortDescription:
+				"The burger builder is an app that I developed to train my React competencies. Build your burger, sign/log in and review your orders. React Hooks, Redux, Jest/Enzyme, JWT token based Auth.",
+			previewImage: BurgerBuilder,
+			livePreview: "https://react-my-burger-builder-d060b.web.app/",
+			gitHub: "https://github.com/Brainilio/burger-builder",
+			tags: ["REACTJS", "FIREBASE", "REDUX"],
+			category: "Front-End",
+			longerDescription: "",
+			dateCreated: "AUGUST, 2020",
+			fullImages: [bb1, bb2, bb3],
+		},
+
 		{
 			name: "LOL: My Favorite Champ",
 			shortDescription:
@@ -65,7 +104,7 @@ const Projects = () => {
 			category: "Full-Stack",
 			longerDescription: "",
 			dateCreated: "AUGUST, 2020",
-			fullImages: ["", "", ""],
+			fullImages: [lol1, lol2, lol3, lol4, lol5],
 		},
 		{
 			name: "Natours <Still in DEV>",
@@ -78,7 +117,7 @@ const Projects = () => {
 			category: "Full-Stack",
 			longerDescription: "",
 			dateCreated: "OCTOBER, 2020",
-			fullImages: ["", "", ""],
+			fullImages: [n1, n2, n3, n4, n5, n6, n7],
 		},
 		{
 			name: "Thanos(?) Runner",
@@ -91,7 +130,7 @@ const Projects = () => {
 			category: "Games",
 			longerDescription: "",
 			dateCreated: "JULY, 2018",
-			fullImages: ["", "", ""],
+			fullImages: [t1, t2, t3, t4],
 		},
 		{
 			name: "Paper Invaders",
@@ -104,9 +143,17 @@ const Projects = () => {
 			category: "Games",
 			longerDescription: "",
 			dateCreated: "JULY, 2020",
-			fullImages: ["", "", ""],
+			fullImages: [p1, p2],
 		},
 	])
+
+	const [modalOpen, setModalOpen] = useState(false)
+	const [project, setproject] = useState(null)
+
+	const modalHandler = (project = null) => {
+		setModalOpen((prevstate) => !prevstate)
+		setproject(project)
+	}
 
 	return (
 		<section className="projects">
@@ -129,9 +176,23 @@ const Projects = () => {
 				</a>
 				.{" "}
 			</p>
+
+			{modalOpen ? (
+				<Modal show={modalOpen} clicked={modalHandler}>
+					<ProjectDetail clicked={modalHandler} project={project} />
+				</Modal>
+			) : null}
+
 			<div ref={projectRef} className="project-cards">
 				{projects.map((project) => {
-					return <ProjectCard key={project.name} information={project} />
+					return (
+						<ProjectCard
+							clicked={modalHandler}
+							show={modalOpen}
+							key={project.name}
+							information={project}
+						/>
+					)
 				})}
 			</div>
 		</section>

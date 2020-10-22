@@ -1,0 +1,132 @@
+@import "../../styles/responsive/breakpoints.scss";
+
+.project-detail-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	color: rgb(255, 255, 255);
+	width: 80%;
+	height: 100%;
+
+	.project-detail-close-modal {
+		position: absolute;
+		top: 5%;
+		right: 5%;
+		cursor: pointer;
+		background: none;
+		border-radius: 50;
+		color: white;
+		height: 30px;
+		width: 30px;
+		border: 1px solid white;
+		transition: all 0.3s ease;
+		&:hover {
+			color: black;
+			background: white;
+		}
+	}
+	.project-detail-images {
+		width: 50%;
+		height: 50%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		margin: 1em auto;
+
+		img {
+			display: flex;
+			justify-content: center;
+			object-fit: contain;
+			background: no-repeat center;
+		}
+	}
+
+	.project-title-with-tags {
+		display: flex;
+		align-items: center;
+		flex-direction: column;
+		margin-bottom: 1em;
+
+		.project-detail-title {
+			font-size: 30px;
+			align-self: center;
+		}
+
+		.project-detail-tags-row {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			margin-top: 25px;
+			height: 10%;
+			width: 100%;
+
+			@include screens {
+				height: 10%;
+			}
+
+			.project-card-single-tag {
+				cursor: default;
+				min-width: 100px;
+				width: auto;
+				height: 30px;
+				background-color: rgba(162, 162, 162, 0.764);
+				color: black;
+				margin: 0 10px;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				border-radius: 500px;
+			}
+		}
+	}
+
+	.project-detail-description {
+		width: 75%;
+		height: 50%;
+		padding: 20px;
+		overflow: scroll;
+		margin: auto;
+	}
+
+	.project-detail-buttons {
+		margin: 1em 0;
+		display: flex;
+		justify-content: space-around;
+		align-items: center;
+		height: 10%;
+
+		@include screens {
+			height: 15%;
+		}
+
+		.project-detail-single-button {
+			cursor: pointer;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			color: white;
+			height: 35px;
+			width: 100px;
+			margin: 0 1em;
+			background: none;
+			border: 1px solid white;
+			transition: all 0.3s ease-in;
+			text-decoration: none;
+			font-size: 15px;
+
+			a {
+				&:hover {
+					text-decoration: none;
+					color: black;
+					background-color: white;
+				}
+			}
+
+			&:hover {
+				color: black;
+				background-color: white;
+			}
+		}
+	}
+}
