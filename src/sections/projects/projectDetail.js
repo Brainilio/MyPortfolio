@@ -16,10 +16,15 @@ const projectDetail = (props) => {
 
 	return (
 		<div className="project-detail-container">
-			<button onClick={props.clicked} className="project-detail-close-modal">
-				X
-			</button>
-			<Carousel autoPlay={6000} centered infinite offset={20}>
+			<Carousel
+				autoPlay={6000}
+				minDraggableOffset={5}
+				clickToChange
+				infinite
+				offset={20}
+				lazyLoad
+				stopAutoPlayOnHover
+			>
 				{props.project.fullImages.map((image) => (
 					<img key={image} className="image" src={image} alt="project" />
 				))}

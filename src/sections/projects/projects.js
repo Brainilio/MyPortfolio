@@ -281,9 +281,14 @@ const Projects = () => {
 			</p>
 
 			{modalOpen ? (
-				<Modal show={modalOpen} clicked={modalHandler}>
-					<ProjectDetail clicked={modalHandler} project={project} />
-				</Modal>
+				<>
+					<button onClick={modalHandler} className="project-detail-close-modal">
+						X
+					</button>
+					<Modal show={modalOpen} clicked={modalHandler}>
+						<ProjectDetail clicked={modalHandler} project={project} />
+					</Modal>
+				</>
 			) : null}
 
 			<div ref={projectRef} className="project-cards">

@@ -10,16 +10,16 @@ const About = () => {
 	const imgRef = React.useRef(null)
 	gsap.registerPlugin(ScrollTrigger)
 	useEffect(() => {
-		gsap.from(textRef.current, {
-			scrollTrigger: {
-				trigger: textRef.current,
+		// gsap.from(textRef.current, {
+		// 	scrollTrigger: {
+		// 		trigger: textRef.current,
 
-				toggleActions: "restart",
-			},
-			x: -200,
-			duration: 0.8,
-			opacity: 0,
-		})
+		// 		toggleActions: "restart",
+		// 	},
+		// 	x: -200,
+		// 	duration: 0.8,
+		// 	opacity: 0,
+		// })
 		gsap.from(imgRef.current, {
 			scrollTrigger: {
 				trigger: imgRef.current,
