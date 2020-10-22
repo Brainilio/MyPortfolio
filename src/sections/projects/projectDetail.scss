@@ -13,7 +13,9 @@
 	}
 
 	.project-detail-close-modal {
-		position: absolute;
+		position: fixed;
+		display: inline-block;
+		box-sizing: border-box;
 		z-index: 3000;
 		top: 5%;
 		right: 5%;
@@ -25,6 +27,7 @@
 		width: 30px;
 		border: 1px solid white;
 		transition: all 0.3s ease;
+
 		&:hover {
 			color: black;
 			background: white;

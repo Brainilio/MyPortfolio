@@ -19,7 +19,6 @@
     "react-lazyload": "^3.0.0",
     "react-particles-js": "^3.3.0",
     "react-scripts": "^3.4.4",
-    "react-slick": "^0.27.12",
     "react-svg": "^11.0.40",
     "react-use": "^15.3.4"
   },
