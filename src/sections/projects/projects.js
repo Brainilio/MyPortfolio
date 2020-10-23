@@ -273,8 +273,8 @@ const Projects = () => {
 				</span>
 			</div>
 			<p className="projects-paragraph">
-				Here are some of my best projects. Click on the images to read more
-				about it.
+				Here are some of my best projects. <br /> Click on the the project card
+				for more information!
 				<br />
 				To see more projects, visit my{" "}
 				<a
@@ -314,4 +314,4 @@ const Projects = () => {
 	)
 }
 
-export default Projects
+export default React.memo(Projects)

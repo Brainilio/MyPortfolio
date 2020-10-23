@@ -10,9 +10,11 @@
 	background-color: white;
 	box-shadow: 5px 5px 25px 3px black;
 	transition: all 0.8s ease;
+	position: relative;
 
 	&:hover {
-		transform: rotateX(20deg) rotateZ(5deg) rotateY(-15deg);
+		transform: rotateX(15deg) rotateZ(5deg) rotateY(-10deg);
+		box-shadow: 20px 15px 30px 5px rgba(78, 59, 77, 0.617);
 
 		@include screens {
 			transform: none;
@@ -26,7 +28,7 @@
 	}
 
 	.project-cards-image {
-		height: 40%;
+		height: 200px;
 		width: 100%;
 		object-fit: cover;
 		cursor: pointer;
@@ -42,16 +44,17 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
+
 		color: black;
-		height: 40%;
+		height: 30%;
 		width: 100%;
 
 		.project-cards-description-title {
 			font-size: 18px;
-			margin-top: 1rem;
+			margin-top: 5rem;
 
 			@include screens {
-				margin-top: 1rem;
+				margin-top: 0rem;
 				font-size: 20px;
 			}
 		}
@@ -65,14 +68,13 @@
 	.project-cards-tags-row {
 		display: flex;
 		justify-content: center;
-		align-items: flex-end;
-		margin-top: 20px;
-		margin-bottom: 10px;
-		height: 10%;
+		margin-top: 20em;
 		width: 100%;
+		position: absolute;
 
 		@include screens {
 			height: 10%;
+			margin-top: 16em;
 		}
 
 		.project-card-single-tag {
@@ -91,11 +93,15 @@
 	}
 
 	.project-cards-buttons {
+		position: absolute;
+		bottom: 0%;
 		margin-top: 15px;
 		display: flex;
+		width: 100%;
 		justify-content: space-around;
 		align-items: center;
-		height: 10%;
+		height: 15%;
+		background-color: black;
 
 		@include screens {
 			height: 15%;
@@ -106,17 +112,17 @@
 			display: flex;
 			justify-content: center;
 			align-items: center;
-			color: black;
+			color: white;
 			height: 35px;
 			width: 100px;
 			background: none;
-			border: 1px solid black;
+			border: 1px solid white;
 			transition: all 0.3s ease-in;
 			text-decoration: none;
 
 			&:hover {
-				background-color: black;
-				color: white;
+				background-color: white;
+				color: black;
 			}
 		}
 	}

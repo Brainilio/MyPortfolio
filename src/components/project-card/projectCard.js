@@ -16,6 +16,10 @@ const ProjectCard = (props) => {
 
 			<div className="project-cards-single-card">
 				<Link
+					style={{
+						position: "relative",
+						textDecoration: "none",
+					}}
 					to={{
 						pathname: `/project/${props.information.slug}`,
 						project: props.information,
@@ -27,15 +31,30 @@ const ProjectCard = (props) => {
 						alt="preview of project"
 						// onClick={() => props.clicked(props.information)}
 					/>
+
+					<div className="project-cards-description">
+						<span className="project-cards-description-title">
+							{props.information.name}
+						</span>
+						<p className="project-cards-description-paragraph">
+							{props.information.shortDescription}
+						</p>
+						<div className="project-cards-tags-row">
+							{props.information.tags.map((tag) => (
+								<div key={tag} className="project-card-single-tag">
+									{tag}
+								</div>
+							))}
+						</div>
+					</div>
 				</Link>
-				<div className="project-cards-description">
-					<span className="project-cards-description-title">
-						{props.information.name}
-					</span>
-					<p className="project-cards-description-paragraph">
-						{props.information.shortDescription}
-					</p>
-				</div>
+				{/* <div className="project-cards-tags-row">
+						{props.information.tags.map((tag) => (
+							<div key={tag} className="project-card-single-tag">
+								{tag}
+							</div>
+						))}
+					</div> */}
 
 				<div className="project-cards-buttons">
 					<a
@@ -55,14 +74,6 @@ const ProjectCard = (props) => {
 					>
 						LIVE
 					</a>
-				</div>
-
-				<div className="project-cards-tags-row">
-					{props.information.tags.map((tag) => (
-						<div key={tag} className="project-card-single-tag">
-							{tag}
-						</div>
-					))}
 				</div>
 			</div>
 		</>

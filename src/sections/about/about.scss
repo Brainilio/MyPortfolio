@@ -89,6 +89,7 @@
 
 		.about-image {
 			margin-right: 15em;
+
 			@include screens {
 				margin-top: 5em;
 				margin-right: 0;
@@ -124,6 +125,11 @@
 			.about-image-image {
 				width: 200px;
 				height: 200px;
+				transition: all 0.5s ease-in-out;
+
+				&:hover {
+					scale: 1.3;
+				}
 			}
 		}
 	}

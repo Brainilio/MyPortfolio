@@ -54,7 +54,7 @@ const ProjectDetail = (props) => {
 					</a>
 				</div>
 
-				<p className="project-detail-description">
+				<div className="project-detail-description">
 					<h3>Description</h3>
 					{props.location.project.description}
 					<h3>Process</h3>
@@ -84,7 +84,7 @@ const ProjectDetail = (props) => {
 							<h1>Additional links</h1>
 							<ul>
 								{props.location.project.additionalLinks.map((link) => (
-									<li key={link}>
+									<li key={link.name}>
 										<a
 											rel="noopener noreferrer"
 											target="_blank"
@@ -97,7 +97,7 @@ const ProjectDetail = (props) => {
 							</ul>
 						</>
 					) : null}
-				</p>
+				</div>
 			</section>
 		)
 	}
@@ -105,4 +105,4 @@ const ProjectDetail = (props) => {
 	return content
 }
 
-export default ProjectDetail
+export default React.memo(ProjectDetail)
