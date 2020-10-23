@@ -80,6 +80,13 @@
 
 			.landing-title-text-name {
 				font-size: 38px;
+				transition: all 0.5s ease-in-out;
+
+				&:hover {
+					transform: skewX(-5deg);
+
+					scale: 1.1;
+				}
 			}
 			.landing-title-text-title {
 				font-size: 20px;
@@ -126,6 +133,12 @@
 				background: none;
 				border: none;
 				transition: all 0.3s ease-in;
+
+				&:hover {
+					transform: skewX(-5deg);
+					scale: 1.1;
+				}
+
 				a {
 					text-decoration: none;
 				}
@@ -163,6 +176,7 @@
 		@include screenl {
 			margin-bottom: 2em;
 		}
+
 		.landing-icon-first {
 			transform: translate(-50px, -50px);
 			position: absolute;

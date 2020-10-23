@@ -2,6 +2,7 @@ import React from "react"
 // import ProjectDetail from "../../sections/projects/projectDetail"
 // import Modal from "../Modal/Modal"
 import "./projectCard.scss"
+import { Link } from "react-router-dom"
 // import LazyLoad from "react-lazyload"
 
 const ProjectCard = (props) => {
@@ -14,13 +15,19 @@ const ProjectCard = (props) => {
 			) : null} */}
 
 			<div className="project-cards-single-card">
-				<img
-					className="project-cards-image"
-					src={props.information.previewImage}
-					alt="preview of project"
-					onClick={() => props.clicked(props.information)}
-				/>
-
+				<Link
+					to={{
+						pathname: `/project/${props.information.slug}`,
+						project: props.information,
+					}}
+				>
+					<img
+						className="project-cards-image"
+						src={props.information.previewImage}
+						alt="preview of project"
+						// onClick={() => props.clicked(props.information)}
+					/>
+				</Link>
 				<div className="project-cards-description">
 					<span className="project-cards-description-title">
 						{props.information.name}

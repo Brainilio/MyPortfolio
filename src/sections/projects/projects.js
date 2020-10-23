@@ -9,8 +9,8 @@ import Natours from "../../resources/projects/natours.webp"
 import Thanosrunner from "../../resources/projects/thanosrunner.webp"
 import Paperinvaders from "../../resources/projects/paperinvaders.webp"
 import { ScrollTrigger } from "gsap/all"
-import Modal from "../../components/Modal/Modal"
-import ProjectDetail from "./projectDetail"
+// import Modal from "../../components/Modal/Modal"
+// import ProjectDetail from "./projectDetail"
 
 // pictures...
 import bb1 from "../../resources/projects/burger-builder/1.webp"
@@ -57,7 +57,6 @@ const Projects = () => {
 		gsap.from(projectRef.current, {
 			scrollTrigger: {
 				trigger: projectRef.current,
-				toggleActions: "restart none none none",
 			},
 			x: -200,
 			opacity: 0,
@@ -65,6 +64,7 @@ const Projects = () => {
 			duration: 1,
 		})
 	}, [])
+
 	const [projects] = useState([
 		{
 			name: "Salvame",
@@ -119,6 +119,7 @@ const Projects = () => {
 			],
 			dateCreated: "JULY, 2020",
 			fullImages: [s1, s2, s3, s4, s5, s6, s7, s8],
+			slug: "salvame",
 		},
 		{
 			name: "Burger Builder",
@@ -142,6 +143,7 @@ const Projects = () => {
 			additionalLinks: [],
 			dateCreated: "AUGUST, 2020",
 			fullImages: [bb1, bb2, bb3],
+			slug: "burger-builder",
 		},
 
 		{
@@ -171,6 +173,7 @@ const Projects = () => {
 			],
 			dateCreated: "AUGUST, 2020",
 			fullImages: [lol1, lol2, lol3, lol4, lol5],
+			slug: "lol-my-fav-champ",
 		},
 		{
 			name: "Natours <Still in DEV>",
@@ -194,6 +197,7 @@ const Projects = () => {
 			additionalLinks: [],
 			dateCreated: "OCTOBER, 2020",
 			fullImages: [n1, n2, n3, n4, n5, n6, n7],
+			slug: "natours",
 		},
 		{
 			name: "Thanos(?) Runner",
@@ -223,6 +227,7 @@ const Projects = () => {
 			],
 			dateCreated: "JULY, 2018",
 			fullImages: [t1, t2, t3, t4],
+			slug: "thanos-runner",
 		},
 		{
 			name: "Paper Invaders",
@@ -246,11 +251,13 @@ const Projects = () => {
 			additionalLinks: [],
 			dateCreated: "JULY, 2020",
 			fullImages: [p1, p2],
+			slug: "paper-invaders",
 		},
 	])
 
 	const [modalOpen, setModalOpen] = useState(false)
-	const [project, setproject] = useState(null)
+
+	const [setproject] = useState(null)
 
 	const modalHandler = (project = null) => {
 		setModalOpen((prevstate) => !prevstate)
@@ -280,7 +287,7 @@ const Projects = () => {
 				.{" "}
 			</p>
 
-			{modalOpen ? (
+			{/* {modalOpen ? (
 				<>
 					<button onClick={modalHandler} className="project-detail-close-modal">
 						X
@@ -289,7 +296,7 @@ const Projects = () => {
 						<ProjectDetail clicked={modalHandler} project={project} />
 					</Modal>
 				</>
-			) : null}
+			) : null} */}
 
 			<div ref={projectRef} className="project-cards">
 				{projects.map((project) => {

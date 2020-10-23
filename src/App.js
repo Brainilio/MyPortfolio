@@ -1,27 +1,20 @@
 import React, { useState } from "react"
-import DecorativeLine from "./components/decorativeLine/decorativeLine"
-import About from "./sections/about/about"
-import Contact from "./sections/contact/contact"
-import Landing from "./sections/landing/landing"
-import Projects from "./sections/projects/projects"
-import Publicmessage from "./sections/publicmessage/publicmessage"
-import Skill from "./sections/skill/skill"
 import Particles from "react-particles-js"
-import Footer from "./sections/footer/footer"
-import FallingStars from "./components/falling-stars/fallingStars"
-import CrescentMoon from "./components/crescentmoon/crescentMoon"
 import Rocketship from "./components/rocketship/rocketship"
+import { Switch, Route, useLocation } from "react-router-dom"
+import { TransitionGroup, CSSTransition } from "react-transition-group"
+import ProjectDetail from "./sections/projects/projectDetail"
+import Main from "./sections/main"
 
 function App() {
-	const [show, setShow] = useState(true)
-
-	const togglePublicMessage = () => setShow((prevState) => !prevState)
+	let location = useLocation()
 
 	return (
 		<>
 			<Rocketship />
 			<Particles
 				className="particles-background"
+				width="100vw"
 				params={{
 					interactivity: {
 						detectsOn: "canvas",
@@ -50,16 +43,10 @@ function App() {
 				}}
 			/>
 
-			<CrescentMoon />
-			<DecorativeLine />
-			<FallingStars />
-			{show ? <Publicmessage show={togglePublicMessage} /> : null}
-			<Contact />
-			<Landing />
-			<Projects />
-			<About />
-			<Skill />
-			<Footer />
+			<Switch location={location}>
+				<Route path="/" exact component={Main} />
+				<Route path="/project/:name" component={ProjectDetail} />
+			</Switch>
 		</>
 	)
 }

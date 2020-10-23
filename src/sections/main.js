@@ -1,0 +1,34 @@
+import React, { useState } from "react"
+import DecorativeLine from "../components/decorativeLine/decorativeLine"
+import About from "./about/about"
+import Contact from "./contact/contact"
+import Landing from "./landing/landing"
+import Projects from "./projects/projects"
+import Publicmessage from "./publicmessage/publicmessage"
+import Skill from "./skill/skill"
+import Footer from "./footer/footer"
+import FallingStars from "../components/falling-stars/fallingStars"
+import CrescentMoon from "../components/crescentmoon/crescentMoon"
+
+const Main = () => {
+	const [show, setShow] = useState(false)
+	const togglePublicMessage = () => setShow((prevState) => !prevState)
+
+	return (
+		<>
+			<Contact />
+			<CrescentMoon />
+			<DecorativeLine />
+			<FallingStars />
+			{show ? <Publicmessage show={togglePublicMessage} /> : null}
+
+			<Landing />
+			<Projects />
+			<About />
+			<Skill />
+			<Footer />
+		</>
+	)
+}
+
+export default Main
