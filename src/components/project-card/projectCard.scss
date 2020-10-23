@@ -30,6 +30,7 @@
 	.project-cards-image {
 		height: 200px;
 		width: 100%;
+		position: relative;
 		object-fit: cover;
 		cursor: pointer;
 		transition: opacity 0.8s ease-in-out;
@@ -44,9 +45,8 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-
+		position: relative;
 		color: black;
-		height: 30%;
 		width: 100%;
 
 		.project-cards-description-title {
@@ -68,13 +68,10 @@
 	.project-cards-tags-row {
 		display: flex;
 		justify-content: center;
-		margin-top: 20em;
 		width: 100%;
-		position: absolute;
 
 		@include screens {
 			height: 10%;
-			margin-top: 16em;
 		}
 
 		.project-card-single-tag {

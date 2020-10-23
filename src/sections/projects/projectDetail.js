@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import "./projectDetail.scss"
 import AliceCarousel from "react-alice-carousel"
 import "react-alice-carousel/lib/alice-carousel.css"
@@ -8,6 +8,10 @@ const ProjectDetail = (props) => {
 	//props.location.project == project you're working with.
 	let history = useHistory()
 	let content = <Redirect to="/" />
+
+	useEffect(() => {
+		window.scrollTo(0, 0)
+	}, [])
 
 	if (props.location.project) {
 		content = (
