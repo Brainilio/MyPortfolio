@@ -3,6 +3,19 @@ import gsap from "gsap/gsap-core"
 import React, { useEffect, useRef, useState } from "react"
 import SingleSkill from "../../components/singleSkill/singleSkill"
 import "./skill.scss"
+import { ReactComponent as Express } from "../../resources/icons/expressjs-icon.svg"
+import { ReactComponent as Html } from "../../resources/icons/w3_html5-icon.svg"
+import { ReactComponent as Css } from "../../resources/icons/css3.svg"
+import { ReactComponent as Cc } from "../../resources/icons/creative-cloud.svg"
+import { ReactComponent as Jest } from "../../resources/icons/jestjsio-icon.svg"
+import { ReactComponent as Laravel } from "../../resources/icons/laravel-ar21.svg"
+import { ReactComponent as Php } from "../../resources/icons/php-ar21.svg"
+import { ReactComponent as MongoDB } from "../../resources/icons/mongodb-icon.svg"
+import { ReactComponent as Typescript } from "../../resources/icons/typescriptlang-icon.svg"
+import { ReactComponent as Vue } from "../../resources/icons/vuejs-icon.svg"
+import { ReactComponent as Node } from "../../resources/icons/nodejs-icon.svg"
+import { ReactComponent as Re } from "../../resources/icons/reactjs-icon.svg"
+import { ReactComponent as Python } from "../../resources/icons/python-ar21.svg"
 
 const Skill = () => {
 	const skillsRef = useRef(null)
@@ -18,7 +31,6 @@ const Skill = () => {
 			duration: 0.8,
 			x: 300,
 			opacity: 0,
-			stagger: 0.5,
 		})
 		gsap.from(textRef.current, {
 			scrollTrigger: {
@@ -38,11 +50,6 @@ const Skill = () => {
 			type: "fab",
 		},
 		{
-			name: "TYPESCRIPT",
-			icon: "js",
-			type: "fab",
-		},
-		{
 			name: "JAVASCRIPT",
 			icon: "js",
 			type: "fab",
@@ -53,13 +60,8 @@ const Skill = () => {
 			type: "fa",
 		},
 		{
-			name: "NODEJS/EXPRESS",
-			icon: "node-js",
-			type: "fab",
-		},
-		{
-			name: "MONGODB/MONGOOSE",
-			icon: "database",
+			name: "THREEJS",
+			icon: "cube",
 			type: "fa",
 		},
 		{
@@ -77,19 +79,10 @@ const Skill = () => {
 			icon: "project-diagram",
 			type: "fa",
 		},
-		{
-			name: "PHP & LARAVEL",
-			icon: "php",
-			type: "fab",
-		},
+
 		{
 			name: "USABILITY TESTING AND UX RESEARCH",
 			icon: "vial",
-			type: "fa",
-		},
-		{
-			name: "HTML/CSS",
-			icon: "file-code",
 			type: "fa",
 		},
 		{
@@ -102,17 +95,25 @@ const Skill = () => {
 			icon: "suitcase",
 			type: "fa",
 		},
-		{
-			name: "THREEJS",
-			icon: "cube",
-			type: "fa",
-		},
+
 		{
 			name: "DESIGN PATTERNS",
 			icon: "shoe-prints",
 			type: "fa",
 		},
 	])
+
+	/*
+{iconSkills.map((icon) => (
+					<SingleSkill
+						key={icon.name}
+						type={icon.type}
+						iconName={icon.icon}
+						name={icon.name}
+					/>
+				))}
+
+	*/
 
 	return (
 		<section className="my-skills">
@@ -130,6 +131,34 @@ const Skill = () => {
 			</p>
 
 			<div ref={skillsRef} className="skills-column">
+				<div>
+					<Re />
+					<span>REACT</span>
+				</div>
+				<div>
+					<Node />
+					<span>NODE.JS</span>
+				</div>
+				<div>
+					<MongoDB />
+					<span>MONGODB/MONGOOSE</span>
+				</div>
+				<div>
+					<Express />
+					<span>EXPRESS.JS</span>
+				</div>
+				<div>
+					<Typescript />
+					<span>TYPESCRIPT</span>
+				</div>
+				<div>
+					<Html />
+					<span>HTML5</span>
+				</div>
+				<div>
+					<Css />
+					<span>CSS3</span>
+				</div>
 				{iconSkills.map((icon) => (
 					<SingleSkill
 						key={icon.name}
@@ -138,6 +167,32 @@ const Skill = () => {
 						name={icon.name}
 					/>
 				))}
+				<div>
+					<Laravel />
+					<span>LARAVEL</span>
+				</div>
+				<div>
+					<Php />
+					<span>PHP</span>
+				</div>
+
+				<div>
+					<Python />
+					<span>PYTHON</span>
+				</div>
+				<div>
+					<Vue />
+					<span>VUEJS</span>
+				</div>
+				<div>
+					<Cc />
+					<span>CREATIVE CLOUD</span>
+				</div>
+
+				<div>
+					<Jest />
+					<span>JEST/ENZYME</span>
+				</div>
 			</div>
 		</section>
 	)

@@ -18,7 +18,7 @@ const DecorativeLine = () => {
 			y: 150,
 			opacity: 1,
 			height: 950,
-			duration: 3,
+			duration: 1.8,
 		})
 		gsap.to(rightRef.current, {
 			scrollTrigger: {
@@ -29,7 +29,7 @@ const DecorativeLine = () => {
 			y: 150,
 			opacity: 1,
 			height: 950,
-			duration: 3,
+			duration: 1.8,
 		})
 	}, [])
 	return (
