@@ -151,7 +151,8 @@ const Projects = () => {
 			shortDescription:
 				"LOL: My Favorite Champ is a MERN-stack application in which you can preview your favorite League of Legends champions and see their in-game pros and cons. This is a project that I made in 2018 and decided to remake in React.",
 			previewImage: Lolmfc,
-			livePreview: "https://github.com/Brainilio/lol-my-fav-champ",
+			livePreview:
+				"http://ec2-18-192-56-124.eu-central-1.compute.amazonaws.com/",
 			gitHub: "https://github.com/Brainilio/lol-my-fav-champ",
 			tags: ["REACTJS", "NODEJS", "MONGODB"],
 			category: "Full-Stack",
