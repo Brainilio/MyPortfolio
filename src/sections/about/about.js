@@ -42,20 +42,33 @@ const About = () => {
 			<div className="about-block">
 				<div ref={textRef} className="about-text">
 					<p aria-hidden>
-						Hi, I'm Brainilio and I'm known as a creative developer. I aim,
-						every single day, to combine both technology and creativity together
-						in order to create and develop excellent solutions to real life
-						problems. Applied creativity is reflected in my everyday life in
-						which I love to develop new recipes to cook, play around with
-						Arduino, draw my own comic book and be active when it comes to
-						playing instruments. My{" "}
-						<a href="https://drive.google.com/file/d/1-Tc6Kt-0-HnnJP0XjTz7SeSmw6u3IQ6E/view?usp=sharing">
+						I am a creative developer driven by empathy, creativity, and
+						humility, specializing in Full-stack and UX/UI development. I aim to
+						combine these two special powers of my to create and develop
+						meaningful solutions for users. Applied creativity is reflected in
+						my everyday life in which I love to develop new recipes to cook,
+						play around with Arduino, draw my own comic book and be active when
+						it comes to playing instruments. My{" "}
+						<a
+							rel="noopener noreferrer"
+							target="_blank"
+							href="https://drive.google.com/file/d/1-Tc6Kt-0-HnnJP0XjTz7SeSmw6u3IQ6E/view?usp=sharing"
+						>
 							strengths
 						</a>{" "}
-						reflect a desire in achieving, responsibility and developing with a
-						restorative and deliberative attitude. I am a strong believer in
-						values, ethics and empathy in the field of tech.{" "}
-						<a href="mailto: brainilioir@gmail.com">Let's connect!</a>
+						reflect a desire for achievement, responsibility, and collaboration.
+						I stand firm in my values and work to bring ethics and empathy to
+						the tech field. Interested in talking?{" "}
+						<a href="mailto: brainilioir@gmail.com">Let's connect</a> or check
+						out my{" "}
+						<a
+							rel="noopener noreferrer"
+							target="_blank"
+							href="https://drive.google.com/file/d/1TKXgKWR2D66Lec7gOloXPdmQT4jZtgTK/view?usp=sharing"
+							alt="resume"
+						>
+							resume!
+						</a>
 					</p>
 				</div>
 				<div className="about-image">

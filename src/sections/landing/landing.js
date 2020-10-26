@@ -47,7 +47,15 @@ const Landing = () => {
 					</span>
 				</div>
 				<div className="landing-title-cta-buttons">
-					<div className="landing-title-cta-my-work">MY WORK</div>
+					<a
+						className="landing-title-cta-my-work"
+						rel="noopener noreferrer"
+						target="_blank"
+						href="https://drive.google.com/file/d/1TKXgKWR2D66Lec7gOloXPdmQT4jZtgTK/view?usp=sharing"
+					>
+						MY RESUME
+					</a>
+
 					<button className="landing-title-cta-contact-me">
 						<a href="mailto: brainilioir@gmail.com">CONTACT ME</a>
 					</button>

@@ -85,6 +85,26 @@
 				width: 70%;
 				margin: 0 auto;
 			}
+
+			.resume-button {
+				cursor: pointer;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				color: white;
+				margin-right: 20px;
+				height: 50px;
+				width: 120px;
+				background: none;
+				border: 1px solid white;
+				transition: all 0.3s ease-in;
+				text-decoration: none;
+
+				&:hover {
+					background-color: white;
+					color: black;
+				}
+			}
 		}
 
 		.about-image {
