@@ -16,6 +16,14 @@ import { ReactComponent as Vue } from "../../resources/icons/vuejs-icon.svg"
 import { ReactComponent as Node } from "../../resources/icons/nodejs-icon.svg"
 import { ReactComponent as Re } from "../../resources/icons/reactjs-icon.svg"
 import { ReactComponent as Python } from "../../resources/icons/python-ar21.svg"
+import { ReactComponent as GraphQL } from "../../resources/icons/graphql-icon.svg"
+import { ReactComponent as Material } from "../../resources/icons/material-ui.svg"
+import { ReactComponent as Bootstrap } from "../../resources/icons/bootstrap.svg"
+import { ReactComponent as Apollo } from "../../resources/icons/apollographql-icon.svg"
+import { ReactComponent as Ubuntu } from "../../resources/icons/ubuntu-icon.svg"
+import { ReactComponent as AWS } from "../../resources/icons/amazon_aws-icon.svg"
+import { ReactComponent as Digital } from "../../resources/icons/digitalocean-icon.svg"
+import { ReactComponent as Wordpress } from "../../resources/icons/wordpress-icon.svg"
 
 const Skill = () => {
 	const skillsRef = useRef(null)
@@ -188,10 +196,42 @@ const Skill = () => {
 					<Cc />
 					<span>CREATIVE CLOUD</span>
 				</div>
-
 				<div>
 					<Jest />
 					<span>JEST/ENZYME</span>
+				</div>
+				{/* TODO: ADD THESE LOGOS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */}
+				<div>
+					<Bootstrap />
+					<span>BOOTSTRAP</span>
+				</div>
+				<div>
+					<Material />
+					<span>MATERIAL UI</span>
+				</div>
+				<div>
+					<GraphQL />
+					<span>GRAPHQL</span>
+				</div>
+				<div>
+					<Apollo />
+					<span>APOLLO</span>
+				</div>
+				<div>
+					<Ubuntu />
+					<span>UBUNTU</span>
+				</div>
+				<div>
+					<AWS />
+					<span>AWS</span>
+				</div>
+				<div>
+					<Digital />
+					<span>DIGITAL OCEAN</span>
+				</div>
+				<div>
+					<Wordpress />
+					<span>WORDPRESS</span>
 				</div>
 			</div>
 		</section>

@@ -52,7 +52,7 @@ const About = () => {
 						<a
 							rel="noopener noreferrer"
 							target="_blank"
-							href="https://drive.google.com/file/d/1-Tc6Kt-0-HnnJP0XjTz7SeSmw6u3IQ6E/view?usp=sharing"
+							href="https://drive.google.com/file/d/153Y-GmPSOaq0zd6MRoqXq1BPZsdXWcUy/view?usp=sharing"
 						>
 							strengths
 						</a>{" "}

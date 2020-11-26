@@ -53,7 +53,7 @@ const Contact = () => {
 					/>
 				</a>
 				<a
-					href="https://drive.google.com/file/d/1IyJzRLrdyABNqv6gAYI0zPRFz87TWgbi/view?usp=sharing"
+					href="https://drive.google.com/file/d/153Y-GmPSOaq0zd6MRoqXq1BPZsdXWcUy/view?usp=sharing"
 					rel="noopener noreferrer"
 					target="_blank"
 					className="icon"
