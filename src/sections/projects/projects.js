@@ -67,6 +67,31 @@ const Projects = () => {
 
 	const [projects] = useState([
 		{
+			name: "Natours",
+			shortDescription:
+				"Natours is a full-stack web-application website that lets users check out and book the most exciting tours ever! Features include examples like CRUD operations for admins, payments using stripe, file upload handling and authorization",
+			previewImage: Natours,
+			livePreview:
+				"http://ec2-18-192-13-45.eu-central-1.compute.amazonaws.com/",
+			gitHub: "https://github.com/Brainilio/natours",
+			tags: ["MERN", "MVC", "UX/UI"],
+			category: "Full-Stack",
+			description:
+				"Natours is a MERN application that lets you check out the coolest tours around the globe, book them and review them after experiencing them! As a guide/administrator you have full CRUD functionalities over users, tours and reviews, along with your own statistic dashboard. This project was develop to really combine both front-end and back-end skills. As this project is still in progress, some features are still missing such as payments and extra security protocols.",
+			process:
+				"Before diving into this application, I went to refresh my knowledge on NodeJS by following a broad and deep fundamentals course. So again, I coded as I learned; which to me is one of the best methods to learn. I decided to really control the structure of my back-end by making use of the MVC pattern. This allows me to scale my project as much as I want. After deploying my back-end, I made visuals using AdobeXD before setting up my front-end using react, react-router and redux for global state management.",
+			challenges:
+				"Knowing how security practices work can be a pain and a challenge, but with a lot of practice, asking and dedication I believe one will get better at it.",
+			differently:
+				"As of now, I am satisfied with my results, but will comment later on this point, when this project is \n'finished'.",
+			takeaway:
+				"I love how I approached this project. I made sure to not fully develop all back-end and front-end features (just like how you avoid tightening the screws when assembling a desk from IKEA until everything is in place).  ",
+			additionalLinks: [],
+			dateCreated: "OCTOBER, 2020",
+			fullImages: [n1, n2, n3, n4, n5, n6, n7],
+			slug: "natours",
+		},
+		{
 			name: "Salvame",
 			shortDescription:
 				"Salvame is an art-initiative to empower and inform the locals of Boyle Heights about environmental racism. I created a web-app using three-js to display local art in an abstract and symbolic way.",
@@ -176,30 +201,7 @@ const Projects = () => {
 			fullImages: [lol1, lol2, lol3, lol4, lol5],
 			slug: "lol-my-fav-champ",
 		},
-		{
-			name: "Natours <Still in DEV>",
-			shortDescription:
-				"Natours is a full-stack web-application website that lets users check out and book the most exciting tours ever! Features include examples like CRUD operations for admins, payments using stripe, file upload handling and authorization",
-			previewImage: Natours,
-			livePreview: "https://github.com/Brainilio/natours",
-			gitHub: "https://github.com/Brainilio/natours",
-			tags: ["MERN", "MVC", "UX/UI"],
-			category: "Full-Stack",
-			description:
-				"Natours is a MERN application that lets you check out the coolest tours around the globe, book them and review them after experiencing them! As a guide/administrator you have full CRUD functionalities over users, tours and reviews, along with your own statistic dashboard. This project was develop to really combine both front-end and back-end skills. As this project is still in progress, some features are still missing such as payments and extra security protocols.",
-			process:
-				"Before diving into this application, I went to refresh my knowledge on NodeJS by following a broad and deep fundamentals course. So again, I coded as I learned; which to me is one of the best methods to learn. I decided to really control the structure of my back-end by making use of the MVC pattern. This allows me to scale my project as much as I want. After deploying my back-end, I made visuals using AdobeXD before setting up my front-end using react, react-router and redux for global state management.",
-			challenges:
-				"Knowing how security practices work can be a pain and a challenge, but with a lot of practice, asking and dedication I believe one will get better at it.",
-			differently:
-				"As of now, I am satisfied with my results, but will comment later on this point, when this project is \n'finished'.",
-			takeaway:
-				"I love how I approached this project. I made sure to not fully develop all back-end and front-end features (just like how you avoid tightening the screws when assembling a desk from IKEA until everything is in place).  ",
-			additionalLinks: [],
-			dateCreated: "OCTOBER, 2020",
-			fullImages: [n1, n2, n3, n4, n5, n6, n7],
-			slug: "natours",
-		},
+
 		{
 			name: "Thanos(?) Runner",
 			shortDescription:
