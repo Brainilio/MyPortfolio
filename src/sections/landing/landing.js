@@ -51,7 +51,7 @@ const Landing = () => {
 						className="landing-title-cta-my-work"
 						rel="noopener noreferrer"
 						target="_blank"
-						href="https://drive.google.com/file/d/153Y-GmPSOaq0zd6MRoqXq1BPZsdXWcUy/view?usp=sharing"
+						href="https://drive.google.com/file/d/1TgOjKdYPxZr7SmBChUm1osO84EPkXSA8/view?usp=sharing"
 					>
 						MY RESUME
 					</a>

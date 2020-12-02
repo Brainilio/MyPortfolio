@@ -64,7 +64,7 @@ const About = () => {
 						<a
 							rel="noopener noreferrer"
 							target="_blank"
-							href="https://drive.google.com/file/d/1TKXgKWR2D66Lec7gOloXPdmQT4jZtgTK/view?usp=sharing"
+							href="https://drive.google.com/file/d/1TgOjKdYPxZr7SmBChUm1osO84EPkXSA8/view?usp=sharing"
 							alt="resume"
 						>
 							resume!
