@@ -8,6 +8,7 @@ import gsap from "gsap"
 import Natours from "../../resources/projects/natours.webp"
 import Thanosrunner from "../../resources/projects/thanosrunner.webp"
 import Paperinvaders from "../../resources/projects/paperinvaders.webp"
+import { NavLink } from "react-router-dom"
 import { ScrollTrigger } from "gsap/all"
 // import Modal from "../../components/Modal/Modal"
 // import ProjectDetail from "./projectDetail"
@@ -290,6 +291,10 @@ const Projects = () => {
 				.{" "}
 			</p>
 
+			<NavLink style={{ textDecoration: "none" }} to="projects">
+				<button className="all-projects-button">All Projects</button>
+			</NavLink>
+
 			{/* {modalOpen ? (
 				<>
 					<button onClick={modalHandler} className="project-detail-close-modal">
@@ -302,7 +307,7 @@ const Projects = () => {
 			) : null} */}
 
 			<div ref={projectRef} className="project-cards">
-				{projects.map((project) => {
+				{projects.slice(0, 6).map((project) => {
 					return (
 						<ProjectCard
 							clicked={modalHandler}

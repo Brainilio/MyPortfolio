@@ -39,7 +39,6 @@
 			justify-content: center;
 		}
 
-
 		.projects-title-block {
 			width: 30px;
 			height: 30px;
@@ -75,6 +74,45 @@
 		}
 	}
 
+	.all-projects-button {
+		margin-left: 17em;
+		cursor: pointer;
+
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		color: white;
+		font-family: "Courier New", Courier, monospace;
+
+		height: 40px;
+
+		width: 120px;
+		background: none;
+		border: 1px solid white;
+		transition: all 0.3s ease-in;
+		text-decoration: none;
+
+		&:hover {
+			background-color: white;
+			color: black;
+		}
+
+		@include screens {
+			margin: 0 auto;
+			text-align: center;
+		}
+
+		@include screenm {
+			margin: 0 0 2em 0;
+			text-align: center;
+		}
+
+		@include screenl {
+			margin: 0 0 2em 0;
+			text-align: center;
+		}
+	}
+
 	.project-cards {
 		margin-top: 6em;
 		margin-left: 12em;
@@ -88,20 +126,20 @@
 		}
 
 		@include screenm {
-			margin: 0 auto; 
+			margin: 0 auto;
 			grid-template-columns: 1fr 1fr;
 			grid-gap: 2em;
 		}
 
 		@include screenl {
-			margin: 0 auto; 
+			margin: 0 auto;
 			grid-template-columns: 1fr 1fr;
 			grid-gap: 2em;
 		}
 
 		@include screenxl {
-			margin: 0 auto; 
-			
+			margin: 0 auto;
+
 			grid-gap: 2em;
 		}
 	}

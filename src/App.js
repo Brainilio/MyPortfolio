@@ -3,6 +3,7 @@ import Particles from "react-particles-js"
 import Rocketship from "./components/rocketship/rocketship"
 import { Switch, Route, useLocation } from "react-router-dom"
 // import { TransitionGroup, CSSTransition } from "react-transition-group"
+import ProjectPage from "./pages/projectpage/ProjectPage"
 import ProjectDetail from "./sections/projects/projectDetail"
 import Main from "./sections/main"
 
@@ -45,6 +46,7 @@ function App() {
 
 			<Switch location={location}>
 				<Route path="/" exact component={Main} />
+				<Route path="/projects" component={ProjectPage} />
 				<Route path="/project/:name" component={ProjectDetail}></Route>
 			</Switch>
 		</>
