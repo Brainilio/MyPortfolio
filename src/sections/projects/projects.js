@@ -277,10 +277,8 @@ const Projects = () => {
 				</span>
 			</div>
 			<p className="projects-paragraph">
-				Here are some of my best projects. <br /> Click on the the project card
-				for more information!
-				<br />
-				To see more projects, visit my{" "}
+				Here are my featured projects. Click on the the project card for more
+				information! To see more code, visit my{" "}
 				<a
 					href="https://github.com/brainilio"
 					rel="noopener noreferrer"
@@ -288,10 +286,14 @@ const Projects = () => {
 				>
 					Github
 				</a>
-				.{" "}
 			</p>
 
 			<NavLink style={{ textDecoration: "none" }} to="projects">
+				<p className="projects-paragraph">
+					Click down below to see all my projects. All of my work ranges from
+					development to UX/UI design and art!
+					<br />
+				</p>
 				<button className="all-projects-button">All Projects</button>
 			</NavLink>
 

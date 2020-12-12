@@ -77,15 +77,12 @@
 	.all-projects-button {
 		margin-left: 17em;
 		cursor: pointer;
-
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		color: white;
 		font-family: "Courier New", Courier, monospace;
-
 		height: 40px;
-
 		width: 120px;
 		background: none;
 		border: 1px solid white;
@@ -103,12 +100,12 @@
 		}
 
 		@include screenm {
-			margin: 0 0 2em 0;
+			margin: 0 auto;
 			text-align: center;
 		}
 
 		@include screenl {
-			margin: 0 0 2em 0;
+			margin: 0 auto;
 			text-align: center;
 		}
 	}

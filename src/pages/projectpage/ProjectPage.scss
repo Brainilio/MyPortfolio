@@ -1,23 +1,87 @@
-.all-projects-button {
-	margin-left: 17em;
-	cursor: pointer;
+@import "../../styles/responsive/breakpoints.scss";
 
+.all-projects {
+	min-width: 100vw;
 	display: flex;
-	justify-content: center;
-	align-items: center;
-	color: white;
-	font-family: "Courier New", Courier, monospace;
+	flex-direction: column;
 
-	height: 40px;
+	@include screens {
+		width: 100vw;
+	}
 
-	width: 120px;
-	background: none;
-	border: 1px solid white;
-	transition: all 0.3s ease-in;
-	text-decoration: none;
+	@include screenm {
+		width: 100vw;
+	}
 
-	&:hover {
-		background-color: white;
-		color: black;
+	@include screenl {
+		width: 100vw;
+	}
+
+	.project-page-title {
+		display: flex;
+		align-items: center;
+		margin-top: 5em;
+		margin-left: 12em;
+		justify-content: flex-start;
+
+		@include screens {
+			margin: 5em 0 2em 0;
+			justify-content: center;
+		}
+
+		@include screenm {
+			margin: 5em 0 2em 0;
+			justify-content: center;
+		}
+
+		@include screenl {
+			margin: 5em 0 2em 0;
+			justify-content: center;
+		}
+
+		.project-page-title-block {
+			width: 30px;
+			height: 30px;
+			background-color: rgb(224, 224, 224);
+		}
+
+		.project-page-title-title {
+			font-size: 20px;
+			margin-left: 10px;
+		}
+	}
+
+	.all-projects-paragraph {
+		margin-left: 12em;
+		width: 50%;
+
+		@include screens {
+			margin: 0 auto;
+			width: 100%;
+			text-align: center;
+		}
+
+		@include screenm {
+			margin: 0 0 2em 0;
+			width: 100%;
+			text-align: center;
+		}
+
+		@include screenl {
+			margin: 0 0 2em 0;
+			width: 100%;
+			text-align: center;
+		}
+	}
+
+	// TODO: fix these projects
+
+	.development-projects {
+	}
+
+	.design-projects {
+	}
+
+	.art-projects {
 	}
 }
