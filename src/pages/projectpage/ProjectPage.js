@@ -22,28 +22,30 @@ const ProjectPage = (props) => {
 					respective pill below.
 				</p>
 
-				<div className="development-projects">
-					<div className="project-page-title">
-						<div className="project-page-title-block"></div>
-						<span className="project-page-title-title" aria-hidden>
-							Development
-						</span>
+				<div className="projects">
+					<div className="development-projects">
+						<div className="project-page-title">
+							<div className="project-page-title-block"></div>
+							<span className="project-page-title-title" aria-hidden>
+								Development
+							</span>
+						</div>
 					</div>
-				</div>
-				<div className="design-projects">
-					<div className="project-page-title">
-						<div className="project-page-title-block"></div>
-						<span className="project-page-title-title" aria-hidden>
-							UX/UI Design
-						</span>
+					<div className="design-projects">
+						<div className="project-page-title">
+							<div className="project-page-title-block"></div>
+							<span className="project-page-title-title" aria-hidden>
+								UX/UI Design
+							</span>
+						</div>
 					</div>
-				</div>
-				<div className="art-projects">
-					<div className="project-page-title">
-						<div className="project-page-title-block"></div>
-						<span className="project-page-title-title" aria-hidden>
-							Art
-						</span>
+					<div className="art-projects">
+						<div className="project-page-title">
+							<div className="project-page-title-block"></div>
+							<span className="project-page-title-title" aria-hidden>
+								Art
+							</span>
+						</div>
 					</div>
 				</div>
 			</section>
