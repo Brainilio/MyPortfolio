@@ -49,14 +49,16 @@ const ProjectCard = (props) => {
 						CODE
 					</a>
 
-					<a
-						rel="noopener noreferrer"
-						target="_blank"
-						href={props.information.livePreview}
-						className="project-cards-single-button"
-					>
-						LIVE
-					</a>
+					{props.information.livePreview ? (
+						<a
+							rel="noopener noreferrer"
+							target="_blank"
+							href={props.information.livePreview}
+							className="project-cards-single-button"
+						>
+							LIVE
+						</a>
+					) : null}
 				</div>
 			</div>
 		</>

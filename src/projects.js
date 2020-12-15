@@ -4,6 +4,11 @@ import Lolmfc from "./resources/projects/lolmfc.webp"
 import Natours from "./resources/projects/natours.webp"
 import Thanosrunner from "./resources/projects/thanosrunner.webp"
 import Paperinvaders from "./resources/projects/paperinvaders.webp"
+import PokeDex from "./resources/projects/pokedex.png"
+import Leidsman from "./resources/projects/leidsman.png"
+import MariaBeautySalon from "./resources/projects/mariabeautysalon.png"
+import Classifier from "./resources/projects/classifier.png"
+
 // pictures...
 import bb1 from "./resources/projects/burger-builder/1.webp"
 import bb2 from "./resources/projects/burger-builder/2.webp"
@@ -229,6 +234,116 @@ const projects = [
 		fullImages: [p1, p2],
 		slug: "paper-invaders",
 	},
+	{
+		name: "My PokeDex",
+		shortDescription:
+			"My PokeDex is my first ever Android app that I developed using Java and Android Studio. This project was made to play around with Android development concepts and to familiarize myself with different technologies. ",
+		previewImage: PokeDex,
+		livePreview: "",
+		gitHub: "https://github.com/Brainilio/My_Pokedex",
+		tags: ["ANDROID", "JAVA", "MOBILE"],
+		category: "Development",
+		description:
+			"As a creative empathy driven developer I have to familiarize myself with different types of technologies. This is why for my programming class I decided to program a mobile application using Java/Android. Despite having no familiarity with this language, I still was able to come up with a nice looking android app, using my own Pokemon API and the google maps API to really personalize someone’s user’s dashboard. In this app you have the possibility to view your pokemons, view your current location and adjust the settings of the current application.",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
+		additionalLinks: [],
+		dateCreated: "MAY 2020",
+		fullImages: [],
+		slug: "my-pokedex",
+	},
+	{
+		name: "Leidsman Begeleiding",
+		shortDescription:
+			"Leidsman is a dutch math discussion platform that allows you to post your favorite math subjects, favorite them and comment on other posts in order to discuss various math subjects.",
+		previewImage: Leidsman,
+		livePreview: "",
+		gitHub: "https://github.com/Brainilio/LeidsmanBegeleiding",
+		tags: ["LARAVEL", "PHP", "MVC"],
+		category: "Development",
+		description:
+			"Leidsman is a dutch math discussion platform in which you can post your favorite math subjects, favorite them and comment on other posts to discuss the subject at hand. I used Laravel for this website and MySQL as a database, for the front-end I used Bootstrap to keep things simple. the MVC architecture and it kept things neat and organized. Features include:  - Can’t access post if you’re not authenticated, - Search, sort, filters on posts, - Favorite math subjects, - Comment on posts, - Edit your profile-name, - Logincounter to keep track of your activity in DB -> certain features are limited if you have a logincounter less than 7 , - Admin can see all users, delete posts, comments and add posts",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
+		additionalLinks: [],
+		dateCreated: "OCTOBER 2018",
+		fullImages: [],
+		slug: "leidsman-begeleiding",
+	},
+	{
+		name: "Maria Beauty Salon",
+		shortDescription:
+			"My first ever “web-application”! I made a reservation system for my mother’s salon in pure PHP. Functionalities include form validation, authentication, authorization and full CRUD operations over reservations",
+		previewImage: MariaBeautySalon,
+		livePreview: "https://stud.hosted.hr.nl/0924777/ProjectCLE2SPRINT1/",
+		gitHub: "https://github.com/Brainilio/MariaBeautySalon",
+		tags: ["PHP", "MATERIALIZE", "MYSQL"],
+		category: "Development",
+		description:
+			"My first ever “web-application”! I made a reservation system for my mother’s salon in pure PHP. This was the first time interacting with this language and I was able to develop a reservation system for all my mother’s employees at the time with a login-system and a dashboard with CRUD functionalities to view all of the reservations you have ahead of you. Only the admin (Maria) has access to all reservations and employee accounts. The front-end was developed in materialize/css and I used the weather API to display the weather in the local area. Note: the file structure is terrible, but this was my first web-app, so expect spaghetti code upon reviewing.",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway:
+			"I would definitely structure out the code next time in order to avoid such a terrible file structure.",
+		additionalLinks: [],
+		dateCreated: "DEC 2017",
+		fullImages: [],
+		slug: "maria-beauty-salon",
+	},
+	{
+		name: "Machine Learning Basics",
+		shortDescription:
+			"Machine Learning application that includes Kmeans clustering, logistic regression and decision trees using sklearn.",
+		previewImage: Classifier,
+		livePreview: "",
+		gitHub: "https://github.com/Brainilio/MachineLearningExample",
+		tags: ["ML", "PYTHON", "SCIKIT"],
+		category: "Development",
+		description: "",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
+		additionalLinks: [],
+		dateCreated: "MARCH 2017",
+		fullImages: [],
+		slug: "machine-learning-basics",
+	},
 ]
+
+/* Projects to add: Lucky Comics, Art exhibition, What's on the menu?, Fashionhub, PWA, Blockchain, machinelearning, safeways, fried chicken dingers, 
+comic goliath david, evolife, super bespaar app, killer robots, healthcare robots, abilene, chat-o-matic */
+
+//Blank project:
+
+/* 
+
+	{
+		name: "",
+		shortDescription:
+			"",
+		previewImage: null,
+		livePreview: "",
+		gitHub: "",
+		tags: [],
+		category: "",
+		description: "",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
+		additionalLinks: [],
+		dateCreated: "",
+		fullImages: [],
+		slug: "",
+     },
+     
+
+*/
 
 export default projects

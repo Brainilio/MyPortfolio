@@ -78,6 +78,23 @@ const ProjectPage = (props) => {
 								))}
 						</div>
 					</div>
+
+					<div className="essay-projects">
+						<div className="project-page-title">
+							<div className="project-page-title-block"></div>
+							<span className="project-page-title-title" aria-hidden>
+								Essays/Research
+							</span>
+						</div>
+
+						<div className="project-cards">
+							{projects
+								.filter((project) => project.category === "Essay")
+								.map((project) => (
+									<ProjectCard key={project.name} information={project} />
+								))}
+						</div>
+					</div>
 				</div>
 			</section>
 		</>
