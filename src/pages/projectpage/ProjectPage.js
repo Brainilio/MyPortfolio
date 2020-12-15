@@ -1,19 +1,21 @@
 import React from "react"
-import { NavLink } from "react-router-dom"
+import { useHistory } from "react-router-dom"
 import "./ProjectPage.scss"
 import ProjectCard from "../../components/project-card/projectCard"
+import projects from "../../projects"
 
 const ProjectPage = (props) => {
-	React.useEffect(() => {
-		console.log(props.location.projects)
-	}, [])
+	let history = useHistory()
+
+	// const [filter, setFilter] = React.useState("all")
 
 	return (
 		<>
 			<section className="all-projects">
-				<NavLink style={{ textDecoration: "none" }} to="/">
-					<button className="all-projects-button">Back</button>
-				</NavLink>
+				<button onClick={history.goBack} className="all-projects-button">
+					Back
+				</button>
+
 				<div className="project-page-title">
 					<div className="project-page-title-block"></div>
 					<span className="project-page-title-title" aria-hidden>
@@ -37,7 +39,7 @@ const ProjectPage = (props) => {
 						</div>
 
 						<div className="project-cards">
-							{props.location.projects
+							{projects
 								.filter((project) => project.category === "Development")
 								.map((project) => (
 									<ProjectCard key={project.name} information={project} />
@@ -53,7 +55,7 @@ const ProjectPage = (props) => {
 						</div>
 
 						<div className="project-cards">
-							{props.location.projects
+							{projects
 								.filter((project) => project.category === "Design")
 								.map((project) => (
 									<ProjectCard key={project.name} information={project} />
@@ -69,7 +71,7 @@ const ProjectPage = (props) => {
 						</div>
 
 						<div className="project-cards">
-							{props.location.projects
+							{projects
 								.filter((project) => project.category === "Art")
 								.map((project) => (
 									<ProjectCard key={project.name} information={project} />
@@ -82,4 +84,4 @@ const ProjectPage = (props) => {
 	)
 }
 
-export default ProjectPage
+export default React.memo(ProjectPage)

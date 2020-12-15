@@ -13,7 +13,10 @@ const ProjectDetail = (props) => {
 		window.scrollTo(0, 0)
 	}, [])
 
-	if (props.location.project) {
+	if (
+		props.location.project &&
+		props.location.project.category === "Development"
+	) {
 		content = (
 			<section className="project-detail-container">
 				{/* <Link to="/"> */}
