@@ -76,7 +76,7 @@ const Projects = () => {
 				"http://ec2-18-192-13-45.eu-central-1.compute.amazonaws.com/",
 			gitHub: "https://github.com/Brainilio/natours",
 			tags: ["MERN", "MVC", "UX/UI"],
-			category: "Full-Stack",
+			category: "Development",
 			description:
 				"Natours is a MERN application that lets you check out the coolest tours around the globe, book them and review them after experiencing them! As a guide/administrator you have full CRUD functionalities over users, tours and reviews, along with your own statistic dashboard. This project was develop to really combine both front-end and back-end skills. As this project is still in progress, some features are still missing such as payments and extra security protocols.",
 			process:
@@ -100,7 +100,7 @@ const Projects = () => {
 			livePreview: "https://salvame-react.netlify.app/",
 			gitHub: "https://github.com/Brainilio/salvame-app",
 			tags: ["REACTJS", "THREEJS", "GSAP"],
-			category: "Front-End",
+			category: "Development",
 			description:
 				"Salvame is an art initiative to encourage, empower and inform the locals of Boyle Heights to stand up against environmental racism through an online local art museum. This project implements real time AQI data which “clouds” the art as the poor air quality intensifies. Salvame informs users about environmental racism, working to provide a platform for locals and organizations advocating against this problem.",
 			process:
@@ -155,7 +155,7 @@ const Projects = () => {
 			livePreview: "https://react-my-burger-builder-d060b.web.app/",
 			gitHub: "https://github.com/Brainilio/burger-builder",
 			tags: ["REACTJS", "FIREBASE", "REDUX"],
-			category: "Front-End",
+			category: "Development",
 			description:
 				"Burger builder is my first actual reactjs application in which i implemented general common fundamentals and features. I built this application while learning all about ReactJS, and implemented most of my learning into this project. Burger Builder lets users build their burger, order and review it. I used Redux for global state management, Jest/Enzyme for testing, react-router for routing and css modules for styling.",
 			process:
@@ -181,7 +181,7 @@ const Projects = () => {
 				"http://ec2-18-192-56-124.eu-central-1.compute.amazonaws.com/",
 			gitHub: "https://github.com/Brainilio/lol-my-fav-champ",
 			tags: ["REACTJS", "NODEJS", "MONGODB"],
-			category: "Full-Stack",
+			category: "Development",
 			description:
 				"LOLMFC is a MERN-stack application which used to be a MEVN-stack application when I first developed it in 2018. I decided to revamp this project, because of the lack of features it had alogn with wanting to test out my skills in React. LOLMFC allows you to create an account and add your favorite League of Legends champions to your dashboard. By clicking on your champion card, you get to read more details about your favorite champion's backstory and they scale against other enemies. ",
 			process:
@@ -211,7 +211,7 @@ const Projects = () => {
 			livePreview: "https://brainilio.github.io/ThanosRunner/",
 			gitHub: "https://github.com/Brainilio/ThanosRunner",
 			tags: ["TSCRIPT", "OOP", "GAME"],
-			category: "Games",
+			category: "Development",
 			description:
 				"Thanos Runner is an endless runner game featuring... LINK! In order to win the game you have to collect 6 infinity stones while at the same time avoid obstacles such as mini hulks, stormbreakers and fireballs. The game gets harder the more stones you collect! This is the first time I’ve developed something in Typescript using OOP principles (Inheritance, UML diagramming, Encapsulation, Classes, Composition). Use AD to run and SPACE to jump.",
 			process:
@@ -241,7 +241,7 @@ const Projects = () => {
 			livePreview: "https://brainilio.github.io/Typescript_Design_Patterns/",
 			gitHub: "https://github.com/Brainilio/Typescript_Design_Patterns",
 			tags: ["TSCRIPT", "DPATTERNS", "OOP"],
-			category: "Games",
+			category: "Development",
 			description:
 				"Copy Invaders is a web-game that I developed in under 3 hours for my programming class. This game was developed in order to prove my competencies in using common design patterns in OOP. I implemented the observer’s pattern, strategy pattern and the singleton pattern in this game.",
 			process:
@@ -258,15 +258,6 @@ const Projects = () => {
 			slug: "paper-invaders",
 		},
 	])
-
-	const [modalOpen, setModalOpen] = useState(false)
-
-	const [setproject] = useState(null)
-
-	const modalHandler = (project = null) => {
-		setModalOpen((prevstate) => !prevstate)
-		setproject(project)
-	}
 
 	return (
 		<section className="projects">
@@ -288,7 +279,13 @@ const Projects = () => {
 				</a>
 			</p>
 
-			<NavLink style={{ textDecoration: "none" }} to="projects">
+			<NavLink
+				style={{ textDecoration: "none" }}
+				to={{
+					pathname: "projects",
+					projects: projects,
+				}}
+			>
 				<p className="projects-paragraph">
 					Click down below to see all my projects. All of my work ranges from
 					development to UX/UI design and art!
@@ -297,27 +294,9 @@ const Projects = () => {
 				<button className="all-projects-button">All Projects</button>
 			</NavLink>
 
-			{/* {modalOpen ? (
-				<>
-					<button onClick={modalHandler} className="project-detail-close-modal">
-						X
-					</button>
-					<Modal show={modalOpen} clicked={modalHandler}>
-						<ProjectDetail clicked={modalHandler} project={project} />
-					</Modal>
-				</>
-			) : null} */}
-
 			<div ref={projectRef} className="project-cards">
 				{projects.slice(0, 6).map((project) => {
-					return (
-						<ProjectCard
-							clicked={modalHandler}
-							show={modalOpen}
-							key={project.name}
-							information={project}
-						/>
-					)
+					return <ProjectCard key={project.name} information={project} />
 				})}
 			</div>
 		</section>

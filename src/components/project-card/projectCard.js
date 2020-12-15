@@ -1,19 +1,10 @@
 import React from "react"
-// import ProjectDetail from "../../sections/projects/projectDetail"
-// import Modal from "../Modal/Modal"
 import "./projectCard.scss"
 import { Link } from "react-router-dom"
-// import LazyLoad from "react-lazyload"
 
 const ProjectCard = (props) => {
 	return (
 		<>
-			{/* {props.show ? (
-				<Modal show={props.show} clicked={props.clicked}>
-					<ProjectDetail name={props.information.name} />
-				</Modal>
-			) : null} */}
-
 			<div className="project-cards-single-card">
 				<Link
 					style={{
@@ -29,7 +20,6 @@ const ProjectCard = (props) => {
 						className="project-cards-image"
 						src={props.information.previewImage}
 						alt="preview of project"
-						// onClick={() => props.clicked(props.information)}
 					/>
 
 					<div className="project-cards-description">
@@ -48,13 +38,6 @@ const ProjectCard = (props) => {
 						</div>
 					</div>
 				</Link>
-				{/* <div className="project-cards-tags-row">
-						{props.information.tags.map((tag) => (
-							<div key={tag} className="project-card-single-tag">
-								{tag}
-							</div>
-						))}
-					</div> */}
 
 				<div className="project-cards-buttons">
 					<a
