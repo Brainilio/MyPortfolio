@@ -1,0 +1,33 @@
+@import "../../styles/responsive/breakpoints.scss";
+
+.filter-all-projects {
+	margin-left: 12em;
+
+	.filter-button-row {
+		display: flex;
+		margin-top: 1em;
+
+		@include screens {
+			height: 10%;
+		}
+
+		.single-button-filter {
+			cursor: pointer;
+			min-width: 100px;
+			width: auto;
+			height: 30px;
+			background-color: rgba(162, 162, 162, 0.764);
+			color: black;
+			margin-right: 2em;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			border-radius: 500px;
+
+			&:disabled {
+				cursor: default;
+				opacity: 50%;
+			}
+		}
+	}
+}

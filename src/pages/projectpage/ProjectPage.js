@@ -3,11 +3,32 @@ import { useHistory } from "react-router-dom"
 import "./ProjectPage.scss"
 import ProjectCard from "../../components/project-card/projectCard"
 import projects from "../../projects"
+import Filter from "../../components/Filter/Filter"
 
 const ProjectPage = (props) => {
 	let history = useHistory()
 
-	// const [filter, setFilter] = React.useState("all")
+	const [filter, setFilter] = React.useState({
+		All: true,
+		Development: false,
+		Design: false,
+		Art: false,
+		Essays: false,
+	})
+
+	const buttonHandler = (value) => {
+		let newItems = {}
+
+		for (let item in filter) {
+			if (item === value) {
+				newItems[item] = true
+			} else {
+				newItems[item] = false
+			}
+		}
+
+		setFilter(newItems)
+	}
 
 	return (
 		<>
@@ -29,72 +50,84 @@ const ProjectPage = (props) => {
 					respective pill below.
 				</p>
 
+				<Filter clicked={buttonHandler} currentProject={filter} />
+
 				<div className="projects">
-					<div className="development-projects">
-						<div className="project-page-title">
-							<div className="project-page-title-block"></div>
-							<span className="project-page-title-title" aria-hidden>
-								Development
-							</span>
-						</div>
+					{filter.All || filter.Development ? (
+						<div className="development-projects">
+							<div className="project-page-title">
+								<div className="project-page-title-block"></div>
+								<span className="project-page-title-title" aria-hidden>
+									Development
+								</span>
+							</div>
 
-						<div className="project-cards">
-							{projects
-								.filter((project) => project.category === "Development")
-								.map((project) => (
-									<ProjectCard key={project.name} information={project} />
-								))}
+							<div className="project-cards">
+								{projects
+									.filter((project) => project.category === "Development")
+									.map((project) => (
+										<ProjectCard key={project.name} information={project} />
+									))}
+							</div>
 						</div>
-					</div>
-					<div className="design-projects">
-						<div className="project-page-title">
-							<div className="project-page-title-block"></div>
-							<span className="project-page-title-title" aria-hidden>
-								UX/UI Design
-							</span>
-						</div>
+					) : null}
 
-						<div className="project-cards">
-							{projects
-								.filter((project) => project.category === "Design")
-								.map((project) => (
-									<ProjectCard key={project.name} information={project} />
-								))}
-						</div>
-					</div>
-					<div className="art-projects">
-						<div className="project-page-title">
-							<div className="project-page-title-block"></div>
-							<span className="project-page-title-title" aria-hidden>
-								Art
-							</span>
-						</div>
+					{filter.All || filter.Design ? (
+						<div className="design-projects">
+							<div className="project-page-title">
+								<div className="project-page-title-block"></div>
+								<span className="project-page-title-title" aria-hidden>
+									UX/UI Design
+								</span>
+							</div>
 
-						<div className="project-cards">
-							{projects
-								.filter((project) => project.category === "Art")
-								.map((project) => (
-									<ProjectCard key={project.name} information={project} />
-								))}
+							<div className="project-cards">
+								{projects
+									.filter((project) => project.category === "Design")
+									.map((project) => (
+										<ProjectCard key={project.name} information={project} />
+									))}
+							</div>
 						</div>
-					</div>
+					) : null}
 
-					<div className="essay-projects">
-						<div className="project-page-title">
-							<div className="project-page-title-block"></div>
-							<span className="project-page-title-title" aria-hidden>
-								Essays/Research
-							</span>
-						</div>
+					{filter.All || filter.Art ? (
+						<div className="art-projects">
+							<div className="project-page-title">
+								<div className="project-page-title-block"></div>
+								<span className="project-page-title-title" aria-hidden>
+									Art
+								</span>
+							</div>
 
-						<div className="project-cards">
-							{projects
-								.filter((project) => project.category === "Essay")
-								.map((project) => (
-									<ProjectCard key={project.name} information={project} />
-								))}
+							<div className="project-cards">
+								{projects
+									.filter((project) => project.category === "Art")
+									.map((project) => (
+										<ProjectCard key={project.name} information={project} />
+									))}
+							</div>
 						</div>
-					</div>
+					) : null}
+
+					{filter.All || filter.Essays ? (
+						<div className="essay-projects">
+							<div className="project-page-title">
+								<div className="project-page-title-block"></div>
+								<span className="project-page-title-title" aria-hidden>
+									Essays/Research
+								</span>
+							</div>
+
+							<div className="project-cards">
+								{projects
+									.filter((project) => project.category === "Essay")
+									.map((project) => (
+										<ProjectCard key={project.name} information={project} />
+									))}
+							</div>
+						</div>
+					) : null}
 				</div>
 			</section>
 		</>
