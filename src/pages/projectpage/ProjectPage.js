@@ -77,7 +77,7 @@ const ProjectPage = (props) => {
 							<div className="project-page-title">
 								<div className="project-page-title-block"></div>
 								<span className="project-page-title-title" aria-hidden>
-									UX/UI Design
+									UX/UI Design (N/A)
 								</span>
 							</div>
 
@@ -96,7 +96,7 @@ const ProjectPage = (props) => {
 							<div className="project-page-title">
 								<div className="project-page-title-block"></div>
 								<span className="project-page-title-title" aria-hidden>
-									Art
+									Art (N/A)
 								</span>
 							</div>
 
@@ -115,8 +115,9 @@ const ProjectPage = (props) => {
 							<div className="project-page-title">
 								<div className="project-page-title-block"></div>
 								<span className="project-page-title-title" aria-hidden>
-									Essays/Research
+									Essays/Research (N/A)
 								</span>
+								<br />
 							</div>
 
 							<div className="project-cards">

@@ -245,9 +245,12 @@ const projects = [
 		category: "Development",
 		description:
 			"As a creative empathy driven developer I have to familiarize myself with different types of technologies. This is why for my programming class I decided to program a mobile application using Java/Android. Despite having no familiarity with this language, I still was able to come up with a nice looking android app, using my own Pokemon API and the google maps API to really personalize someone’s user’s dashboard. In this app you have the possibility to view your pokemons, view your current location and adjust the settings of the current application.",
-		process: "",
-		challenges: "",
-		differently: "",
+		process:
+			"As I started out thinking about an idea for an android app that I could finish up fairly quick, I browsed the internet for ideas. I stumbled upon weather apps, but found this to be a little too overused as a theme, so I went ahead and created my own Pokemon API using a free API service. After having my API set up, I mostly used the official Android docs to figure out most of the things things in Android Development (User settings, API calls, UI layouts).",
+		challenges:
+			"Some of the challenges were folder and file structuring. I didn't know in which file I had to write my code and which files were not supposed to be touched. However, with a quick tutorial I managed to get through this obstacle.",
+		differently:
+			"Next time, I would try and lay every 'feature' out and do proper research on each one before getting tangled up into a mess.",
 		takeaway: "",
 		additionalLinks: [],
 		dateCreated: "MAY 2020",
