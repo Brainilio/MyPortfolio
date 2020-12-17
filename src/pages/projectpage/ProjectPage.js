@@ -8,6 +8,10 @@ import Filter from "../../components/Filter/Filter"
 const ProjectPage = (props) => {
 	let history = useHistory()
 
+	React.useEffect(() => {
+		window.scrollTo(0, 0)
+	}, [])
+
 	const [filter, setFilter] = React.useState({
 		All: true,
 		Development: false,

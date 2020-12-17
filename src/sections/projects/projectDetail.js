@@ -51,14 +51,16 @@ const ProjectDetail = (props) => {
 						<button className="project-detail-single-button">CODE </button>
 					</a>
 
-					<a
-						rel="noopener noreferrer"
-						target="_blank"
-						href={props.location.project.livePreview}
-						className="project-cards-single-button"
-					>
-						<button className="project-detail-single-button">LIVE</button>
-					</a>
+					{props.location.project.livePreview ? (
+						<a
+							rel="noopener noreferrer"
+							target="_blank"
+							href={props.location.project.livePreview}
+							className="project-cards-single-button"
+						>
+							<button className="project-detail-single-button">LIVE</button>
+						</a>
+					) : null}
 				</div>
 
 				<div className="project-detail-description">

@@ -75,7 +75,8 @@
 	}
 
 	.all-projects-button {
-		margin-left: 17em;
+		margin-left: 13em;
+		font-size: 15px;
 		cursor: pointer;
 		display: flex;
 		justify-content: center;
@@ -83,7 +84,7 @@
 		color: white;
 		font-family: "Courier New", Courier, monospace;
 		height: 40px;
-		width: 120px;
+		width: 130px;
 		background: none;
 		border: 1px solid white;
 		transition: all 0.3s ease-in;
