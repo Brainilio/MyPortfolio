@@ -37,7 +37,10 @@ const ProjectPage = (props) => {
 	return (
 		<>
 			<section className="all-projects">
-				<button onClick={history.goBack} className="all-projects-button">
+				<button
+					onClick={() => history.push("/")}
+					className="all-projects-button"
+				>
 					&lt; Back
 				</button>
 
