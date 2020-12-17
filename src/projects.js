@@ -74,7 +74,8 @@ const projects = [
 		shortDescription:
 			"Natours is a full-stack web-application website that lets users check out and book the most exciting tours ever! Features include examples like CRUD operations for admins, payments using stripe, file upload handling and authorization",
 		previewImage: Natours,
-		livePreview: "http://ec2-18-192-13-45.eu-central-1.compute.amazonaws.com/",
+		livePreview:
+			"http://ec2-18-156-171-101.eu-central-1.compute.amazonaws.com/",
 		gitHub: "https://github.com/Brainilio/natours",
 		tags: ["MERN", "MVC", "UX/UI"],
 		category: "Development",
@@ -178,7 +179,7 @@ const projects = [
 		shortDescription:
 			"LOL: My Favorite Champ is a MERN-stack application in which users can preview their favorite League of Legends champions and see their in-game pros and cons. This is a project that I made in 2018 and decided to remake in React.",
 		previewImage: Lolmfc,
-		livePreview: "http://ec2-18-192-56-124.eu-central-1.compute.amazonaws.com/",
+		livePreview: "http://ec2-18-157-186-6.eu-central-1.compute.amazonaws.com/",
 		gitHub: "https://github.com/Brainilio/lol-my-fav-champ",
 		tags: ["REACTJS", "NODEJS", "MONGODB"],
 		category: "Development",
