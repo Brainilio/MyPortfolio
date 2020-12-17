@@ -34,7 +34,7 @@ const ProjectPage = (props) => {
 		<>
 			<section className="all-projects">
 				<button onClick={history.goBack} className="all-projects-button">
-					Back
+					&lt; Back
 				</button>
 
 				<div className="project-page-title">

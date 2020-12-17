@@ -17,6 +17,43 @@
 		width: 100vw;
 	}
 
+	.all-projects-button {
+		margin-top: 5em;
+		margin-left: 17em;
+		cursor: pointer;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		color: white;
+		font-family: "Courier New", Courier, monospace;
+		height: 40px;
+		width: 120px;
+		background: none;
+		border: 1px solid white;
+		transition: all 0.3s ease-in;
+		text-decoration: none;
+
+		&:hover {
+			background-color: white;
+			color: black;
+		}
+
+		@include screens {
+			margin: 0 auto;
+			text-align: center;
+		}
+
+		@include screenm {
+			margin: 0 auto;
+			text-align: center;
+		}
+
+		@include screenl {
+			margin: 0 auto;
+			text-align: center;
+		}
+	}
+
 	.project-page-title {
 		display: flex;
 		align-items: center;
@@ -99,12 +136,12 @@
 
 	// TODO: fix these projects
 
-	.development-projects {
-	}
+	// .development-projects {
+	// }
 
-	.design-projects {
-	}
+	// .design-projects {
+	// }
 
-	.art-projects {
-	}
+	// .art-projects {
+	// }
 }

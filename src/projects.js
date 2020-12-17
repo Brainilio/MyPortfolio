@@ -45,6 +45,29 @@ import t2 from "./resources/projects/thanosrunner/2.webp"
 import t3 from "./resources/projects/thanosrunner/3.webp"
 import t4 from "./resources/projects/thanosrunner/4.webp"
 
+import pd1 from "./resources/projects/pokedex/1.png"
+import pd2 from "./resources/projects/pokedex/2.png"
+import pd3 from "./resources/projects/pokedex/3.png"
+
+import mb1 from "./resources/projects/maria/1.png"
+import mb2 from "./resources/projects/maria/2.png"
+import mb3 from "./resources/projects/maria/3.png"
+import mb4 from "./resources/projects/maria/4.png"
+import mb5 from "./resources/projects/maria/5.png"
+import mb6 from "./resources/projects/maria/6.png"
+
+import lm1 from "./resources/projects/leidsman/1.png"
+import lm2 from "./resources/projects/leidsman/2.png"
+import lm3 from "./resources/projects/leidsman/3.png"
+import lm4 from "./resources/projects/leidsman/4.png"
+import lm5 from "./resources/projects/leidsman/5.png"
+import lm6 from "./resources/projects/leidsman/6.png"
+
+import ml1 from "./resources/projects/machine/1.png"
+import ml2 from "./resources/projects/machine/2.png"
+import ml3 from "./resources/projects/machine/3.png"
+import ml4 from "./resources/projects/machine/4.png"
+
 const projects = [
 	{
 		name: "Natours",
@@ -139,7 +162,7 @@ const projects = [
 		process:
 			"When starting off this project, I made a quick sketch of all the components. By doing this, you really get a feel of how React is supposed to be leveraged. This makes your journey as a developer easy as well. As I was nearing the end of this project, I decided to turn my react class based components into react functional components.",
 		challenges:
-			"Some challenges I faced while making this project was definitely understanding how Redux works. Redux is a tool that often requires a lot of set-up (until I found out about redux toolkit that is). Another challenge I faced before even using react hooks, was prop-drilling. I quickly lost vision of where my props were, so switching over to a global state was definitely something that relieved that pain. At last, features like React.memo and React.callback are still some things I need to get more familiar with.",
+			"Some challenges I faced while making this project was definitely understanding how Redux works. Redux is a tool that often requires a lot of set-up (until I found out about redux toolkit that is). Another challenge I faced before even using react hooks, was prop-drilling. I quickly lost vision of where my props were, so switching over to a global state was definitely something that relieved that pain. At last, features like React.memo and React.callback are still some things I need to get more familiar with. ",
 		differently:
 			"Next time I would use react-functional components right away, really track when my components render and use memoization to my advantage.",
 		takeaway:
@@ -251,10 +274,11 @@ const projects = [
 			"Some of the challenges were folder and file structuring. I didn't know in which file I had to write my code and which files were not supposed to be touched. However, with a quick tutorial I managed to get through this obstacle.",
 		differently:
 			"Next time, I would try and lay every 'feature' out and do proper research on each one before getting tangled up into a mess.",
-		takeaway: "",
+		takeaway:
+			"Android development is certainly interesting and I can definitely see the future of mobile applications being inevitable. Though, I do have a preference for technologies like React Native for cross-platform development.",
 		additionalLinks: [],
 		dateCreated: "MAY 2020",
-		fullImages: [],
+		fullImages: [pd1, pd2, pd3],
 		slug: "my-pokedex",
 	},
 	{
@@ -268,34 +292,40 @@ const projects = [
 		category: "Development",
 		description:
 			"Leidsman is a dutch math discussion platform in which you can post your favorite math subjects, favorite them and comment on other posts to discuss the subject at hand. I used Laravel for this website and MySQL as a database, for the front-end I used Bootstrap to keep things simple. the MVC architecture and it kept things neat and organized. Features include:  - Can’t access post if you’re not authenticated, - Search, sort, filters on posts, - Favorite math subjects, - Comment on posts, - Edit your profile-name, - Logincounter to keep track of your activity in DB -> certain features are limited if you have a logincounter less than 7 , - Admin can see all users, delete posts, comments and add posts",
-		process: "",
-		challenges: "",
-		differently: "",
-		takeaway: "",
+		process:
+			"This project was my first project using a MVC framework. When researching frameworks, I found Laravel being one of the easy-going and beginner friendly ones. Before even choosing laravel, I made sure to play around with other MVC frameworks and compare them to each other. In the end, Laravel got my vote and I decided to use this for my website. My application required a couple of features such as: Authentication, Authorization, Search/Filters, Keeping track of an user state (e.g. amount of times they logged in, amount of clicks, average time they're logged in for etc). I ended up finishing this project in a month.",
+		challenges:
+			"The hardest challenge was deciding where I should be writing my business logic.",
+		differently:
+			"I would change the front-end, since the design and the front-end looks kind of scrappy.",
+		takeaway:
+			"I love Laravel! It's syntactically so chill to work in and it truly made me understand the MVC pattern.",
 		additionalLinks: [],
 		dateCreated: "OCTOBER 2018",
-		fullImages: [],
+		fullImages: [lm1, lm2, lm3, lm4, lm5, lm6],
 		slug: "leidsman-begeleiding",
 	},
 	{
 		name: "Maria Beauty Salon",
 		shortDescription:
-			"My first ever “web-application”! I made a reservation system for my mother’s salon in pure PHP. Functionalities include form validation, authentication, authorization and full CRUD operations over reservations",
+			"My first ever “web-application”! I made a reservation system for my mother’s salon in pure PHP, HTML/Materialize & MySQL. Functionalities include form validation, authentication, authorization and full CRUD operations over reservations",
 		previewImage: MariaBeautySalon,
 		livePreview: "https://stud.hosted.hr.nl/0924777/ProjectCLE2SPRINT1/",
 		gitHub: "https://github.com/Brainilio/MariaBeautySalon",
-		tags: ["PHP", "MATERIALIZE", "MYSQL"],
+		tags: ["PHP", "MATERIAL", "MYSQL"],
 		category: "Development",
 		description:
-			"My first ever “web-application”! I made a reservation system for my mother’s salon in pure PHP. This was the first time interacting with this language and I was able to develop a reservation system for all my mother’s employees at the time with a login-system and a dashboard with CRUD functionalities to view all of the reservations you have ahead of you. Only the admin (Maria) has access to all reservations and employee accounts. The front-end was developed in materialize/css and I used the weather API to display the weather in the local area. Note: the file structure is terrible, but this was my first web-app, so expect spaghetti code upon reviewing.",
-		process: "",
-		challenges: "",
-		differently: "",
-		takeaway:
-			"I would definitely structure out the code next time in order to avoid such a terrible file structure.",
+			"My first ever “web-application”! I made a reservation system for my mother’s salon in pure PHP, HTML/Materialize & MySQL. This was my first time interacting with these languages, yet I was able to develop a reservation system for my mother at the time with a login-system and a dashboard with CRUD functionalities to view all of the reservations you have ahead of you. Only the admin (Maria) has access to all reservations and employee accounts. The front-end was developed using materialize/css and I used a weather API to display the weather in Rotterdam. Note: the file structure is terrible, but this was my first web-app, so expect spaghetti code upon reviewing.",
+		process:
+			"As this was my first web application I thought it would be very important to know exactly what my mother wanted, so I scheduled to do some interviews with stakeholders to get to know potential users. After doing proper reserach, I set up a customer journey & a persona. Based on these personas I developed user stories and ordered them using Moscow Analysis. After doing this, I developed a couple of wireframes, tested them and held a debriefing with my mom for a desired launch-date. When my designs got approved, I made a flowchart analysis to truly lay out the system processes for myself. After doing the UX/UI process, I started getting familiar with PHP and MySQL by doing online courses and just trying out things for myself. I remember the big smile on my face when I first interacted with the database and saw my data being manipulated. I had SO much joy, and knew exactly that this is what I wanted to keep doing for the rest of my life. After wrapping up the back-end, I went ahead and developed the front-end in Materialize and tested my application with users. After getting green lights, I was happy to announce my first iteration of the application. ",
+		challenges:
+			"The hardest challenge was not being familiar with PHP and MySQL. On top of that, it took me a while to get used to writing the actual code and structure it. At the end of my project, my teacher also challenged me to toy around with JavaScript. I had no idea where to implement this piece of JavaScript, so I tried to add a functionality that would pause the image slider. However, the continue button didn't work, so that's that..",
+		differently:
+			"I would try and ask for some advice on how to best prepare yourself and write PHP code. Though, at the time I had no clue what design patterns were or what quality code meant.",
+		takeaway: "I would definitely avoid such a terrible file structure.",
 		additionalLinks: [],
 		dateCreated: "DEC 2017",
-		fullImages: [],
+		fullImages: [mb1, mb2, mb3, mb4, mb5, mb6],
 		slug: "maria-beauty-salon",
 	},
 	{
@@ -307,14 +337,19 @@ const projects = [
 		gitHub: "https://github.com/Brainilio/MachineLearningExample",
 		tags: ["ML", "PYTHON", "SCIKIT"],
 		category: "Development",
-		description: "",
-		process: "",
-		challenges: "",
-		differently: "",
-		takeaway: "",
+		description:
+			"This project was developed to get familiar with Python, skicit, famous algorithms, terms like under- and overfitting, supervised and unsupervised learning.",
+		process:
+			"Before even writing some code, I wanted to know how each algorithm works, so I went ahead and did proper research on the k-means algorithm, logistic regression and decision trees on top of writing down the algorithms step by step. Then, after doing proper research on terms such as supervised and unsupervised learning I also read through the Skicit library, since it would be a far stretch as a beginner to write these algorithms from scratch. Only after getting a little conventional with the library and terms, I went ahead and wrote all the code and visualized them.",
+		challenges:
+			"My biggest challenge was getting familiar with Python and understanding jargon.",
+		differently:
+			"I would just try and practice these things more and try to understand the differences and applications of each algorithm.",
+		takeaway:
+			"Machine Learning is an interesting technology but I truly believe you need to know your dos and donts before applying and writing it",
 		additionalLinks: [],
-		dateCreated: "MARCH 2017",
-		fullImages: [],
+		dateCreated: "MARCH 2020",
+		fullImages: [ml1, ml2, ml3, ml4],
 		slug: "machine-learning-basics",
 	},
 ]
