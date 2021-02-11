@@ -37,7 +37,7 @@ const About = () => {
 			<div className="about-block">
 				<div ref={textRef} className="about-text">
 					<span className="about-title" aria-hidden>
-						About me
+						About Me
 					</span>
 					<p aria-hidden>
 						I am a creative developer driven by empathy, creativity, and

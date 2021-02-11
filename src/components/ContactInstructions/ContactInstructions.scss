@@ -1,0 +1,70 @@
+@import "../../styles/responsive/breakpoints.scss";
+
+.contact-instructions {
+	display: flex;
+	flex-direction: column;
+	margin: 2em;
+	justify-content: center;
+	align-items: flex-start;
+
+	@include screenxxs {
+		align-items: center;
+		text-align: center;
+		margin: 0;
+	}
+
+	@include screenxs {
+		align-items: center;
+		text-align: center;
+		margin: 0;
+	}
+
+	@include screens {
+		align-items: center;
+		text-align: center;
+		margin: 0;
+	}
+
+	h3 {
+		width: 80%;
+		font-size: 25px;
+
+		@include screenxxs {
+			width: 100%;
+		}
+
+		@include screenxs {
+			width: 100%;
+		}
+
+		@include screens {
+			width: 100%;
+		}
+	}
+
+	ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+
+		li {
+			p {
+				width: 80%;
+
+				@include screenxxs {
+					width: 100%;
+				}
+
+				@include screenxs {
+					width: 100%;
+				}
+
+				@include screens {
+					padding-left: 4em;
+					padding-right: 4em;
+					width: 100%;
+				}
+			}
+		}
+	}
+}

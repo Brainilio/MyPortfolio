@@ -25,31 +25,33 @@ import { ReactComponent as AWS } from "../../resources/icons/amazon_aws-icon.svg
 import { ReactComponent as Digital } from "../../resources/icons/digitalocean-icon.svg"
 import { ReactComponent as Wordpress } from "../../resources/icons/wordpress-icon.svg"
 
+import icons from "../../resources/icons.webp"
+
 const Skill = () => {
 	const skillsRef = useRef(null)
 	const textRef = useRef(null)
 	gsap.registerPlugin(ScrollTrigger)
 	useEffect(() => {
-		gsap.from(skillsRef.current.children, {
-			scrollTrigger: {
-				trigger: skillsRef.current.children,
-				toggleActions: "play",
-				start: "top center",
-			},
-			duration: 0.8,
-			x: 300,
-			opacity: 0,
-		})
-		gsap.from(textRef.current, {
-			scrollTrigger: {
-				trigger: textRef.current,
-				toggleActions: "play",
-				start: "top center",
-			},
-			duration: 0.8,
-			x: -200,
-			opacity: 0,
-		})
+		// gsap.from(skillsRef.current.children, {
+		// 	scrollTrigger: {
+		// 		trigger: skillsRef.current.children,
+		// 		toggleActions: "play",
+		// 		start: "top center",
+		// 	},
+		// 	duration: 0.8,
+		// 	x: 300,
+		// 	opacity: 0,
+		// })
+		// gsap.from(textRef.current, {
+		// 	scrollTrigger: {
+		// 		trigger: textRef.current,
+		// 		toggleActions: "play",
+		// 		start: "top center",
+		// 	},
+		// 	duration: 0.8,
+		// 	x: -200,
+		// 	opacity: 0,
+		// })
 	}, [])
 	const [iconSkills] = useState([
 		{
@@ -125,18 +127,19 @@ const Skill = () => {
 
 	return (
 		<section className="my-skills">
-			<div className="skills-title">
-				<div className="skills-title-block"></div>
-				<span className="skills-title-title" aria-hidden>
-					MY SKILLS 🛠
-				</span>
+			<div className="skills-title-block">
+				<div className="skills-title">
+					<span className="skills-title-title" aria-hidden>
+						My Skills
+					</span>
+				</div>
+				<p ref={textRef}>
+					I am at my best when developing fullstack applications using
+					Javascript and UX/UI designing. However, I don't like limiting myself
+					to a particular stack. I am constantly learning and adapting to
+					whatever end-users need.{" "}
+				</p>
 			</div>
-			<p ref={textRef}>
-				I am at my best when developing fullstack applications using Javascript
-				and UX/UI designing. However, I don't like limiting myself to a
-				particular stack. I am constantly learning and adapting to whatever
-				end-users need.{" "}
-			</p>
 
 			<div className="skill-hero">
 				<div className="skill-hero-text">
@@ -189,103 +192,8 @@ const Skill = () => {
 					</ul>
 				</div>
 				{/* img right here */}
-				<div className="skill-hero-img"></div>
-			</div>
-
-			<div ref={skillsRef} className="skills-column">
-				<div>
-					<Re />
-					<span>REACT</span>
-				</div>
-				<div>
-					<Node />
-					<span>NODE.JS</span>
-				</div>
-				<div>
-					<MongoDB />
-					<span>MONGODB/MONGOOSE</span>
-				</div>
-				<div>
-					<Express />
-					<span>EXPRESS.JS</span>
-				</div>
-				<div>
-					<Typescript />
-					<span>TYPESCRIPT</span>
-				</div>
-				<div>
-					<Html />
-					<span>HTML5</span>
-				</div>
-				<div>
-					<Css />
-					<span>CSS3</span>
-				</div>
-				{iconSkills.map((icon) => (
-					<SingleSkill
-						key={icon.name}
-						type={icon.type}
-						iconName={icon.icon}
-						name={icon.name}
-					/>
-				))}
-				<div>
-					<Laravel />
-					<span>LARAVEL</span>
-				</div>
-				<div>
-					<Php />
-					<span>PHP</span>
-				</div>
-
-				<div>
-					<Python />
-					<span>PYTHON</span>
-				</div>
-				<div>
-					<Vue />
-					<span>VUEJS</span>
-				</div>
-				<div>
-					<Cc />
-					<span>CREATIVE CLOUD</span>
-				</div>
-				<div>
-					<Jest />
-					<span>JEST/ENZYME</span>
-				</div>
-				{/* TODO: ADD THESE LOGOS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */}
-				<div>
-					<Bootstrap />
-					<span>BOOTSTRAP</span>
-				</div>
-				<div>
-					<Material />
-					<span>MATERIAL UI</span>
-				</div>
-				<div>
-					<GraphQL />
-					<span>GRAPHQL</span>
-				</div>
-				<div>
-					<Apollo />
-					<span>APOLLO</span>
-				</div>
-				<div>
-					<Ubuntu />
-					<span>UBUNTU</span>
-				</div>
-				<div>
-					<AWS />
-					<span>AWS</span>
-				</div>
-				<div>
-					<Digital />
-					<span>DIGITAL OCEAN</span>
-				</div>
-				<div>
-					<Wordpress />
-					<span>WORDPRESS</span>
+				<div className="skill-hero-img">
+					<img src={icons} width="400" height="400" />
 				</div>
 			</div>
 		</section>
