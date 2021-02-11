@@ -16,9 +16,9 @@ const Main = () => {
 
 	return (
 		<>
-			<Contact />
+			{/* <Contact /> */}
 			<CrescentMoon />
-			<DecorativeLine />
+			{/* <DecorativeLine /> */}
 			<FallingStars />
 			{show ? <Publicmessage show={togglePublicMessage} /> : null}
 

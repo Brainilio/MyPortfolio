@@ -11,6 +11,7 @@
 	box-shadow: 5px 5px 25px 3px black;
 	transition: all 0.8s ease;
 	position: relative;
+	border-radius: 50px;
 
 	&:hover {
 		transform: rotateX(15deg) rotateZ(5deg) rotateY(-10deg);
@@ -30,7 +31,10 @@
 	.project-cards-image {
 		height: 200px;
 		width: 100%;
+		border: none;
 		position: relative;
+		border-top-left-radius: 50px;
+		border-top-right-radius: 50px;
 		object-fit: cover;
 		cursor: pointer;
 		transition: opacity 0.8s ease-in-out;

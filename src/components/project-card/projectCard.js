@@ -29,13 +29,13 @@ const ProjectCard = (props) => {
 						<p className="project-cards-description-paragraph">
 							{props.information.shortDescription}
 						</p>
-						<div className="project-cards-tags-row">
+						{/* <div className="project-cards-tags-row">
 							{props.information.tags.map((tag) => (
 								<div key={tag} className="project-card-single-tag">
 									{tag}
 								</div>
 							))}
-						</div>
+						</div> */}
 					</div>
 				</Link>
 

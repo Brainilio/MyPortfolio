@@ -12,23 +12,22 @@ const Projects = () => {
 	gsap.registerPlugin(ScrollTrigger)
 
 	useEffect(() => {
-		gsap.from(projectRef.current, {
-			scrollTrigger: {
-				trigger: projectRef.current,
-			},
-			x: -200,
-			opacity: 0,
-			ease: "power1",
-			duration: 1,
-		})
+		// gsap.from(projectRef.current, {
+		// 	scrollTrigger: {
+		// 		trigger: projectRef.current,
+		// 	},
+		// 	x: -200,
+		// 	opacity: 0,
+		// 	ease: "power1",
+		// 	duration: 1,
+		// })
 	}, [])
 
 	return (
 		<section className="projects">
 			<div className="projects-title">
-				<div className="projects-title-block"></div>
-				<span className="projects-title-title" aria-hidden>
-					MY WORK 💻
+				<span className="projects-title" aria-hidden>
+					My Work 💻
 				</span>
 			</div>
 			<p className="projects-paragraph">
@@ -55,7 +54,7 @@ const Projects = () => {
 					development to UX/UI design and art!
 					<br />
 				</p>
-				<button className="all-projects-button">All Projects</button>
+				<button className="all-projects-button">P R O J E C T S</button>
 			</NavLink>
 
 			<div ref={projectRef} className="project-cards">
