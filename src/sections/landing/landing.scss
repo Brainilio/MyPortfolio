@@ -62,25 +62,6 @@
 			flex-direction: column;
 			align-items: center;
 
-			.landing-emoji {
-				display: inline-block;
-				margin-left: 15px;
-				transform: rotateZ(35deg);
-				animation: waving 0.8s ease-in-out infinite;
-
-				@keyframes waving {
-					0% {
-						transform: rotateZ(-15deg);
-					}
-					50% {
-						transform: rotateZ(15deg);
-					}
-					100% {
-						transform: rotateZ(-15deg);
-					}
-				}
-			}
-
 			.landing-title-text-name {
 				font-size: 100px;
 				font-weight: 900;

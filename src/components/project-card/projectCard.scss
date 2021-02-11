@@ -10,8 +10,9 @@
 	background-color: white;
 	box-shadow: 5px 5px 25px 3px black;
 	transition: all 0.8s ease;
+	border: none;
 	position: relative;
-	border-radius: 50px;
+	border-radius: 25px;
 
 	&:hover {
 		transform: rotateX(15deg) rotateZ(5deg) rotateY(-10deg);
@@ -33,15 +34,11 @@
 		width: 100%;
 		border: none;
 		position: relative;
-		border-top-left-radius: 50px;
-		border-top-right-radius: 50px;
+		border-top-left-radius: 25px;
+		border-top-right-radius: 25px;
 		object-fit: cover;
 		cursor: pointer;
-		transition: opacity 0.8s ease-in-out;
-
-		&:hover {
-			opacity: 80%;
-		}
+		transition: all 0.8s ease-in-out;
 	}
 
 	.project-cards-description {
@@ -55,7 +52,11 @@
 
 		.project-cards-description-title {
 			font-size: 18px;
-			margin-top: 0rem;
+			margin-top: 2rem;
+			font-weight: 900;
+			text-align: center;
+			width: 100%;
+			font-size: 25px;
 
 			@include screens {
 				margin-top: 0rem;
@@ -69,40 +70,40 @@
 		}
 	}
 
-	.project-cards-tags-row {
-		display: flex;
-		justify-content: center;
-		width: 100%;
+	// .project-cards-tags-row {
+	// 	display: flex;
+	// 	justify-content: center;
+	// 	width: 100%;
 
-		@include screens {
-			height: 10%;
-		}
+	// 	@include screens {
+	// 		height: 10%;
+	// 	}
 
-		.project-card-single-tag {
-			cursor: default;
-			min-width: 100px;
-			width: auto;
-			height: 30px;
-			background-color: rgba(162, 162, 162, 0.764);
-			color: black;
-			margin: 0 auto;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			border-radius: 500px;
-		}
-	}
+	// 	.project-card-single-tag {
+	// 		cursor: default;
+	// 		min-width: 100px;
+	// 		width: auto;
+	// 		height: 30px;
+	// 		background-color: rgba(162, 162, 162, 0.764);
+	// 		color: black;
+	// 		margin: 0 auto;
+	// 		display: flex;
+	// 		justify-content: center;
+	// 		align-items: center;
+	// 		border-radius: 500px;
+	// 	}
+	// }
 
 	.project-cards-buttons {
 		position: absolute;
 		bottom: 0%;
-		margin-top: 15px;
+
 		display: flex;
 		width: 100%;
 		justify-content: space-around;
+
+		margin: 2em auto;
 		align-items: center;
-		height: 15%;
-		background-color: black;
 
 		@include screens {
 			height: 15%;
@@ -114,10 +115,11 @@
 			justify-content: center;
 			align-items: center;
 			color: white;
-			height: 35px;
-			width: 100px;
-			background: none;
-			border: 1px solid white;
+			height: 50px;
+			width: 150px;
+
+			background: linear-gradient(142deg, #e99a33 0%, #be3490 100%);
+			border-radius: 30px;
 			transition: all 0.3s ease-in;
 			text-decoration: none;
 

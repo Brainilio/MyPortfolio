@@ -13,32 +13,29 @@ const About = () => {
 		// gsap.from(textRef.current, {
 		// 	scrollTrigger: {
 		// 		trigger: textRef.current,
-
 		// 		toggleActions: "restart",
 		// 	},
 		// 	x: -200,
 		// 	duration: 0.8,
 		// 	opacity: 0,
 		// })
-		gsap.from(imgRef.current, {
-			scrollTrigger: {
-				trigger: imgRef.current,
-				toggleActions: "restart",
-			},
-			rotateZ: 360,
-			duration: 0.8,
-			opacity: 0,
-		})
+		// gsap.from(imgRef.current, {
+		// 	scrollTrigger: {
+		// 		trigger: imgRef.current,
+		// 		toggleActions: "restart",
+		// 	},
+		// 	rotateZ: 360,
+		// 	duration: 0.8,
+		// 	opacity: 0,
+		// })
 	}, [])
 
 	return (
 		<section className="about">
-			<div className="about-title">
-				<div className="about-title-block"></div>
-				<span className="about-title-title" aria-hidden>
-					ABOUT ME ⚡️
-				</span>
-			</div>
+			<span className="about-title" aria-hidden>
+				About me
+			</span>
+
 			<div className="about-block">
 				<div ref={textRef} className="about-text">
 					<p aria-hidden>
@@ -59,7 +56,7 @@ const About = () => {
 						reflect a desire for achievement, responsibility, and collaboration.
 						I stand firm in my values and work to bring ethics and empathy to
 						the tech field. Interested in talking?{" "}
-						<a href="mailto: brainilioir@gmail.com">Let's connect</a> or check
+						{/* <a href="mailto: brainilioir@gmail.com">Let's connect</a> or check
 						out my{" "}
 						<a
 							rel="noopener noreferrer"
@@ -68,11 +65,10 @@ const About = () => {
 							alt="resume"
 						>
 							resume!
-						</a>
+						</a> */}
 					</p>
 				</div>
 				<div className="about-image">
-					<div ref={imgRef} className="about-border-style-image"></div>
 					<LazyLoad offset={100}>
 						<img
 							width="200"

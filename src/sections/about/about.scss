@@ -9,7 +9,9 @@
 		display: flex;
 		align-items: center;
 		margin-top: 5em;
-		margin-left: 12em;
+		margin-left: 5em;
+		font-size: 35px;
+		font-weight: 900;
 
 		@include screens {
 			margin: 5em 0 0 0;
@@ -24,21 +26,6 @@
 		@include screenl {
 			margin: 5em 0 0 0;
 			justify-content: center;
-		}
-
-		.about-title-title {
-			font-size: 20px;
-			margin-left: 10px;
-		}
-
-		.about-title-block {
-			width: 30px;
-			height: 30px;
-			background-color: rgb(224, 224, 224);
-		}
-		.about-title-title {
-			font-size: 20px;
-			margin-left: 10px;
 		}
 	}
 
@@ -47,42 +34,45 @@
 		align-items: center;
 		justify-content: space-between;
 		margin-top: 6em;
+		margin-left: 11em;
+		margin-right: 11em;
 
 		@include screens {
 			margin-top: 3em;
+			margin: 0 auto;
 			flex-direction: column;
 			justify-content: center;
 		}
 
 		@include screenm {
 			margin-top: 3em;
+			margin: 0 auto;
 			flex-direction: column;
 			justify-content: center;
 		}
 
 		@include screenl {
 			margin-top: 3em;
+			margin: 0 auto;
 			flex-direction: column;
 			justify-content: center;
 		}
 
 		.about-text {
-			text-align: justify;
-			width: 40%;
-			margin-left: 12em;
+			width: 50%;
 
 			@include screens {
-				width: 90%;
+				width: 80%;
 				margin: 0 auto;
 			}
 
 			@include screenm {
-				width: 70%;
+				width: 80%;
 				margin: 0 auto;
 			}
 
 			@include screenl {
-				width: 70%;
+				width: 80%;
 				margin: 0 auto;
 			}
 
@@ -108,8 +98,6 @@
 		}
 
 		.about-image {
-			margin-right: 15em;
-
 			@include screens {
 				margin-top: 5em;
 				margin-right: 0;

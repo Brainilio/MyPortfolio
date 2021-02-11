@@ -27,6 +27,7 @@
 		text-align: center;
 		font-weight: 900;
 		font-size: 35px;
+		margin-bottom: 10px;
 
 		@include screens {
 			justify-content: center;
@@ -50,6 +51,8 @@
 	.projects-paragraph {
 		justify-content: center;
 		text-align: center;
+		margin: 0 auto;
+		width: 30%;
 
 		@include screens {
 			width: 100%;
@@ -80,7 +83,7 @@
 		border-radius: 30px;
 		font-weight: 900;
 		background: linear-gradient(142deg, #e99a33 0%, #be3490 100%);
-		transition: all 0.3s ease-in;
+
 		text-decoration: none;
 		border: none;
 
@@ -109,7 +112,7 @@
 		margin-top: 5em;
 		margin: 0 auto;
 		display: grid;
-		grid-gap: 2em;
+		grid-gap: 3em;
 		grid-template-columns: 1fr 1fr 1fr;
 
 		@include screens {

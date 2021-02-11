@@ -6,7 +6,7 @@ import { ReactSVG } from "react-svg"
 const Footer = () => {
 	return (
 		<>
-			<ReactSVG className="astro" src={austronaut} />
+			{/* <ReactSVG className="astro" src={austronaut} /> */}
 			<footer className="footer">
 				<div className="moon-ground">
 					<span className="text-footer" aria-hidden>

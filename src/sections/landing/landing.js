@@ -37,9 +37,6 @@ const Landing = () => {
 				<div className="landing-title-text">
 					<span className="landing-title-text-name">
 						Brainilio
-						<span className="landing-emoji" role="img" aria-hidden>
-							👋🏽
-						</span>
 					</span>
 					<span className="landing-title-text-title">Creative Developer</span>
 					{/* <span className="landing-title-text-mission">
