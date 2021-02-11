@@ -1,6 +1,8 @@
 import React, { useEffect } from "react"
 import "./about.scss"
 import profile from "../../resources/me.webp"
+import sanfran from "../../resources/san-fran.webp"
+import rotterdam from "../../resources/rotterdam.webp"
 import LazyLoad from "react-lazyload"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/all"
@@ -32,12 +34,11 @@ const About = () => {
 
 	return (
 		<section className="about">
-			<span className="about-title" aria-hidden>
-				About me
-			</span>
-
 			<div className="about-block">
 				<div ref={textRef} className="about-text">
+					<span className="about-title" aria-hidden>
+						About me
+					</span>
 					<p aria-hidden>
 						I am a creative developer driven by empathy, creativity, and
 						humility, specializing in Full-stack and UX/UI development. I aim to
@@ -67,17 +68,43 @@ const About = () => {
 							resume!
 						</a> */}
 					</p>
+					<div>
+						<button className="button-lets-chat">L E T ' S C H A T</button>
+						<button className="button-resume-chat">R E S U M E</button>
+					</div>
 				</div>
 				<div className="about-image">
-					<LazyLoad offset={100}>
-						<img
-							width="200"
-							height="200"
-							className="about-image-image"
-							alt="an astronaut"
-							src={profile}
-						/>
-					</LazyLoad>
+					<div>
+						<LazyLoad offset={100}>
+							<img
+								width="200"
+								height="250"
+								className="about-image-sanfran"
+								alt="san francisco"
+								src={sanfran}
+							/>
+						</LazyLoad>
+						<LazyLoad offset={100}>
+							<img
+								width="200"
+								height="250"
+								className="about-image-image"
+								alt="brainilio"
+								src={profile}
+							/>
+						</LazyLoad>
+					</div>
+					<div>
+						<LazyLoad offset={100}>
+							<img
+								width="420"
+								height="200"
+								className="about-image-rotterdam"
+								alt="rotterdam"
+								src={rotterdam}
+							/>
+						</LazyLoad>
+					</div>
 				</div>
 			</div>
 		</section>

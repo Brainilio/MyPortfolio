@@ -61,6 +61,51 @@
 		}
 	}
 
+	.skill-hero {
+		height: 450px auto;
+		border-radius: 50px;
+		margin: 3em auto;
+		padding: 1em;
+		width: 80%;
+		overflow: hidden;
+		background: linear-gradient(142deg, hsl(234, 82%, 57%) 0%, #ad5ee2 100%);
+
+		.skill-hero-text {
+			margin-top: 3em;
+			margin-bottom: 3em;
+			width: 50%;
+
+			@include screenl {
+				width: 100%;
+			}
+
+			@include screenm {
+				width: 100%;
+			}
+
+			@include screenxs {
+				width: 100%;
+			}
+
+			@include screenxxs {
+				width: 100%;
+			}
+			ul {
+				list-style-type: none;
+
+				li {
+					display: flex;
+					flex-direction: column;
+					margin: 1em 0;
+					font-size: 18px;
+				}
+			}
+		}
+
+		.skill-hero-img {
+		}
+	}
+
 	.skills-column {
 		margin-top: 5em;
 		display: grid;

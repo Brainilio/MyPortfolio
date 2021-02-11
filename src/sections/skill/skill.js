@@ -138,6 +138,60 @@ const Skill = () => {
 				end-users need.{" "}
 			</p>
 
+			<div className="skill-hero">
+				<div className="skill-hero-text">
+					<ul>
+						<li>
+							<span>
+								<strong>Languages</strong>
+							</span>
+							<span>JavaScript, TypeScript, Python, SQL, PHP</span>
+						</li>
+						<li>
+							<span>
+								<strong>Front-End</strong>
+							</span>
+							<span>
+								React, HTML5, CSS3, VueJS, Bootstrap, Apollo, Material UI, THREE
+							</span>
+						</li>
+						<li>
+							<span>
+								<strong>Back-End</strong>
+							</span>
+							<span>NodeJS, MongoDB, ExpressJS, Laravel, GraphQL, MySQL</span>
+						</li>
+						<li>
+							<span>
+								<strong>Tools</strong>
+							</span>
+							<span>
+								Jest/Enzyme, Terminal, AWS, Wordpress, Digital Ocean, Git
+							</span>
+						</li>
+						<li>
+							<span>
+								<strong>UX/UI</strong>
+							</span>
+							<span>
+								Creative Cloud, Gamification, Low and High fidelity prototyping
+							</span>
+						</li>
+						<li>
+							<span>
+								<strong>Other</strong>
+							</span>
+							<span>
+								Object Oriented Programming, Datastructures & Algorithms, Agile
+								& Scrum methodologies, Unit Testing, Design patterns
+							</span>
+						</li>
+					</ul>
+				</div>
+				{/* img right here */}
+				<div className="skill-hero-img"></div>
+			</div>
+
 			<div ref={skillsRef} className="skills-column">
 				<div>
 					<Re />
