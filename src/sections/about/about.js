@@ -69,7 +69,9 @@ const About = () => {
 						</a> */}
 					</p>
 					<div>
-						<button className="button-lets-chat">L E T ' S C H A T</button>
+						<button className="button-lets-chat">
+							L E T ' S &nbsp; C H A T
+						</button>
 						<button className="button-resume-chat">R E S U M E</button>
 					</div>
 				</div>

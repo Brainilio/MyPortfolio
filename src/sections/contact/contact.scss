@@ -5,17 +5,22 @@
 	margin-bottom: 10em;
 	color: white;
 
-	@include screenxxs {
-		margin: 0;
-		margin-bottom: 2em;
-	}
-
 	@include screenxs {
 		margin: 0;
 		margin-bottom: 2em;
 	}
 
 	@include screens {
+		margin: 0;
+		margin-bottom: 2em;
+	}
+
+	@include screenm {
+		margin: 0;
+		margin-bottom: 2em;
+	}
+
+	@include screenl {
 		margin: 0;
 		margin-bottom: 2em;
 	}
@@ -27,14 +32,6 @@
 		display: flex;
 		align-items: baseline;
 		justify-content: space-evenly;
-
-		@include screenxxs {
-			flex-direction: column;
-			justify-content: center;
-			align-items: center;
-			margin-left: 2em;
-			margin-right: 2em;
-		}
 
 		@include screenxs {
 			flex-direction: column;
@@ -48,9 +45,16 @@
 			flex-direction: column;
 			justify-content: center;
 			align-items: center;
-			margin-top: 5em;
 			margin-left: 2em;
 			margin-right: 2em;
+		}
+
+		@include screenl {
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			margin: 0 auto;
+			margin-top: 8em;
 		}
 	}
 
@@ -72,20 +76,32 @@
 				margin-bottom: 2em;
 			}
 
-			@include screenxxs {
-				width: 100%;
-				justify-content: center;
-				align-items: center;
-			}
-
 			@include screenxs {
+				margin-top: 5em;
 				width: 100%;
 				justify-content: center;
 				align-items: center;
 			}
 
 			@include screens {
-				margin-top: 3em;
+				margin-top: 5em;
+				width: 100%;
+				justify-content: center;
+				align-items: center;
+			}
+
+			@include screenm {
+				margin-top: 5em;
+				width: 100%;
+				justify-content: center;
+				align-items: center;
+			}
+
+			@include screenl {
+				margin-top: 5em;
+				width: 100%;
+				justify-content: center;
+				align-items: center;
 			}
 		}
 
@@ -105,11 +121,20 @@
 			margin-top: 3em;
 		}
 
+		@include screenl {
+			margin-top: 3em;
+		}
+
 		h1,
 		span {
-			@include screens {
+			@include screenl {
 				text-align: center;
 			}
+		}
+
+		h1 {
+			font-size: 30px;
+			font-weight: 900;
 		}
 
 		form {
@@ -118,13 +143,8 @@
 			grid-template-columns: 1fr 1fr;
 			grid-gap: 2em;
 
-			@include screenxxs {
-				display: flex;
-				width: 85vw;
-				flex-direction: column;
-			}
-
 			@include screenxs {
+				margin-top: 2em;
 				display: flex;
 				width: 85vw;
 				flex-direction: column;
@@ -132,6 +152,23 @@
 
 			@include screens {
 				margin-top: 2em;
+				display: flex;
+				width: 85vw;
+				flex-direction: column;
+			}
+
+			@include screenm {
+				margin-top: 2em;
+				display: flex;
+				width: 85vw;
+				flex-direction: column;
+			}
+
+			@include screenl {
+				margin-top: 2em;
+				display: flex;
+				width: 85vw;
+				flex-direction: column;
 			}
 
 			div {

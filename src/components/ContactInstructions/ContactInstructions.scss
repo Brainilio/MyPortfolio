@@ -7,38 +7,52 @@
 	justify-content: center;
 	align-items: flex-start;
 
-	@include screenxxs {
-		align-items: center;
-		text-align: center;
-		margin: 0;
-	}
-
 	@include screenxs {
 		align-items: center;
 		text-align: center;
-		margin: 0;
+		margin: 0 auto;
 	}
 
 	@include screens {
 		align-items: center;
 		text-align: center;
-		margin: 0;
+		margin: 0 auto;
+	}
+
+	@include screenm {
+		align-items: center;
+		text-align: center;
+		margin: 0 auto;
+	}
+
+	@include screenl {
+		align-items: center;
+		text-align: center;
+		margin: 0 auto;
 	}
 
 	h3 {
 		width: 80%;
-		font-size: 25px;
-
-		@include screenxxs {
-			width: 100%;
-		}
+		font-size: 18px;
 
 		@include screenxs {
-			width: 100%;
+			margin: 1em auto;
+			width: 80%;
 		}
 
 		@include screens {
-			width: 100%;
+			margin: 1em auto;
+			width: 80%;
+		}
+
+		@include screenm {
+			margin: 1em auto;
+			width: 80%;
+		}
+
+		@include screenl {
+			margin: 1em auto;
+			width: 80%;
 		}
 	}
 
@@ -51,18 +65,24 @@
 			p {
 				width: 80%;
 
-				@include screenxxs {
-					width: 100%;
-				}
-
 				@include screenxs {
-					width: 100%;
+					width: 80%;
+					margin: 0 auto;
 				}
 
 				@include screens {
-					padding-left: 4em;
-					padding-right: 4em;
-					width: 100%;
+					width: 80%;
+					margin: 0 auto;
+				}
+
+				@include screenm {
+					width: 80%;
+					margin: 0 auto;
+				}
+
+				@include screenl {
+					width: 80%;
+					margin: 0 auto;
 				}
 			}
 		}

@@ -26,18 +26,9 @@ const Projects = () => {
 	return (
 		<section className="projects">
 			<div className="projects-title">
-				<span className="projects-title" aria-hidden>
+				<span className="projects-title-title" aria-hidden>
 					My Work
 				</span>
-			</div>
-
-			<NavLink
-				style={{ textDecoration: "none" }}
-				to={{
-					pathname: "projects",
-					projects: projects,
-				}}
-			>
 				<p className="projects-paragraph">
 					Here are my featured projects.
 					<strong> Click on a project card for more details! </strong>
@@ -46,8 +37,17 @@ const Projects = () => {
 					<br />
 				</p>
 
-				<button className="all-projects-button">P R O J E C T S</button>
-			</NavLink>
+				<button className="all-projects-button">
+					<NavLink
+						to={{
+							pathname: "projects",
+							projects: projects,
+						}}
+					>
+						A L L &nbsp; P R O J E C T S
+					</NavLink>
+				</button>
+			</div>
 
 			<div ref={projectRef} className="project-cards">
 				{projects.slice(0, 3).map((project) => {

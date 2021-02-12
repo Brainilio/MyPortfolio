@@ -33,7 +33,7 @@ function App() {
 						},
 						move: {
 							direction: "none",
-							speed: 1,
+							speed: 0,
 							random: false,
 							straight: false,
 						},

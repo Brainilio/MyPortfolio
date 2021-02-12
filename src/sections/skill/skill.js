@@ -1,29 +1,7 @@
 import { ScrollTrigger } from "gsap/all"
 import gsap from "gsap/gsap-core"
 import React, { useEffect, useRef, useState } from "react"
-import SingleSkill from "../../components/singleSkill/singleSkill"
 import "./skill.scss"
-import { ReactComponent as Express } from "../../resources/icons/expressjs-icon.svg"
-import { ReactComponent as Html } from "../../resources/icons/w3_html5-icon.svg"
-import { ReactComponent as Css } from "../../resources/icons/css3.svg"
-import { ReactComponent as Cc } from "../../resources/icons/creative-cloud.svg"
-import { ReactComponent as Jest } from "../../resources/icons/jestjsio-icon.svg"
-import { ReactComponent as Laravel } from "../../resources/icons/laravel-ar21.svg"
-import { ReactComponent as Php } from "../../resources/icons/php-ar21.svg"
-import { ReactComponent as MongoDB } from "../../resources/icons/mongodb-icon.svg"
-import { ReactComponent as Typescript } from "../../resources/icons/typescriptlang-icon.svg"
-import { ReactComponent as Vue } from "../../resources/icons/vuejs-icon.svg"
-import { ReactComponent as Node } from "../../resources/icons/nodejs-icon.svg"
-import { ReactComponent as Re } from "../../resources/icons/reactjs-icon.svg"
-import { ReactComponent as Python } from "../../resources/icons/python-ar21.svg"
-import { ReactComponent as GraphQL } from "../../resources/icons/graphql-icon.svg"
-import { ReactComponent as Material } from "../../resources/icons/material-ui.svg"
-import { ReactComponent as Bootstrap } from "../../resources/icons/bootstrap.svg"
-import { ReactComponent as Apollo } from "../../resources/icons/apollographql-icon.svg"
-import { ReactComponent as Ubuntu } from "../../resources/icons/ubuntu-icon.svg"
-import { ReactComponent as AWS } from "../../resources/icons/amazon_aws-icon.svg"
-import { ReactComponent as Digital } from "../../resources/icons/digitalocean-icon.svg"
-import { ReactComponent as Wordpress } from "../../resources/icons/wordpress-icon.svg"
 
 import icons from "../../resources/icons.webp"
 
@@ -53,77 +31,6 @@ const Skill = () => {
 		// 	opacity: 0,
 		// })
 	}, [])
-	const [iconSkills] = useState([
-		{
-			name: "REACTJS",
-			icon: "react",
-			type: "fab",
-		},
-		{
-			name: "JAVASCRIPT",
-			icon: "js",
-			type: "fab",
-		},
-		{
-			name: "UX/UI",
-			icon: "pen",
-			type: "fa",
-		},
-		{
-			name: "THREEJS",
-			icon: "cube",
-			type: "fa",
-		},
-		{
-			name: "OBJECT-ORIENTED PROGRAMMING",
-			icon: "object-group",
-			type: "fa",
-		},
-		{
-			name: "DATASTRUCTURES & ALGORITHMS",
-			icon: "brain",
-			type: "fa",
-		},
-		{
-			name: "AGILE & SCRUM METHODOLOGIES",
-			icon: "project-diagram",
-			type: "fa",
-		},
-
-		{
-			name: "USABILITY TESTING AND UX RESEARCH",
-			icon: "vial",
-			type: "fa",
-		},
-		{
-			name: "REST API AND WEBSERVICES",
-			icon: "network-wired",
-			type: "fa",
-		},
-		{
-			name: "UNIT TESTING",
-			icon: "suitcase",
-			type: "fa",
-		},
-
-		{
-			name: "DESIGN PATTERNS",
-			icon: "shoe-prints",
-			type: "fa",
-		},
-	])
-
-	/*
-{iconSkills.map((icon) => (
-					<SingleSkill
-						key={icon.name}
-						type={icon.type}
-						iconName={icon.icon}
-						name={icon.name}
-					/>
-				))}
-
-	*/
 
 	return (
 		<section className="my-skills">
