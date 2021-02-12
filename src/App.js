@@ -6,12 +6,14 @@ import { Switch, Route, useLocation } from "react-router-dom"
 import ProjectPage from "./pages/projectpage/ProjectPage"
 import ProjectDetail from "./sections/projects/projectDetail"
 import Main from "./sections/main"
+import NavBar from "./components/NavBar/NavBar"
 
 function App() {
 	let location = useLocation()
 
 	return (
 		<>
+			<NavBar />
 			<Rocketship />
 			<Particles
 				className="particles-background"

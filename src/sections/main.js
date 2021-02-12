@@ -1,5 +1,4 @@
 import React, { useState } from "react"
-import DecorativeLine from "../components/decorativeLine/decorativeLine"
 import About from "./about/about"
 import Contact from "./Contact/Contact"
 import Landing from "./landing/landing"
@@ -16,12 +15,9 @@ const Main = () => {
 
 	return (
 		<>
-			{/* <Contact /> */}
 			<CrescentMoon />
-			{/* <DecorativeLine /> */}
 			<FallingStars />
 			{show ? <Publicmessage show={togglePublicMessage} /> : null}
-
 			<Landing />
 			<Projects />
 			<About />

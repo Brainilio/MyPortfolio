@@ -50,7 +50,7 @@ const Projects = () => {
 			</div>
 
 			<div ref={projectRef} className="project-cards">
-				{projects.slice(0, 3).map((project) => {
+				{projects.slice(0, 6).map((project) => {
 					return <ProjectCard key={project.name} information={project} />
 				})}
 			</div>

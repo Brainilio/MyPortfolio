@@ -1,0 +1,41 @@
+@import "../../styles/responsive/breakpoints.scss";
+
+nav {
+	top: 0;
+	left: 0;
+	z-index: 9999;
+	height: 8vh;
+	width: 100vw;
+	display: flex;
+	align-items: center;
+	position: fixed;
+	justify-content: space-between;
+	background-color: rgba(17, 17, 17, 0.404);
+	padding-left: 2em;
+
+	.logo {
+		span {
+			font-size: 25px;
+			font-weight: 900;
+		}
+	}
+
+	.nav-items {
+		padding-right: 2em;
+		ul {
+			display: flex;
+			justify-content: space-evenly;
+			list-style: none;
+
+			li {
+				margin: 0 2em;
+				span {
+					font-weight: 900;
+					font-size: 20px;
+				}
+
+				cursor: pointer;
+			}
+		}
+	}
+}

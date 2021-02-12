@@ -24,9 +24,12 @@
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^3.4.4",
+    "react-scroll": "^1.8.1",
     "react-svg": "^11.0.40",
+    "react-three-fiber": "^5.3.18",
     "react-transition-group": "^4.4.1",
     "react-use": "^15.3.4",
+    "three": "^0.125.2",
     "yup": "^0.32.8"
   },
   "scripts": {
