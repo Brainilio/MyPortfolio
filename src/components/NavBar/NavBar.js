@@ -2,7 +2,18 @@ import React from "react"
 import "./NavBar.scss"
 import { Link } from "react-scroll"
 
-const NavBar = () => {
+const NavBar = (props) => {
+	let [handler, setHandler] = React.useState(false)
+	let classes = "hamburger-menu"
+
+	if (handler) {
+		classes = "hamburger-menu hamburger-close"
+	}
+	function hamburgerHandler() {
+		props.clicked()
+		setHandler((prevstate) => !prevstate)
+	}
+
 	return (
 		<nav>
 			<div className="logo">
@@ -15,6 +26,7 @@ const NavBar = () => {
 					<span>Brainilio</span>
 				</Link>
 			</div>
+
 			<div className="nav-items">
 				<ul>
 					<li>
@@ -62,6 +74,12 @@ const NavBar = () => {
 						</Link>
 					</li>
 				</ul>
+			</div>
+
+			<div className={classes} onClick={hamburgerHandler}>
+				<span></span>
+				<span></span>
+				<span></span>
 			</div>
 		</nav>
 	)
