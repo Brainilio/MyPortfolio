@@ -6,7 +6,7 @@ const NavBar = (props) => {
 	let [handler, setHandler] = React.useState(false)
 	let classes = "hamburger-menu"
 
-	if (handler) {
+	if (props.show) {
 		classes = "hamburger-menu hamburger-close"
 	}
 	function hamburgerHandler() {

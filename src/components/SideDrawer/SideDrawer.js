@@ -7,7 +7,7 @@ import p4 from "../../resources/menu/menu-4.webp"
 import gsap from "gsap"
 import { Link } from "react-scroll"
 
-export const staggerText = (node1, node2, node3, node4) => {
+const staggerText = (node1, node2, node3, node4) => {
 	gsap.from([node1, node2, node3, node4], {
 		duration: 0.8,
 		opacity: 0,
@@ -38,7 +38,6 @@ const SideDrawer = (props) => {
 
 	const backgroundHandler = (image) => {
 		setcurrentImage(image)
-		// handleCity(imageSelector)
 		setCurrentImageClass("kenburn")
 	}
 
@@ -49,7 +48,6 @@ const SideDrawer = (props) => {
 	}, [props.show])
 
 	const resetImage = () => {
-		// handleCityOut(imageSelector)
 		setCurrentImageClass("")
 		setcurrentImage("")
 	}
@@ -78,33 +76,58 @@ const SideDrawer = (props) => {
 							</Link>
 						</li>
 						<li>
-							<h1
-								ref={(el) => (line2 = el)}
-								onMouseLeave={resetImage}
-								onMouseOver={() => backgroundHandler(p4)}
-								onClick={props.clicked}
+							<Link
+								activeClass="link-active"
+								to="about"
+								smooth={true}
+								offset={-150}
+								duration={600}
 							>
-								About
-							</h1>
+								<h1
+									ref={(el) => (line2 = el)}
+									onMouseLeave={resetImage}
+									onMouseOver={() => backgroundHandler(p4)}
+									onClick={props.clicked}
+								>
+									About
+								</h1>
+							</Link>
 						</li>
 						<li>
-							<h1
-								ref={(el) => (line3 = el)}
-								onMouseLeave={resetImage}
-								onMouseOver={() => backgroundHandler(p2)}
-								onClick={props.clicked}
+							<Link
+								activeClass="link-active"
+								to="my-skills"
+								smooth={true}
+								offset={-150}
+								duration={600}
 							>
-								Skills
-							</h1>
+								<h1
+									ref={(el) => (line3 = el)}
+									onMouseLeave={resetImage}
+									onMouseOver={() => backgroundHandler(p2)}
+									onClick={props.clicked}
+								>
+									Skills
+								</h1>
+							</Link>
 						</li>
 						<li>
-							<h1
-								ref={(el) => (line4 = el)}
-								onMouseLeave={resetImage}
-								onMouseOver={() => backgroundHandler(p3)}
+							<Link
+								activeClass="link-active"
+								to="contact"
+								smooth={true}
+								offset={-150}
+								duration={600}
 							>
-								Contact Me
-							</h1>
+								<h1
+									ref={(el) => (line4 = el)}
+									onMouseLeave={resetImage}
+									onMouseOver={() => backgroundHandler(p3)}
+									onClick={() => props.clicked()}
+								>
+									Contact Me
+								</h1>
+							</Link>
 						</li>
 					</ul>
 				</div>

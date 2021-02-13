@@ -20,7 +20,7 @@ function App() {
 	return (
 		<>
 			<SideDrawer clicked={handlesidedrawer} show={drawer} />
-			<NavBar clicked={handlesidedrawer} />
+			<NavBar clicked={handlesidedrawer} show={drawer} />
 			<Rocketship />
 			<Particles
 				className="particles-background"
