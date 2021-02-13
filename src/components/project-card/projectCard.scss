@@ -71,30 +71,6 @@
 		}
 	}
 
-	// .project-cards-tags-row {
-	// 	display: flex;
-	// 	justify-content: center;
-	// 	width: 100%;
-
-	// 	@include screens {
-	// 		height: 10%;
-	// 	}
-
-	// 	.project-card-single-tag {
-	// 		cursor: default;
-	// 		min-width: 100px;
-	// 		width: auto;
-	// 		height: 30px;
-	// 		background-color: rgba(162, 162, 162, 0.764);
-	// 		color: black;
-	// 		margin: 0 auto;
-	// 		display: flex;
-	// 		justify-content: center;
-	// 		align-items: center;
-	// 		border-radius: 500px;
-	// 	}
-	// }
-
 	.project-cards-buttons {
 		position: absolute;
 		bottom: 0%;
@@ -115,11 +91,35 @@
 			display: flex;
 			justify-content: center;
 			align-items: center;
-			color: white;
+			color: #be3490;
 			height: 50px;
+			font-weight: 900;
 			width: 150px;
 
-			background: linear-gradient(142deg, #e99a33 0%, #be3490 100%);
+			background: none;
+			border: 3px solid #be3490;
+			border-radius: 30px;
+			transition: all 0.3s ease-in;
+			text-decoration: none;
+
+			&:hover {
+				background: linear-gradient(142deg, #ffe920 0%, #be3490 100%);
+				color: white;
+				border: none;
+			}
+		}
+
+		.project-cards-single-button-2 {
+			cursor: pointer;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			color: white;
+			height: 50px;
+			font-weight: 900;
+			width: 150px;
+
+			background: linear-gradient(142deg, #35218f 0%, #cd2ad3 100%);
 			border-radius: 30px;
 			transition: all 0.3s ease-in;
 			text-decoration: none;

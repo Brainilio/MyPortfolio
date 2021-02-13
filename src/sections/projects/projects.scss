@@ -71,13 +71,12 @@
 			width: 190px;
 			border-radius: 30px;
 			font-weight: 900;
-			background: linear-gradient(142deg, #e99a33 0%, #be3490 100%);
-
+			background: linear-gradient(142deg, #337ce9 0%, #e846fd 100%);
+			transition: all 0.3s ease;
 			text-decoration: none;
 			border: none;
 
 			&:hover {
-				background-color: white;
 				color: black;
 			}
 

@@ -6,6 +6,7 @@ import rotterdam from "../../resources/rotterdam.webp"
 import LazyLoad from "react-lazyload"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/all"
+import { Link } from "react-scroll"
 
 const About = () => {
 	const textRef = React.useRef(null)
@@ -57,22 +58,20 @@ const About = () => {
 						reflect a desire for achievement, responsibility, and collaboration.
 						I stand firm in my values and work to bring ethics and empathy to
 						the tech field. Interested in talking?{" "}
-						{/* <a href="mailto: brainilioir@gmail.com">Let's connect</a> or check
-						out my{" "}
+					</p>
+					<div>
+						<Link smooth={true} duration={600} offset={-500} to="contact">
+							<button className="button-lets-chat">
+								L E T ' S &nbsp; C H A T
+							</button>
+						</Link>
 						<a
 							rel="noopener noreferrer"
 							target="_blank"
 							href="https://drive.google.com/file/d/1TgOjKdYPxZr7SmBChUm1osO84EPkXSA8/view?usp=sharing"
-							alt="resume"
 						>
-							resume!
-						</a> */}
-					</p>
-					<div>
-						<button className="button-lets-chat">
-							L E T ' S &nbsp; C H A T
-						</button>
-						<button className="button-resume-chat">R E S U M E</button>
+							<button className="button-resume-chat">R E S U M E</button>
+						</a>
 					</div>
 				</div>
 				<div className="about-image">

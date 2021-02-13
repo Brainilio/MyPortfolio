@@ -1,26 +1,17 @@
-import React, { useState } from "react"
+import React from "react"
 import Particles from "react-particles-js"
 import Rocketship from "./components/rocketship/rocketship"
 import { Switch, Route, useLocation } from "react-router-dom"
-// import { TransitionGroup, CSSTransition } from "react-transition-group"
+
 import ProjectPage from "./pages/projectpage/ProjectPage"
 import ProjectDetail from "./sections/projects/projectDetail"
 import Main from "./sections/main"
-import NavBar from "./components/NavBar/NavBar"
-import SideDrawer from "./components/SideDrawer/SideDrawer"
 
 function App() {
 	let location = useLocation()
-	const [drawer, setsidedrawer] = useState(false)
-
-	const handlesidedrawer = () => {
-		setsidedrawer((prevstate) => !prevstate)
-	}
 
 	return (
 		<>
-			<SideDrawer clicked={handlesidedrawer} show={drawer} />
-			<NavBar clicked={handlesidedrawer} show={drawer} />
 			<Rocketship />
 			<Particles
 				className="particles-background"

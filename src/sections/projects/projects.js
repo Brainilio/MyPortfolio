@@ -36,17 +36,16 @@ const Projects = () => {
 					development to UX/UI design and art!
 					<br />
 				</p>
-
-				<button className="all-projects-button">
-					<NavLink
-						to={{
-							pathname: "projects",
-							projects: projects,
-						}}
-					>
+				<NavLink
+					to={{
+						pathname: "projects",
+						projects: projects,
+					}}
+				>
+					<button className="all-projects-button">
 						A L L &nbsp; P R O J E C T S
-					</NavLink>
-				</button>
+					</button>
+				</NavLink>
 			</div>
 
 			<div ref={projectRef} className="project-cards">

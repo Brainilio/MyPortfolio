@@ -2,6 +2,7 @@ import React, { useEffect } from "react"
 
 import "./landing.scss"
 import { gsap } from "gsap"
+import { Link } from "react-scroll"
 
 const Landing = () => {
 	const titleRef = React.useRef(null)
@@ -35,27 +36,29 @@ const Landing = () => {
 		<section className="landing">
 			<div ref={titleRef} className="landing-title">
 				<div className="landing-title-text">
-					<span className="landing-title-text-name">
-						Brainilio
-					</span>
+					<span className="landing-title-text-name">Brainilio</span>
 					<span className="landing-title-text-title">Creative Developer</span>
 					{/* <span className="landing-title-text-mission">
 						Driven by humility, empathy and creativity
 					</span> */}
 				</div>
 				<div className="landing-title-cta-buttons">
-					<a
+					<Link
+						smooth={true}
+						duration={600}
+						offset={-500}
+						to="contact"
 						className="landing-title-cta-my-work"
-						rel="noopener noreferrer"
-						target="_blank"
-						href="https://drive.google.com/file/d/1TgOjKdYPxZr7SmBChUm1osO84EPkXSA8/view?usp=sharing"
 					>
-						<strong>R E S U M E</strong>
-					</a>
+						<strong>L E T ' S &nbsp; C H A T</strong>
+					</Link>
 
 					<button className="landing-title-cta-contact-me">
-						<a href="mailto: brainilioir@gmail.com">
-							{" "}
+						<a
+							rel="noopener noreferrer"
+							target="_blank"
+							href="https://drive.google.com/file/d/1TgOjKdYPxZr7SmBChUm1osO84EPkXSA8/view?usp=sharing"
+						>
 							<strong>R E S U M E</strong>
 						</a>
 					</button>

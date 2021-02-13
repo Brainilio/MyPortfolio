@@ -99,10 +99,45 @@
 					background: linear-gradient(142deg, #e99a33 0%, #be3490 100%);
 					text-decoration: none;
 					border: none;
+					transition: all 0.3s ease-in-out;
 
 					&:hover {
 						background-color: white;
 						color: black;
+					}
+
+					@include screenxs {
+						margin: 1em;
+					}
+				}
+
+				.button-resume-chat {
+					margin-top: 2em;
+					margin-bottom: 2em;
+					margin-right: 2em;
+					font-size: 15px;
+					cursor: pointer;
+					color: white;
+					height: 50px;
+					width: 150px;
+					border-radius: 30px;
+					font-weight: 900;
+					background: none;
+					border: 3px solid white;
+					transition: all 0.3s ease-in-out;
+
+					&:hover {
+						background-color: white;
+						color: black;
+					}
+
+					a {
+						margin: 0;
+						width: 150px;
+						&:hover {
+							background-color: white;
+							color: black;
+						}
 					}
 
 					@include screenxs {

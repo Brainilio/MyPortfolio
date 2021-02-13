@@ -46,7 +46,7 @@ const ProjectCard = (props) => {
 						href={props.information.gitHub}
 						className="project-cards-single-button"
 					>
-						CODE
+						C O D E
 					</a>
 
 					{props.information.livePreview ? (
@@ -54,9 +54,9 @@ const ProjectCard = (props) => {
 							rel="noopener noreferrer"
 							target="_blank"
 							href={props.information.livePreview}
-							className="project-cards-single-button"
+							className="project-cards-single-button-2"
 						>
-							LIVE
+							L I V E
 						</a>
 					) : null}
 				</div>
