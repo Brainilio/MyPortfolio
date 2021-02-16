@@ -7,11 +7,13 @@
 	right: 5%;
 	cursor: pointer;
 	background: none;
-	border-radius: 50;
+	border-radius: 50%;
+	font-weight: 500;
+	font-size: 25px;
 	color: white;
 	height: 50px;
 	width: 50px;
-	border: 1px solid white;
+	border: 2px solid white;
 	transition: all 0.3s ease;
 
 	&:hover {
@@ -85,8 +87,9 @@
 		}
 
 		.project-detail-title {
-			font-size: 30px;
+			font-size: 65px;
 			align-self: left;
+			font-weight: 900;
 			display: flex;
 		}
 
@@ -107,9 +110,9 @@
 				min-width: 100px;
 				width: auto;
 				height: 30px;
-				background-color: rgba(162, 162, 162, 0.764);
-				color: black;
+				color: white;
 				margin: 0 5px;
+				font-weight: 900;
 				display: flex;
 				justify-content: center;
 				align-items: center;
@@ -123,6 +126,9 @@
 		scroll-behavior: smooth;
 		overflow: scroll;
 
+		h3 {
+			font-weight: 900;
+		}
 		@include screenxs {
 			width: 85%;
 			height: auto;
@@ -148,33 +154,48 @@
 			height: 15%;
 		}
 
-		.project-detail-single-button {
+		.project-cards-single-button {
+			cursor: pointer;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			color: #be3490;
+			height: 50px;
+			font-weight: 900;
+			width: 150px;
+			margin: 0 1em;
+
+			background: none;
+			border: 3px solid #be3490;
+			border-radius: 30px;
+			transition: all 0.3s ease-in;
+			text-decoration: none;
+
+			&:hover {
+				background: linear-gradient(142deg, #ffe920 0%, #be3490 100%);
+				color: white;
+				border: none;
+			}
+		}
+
+		.project-cards-single-button-2 {
 			cursor: pointer;
 			display: flex;
 			justify-content: center;
 			align-items: center;
 			color: white;
-			height: 35px;
-			width: 100px;
-			margin: 0 20px;
-
-			background: none;
-			border: 1px solid white;
+			height: 50px;
+			font-weight: 900;
+			width: 150px;
+			margin: 0 1em;
+			background: linear-gradient(142deg, #35218f 0%, #cd2ad3 100%);
+			border-radius: 30px;
 			transition: all 0.3s ease-in;
 			text-decoration: none;
-			font-size: 15px;
-
-			a {
-				&:hover {
-					text-decoration: none;
-					color: black;
-					background-color: white;
-				}
-			}
 
 			&:hover {
-				color: black;
 				background-color: white;
+				color: black;
 			}
 		}
 	}

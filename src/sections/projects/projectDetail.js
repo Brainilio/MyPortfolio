@@ -19,15 +19,12 @@ const ProjectDetail = (props) => {
 	) {
 		content = (
 			<section className="project-detail-container">
-				{/* <Link to="/"> */}
 				<button onClick={history.goBack} className="project-detail-close-modal">
 					X
 				</button>
-				{/* </Link> */}
 
 				<div className="project-title-with-tags">
 					<span className="project-detail-title">
-						<div className="project-title-block"></div>
 						{props.location.project.name}
 					</span>
 					<span className="project-detail-date">
@@ -36,7 +33,7 @@ const ProjectDetail = (props) => {
 					<div className="project-detail-tags-row">
 						{props.location.project.tags.map((tag) => (
 							<div key={tag} className="project-card-single-tag">
-								{tag}
+								#{tag}
 							</div>
 						))}
 					</div>
@@ -48,7 +45,7 @@ const ProjectDetail = (props) => {
 						href={props.location.project.gitHub}
 						className="project-cards-single-button"
 					>
-						<button className="project-detail-single-button">CODE </button>
+						CODE
 					</a>
 
 					{props.location.project.livePreview ? (
@@ -56,9 +53,9 @@ const ProjectDetail = (props) => {
 							rel="noopener noreferrer"
 							target="_blank"
 							href={props.location.project.livePreview}
-							className="project-cards-single-button"
+							className="project-cards-single-button-2"
 						>
-							<button className="project-detail-single-button">LIVE</button>
+							LIVE
 						</a>
 					) : null}
 				</div>

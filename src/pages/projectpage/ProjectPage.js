@@ -1,38 +1,13 @@
 import React from "react"
-import { Link, useHistory } from "react-router-dom"
+import { Link } from "react-router-dom"
 import "./ProjectPage.scss"
 import ProjectCard from "../../components/project-card/projectCard"
 import projects from "../../projects"
-import Filter from "../../components/Filter/Filter"
-
+import Contact from "../../sections/Contact/Contact"
 const ProjectPage = (props) => {
-	let history = useHistory()
-
 	React.useEffect(() => {
 		window.scrollTo(0, 0)
 	}, [])
-
-	const [filter, setFilter] = React.useState({
-		All: true,
-		Development: false,
-		Design: false,
-		Art: false,
-		Essays: false,
-	})
-
-	const buttonHandler = (value) => {
-		let newItems = {}
-
-		for (let item in filter) {
-			if (item === value) {
-				newItems[item] = true
-			} else {
-				newItems[item] = false
-			}
-		}
-
-		setFilter(newItems)
-	}
 
 	return (
 		<>
@@ -55,6 +30,8 @@ const ProjectPage = (props) => {
 							))}
 					</div>
 				</div>
+
+				<Contact />
 			</section>
 		</>
 	)
