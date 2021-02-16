@@ -3,6 +3,7 @@
 .all-projects {
 	min-width: 100vw;
 	display: flex;
+	align-items: center;
 	flex-direction: column;
 
 	@include screens {
@@ -17,26 +18,26 @@
 		width: 100vw;
 	}
 
-	.all-projects-button {
-		margin-top: 5em;
-		margin-left: 11em;
+	.link-back {
+		margin: 1em;
 		font-size: 18px;
 		cursor: pointer;
-		display: flex;
-		justify-content: center;
-		align-items: center;
 		color: white;
-		font-family: "Courier New", Courier, monospace;
-		height: 40px;
-		width: 120px;
 		background: none;
-		border: 1px solid white;
 		transition: all 0.3s ease-in;
 		text-decoration: none;
+		&::after {
+			content: "";
+			display: block;
+			width: 0;
+			height: 2px;
+			background: #fff;
+			transition: width 0.3s;
+		}
 
-		&:hover {
-			background-color: white;
-			color: black;
+		&:hover::after {
+			width: 100%;
+			transition: width 0.3s;
 		}
 
 		@include screens {
@@ -56,11 +57,11 @@
 	}
 
 	.project-page-title {
+		margin-top: 2em;
 		display: flex;
 		align-items: center;
-		margin-top: 5em;
-		margin-left: 12em;
 		justify-content: flex-start;
+		flex-direction: column;
 
 		@include screens {
 			margin: 5em 0 2em 0;
@@ -75,40 +76,11 @@
 		@include screenl {
 			margin: 5em 0 2em 0;
 			justify-content: center;
-		}
-
-		.project-page-title-block {
-			width: 30px;
-			height: 30px;
-			background-color: rgb(224, 224, 224);
 		}
 
 		.project-page-title-title {
-			font-size: 20px;
-			margin-left: 10px;
-		}
-	}
-
-	.all-projects-paragraph {
-		margin-left: 12em;
-		width: 50%;
-
-		@include screens {
-			margin: 0 auto;
-			width: 100%;
-			text-align: center;
-		}
-
-		@include screenm {
-			margin: 0 0 2em 0;
-			width: 100%;
-			text-align: center;
-		}
-
-		@include screenl {
-			margin: 0 0 2em 0;
-			width: 100%;
-			text-align: center;
+			font-weight: 900;
+			font-size: 80px;
 		}
 	}
 
