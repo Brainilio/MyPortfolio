@@ -6,12 +6,14 @@ import { Switch, Route, useLocation } from "react-router-dom"
 import ProjectPage from "./pages/projectpage/ProjectPage"
 import ProjectDetail from "./sections/projects/projectDetail"
 import Main from "./sections/main"
+import { ReactComponent as TextSpinning } from "./resources/spinnertext.svg"
 
 function App() {
 	let location = useLocation()
 
 	return (
 		<>
+			<TextSpinning className="spinning-text" />
 			<Rocketship />
 			<Particles
 				className="particles-background"

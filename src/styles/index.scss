@@ -6,6 +6,26 @@ html {
 	scroll-behavior: smooth;
 }
 
+.spinning-text {
+	opacity: 0.5;
+	position: absolute;
+	left: 60%;
+	top: 50%;
+	padding: 5em;
+	height: 540px;
+	transform-origin: center center;
+	animation: spin 8s infinite linear;
+}
+
+@keyframes spin {
+	from {
+		transform: rotate(360deg);
+	}
+	to {
+		transform: rotate(0);
+	}
+}
+
 body {
 	scroll-behavior: smooth;
 	overflow-x: hidden;
