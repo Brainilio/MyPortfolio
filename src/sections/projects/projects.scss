@@ -98,11 +98,11 @@
 	}
 
 	.project-cards {
-		margin-top: 5em;
-		margin: 0 auto;
-		display: grid;
-		grid-gap: 4em;
-		grid-template-columns: 1fr 1fr 1fr;
+		// margin-top: 5em;
+		// margin: 0 auto;
+		// display: grid;
+		// grid-gap: 4em;
+		// grid-template-columns: 1fr 1fr 1fr;
 
 		@include screens {
 			display: flex;

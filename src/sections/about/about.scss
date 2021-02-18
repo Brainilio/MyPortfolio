@@ -29,7 +29,7 @@
 
 	.about-block {
 		display: flex;
-		justify-content: space-evenly;
+		justify-content: space-between;
 		align-items: flex-start;
 
 		@include screenxs {
@@ -65,6 +65,7 @@
 			font-size: 20px;
 			display: flex;
 			flex-direction: column;
+			margin-left: 6em;
 
 			@include screens {
 				width: 80%;
@@ -150,6 +151,7 @@
 		.about-image {
 			display: flex;
 			flex-direction: column;
+			margin-right: 8em;
 
 			@include screens {
 				margin-top: 5em;
