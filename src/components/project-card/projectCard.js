@@ -39,30 +39,30 @@ const ProjectCard = (props) => {
 								</div>
 							))}
 						</div> */}
-					</div>
-					{/* </Link> */}
 
-					<div className="project-cards-buttons">
-						<a
-							rel="noopener noreferrer"
-							target="_blank"
-							href={props.information.gitHub}
-							className="project-cards-single-button"
-						>
-							C O D E
-						</a>
-
-						{props.information.livePreview ? (
+						<div className="project-cards-buttons">
 							<a
 								rel="noopener noreferrer"
 								target="_blank"
-								href={props.information.livePreview}
-								className="project-cards-single-button-2"
+								href={props.information.gitHub}
+								className="project-cards-single-button"
 							>
-								L I V E
+								C O D E
 							</a>
-						) : null}
+
+							{props.information.livePreview ? (
+								<a
+									rel="noopener noreferrer"
+									target="_blank"
+									href={props.information.livePreview}
+									className="project-cards-single-button-2"
+								>
+									L I V E
+								</a>
+							) : null}
+						</div>
 					</div>
+					{/* </Link> */}
 				</div>
 			</div>
 		</>
