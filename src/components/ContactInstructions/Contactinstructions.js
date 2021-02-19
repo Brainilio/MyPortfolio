@@ -5,10 +5,10 @@ const Contactinstructions = () => {
 	return (
 		<div className="contact-instructions">
 			<h1>What can you expect from me?</h1>
-			<h3>
+			<h2>
 				Thanks for willing to contact me, let’s get the ball rolling! There are
 				a couple of things you can expect when working together with me.
-			</h3>
+			</h2>
 
 			<ul>
 				<li>
