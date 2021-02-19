@@ -2,7 +2,7 @@ import React from "react"
 import ContactHero from "../../components/ContactHero/ContactHero"
 import Contactinstructions from "../../components/ContactInstructions/Contactinstructions"
 import Form from "../../components/Form/Form"
-import "./Contact.scss"
+import "./contact.scss"
 
 const Contact = () => {
 	return (
