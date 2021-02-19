@@ -6,7 +6,7 @@ const Contactinstructions = () => {
 		<div className="contact-instructions">
 			<h1>What can you expect from me?</h1>
 			<h2>
-				Thanks for willing to contact me, let’s get the ball rolling! There are
+				Thanks for willing to contact me, let’s get this ball rolling! There are
 				a couple of things you can expect when working together with me.
 			</h2>
 

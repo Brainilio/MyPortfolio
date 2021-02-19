@@ -8,11 +8,9 @@ const Footer = () => {
 		<>
 			{/* <ReactSVG className="astro" src={austronaut} /> */}
 			<footer className="footer">
-				<div className="moon-ground">
-					<span className="text-footer" aria-hidden>
-						Developed and Designed with 🖤 by Brainilio
-					</span>
-				</div>
+				<span className="text-footer" aria-hidden>
+					Developed and Designed with 🖤 by Brainilio
+				</span>
 			</footer>
 		</>
 	)

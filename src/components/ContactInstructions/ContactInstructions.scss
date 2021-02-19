@@ -31,9 +31,16 @@
 		margin: 0 auto;
 	}
 
+	h1 {
+		font-weight: 900;
+		font-size: 25px;
+	}
+
 	h2 {
 		width: 80%;
-		font-size: 18px;
+		font-size: 20px;
+		margin: 0;
+		font-weight: normal;
 
 		@include screenxs {
 			margin: 1em auto;
@@ -62,8 +69,12 @@
 		padding: 0;
 
 		li {
+			h3 {
+				font-size: 25px;
+			}
 			p {
 				width: 80%;
+				font-size: 22px;
 
 				@include screenxs {
 					width: 80%;

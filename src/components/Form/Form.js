@@ -30,22 +30,12 @@ const Form = () => {
 		phone: "",
 		message: "",
 	})
-	// const [error, setError] = useState({
-	// 	name: errors.name?.message || "",
-	// 	email: errors.email?.message || "",
-	// 	phone: errors.phone?.message || "",
-	// })
-
-	useEffect(() => {}, [])
 
 	const formHandler = async (e) => {
 		setSuccess(false)
 		setFail(false)
 		setLoader(true)
 		setShowFarm(false)
-
-		// const isValid = await contactSchema.isValid(formData)
-		// console.log(isValid)
 
 		fetch("/", {
 			method: "POST",
@@ -71,22 +61,6 @@ const Form = () => {
 	const setForm = (e, message) => {
 		let name = e.target.name
 		let value = e.target.value
-
-		// console.log(errors[name]?.message)
-
-		// if (errors[name]) {
-		// 	setError({
-		// 		...error,
-		// 		[name]: errors[name].message,
-		// 	})
-		// }
-
-		// if (error[name] && !errors[name]) {
-		// 	setError({
-		// 		...error,
-		// 		[name]: "",
-		// 	})
-		// }
 
 		if (message) {
 			setFormData({
