@@ -3,7 +3,7 @@ import "./NavBar.scss"
 import { Link } from "react-scroll"
 
 const NavBar = (props) => {
-	let [handler, setHandler] = React.useState(false)
+	let [, setHandler] = React.useState(false)
 	let classes = "hamburger-menu"
 
 	if (props.show) {

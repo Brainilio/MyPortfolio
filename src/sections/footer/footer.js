@@ -1,7 +1,7 @@
 import React from "react"
 import "./footer.scss"
-import austronaut from "../../resources/astronaut.svg"
-import { ReactSVG } from "react-svg"
+// import austronaut from "../../resources/astronaut.svg"
+// import { ReactSVG } from "react-svg"
 
 const Footer = () => {
 	return (

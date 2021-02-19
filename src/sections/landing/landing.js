@@ -1,13 +1,13 @@
 import React, { useEffect } from "react"
 
 import "./landing.scss"
-import { gsap } from "gsap"
+// import { gsap } from "gsap"
 import { Link } from "react-scroll"
 
 const Landing = () => {
 	const titleRef = React.useRef(null)
-	const iconRef = React.useRef(null)
-	const readRef = React.useRef(null)
+	// const iconRef = React.useRef(null)
+	// const readRef = React.useRef(null)
 
 	useEffect(() => {
 		// gsap.from(titleRef.current.children, {

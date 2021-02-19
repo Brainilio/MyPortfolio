@@ -6,7 +6,7 @@ import "./skill.scss"
 import icons from "../../resources/icons.webp"
 
 const Skill = () => {
-	const skillsRef = useRef(null)
+	//
 	const textRef = useRef(null)
 	gsap.registerPlugin(ScrollTrigger)
 	useEffect(() => {
@@ -100,7 +100,12 @@ const Skill = () => {
 				</div>
 				{/* img right here */}
 				<div className="skill-hero-img">
-					<img src={icons} width="400" height="400" />
+					<img
+						src={icons}
+						width="400"
+						height="400"
+						alt="icons of different technologies"
+					/>
 				</div>
 			</div>
 		</section>

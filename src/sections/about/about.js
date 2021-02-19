@@ -10,7 +10,7 @@ import { Link } from "react-scroll"
 
 const About = () => {
 	const textRef = React.useRef(null)
-	const imgRef = React.useRef(null)
+	// const imgRef = React.useRef(null)
 	gsap.registerPlugin(ScrollTrigger)
 	useEffect(() => {
 		// gsap.from(textRef.current, {
