@@ -8,26 +8,39 @@
 	margin-top: 4em;
 	margin-bottom: 4em;
 
-	@include screenxl {
+	@include screenl {
 		flex-direction: column;
+		margin: 1em auto;
 	}
 
 	.project-image {
 		position: relative;
-		max-width: auto;
 		border-radius: 25px;
 		overflow: hidden;
-		box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.219);
+		box-shadow: 3px 3px 3px rgba(33, 7, 54, 0.219);
+		display: flex;
+		align-items: center;
+		justify-content: center;
 
 		.project-cards-image {
+			object-position: center;
 			object-fit: cover;
-			transition: all 0.4s ease-in-out;
+			transition: all 0.4s ease-in;
+			border-radius: 25px;
 			box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.219);
+
+			@include screens {
+				width: 80%;
+			}
 		}
 
 		&:hover .project-cards-image,
 		&:focus .project-cards-image {
-			transform: scale(1.2);
+			transform: scale(1.1);
+
+			@include screens {
+				transform: none;
+			}
 		}
 	}
 
@@ -41,10 +54,16 @@
 
 		.project-cards-description {
 			width: 50%;
+
+			@include screenl {
+				margin-top: 2em;
+				width: 100%;
+				text-align: center;
+			}
+
 			.project-cards-description-title {
 				font-size: 35px;
 				font-weight: 900;
-				text-transform: uppercase;
 			}
 			.project-cards-description-paragraph {
 				font-size: 25px;
@@ -77,6 +96,11 @@
 			display: flex;
 			width: 100%;
 			margin-top: 5em;
+
+			@include screenl {
+				margin-top: 3em;
+				justify-content: center;
+			}
 
 			.project-cards-single-button {
 				cursor: pointer;

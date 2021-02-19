@@ -13,7 +13,7 @@ function App() {
 
 	return (
 		<>
-			{/* <TextSpinning className="spinning-text" /> */}
+			<TextSpinning className="spinning-text" />
 			<Rocketship />
 			<Particles
 				className="particles-background"

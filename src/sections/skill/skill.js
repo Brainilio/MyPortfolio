@@ -1,6 +1,6 @@
 import { ScrollTrigger } from "gsap/all"
 import gsap from "gsap/gsap-core"
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef } from "react"
 import "./skill.scss"
 
 import icons from "../../resources/icons.webp"
