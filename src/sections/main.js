@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import DecorativeLine from "../components/decorativeLine/decorativeLine"
 import About from "./about/about"
-import Contact from "./contact/contact"
+import Contact from "./Contact/contact"
 import Landing from "./landing/landing"
 import Projects from "./projects/projects"
 import Publicmessage from "./publicmessage/publicmessage"
