@@ -1,4 +1,6 @@
-html {
+@import "./responsive/breakpoints.scss";
+
+body {
 	overflow-x: hidden;
 	max-width: 100vw;
 	width: 100vw;
@@ -15,6 +17,10 @@ html {
 	height: 540px;
 	transform-origin: center center;
 	animation: spin 8s infinite linear;
+
+	@include screenm {
+		display: none;
+	}
 }
 
 @keyframes spin {
@@ -64,6 +70,7 @@ section {
 	position: relative;
 	min-height: 100vh;
 	max-width: 100vw;
+	overflow-x: hidden;
 }
 
 a {
@@ -78,12 +85,4 @@ a {
 	width: 100%;
 	height: 100%;
 	position: fixed;
-}
-
-canvas {
-	max-width: 100vw;
-}
-
-.particles-background {
-	max-width: 100vw;
 }

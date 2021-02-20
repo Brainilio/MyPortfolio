@@ -200,15 +200,34 @@
 				margin: 1em;
 				border-radius: 15px;
 				object-fit: cover;
-
-				@include screenxs {
-					margin: 15px 10px;
+				@include screenm {
+					margin: 0 auto;
 				}
 			}
 
+			.about-image-rotterdam {
+				@include screens {
+					margin: 15px;
+					width: 350px;
+					object-fit: cover;
+				}
+			}
+			.about-image-sanfran {
+				@include screens {
+					margin: 10px;
+					width: 165px;
+					object-fit: cover;
+				}
+			}
 			.about-image-image {
 				transition: all 0.5s ease-in-out;
 				border-radius: 15px;
+
+				@include screens {
+					margin: 10px;
+					width: 170px;
+					object-fit: cover;
+				}
 			}
 		}
 	}
