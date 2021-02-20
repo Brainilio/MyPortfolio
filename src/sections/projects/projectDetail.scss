@@ -321,9 +321,15 @@ h2 {
 	justify-content: space-around;
 	flex-direction: row-reverse;
 
+	@include screenl {
+		text-align: center;
+		flex-direction: column-reverse;
+		align-items: center;
+	}
+
 	.p-additional-img {
 		background-color: rgb(0, 0, 0);
-		background: url("../../resources/menu/menu-1.webp");
+		background: url("../../resources/san-fran.webp");
 		width: 450px;
 		height: 450px;
 		border-radius: 25px;

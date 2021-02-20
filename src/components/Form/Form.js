@@ -45,8 +45,6 @@ const Form = () => {
 				[name]: value,
 			})
 		}
-
-		console.log(formData)
 	}
 
 	const validate = () => {
