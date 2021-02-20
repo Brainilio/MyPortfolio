@@ -4,60 +4,141 @@
 	display: flex;
 	flex-direction: column;
 	margin-top: 2em;
-	overflow-x: hidden;
-	.skills-title {
+
+	.skills-title-block {
 		display: flex;
-		align-items: center;
-		margin-top: 5em;
+		flex-direction: column;
+		align-items: flex-start;
 		margin-left: 12em;
 
 		@include screens {
-			margin: 5em 0 2em 0;
-			justify-content: center;
+			margin: 2em auto;
 		}
 
 		@include screenm {
-			margin: 5em 0 2em 0;
-			justify-content: center;
+			margin: 2em auto;
 		}
 
 		@include screenl {
-			margin: 5em 0 2em 0;
-			justify-content: center;
+			margin: 2em auto;
 		}
 
-		.skills-title-block {
-			width: 30px;
-			height: 30px;
-			background-color: rgb(224, 224, 224);
+		.skills-title {
+			margin-top: 5em;
+			font-size: 35px;
+			font-weight: 900;
+			margin-bottom: 1em;
+
+			@include screens {
+				margin: 0 auto;
+				justify-content: center;
+				margin-bottom: 1em;
+			}
+
+			@include screenm {
+				margin: 0 auto;
+				justify-content: center;
+				margin-bottom: 1em;
+			}
+
+			@include screenl {
+				margin: 0 auto;
+				justify-content: center;
+				margin-bottom: 1em;
+			}
 		}
 
-		.skills-title-title {
+		p {
 			font-size: 20px;
-			margin-left: 10px;
+			width: 50%;
+
+			@include screens {
+				width: 100%;
+				margin: 0;
+				text-align: center;
+			}
+
+			@include screenm {
+				width: 70%;
+				margin: 0 auto;
+				text-align: center;
+			}
+
+			@include screenl {
+				width: 70%;
+				margin: 0 auto;
+				text-align: center;
+			}
 		}
 	}
 
-	p {
-		margin-left: 12em;
-		width: 25%;
+	.skill-hero {
+		height: 450px auto;
+		border-radius: 50px;
+		padding: 1em 2em;
+		margin: 3em auto;
+		width: 80%;
+		overflow: hidden;
+		background: linear-gradient(142deg, hsl(234, 82%, 57%) 0%, #ad5ee2 100%);
+		display: flex;
+		align-items: center;
 
-		@include screens {
-			width: 100%;
-			margin: 0;
-			text-align: center;
+		@include screenxs {
+			flex-direction: column;
 		}
-
+		@include screenxxs {
+			flex-direction: column;
+		}
 		@include screenm {
-			width: 70%;
-			margin: 0 auto;
-			text-align: center;
+			flex-direction: column;
+		}
+		@include screenl {
+			flex-direction: column;
 		}
 
-		@include screenl {
-			width: 70%;
+		.skill-hero-text {
+			margin-top: 3em;
+			margin-bottom: 3em;
+			width: 50%;
+
+			@include screenl {
+				width: 100%;
+			}
+
+			@include screenm {
+				width: 100%;
+			}
+
+			@include screenxs {
+				width: 100%;
+			}
+
+			@include screenxxs {
+				width: 100%;
+			}
+			ul {
+				list-style-type: none;
+
+				li {
+					display: flex;
+					flex-direction: column;
+					margin: 1em 0;
+					font-size: 20px;
+				}
+			}
+		}
+
+		.skill-hero-img {
 			margin: 0 auto;
-			text-align: center;
+			width: 40%;
+			height: 100%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			@include screenl {
+				display: none;
+			}
 		}
 	}
 

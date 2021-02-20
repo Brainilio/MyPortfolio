@@ -1,5 +1,4 @@
 import React, { useState } from "react"
-import DecorativeLine from "../components/decorativeLine/decorativeLine"
 import About from "./about/about"
 import Contact from "./Contact/contact"
 import Landing from "./landing/landing"
@@ -9,23 +8,31 @@ import Skill from "./skill/skill"
 import Footer from "./footer/footer"
 import FallingStars from "../components/falling-stars/fallingStars"
 import CrescentMoon from "../components/crescentmoon/crescentMoon"
+import NavBar from "../components/NavBar/NavBar"
+import SideDrawer from "../components/SideDrawer/SideDrawer"
 
 const Main = () => {
 	const [show, setShow] = useState(false)
 	const togglePublicMessage = () => setShow((prevState) => !prevState)
 
+	const [drawer, setsidedrawer] = useState(false)
+
+	const handlesidedrawer = () => {
+		setsidedrawer((prevstate) => !prevstate)
+	}
+
 	return (
 		<>
-			<Contact />
+			<SideDrawer clicked={handlesidedrawer} show={drawer} />
+			<NavBar clicked={handlesidedrawer} show={drawer} />
 			<CrescentMoon />
-			<DecorativeLine />
 			<FallingStars />
 			{show ? <Publicmessage show={togglePublicMessage} /> : null}
-
 			<Landing />
 			<Projects />
 			<About />
 			<Skill />
+			<Contact />
 			<Footer />
 		</>
 	)

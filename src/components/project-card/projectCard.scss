@@ -2,124 +2,147 @@
 
 .project-cards-single-card {
 	display: flex;
-	flex-direction: column;
-	margin-top: 25px;
-	margin-bottom: 25px;
-	height: 550px;
-	width: 350px;
-	background-color: white;
-	box-shadow: 5px 5px 25px 3px black;
-	transition: all 0.8s ease;
-	position: relative;
+	align-items: center;
+	justify-content: space-around;
+	margin-left: 8em;
+	margin-top: 4em;
+	margin-bottom: 4em;
 
-	&:hover {
-		transform: rotateX(15deg) rotateZ(5deg) rotateY(-10deg);
-		box-shadow: 20px 15px 30px 5px rgba(78, 59, 77, 0.617);
-
-		@include screens {
-			transform: none;
-		}
-		@include screenm {
-			transform: none;
-		}
-		@include screenl {
-			transform: none;
-		}
-	}
-
-	.project-cards-image {
-		height: 200px;
-		width: 100%;
-		position: relative;
-		object-fit: cover;
-		cursor: pointer;
-		transition: opacity 0.8s ease-in-out;
-
-		&:hover {
-			opacity: 80%;
-		}
-	}
-
-	.project-cards-description {
-		display: flex;
+	@include screenl {
 		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		position: relative;
-		color: black;
-		width: 100%;
+		margin: 1em auto;
+	}
 
-		.project-cards-description-title {
-			font-size: 18px;
-			margin-top: 0rem;
+	.project-image {
+		position: relative;
+		border-radius: 25px;
+		overflow: hidden;
+		box-shadow: 3px 3px 3px rgba(33, 7, 54, 0.219);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		.project-cards-image {
+			object-position: center;
+			object-fit: cover;
+			transition: all 0.4s ease-in;
+			border-radius: 25px;
+			box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.219);
 
 			@include screens {
-				margin-top: 0rem;
-				font-size: 20px;
+				width: 80%;
 			}
 		}
 
-		.project-cards-description-paragraph {
-			width: 85%;
-			text-align: justify;
+		&:hover .project-cards-image,
+		&:focus .project-cards-image {
+			transform: scale(1.1);
+
+			@include screens {
+				transform: none;
+			}
 		}
 	}
 
-	.project-cards-tags-row {
+	.descriptions {
+		width: 60%;
 		display: flex;
-		justify-content: center;
-		width: 100%;
-
-		@include screens {
-			height: 10%;
-		}
-
-		.project-card-single-tag {
-			cursor: default;
-			min-width: 100px;
-			width: auto;
-			height: 30px;
-			background-color: rgba(162, 162, 162, 0.764);
-			color: black;
-			margin: 0 auto;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			border-radius: 500px;
-		}
-	}
-
-	.project-cards-buttons {
-		position: absolute;
-		bottom: 0%;
-		margin-top: 15px;
-		display: flex;
-		width: 100%;
-		justify-content: space-around;
+		margin: 0;
+		padding: 0;
+		flex-direction: column;
 		align-items: center;
-		height: 15%;
-		background-color: black;
 
-		@include screens {
-			height: 15%;
+		.project-cards-description {
+			width: 50%;
+
+			@include screenl {
+				margin-top: 2em;
+				width: 100%;
+				text-align: center;
+			}
+
+			.project-cards-description-title {
+				font-size: 35px;
+				font-weight: 900;
+			}
+			.project-cards-description-paragraph {
+				font-size: 20px;
+			}
+
+			.read-more {
+				color: rgb(226, 98, 98);
+				font-size: 20px;
+				width: 115px;
+				display: inline-block;
+
+				&::after {
+					content: "";
+					display: block;
+					width: 0;
+					height: 2px;
+					background: #fff;
+					transition: width 0.3s;
+				}
+
+				&:hover::after {
+					width: 100%;
+					transition: width 0.3s;
+				}
+			}
 		}
 
-		.project-cards-single-button {
-			cursor: pointer;
+		.project-cards-buttons {
+			z-index: 2;
 			display: flex;
-			justify-content: center;
-			align-items: center;
-			color: white;
-			height: 35px;
-			width: 100px;
-			background: none;
-			border: 1px solid white;
-			transition: all 0.3s ease-in;
-			text-decoration: none;
+			width: 100%;
+			margin-top: 5em;
 
-			&:hover {
-				background-color: white;
-				color: black;
+			@include screenl {
+				margin-top: 3em;
+				justify-content: center;
+			}
+
+			.project-cards-single-button {
+				cursor: pointer;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				color: #be3490;
+				height: 50px;
+				font-weight: 900;
+				width: 150px;
+				margin-right: 3em;
+				background: none;
+				border: 3px solid #be3490;
+				border-radius: 30px;
+				transition: all 0.3s ease-in;
+				text-decoration: none;
+
+				&:hover {
+					background: linear-gradient(142deg, #ffe920 0%, #be3490 100%);
+					color: white;
+				}
+			}
+
+			.project-cards-single-button-2 {
+				cursor: pointer;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				color: white;
+				height: 50px;
+				font-weight: 900;
+				width: 150px;
+
+				background: linear-gradient(142deg, #35218f 0%, #cd2ad3 100%);
+				border-radius: 30px;
+				transition: all 0.3s ease-in;
+				text-decoration: none;
+
+				&:hover {
+					background-color: white;
+					color: black;
+				}
 			}
 		}
 	}

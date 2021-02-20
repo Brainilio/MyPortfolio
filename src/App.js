@@ -2,16 +2,18 @@ import React from "react"
 import Particles from "react-particles-js"
 import Rocketship from "./components/rocketship/rocketship"
 import { Switch, Route, useLocation } from "react-router-dom"
-// import { TransitionGroup, CSSTransition } from "react-transition-group"
+
 import ProjectPage from "./pages/projectpage/ProjectPage"
 import ProjectDetail from "./sections/projects/projectDetail"
 import Main from "./sections/main"
+import { ReactComponent as TextSpinning } from "./resources/spinnertext.svg"
 
 function App() {
 	let location = useLocation()
 
 	return (
 		<>
+			<TextSpinning className="spinning-text" />
 			<Rocketship />
 			<Particles
 				className="particles-background"
@@ -33,7 +35,7 @@ function App() {
 						},
 						move: {
 							direction: "none",
-							speed: 1,
+							speed: 0,
 							random: false,
 							straight: false,
 						},
