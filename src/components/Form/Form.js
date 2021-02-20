@@ -1,11 +1,20 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import "./Form.scss"
-import { useForm } from "react-hook-form"
+
 import Success from "../../resources/success.gif"
 import Fail from "../../resources/fail.gif"
 import FormLoader from "../FormLoader/FormLoader"
-import { yupResolver } from "@hookform/resolvers/yup"
-import { contactSchema } from "./FormValidation/contactValidation"
+
+const initialState = {
+	name: "",
+	email: "",
+	organization: "",
+	phone: "",
+	message: "",
+	nameError: "",
+	emailError: "",
+	phoneError: "",
+}
 
 function encode(data) {
 	return Object.keys(data)
@@ -14,51 +23,14 @@ function encode(data) {
 }
 
 const Form = () => {
-	const { register, handleSubmit, errors } = useForm({
-		resolver: yupResolver(contactSchema),
-		criteriaMode: "all",
-	})
-
 	const [loader, setLoader] = useState(false)
 	const [success, setSuccess] = useState(false)
 	const [fail, setFail] = useState(false)
 	const [showForm, setShowFarm] = useState(true)
-	const [formData, setFormData] = useState({
-		name: "",
-		email: "",
-		organization: "",
-		phone: "",
-		message: "",
-	})
 
-	const formHandler = async (e) => {
-		setSuccess(false)
-		setFail(false)
-		setLoader(true)
-		setShowFarm(false)
+	const [formData, setFormData] = useState(initialState)
 
-		fetch("/", {
-			method: "POST",
-			headers: { "Content-Type": "application/x-www-form-urlencoded" },
-			body: encode({ "form-name": "contact", ...formData }),
-		})
-			.then(() => {
-				setFail(false)
-				setLoader(false)
-				setSuccess(true)
-				setShowFarm(false)
-			})
-			.catch(() => {
-				setLoader(false)
-				setSuccess(false)
-				setFail(true)
-				setShowFarm(false)
-			})
-
-		e.preventDefault()
-	}
-
-	const setForm = (e, message) => {
+	const handleChange = (e, message) => {
 		let name = e.target.name
 		let value = e.target.value
 
@@ -73,14 +45,88 @@ const Form = () => {
 				[name]: value,
 			})
 		}
+
+		console.log(formData)
+	}
+
+	const validate = () => {
+		let nameError = ""
+		let emailError = ""
+		let phoneError = ""
+		// const regex = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/g
+
+		if (!formData.email) {
+			emailError = "Please type in your email!"
+		} else {
+			emailError = " "
+		}
+
+		if (formData.email) {
+			if (!formData.email.includes("@")) {
+				emailError = "Invalid email!"
+			}
+			emailError = ""
+		}
+
+		if (!formData.name) {
+			nameError = "Please type in your name!"
+		} else {
+			nameError = ""
+		}
+
+		if (!formData.phone) {
+			phoneError = "Please type in your phone number!"
+		} else {
+			phoneError = ""
+		}
+
+		if (formData.phone) {
+			if (formData.phone.length < 9 || formData.phone.length > 12) {
+				phoneError = "Invalid phone number!"
+			}
+			phoneError = ""
+		}
+
+		if (emailError || nameError || phoneError) {
+			setFormData({ ...formData, emailError, nameError, phoneError })
+			return false
+		}
+
+		return true
+	}
+
+	const submitForm = async (e) => {
+		e.preventDefault()
+		const isValid = validate()
+
+		if (isValid) {
+			setSuccess(false)
+			setFail(false)
+			setLoader(true)
+			setShowFarm(false)
+			fetch("/", {
+				method: "POST",
+				headers: { "Content-Type": "application/x-www-form-urlencoded" },
+				body: encode({ "form-name": "contact", ...formData }),
+			})
+				.then(() => {
+					setFail(false)
+					setLoader(false)
+					setSuccess(true)
+					setShowFarm(false)
+					setFormData(initialState)
+				})
+				.catch(() => {
+					setLoader(false)
+					setSuccess(false)
+					setFail(true)
+					setShowFarm(false)
+				})
+		}
 	}
 
 	let form = (
-		<form
-			name="contact"
-			method="POST"
-			onSubmit={(e) => handleSubmit(formHandler(e))}
-		>
+		<form name="contact" method="POST" onSubmit={(e) => submitForm(e)}>
 			<input type="hidden" name="form-name" value="contact" />
 			<div>
 				<label id="lbl-name" htmlFor="name">
@@ -88,17 +134,14 @@ const Form = () => {
 				</label>
 				<input
 					placeholder="John Doe"
-					onChange={setForm}
+					onChange={handleChange}
 					value={formData.name}
 					name="name"
 					type="text"
-					ref={register}
 					aria-labelledby="lbl-name"
 				/>
-				<span
-					style={{ color: "lightred", marginTop: "10px", marginBottom: "0em" }}
-				>
-					{errors.name?.message}
+				<span style={{ marginTop: "10px", marginBottom: "0em" }}>
+					{formData.nameError}
 				</span>
 			</div>
 
@@ -107,10 +150,9 @@ const Form = () => {
 					Email*
 				</label>
 				<input
-					ref={register}
 					placeholder="John@doe.com"
 					value={formData.email}
-					onChange={setForm}
+					onChange={handleChange}
 					name="email"
 					type="email"
 					aria-labelledby="lbl-email"
@@ -118,7 +160,7 @@ const Form = () => {
 				<span
 					style={{ color: "lightred", marginTop: "10px", marginBottom: "0em" }}
 				>
-					{errors.email?.message}
+					{formData.emailError}
 				</span>
 			</div>
 
@@ -128,10 +170,9 @@ const Form = () => {
 				</label>
 				<input
 					aria-labelledby="lbl-org"
-					ref={register}
 					placeholder="Doe LLC"
 					value={formData.organization}
-					onChange={setForm}
+					onChange={handleChange}
 					name="organization"
 					type="text"
 				/>
@@ -142,18 +183,15 @@ const Form = () => {
 					Phone*
 				</label>
 				<input
-					ref={register}
-					placeholder="+31(0)6-123-456-78"
+					placeholder="+1(408)-123-4565 or +31612345678"
 					value={formData.phone}
-					onChange={setForm}
+					onChange={handleChange}
 					name="phone"
 					type="tel"
 					aria-labelledby="lbl-phone"
 				/>
-				<span
-					style={{ color: "lightred", marginTop: "10px", marginBottom: "0em" }}
-				>
-					{errors.phone?.message}
+				<span style={{ marginTop: "10px", marginBottom: "0em" }}>
+					{formData.phoneError}
 				</span>
 			</div>
 
@@ -163,14 +201,13 @@ const Form = () => {
 				</label>
 				<textarea
 					aria-labelledby="lbl-message"
-					ref={register}
 					placeholder="Tell me something about yourself or your business!"
 					name="message"
-					onChange={(event) => setForm(event, true)}
+					onChange={(event) => handleChange(event, true)}
 				/>
 			</div>
 
-			<input ref={register} name="bot-field" type="hidden" onChange={setForm} />
+			<input name="bot-field" type="hidden" onChange={handleChange} />
 
 			<input
 				value="S U B M I T"

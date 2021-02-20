@@ -2,7 +2,14 @@ import React from "react"
 import "./FormLoader.scss"
 
 const FormLoader = () => {
-	return <div className="formloader">Loading...</div>
+	return (
+		<div className="lds-ring">
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+		</div>
+	)
 }
 
 export default FormLoader

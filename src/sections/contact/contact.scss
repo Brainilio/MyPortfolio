@@ -61,7 +61,7 @@
 	.form {
 		display: flex;
 		flex-direction: column;
-		width: 80%;
+		width: 70%;
 
 		.success-form,
 		.fail-form {
@@ -123,6 +123,8 @@
 
 		@include screenl {
 			margin-top: 3em;
+			justify-content: center;
+			align-items: center;
 		}
 
 		h1,
@@ -136,7 +138,7 @@
 			font-size: 20px;
 		}
 		h1 {
-			font-size: 25px;
+			font-size: 35px;
 			font-weight: 900;
 		}
 
@@ -199,6 +201,10 @@
 						outline: thin dotted;
 						border: 2px solid rgb(144, 240, 144);
 					}
+				}
+
+				span {
+					color: rgb(163, 73, 73);
 				}
 
 				&:nth-child(6) {
