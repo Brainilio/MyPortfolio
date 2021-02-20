@@ -1,7 +1,7 @@
 import React, { useEffect } from "react"
 import "./projectDetail.scss"
 import { Redirect, useHistory } from "react-router-dom"
-import Contact from "../Contact/contact"
+import Contact from "../contact/contact"
 
 const ProjectDetail = (props) => {
 	//props.location.project == project you're working with.
