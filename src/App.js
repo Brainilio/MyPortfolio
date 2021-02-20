@@ -2,7 +2,7 @@ import React from "react"
 import Particles from "react-particles-js"
 import Rocketship from "./components/rocketship/rocketship"
 import { Switch, Route, useLocation } from "react-router-dom"
-
+import ReactGA from "react-ga"
 import ProjectPage from "./pages/projectpage/ProjectPage"
 import ProjectDetail from "./sections/projects/projectDetail"
 import Main from "./sections/main"
@@ -10,6 +10,8 @@ import { ReactComponent as TextSpinning } from "./resources/spinnertext.svg"
 
 function App() {
 	let location = useLocation()
+	ReactGA.initialize(`${process.env.REACT_APP_TRACKING_URL}`)
+	ReactGA.pageview("/")
 
 	return (
 		<>
