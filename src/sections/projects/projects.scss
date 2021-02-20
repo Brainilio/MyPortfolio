@@ -1,121 +1,107 @@
 @import "../../styles/responsive/breakpoints.scss";
 
 .projects {
-	min-width: 100vw;
 	display: flex;
 	flex-direction: column;
+	margin-top: 5em;
 
 	@include screens {
+		margin-top: 0em;
 		width: 100vw;
 	}
 
 	@include screenm {
+		margin-top: 0em;
 		width: 100vw;
 	}
 
 	@include screenl {
+		margin-top: 0em;
 		width: 100vw;
 	}
 
 	.projects-title {
 		display: flex;
-		align-items: center;
-		margin-top: 5em;
+		flex-direction: column;
 		margin-left: 12em;
-		justify-content: flex-start;
-
-		@include screens {
-			margin: 5em 0 2em 0;
-			justify-content: center;
-		}
-
-		@include screenm {
-			margin: 5em 0 2em 0;
-			justify-content: center;
-		}
+		margin-bottom: 10px;
 
 		@include screenl {
-			margin: 5em 0 2em 0;
 			justify-content: center;
-		}
-
-		.projects-title-block {
-			width: 30px;
-			height: 30px;
-			background-color: rgb(224, 224, 224);
+			text-align: center;
+			margin: 0 auto;
 		}
 
 		.projects-title-title {
+			font-weight: 900;
+			font-size: 35px;
+		}
+
+		.projects-paragraph {
+			width: 50%;
 			font-size: 20px;
-			margin-left: 10px;
-		}
-	}
 
-	.projects-paragraph {
-		margin-left: 12em;
-		width: 25%;
+			@include screens {
+				width: 100%;
+				text-align: center;
+			}
 
-		@include screens {
-			margin: 0;
-			width: 100%;
-			text-align: center;
-		}
+			@include screenm {
+				width: 100%;
+				text-align: center;
+			}
 
-		@include screenm {
-			margin: 0 0 2em 0;
-			width: 100%;
-			text-align: center;
-		}
-
-		@include screenl {
-			margin: 0 0 2em 0;
-			width: 100%;
-			text-align: center;
-		}
-	}
-
-	.all-projects-button {
-		margin-left: 13em;
-		font-size: 15px;
-		cursor: pointer;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		color: white;
-		font-family: "Courier New", Courier, monospace;
-		height: 40px;
-		width: 130px;
-		background: none;
-		border: 1px solid white;
-		transition: all 0.3s ease-in;
-		text-decoration: none;
-
-		&:hover {
-			background-color: white;
-			color: black;
+			@include screenl {
+				width: 80%;
+				text-align: center;
+				margin: 0 auto;
+				margin-top: 2em;
+			}
 		}
 
-		@include screens {
-			margin: 0 auto;
-			text-align: center;
-		}
+		.all-projects-button {
+			margin: 2em 0;
+			font-size: 15px;
+			cursor: pointer;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			color: white;
+			height: 50px;
+			width: 190px;
+			border-radius: 30px;
+			font-weight: 900;
+			background: linear-gradient(142deg, #337ce9 0%, #e846fd 100%);
+			transition: all 0.3s ease;
+			text-decoration: none;
+			border: none;
 
-		@include screenm {
-			margin: 0 auto;
-			text-align: center;
-		}
+			&:hover {
+				color: black;
+			}
 
-		@include screenl {
-			margin: 0 auto;
-			text-align: center;
+			@include screens {
+				margin: 2em auto;
+				text-align: center;
+			}
+
+			@include screenm {
+				margin: 2em auto;
+				text-align: center;
+			}
+
+			@include screenl {
+				margin: 2em auto;
+				text-align: center;
+			}
 		}
 	}
 
 	.project-cards {
-		margin-top: 6em;
-		margin-left: 12em;
-		display: grid;
-		grid-template-columns: 1fr 1fr 1fr;
+		width: 100%;
+
+		display: flex;
+		flex-direction: column;
 
 		@include screens {
 			display: flex;
@@ -125,20 +111,20 @@
 
 		@include screenm {
 			margin: 0 auto;
-			grid-template-columns: 1fr 1fr;
+			grid-template-columns: 1fr;
 			grid-gap: 2em;
 		}
 
 		@include screenl {
 			margin: 0 auto;
-			grid-template-columns: 1fr 1fr;
+			grid-template-columns: 1fr;
 			grid-gap: 2em;
 		}
 
 		@include screenxl {
 			margin: 0 auto;
-
 			grid-gap: 2em;
+			grid-template-columns: 1fr 1fr;
 		}
 	}
 }

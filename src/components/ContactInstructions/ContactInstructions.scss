@@ -1,0 +1,101 @@
+@import "../../styles/responsive/breakpoints.scss";
+
+.contact-instructions {
+	display: flex;
+	flex-direction: column;
+	margin: 2em;
+	justify-content: center;
+	align-items: flex-start;
+
+	@include screenxs {
+		align-items: center;
+		text-align: center;
+		margin: 0 auto;
+	}
+
+	@include screens {
+		align-items: center;
+		text-align: center;
+		margin: 0 auto;
+	}
+
+	@include screenm {
+		align-items: center;
+		text-align: center;
+		margin: 0 auto;
+	}
+
+	@include screenl {
+		align-items: center;
+		text-align: center;
+		margin: 0 auto;
+	}
+
+	h1 {
+		font-weight: 900;
+		font-size: 35px;
+	}
+
+	h2 {
+		width: 80%;
+		font-size: 20px;
+		margin: 0;
+		font-weight: normal;
+
+		@include screenxs {
+			margin: 1em auto;
+			width: 80%;
+		}
+
+		@include screens {
+			margin: 1em auto;
+			width: 80%;
+		}
+
+		@include screenm {
+			margin: 1em auto;
+			width: 80%;
+		}
+
+		@include screenl {
+			margin: 1em auto;
+			width: 80%;
+		}
+	}
+
+	ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+
+		li {
+			h3 {
+				font-size: 25px;
+			}
+			p {
+				width: 80%;
+				font-size: 22px;
+
+				@include screenxs {
+					width: 80%;
+					margin: 0 auto;
+				}
+
+				@include screens {
+					width: 80%;
+					margin: 0 auto;
+				}
+
+				@include screenm {
+					width: 80%;
+					margin: 0 auto;
+				}
+
+				@include screenl {
+					width: 80%;
+					margin: 0 auto;
+				}
+			}
+		}
+	}
+}
