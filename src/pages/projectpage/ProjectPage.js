@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import "./ProjectPage.scss"
 import ProjectCard from "../../components/project-card/projectCard"
 import projects from "../../projects"
-import Contact from "../../sections/Contact/Contact"
+import Contact from "../../sections/Contact/contact"
 const ProjectPage = (props) => {
 	React.useEffect(() => {
 		window.scrollTo(0, 0)

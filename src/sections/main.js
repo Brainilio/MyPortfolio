@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import About from "./about/about"
-import Contact from "./Contact/Contact"
+import Contact from "./Contact/contact"
 import Landing from "./landing/landing"
 import Projects from "./projects/projects"
 import Publicmessage from "./publicmessage/publicmessage"
