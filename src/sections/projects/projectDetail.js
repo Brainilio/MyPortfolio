@@ -43,12 +43,25 @@ const ProjectDetail = (props) => {
 								</div>
 							</div>
 							<div className="p-buttons">
-								<button className="project-cards-single-button">
-									C O D E{" "}
-								</button>
-								<button className="project-cards-single-button-2">
-									L I V E{" "}
-								</button>
+								<a
+									rel="noopener noreferrer"
+									target="_blank"
+									href={props.location.project.gitHub}
+									className="project-cards-single-button"
+								>
+									CODE{" "}
+								</a>
+
+								{props.location.project.livePreview ? (
+									<a
+										rel="noopener noreferrer"
+										target="_blank"
+										href={props.location.project.livePreview}
+										className="project-cards-single-button-2"
+									>
+										LIVE
+									</a>
+								) : null}
 							</div>
 						</div>
 						<div className="p-image">

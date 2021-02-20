@@ -114,7 +114,7 @@ const SideDrawer = (props) => {
 						<li>
 							<Link
 								activeClass="link-active"
-								to="contact"
+								to="form"
 								smooth={true}
 								offset={-150}
 								duration={600}
