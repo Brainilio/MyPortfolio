@@ -79,25 +79,18 @@
 			flex-direction: column;
 			margin-left: 10em;
 
-			@include screens {
+			@include screenxl {
 				width: 80%;
 				margin: 0 auto;
-				text-align: center;
-			}
-
-			@include screenm {
-				width: 70%;
-				margin: 0 auto;
-				text-align: center;
-			}
-
-			@include screenxl {
-				width: 70%;
-				margin: 0 auto;
-				text-align: center;
+				text-align: justify;
 			}
 
 			div {
+				@include screenl {
+					display: flex;
+					align-items: center;
+					flex-direction: column;
+				}
 				button {
 					margin-top: 2em;
 					margin-bottom: 2em;
@@ -106,7 +99,7 @@
 					cursor: pointer;
 					color: white;
 					height: 50px;
-					width: 150px;
+					width: 200px;
 					border-radius: 30px;
 					font-weight: 900;
 					background: linear-gradient(142deg, #e99a33 0%, #be3490 100%);
@@ -132,7 +125,7 @@
 					cursor: pointer;
 					color: white;
 					height: 50px;
-					width: 150px;
+					width: 200px;
 					border-radius: 30px;
 					font-weight: 900;
 					background: none;

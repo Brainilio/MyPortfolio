@@ -219,7 +219,7 @@ const Form = () => {
 		<div className="form">
 			<h1>Contact</h1>
 			<span>
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit.{" "}
+				Please fill in the form below! I'll respond in less than 24 hours.{" "}
 				<span>* = Required</span>{" "}
 			</span>
 

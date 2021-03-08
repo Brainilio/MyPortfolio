@@ -15,6 +15,9 @@
 	width: 50px;
 	border: 2px solid white;
 	transition: all 0.3s ease;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 
 	&:hover {
 		color: black;
@@ -54,6 +57,7 @@ h2 {
 		align-items: center;
 
 		@include screenl {
+			text-align: justify;
 			flex-direction: column-reverse;
 		}
 		.p-text {
@@ -73,6 +77,10 @@ h2 {
 			p {
 				font-size: 20px;
 				width: 100%;
+
+				@include screenl {
+					text-align: justify;
+				}
 			}
 			.p-info {
 				margin-top: 2em;
@@ -96,6 +104,8 @@ h2 {
 
 				@include screenl {
 					justify-content: center;
+					flex-direction: column;
+					align-items: center;
 				}
 				.project-cards-single-button {
 					cursor: pointer;
@@ -105,7 +115,7 @@ h2 {
 					color: #be3490;
 					height: 50px;
 					font-weight: 900;
-					width: 150px;
+					width: 200px;
 					margin-right: 3em;
 					background: none;
 					border: 3px solid #be3490;
@@ -113,6 +123,10 @@ h2 {
 					transition: all 0.3s ease-in;
 					text-decoration: none;
 
+					@include screenl {
+						margin-right: 0;
+						margin-bottom: 1em;
+					}
 					&:hover {
 						background: linear-gradient(142deg, #ffe920 0%, #be3490 100%);
 						color: white;
@@ -127,7 +141,7 @@ h2 {
 					color: white;
 					height: 50px;
 					font-weight: 900;
-					width: 150px;
+					width: 200px;
 					border: none;
 					background: linear-gradient(142deg, #35218f 0%, #cd2ad3 100%);
 					border-radius: 30px;
@@ -187,6 +201,10 @@ h2 {
 		}
 		p {
 			font-size: 20px;
+
+			@include screenl {
+				text-align: justify;
+			}
 		}
 	}
 }
@@ -227,6 +245,10 @@ h2 {
 		}
 		p {
 			font-size: 20px;
+
+			@include screenl {
+				text-align: justify;
+			}
 		}
 	}
 }
@@ -268,6 +290,10 @@ h2 {
 		}
 		p {
 			font-size: 20px;
+
+			@include screenl {
+				text-align: justify;
+			}
 		}
 	}
 }
@@ -311,6 +337,10 @@ h2 {
 		}
 		p {
 			font-size: 20px;
+
+			@include screenl {
+				text-align: justify;
+			}
 		}
 	}
 }

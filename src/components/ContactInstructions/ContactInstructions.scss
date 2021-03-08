@@ -58,6 +58,10 @@
 		}
 
 		@include screenl {
+			text-align: justify;
+		}
+
+		@include screenl {
 			margin: 1em auto;
 			width: 80%;
 		}
@@ -94,6 +98,8 @@
 				@include screenl {
 					width: 80%;
 					margin: 0 auto;
+
+					text-align: justify;
 				}
 			}
 		}

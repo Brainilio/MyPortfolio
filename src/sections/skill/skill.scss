@@ -29,18 +29,6 @@
 			font-weight: 900;
 			margin-bottom: 1em;
 
-			@include screens {
-				margin: 0 auto;
-				justify-content: center;
-				margin-bottom: 1em;
-			}
-
-			@include screenm {
-				margin: 0 auto;
-				justify-content: center;
-				margin-bottom: 1em;
-			}
-
 			@include screenl {
 				margin: 0 auto;
 				justify-content: center;
@@ -52,22 +40,10 @@
 			font-size: 20px;
 			width: 50%;
 
-			@include screens {
-				width: 100%;
-				margin: 0;
-				text-align: center;
-			}
-
-			@include screenm {
-				width: 70%;
-				margin: 0 auto;
-				text-align: center;
-			}
-
 			@include screenl {
-				width: 70%;
+				width: 80%;
+				text-align: justify;
 				margin: 0 auto;
-				text-align: center;
 			}
 		}
 	}
@@ -83,17 +59,11 @@
 		display: flex;
 		align-items: center;
 
-		@include screenxs {
-			flex-direction: column;
-		}
-		@include screenxxs {
-			flex-direction: column;
-		}
-		@include screenm {
-			flex-direction: column;
-		}
 		@include screenl {
 			flex-direction: column;
+			padding: 0.5em 0.5em;
+			margin: 2em auto;
+			width: 95%;
 		}
 
 		.skill-hero-text {
@@ -105,17 +75,6 @@
 				width: 100%;
 			}
 
-			@include screenm {
-				width: 100%;
-			}
-
-			@include screenxs {
-				width: 100%;
-			}
-
-			@include screenxxs {
-				width: 100%;
-			}
 			ul {
 				list-style-type: none;
 
@@ -136,7 +95,7 @@
 			align-items: center;
 			justify-content: center;
 
-			@include screenl {
+			@include screenxl {
 				display: none;
 			}
 		}

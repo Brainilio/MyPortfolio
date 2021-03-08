@@ -55,6 +55,11 @@
 		.project-cards-description {
 			width: 50%;
 
+			@include screens {
+				width: 100%;
+				text-align: justify;
+			}
+
 			@include screenl {
 				margin-top: 2em;
 				width: 100%;
@@ -67,6 +72,11 @@
 			}
 			.project-cards-description-paragraph {
 				font-size: 20px;
+
+				@include screens {
+					width: 100%;
+					text-align: justify;
+				}
 			}
 
 			.read-more {
@@ -97,6 +107,12 @@
 			width: 100%;
 			margin-top: 5em;
 
+			@include screens {
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+			}
+
 			@include screenl {
 				margin-top: 3em;
 				justify-content: center;
@@ -110,13 +126,17 @@
 				color: #be3490;
 				height: 50px;
 				font-weight: 900;
-				width: 150px;
+				width: 200px;
 				margin-right: 3em;
 				background: none;
 				border: 3px solid #be3490;
 				border-radius: 30px;
 				transition: all 0.3s ease-in;
 				text-decoration: none;
+
+				@include screens {
+					margin-right: 0;
+				}
 
 				&:hover {
 					background: linear-gradient(142deg, #ffe920 0%, #be3490 100%);
@@ -132,13 +152,15 @@
 				color: white;
 				height: 50px;
 				font-weight: 900;
-				width: 150px;
-
+				width: 200px;
 				background: linear-gradient(142deg, #35218f 0%, #cd2ad3 100%);
 				border-radius: 30px;
 				transition: all 0.3s ease-in;
 				text-decoration: none;
 
+				@include screens {
+					margin-top: 1em;
+				}
 				&:hover {
 					background-color: white;
 					color: black;
