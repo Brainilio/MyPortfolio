@@ -24,16 +24,9 @@
 		background: white;
 	}
 
-	@include screenxs {
-		height: 35px;
-		width: 35px;
-	}
-
 	@include screens {
-		top: 2%;
-		right: 3%;
-		width: 40px;
-		height: 40px;
+		height: 50px;
+		width: 50px;
 	}
 }
 section {
@@ -198,8 +191,10 @@ h2 {
 		}
 		h1 {
 			font-size: 60px;
+			text-align: end;
 		}
 		p {
+			text-align: end;
 			font-size: 20px;
 
 			@include screenl {
@@ -287,8 +282,10 @@ h2 {
 		}
 		h1 {
 			font-size: 60px;
+			text-align: end;
 		}
 		p {
+			text-align: end;
 			font-size: 20px;
 
 			@include screenl {
@@ -381,8 +378,10 @@ h2 {
 		}
 		h1 {
 			font-size: 60px;
+			text-align: end;
 		}
 		ul {
+			text-align: end;
 			li {
 				margin: 0;
 				a {

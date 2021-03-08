@@ -81,7 +81,7 @@ const ProjectDetail = (props) => {
 							src={props.location.project.fullImages[0]}
 							width="350px"
 							height="350px"
-							alt="process"
+							alt=""
 						/>
 					</div>
 					<div className="p-process-text">
@@ -95,7 +95,7 @@ const ProjectDetail = (props) => {
 							src={props.location.project.fullImages[1]}
 							width="350px"
 							height="350px"
-							alt="process"
+							alt=""
 						/>
 					</div>
 					<div className="p-challenges-text">
@@ -109,7 +109,7 @@ const ProjectDetail = (props) => {
 							src={props.location.project.fullImages[2]}
 							width="350px"
 							height="350px"
-							alt="process"
+							alt=""
 						/>
 					</div>
 					<div className="p-different-text">
@@ -123,7 +123,7 @@ const ProjectDetail = (props) => {
 							src={props.location.project.fullImages[3]}
 							width="350px"
 							height="350px"
-							alt="process"
+							alt=""
 						/>
 					</div>
 					<div className="p-takeaway-text">
