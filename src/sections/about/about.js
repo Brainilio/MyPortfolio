@@ -10,35 +10,43 @@ import { Link } from "react-scroll"
 
 const About = () => {
 	const textRef = React.useRef(null)
-	// const imgRef = React.useRef(null)
+	const titleRef = React.useRef(null)
+
 	gsap.registerPlugin(ScrollTrigger)
 	useEffect(() => {
-		// gsap.from(textRef.current, {
-		// 	scrollTrigger: {
-		// 		trigger: textRef.current,
-		// 		toggleActions: "restart",
-		// 	},
-		// 	x: -200,
-		// 	duration: 0.8,
-		// 	opacity: 0,
-		// })
-		// gsap.from(imgRef.current, {
-		// 	scrollTrigger: {
-		// 		trigger: imgRef.current,
-		// 		toggleActions: "restart",
-		// 	},
-		// 	rotateZ: 360,
-		// 	duration: 0.8,
-		// 	opacity: 0,
-		// })
+		gsap.from(textRef.current, {
+			scrollTrigger: {
+				trigger: textRef.current,
+			},
+			x: 500,
+			opacity: 0,
+			ease: "power1",
+			duration: 2,
+		})
+
+		gsap.from([titleRef.current.childNodes], {
+			scrollTrigger: {
+				trigger: titleRef.current,
+			},
+			duration: 0.8,
+			yPercent: 80,
+			opacity: 0,
+			delay: 1.5,
+			stagger: 0.08,
+			ease: "power4.easeinout",
+		})
 	}, [])
 
 	return (
-		<section className="about">
+		<section ref={textRef} className="about">
 			<div className="about-block">
-				<div ref={textRef} className="about-text">
-					<span className="about-title" aria-hidden>
-						About Me
+				<div className="about-text">
+					<span ref={titleRef} className="about-title" aria-hidden>
+						<span>A</span>
+						<span>b</span>
+						<span>o</span>
+						<span>u</span>
+						<span>t</span>
 					</span>
 					<p aria-hidden>
 						I am a creative developer driven by empathy, creativity, and
@@ -47,17 +55,10 @@ const About = () => {
 						meaningful solutions for users. Applied creativity is reflected in
 						my everyday life in which I love to develop new recipes to cook,
 						play around with Arduino, draw my own comic book and be active when
-						it comes to playing instruments. My{" "}
-						<a
-							rel="noopener noreferrer"
-							target="_blank"
-							href="https://drive.google.com/file/d/153Y-GmPSOaq0zd6MRoqXq1BPZsdXWcUy/view?usp=sharing"
-						>
-							strengths
-						</a>{" "}
-						reflect a desire for achievement, responsibility, and collaboration.
-						I stand firm in my values and work to bring ethics and empathy to
-						the tech field. Interested in talking?{" "}
+						it comes to playing instruments. My strengths reflect a desire for
+						achievement, responsibility, and collaboration. I stand firm in my
+						values and work to bring ethics and empathy to the tech field.
+						Interested in talking?{" "}
 					</p>
 					<div>
 						<Link smooth={true} duration={600} offset={-500} to="contact">
@@ -78,8 +79,8 @@ const About = () => {
 					<div>
 						<LazyLoad offset={100}>
 							<img
-								width="200"
-								height="250"
+								width="250"
+								height="300"
 								className="about-image-sanfran"
 								alt="san francisco"
 								src={sanfran}
@@ -87,8 +88,8 @@ const About = () => {
 						</LazyLoad>
 						<LazyLoad offset={100}>
 							<img
-								width="200"
-								height="250"
+								width="250"
+								height="300"
 								className="about-image-image"
 								alt="brainilio"
 								src={profile}
@@ -98,8 +99,8 @@ const About = () => {
 					<div>
 						<LazyLoad offset={100}>
 							<img
-								width="420"
-								height="200"
+								width="530"
+								height="300"
 								className="about-image-rotterdam"
 								alt="rotterdam"
 								src={rotterdam}

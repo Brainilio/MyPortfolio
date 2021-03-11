@@ -2,82 +2,58 @@
 
 .about {
 	display: flex;
-	flex-direction: column;
 	min-height: auto !important;
-	margin-top: 10em;
-
-	.about-title {
-		display: flex;
-		font-size: 35px;
-		font-weight: 900;
-
-		@include screens {
-			margin: 2em 0 0 0;
-			justify-content: center;
-		}
-
-		@include screenm {
-			margin: 2em 0 0 0;
-			justify-content: center;
-		}
-
-		@include screenl {
-			margin: 2em 0 0 0;
-			justify-content: center;
-		}
-
-		@include screenxl {
-			margin: 2em 0 0 0;
-			justify-content: center;
-		}
-	}
+	margin-top: 15em;
+	margin-bottom: 15em;
+	margin: 0 auto;
 
 	.about-block {
 		display: flex;
-		justify-content: space-between;
-		align-items: flex-start;
+		align-items: center;
+		justify-content: space-evenly;
+		border-radius: 25px;
+		flex-wrap: wrap;
+		margin: 0 auto;
 
 		@include screenxs {
 			margin-top: 1em;
 			margin: 0 auto;
-			flex-direction: column-reverse;
 			justify-content: center;
+			flex-direction: column;
 		}
 
 		@include screens {
 			margin-top: 1em;
 			margin: 0 auto;
-			flex-direction: column-reverse;
+
 			justify-content: center;
 		}
 
 		@include screenm {
 			margin-top: 1em;
 			margin: 0 auto;
-			flex-direction: column-reverse;
+
 			justify-content: center;
 		}
 
 		@include screenl {
 			margin-top: 1em;
 			margin: 0 auto;
-			flex-direction: column-reverse;
 			justify-content: center;
+			flex-direction: column;
 		}
 
 		@include screenxl {
 			margin-top: 1em;
 			margin: 0 auto;
-			flex-direction: column-reverse;
 			justify-content: center;
 		}
 
 		.about-text {
-			width: 35%;
 			font-size: 20px;
 			display: flex;
 			flex-direction: column;
-			margin-left: 10em;
+			width: 35%;
 
 			@include screenxl {
 				width: 80%;
@@ -85,15 +61,45 @@
 				text-align: justify;
 			}
 
-			div {
+			.about-title {
+				display: flex;
+				font-size: 50px;
+				font-weight: 900;
+				overflow: hidden;
+
+				@include screens {
+					margin: 2em 0 0 0;
+					justify-content: center;
+				}
+
+				@include screenm {
+					margin: 2em 0 0 0;
+					justify-content: center;
+				}
+
 				@include screenl {
+					margin: 2em 0 0 0;
+					justify-content: center;
+				}
+
+				@include screenxl {
+					margin: 2em 0 0 0;
+					justify-content: center;
+				}
+			}
+
+			div {
+				display: flex;
+
+				@include screenxl {
 					display: flex;
 					align-items: center;
 					flex-direction: column;
+					justify-content: center;
 				}
 				button {
 					margin-top: 2em;
-					margin-bottom: 2em;
+					margin-bottom: 1rem;
 					margin-right: 2em;
 					font-size: 15px;
 					cursor: pointer;
@@ -156,7 +162,6 @@
 		.about-image {
 			display: flex;
 			flex-direction: column;
-			margin-right: 10em;
 
 			@include screens {
 				margin-top: 5em;

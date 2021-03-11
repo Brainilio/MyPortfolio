@@ -9,33 +9,55 @@ import projects from "../../projects"
 const Projects = () => {
 	//project modelling
 	const projectRef = useRef(null)
+	const titleRef = useRef(null)
+	// let pr = useRef(null)
 	gsap.registerPlugin(ScrollTrigger)
-
 	useEffect(() => {
-		// gsap.from(projectRef.current, {
-		// 	scrollTrigger: {
-		// 		trigger: projectRef.current,
-		// 	},
-		// 	x: -200,
-		// 	opacity: 0,
-		// 	ease: "power1",
-		// 	duration: 1,
-		// })
+		gsap.from([projectRef.current.childNodes], {
+			scrollTrigger: {
+				trigger: projectRef.current,
+				start: "top center",
+			},
+			x: -500,
+			opacity: 0,
+			ease: "power1",
+
+			duration: 2,
+		})
+
+		gsap.from([titleRef.current.childNodes], {
+			scrollTrigger: {
+				trigger: titleRef.current,
+			},
+			duration: 0.8,
+			yPercent: 80,
+			delay: 2,
+			opacity: 0,
+			stagger: 0.08,
+			ease: "power4.easeinout",
+		})
+
+		// pr.current.scrollLeft = 0
 	}, [])
 
+	// function scrollLeft() {
+	// 	pr.current.scrollLeft += 250
+	// }
+
+	// function scrollRight() {
+	// 	pr.current.scrollLeft = pr.current.scrollLeft - 250
+	// }
+
 	return (
-		<section className="projects">
+		<section ref={projectRef} className="projects">
 			<div className="projects-title">
-				<span className="projects-title-title" aria-hidden>
-					My Work
+				<span ref={titleRef} className="projects-title-title" aria-hidden>
+					<span>W</span>
+					<span>o</span>
+					<span>r</span>
+					<span>k</span>
 				</span>
-				<p className="projects-paragraph">
-					Here are my featured projects.
-					<strong> Click on a project card for more details! </strong>
-					Click down below to see all my projects. All of my work ranges from
-					development to UX/UI design and art!
-					<br />
-				</p>
+
 				<NavLink
 					to={{
 						pathname: "projects",
@@ -48,7 +70,9 @@ const Projects = () => {
 				</NavLink>
 			</div>
 
-			<div ref={projectRef} className="project-cards">
+			{/* <span onClick={scrollLeft}>Scroll left</span>
+			<span onClick={scrollRight}>Scroll right</span> */}
+			<div className="project-cards">
 				{projects.slice(0, 3).map((project) => {
 					return <ProjectCard key={project.name} information={project} />
 				})}

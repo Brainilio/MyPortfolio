@@ -32,11 +32,11 @@ const ProjectDetail = (props) => {
 									<span>{props.location.project.dateCreated}</span>
 								</div>
 								<div>
-									<h2>Tags</h2>
+									<h2>Work performed:</h2>
 									<span>
 										{props.location.project.tags.map((tag) => (
 											<span key={tag} className="project-card-single-tag">
-												#{tag}{" "}
+												<> {tag} &nbsp;</>
 											</span>
 										))}
 									</span>

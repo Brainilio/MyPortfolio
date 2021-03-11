@@ -77,7 +77,7 @@ const projects = [
 		livePreview:
 			"http://ec2-18-156-171-101.eu-central-1.compute.amazonaws.com/",
 		gitHub: "https://github.com/Brainilio/natours",
-		tags: ["MERN", "MVC", "UX/UI"],
+		tags: ["MERN", "MVC", "UX/UI", "AWS", "AdobeXD"],
 		category: "Development",
 		description:
 			"Natours is a MERN application that lets you check out the coolest tours around the globe, book them and review them after experiencing them! As a guide/administrator you have full CRUD functionalities over users, tours and reviews, along with your own statistic dashboard. This project was develop to really combine both front-end and back-end skills. As this project is still in progress, some features are still missing such as payments and extra security protocols.",
@@ -101,7 +101,7 @@ const projects = [
 		previewImage: Salvame,
 		livePreview: "https://salvame-react.netlify.app/",
 		gitHub: "https://github.com/Brainilio/salvame-app",
-		tags: ["REACTJS", "THREEJS", "GSAP"],
+		tags: ["REACTJS", "THREEJS", "GSAP", "UX/UI", "PITCHING", "USER RESEARCH"],
 		category: "Development",
 		description:
 			"Salvame is an art initiative to encourage, empower and inform the locals of Boyle Heights to stand up against environmental racism through an online local art museum. This project implements real time AQI data which “clouds” the art as the poor air quality intensifies. Salvame informs users about environmental racism, working to provide a platform for locals and organizations advocating against this problem.",
@@ -156,7 +156,14 @@ const projects = [
 		previewImage: BurgerBuilder,
 		livePreview: "https://react-my-burger-builder-d060b.web.app/",
 		gitHub: "https://github.com/Brainilio/burger-builder",
-		tags: ["REACTJS", "FIREBASE", "REDUX"],
+		tags: [
+			"REACTJS",
+			"FIREBASE",
+			"REDUX",
+			"UNIT TESTING",
+			"REACT HOOKS",
+			"REACT ROUTER",
+		],
 		category: "Development",
 		description:
 			"Burger builder is my first actual reactjs application in which i implemented general common fundamentals and features. I built this application while learning all about ReactJS, and implemented most of my learning into this project. Burger Builder lets users build their burger, order and review it. I used Redux for global state management, Jest/Enzyme for testing, react-router for routing and css modules for styling.",
@@ -181,7 +188,7 @@ const projects = [
 		previewImage: Lolmfc,
 		livePreview: "http://ec2-18-157-186-6.eu-central-1.compute.amazonaws.com/",
 		gitHub: "https://github.com/Brainilio/lol-my-fav-champ",
-		tags: ["REACTJS", "NODEJS", "MONGODB"],
+		tags: ["REACTJS", "EXPRESS", "MONGODB", "AWS", "NODEJS"],
 		category: "Development",
 		description:
 			"LOLMFC is a MERN-stack application which used to be a MEVN-stack application when I first developed it in 2018. I decided to revamp this project, because of the lack of features it had alogn with wanting to test out my skills in React. LOLMFC allows you to create an account and add your favorite League of Legends champions to your dashboard. By clicking on your champion card, you get to read more details about your favorite champion's backstory and they scale against other enemies. ",
@@ -211,7 +218,7 @@ const projects = [
 		previewImage: Thanosrunner,
 		livePreview: "https://brainilio.github.io/ThanosRunner/",
 		gitHub: "https://github.com/Brainilio/ThanosRunner",
-		tags: ["TSCRIPT", "OOP", "GAME"],
+		tags: ["TYPESCRIPT", "OOP", "GAME"],
 		category: "Development",
 		description:
 			"Thanos Runner is an endless runner game featuring... LINK! In order to win the game you have to collect 6 infinity stones while at the same time avoid obstacles such as mini hulks, stormbreakers and fireballs. The game gets harder the more stones you collect! This is the first time I’ve developed something in Typescript using OOP principles (Inheritance, UML diagramming, Encapsulation, Classes, Composition). Use AD to run and SPACE to jump.",
