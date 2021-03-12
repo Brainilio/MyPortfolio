@@ -110,7 +110,11 @@ function App() {
 				}}
 			/>
 
-			<LoadingScreen />
+			<Switch location={location}>
+				<Route path="/" exact component={Main} />
+				<Route path="/projects" component={ProjectPage} />
+				<Route path="/project/:name" component={ProjectDetail}></Route>
+			</Switch>
 		</div>
 	)
 }
