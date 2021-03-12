@@ -4,14 +4,6 @@ html {
 	scroll-behavior: smooth;
 }
 
-body {
-	overflow-x: hidden;
-	max-width: 100vw;
-	width: 100vw;
-	min-width: 100vw;
-	scroll-behavior: smooth;
-}
-
 .spinning-text {
 	opacity: 0.5;
 	position: absolute;
@@ -45,8 +37,7 @@ body {
 	overflow-x: hidden;
 	margin: 0;
 	padding: 0;
-	height: 100%;
-	color: #ffffffd8;
+	color: #ffffff;
 	height: 100%;
 	max-width: 100vw;
 	background: rgb(10, 6, 10);
@@ -57,7 +48,7 @@ body {
 		rgb(26, 18, 24) 58%,
 		rgba(63, 80, 82, 1) 100%
 	);
-	box-sizing: border-box;
+
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
 		Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
@@ -92,5 +83,15 @@ a {
 .particles-background {
 	width: 100%;
 	height: 100%;
+	position: fixed;
+}
+
+.three-canvas {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
 	position: fixed;
 }

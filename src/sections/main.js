@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useRef } from "react"
 import About from "./about/about"
 import Contact from "./contact/contact"
 import Landing from "./landing/landing"
@@ -10,6 +10,8 @@ import FallingStars from "../components/falling-stars/fallingStars"
 import CrescentMoon from "../components/crescentmoon/crescentMoon"
 import NavBar from "../components/NavBar/NavBar"
 import SideDrawer from "../components/SideDrawer/SideDrawer"
+import { Canvas, useFrame } from "react-three-fiber"
+import { useAnimations, useGLTF } from "@react-three/drei"
 
 const Main = () => {
 	const [show, setShow] = useState(false)

@@ -14,10 +14,19 @@ const Landing = () => {
 
 	useEffect(() => {
 		let topass = []
-
+		let wholebody = document.querySelector("body")
 		for (const child of titleRef.children) {
 			topass.push(child)
 		}
+
+		gsap.from(wholebody, {
+			overflow: "hidden",
+			duration: 3,
+		})
+		gsap.from(fullPage, {
+			backgroundColor: "black",
+			duration: 3,
+		})
 
 		gsap.to(fullPage, {
 			scrollTrigger: {
@@ -32,26 +41,26 @@ const Landing = () => {
 			duration: 0.8,
 		})
 
-		gsap.from(topass, {
-			duration: 0.6,
-			yPercent: 80,
-			opacity: 0,
-			stagger: 0.08,
-			ease: "power4.easeinout",
-		})
+		// gsap.from(topass, {
+		// 	duration: 0.6,
+		// 	yPercent: 80,
+		// 	opacity: 0,
+		// 	stagger: 0.08,
+		// 	ease: "power4.easeinout",
+		// })
 
-		gsap.from(buttonsRef, {
-			duration: 0.8,
-			delay: 0.6,
-			xPercent: -100,
-			opacity: 0,
-		})
+		// gsap.from(buttonsRef, {
+		// 	duration: 0.8,
+		// 	delay: 0.6,
+		// 	xPercent: -100,
+		// 	opacity: 0,
+		// })
 
-		gsap.from(subTitle, {
-			duration: 0.9,
-			yPercent: 300,
-			opacity: 0,
-		})
+		// gsap.from(subTitle, {
+		// 	duration: 0.9,
+		// 	yPercent: 300,
+		// 	opacity: 0,
+		// })
 	}, [])
 
 	return (
