@@ -22,7 +22,7 @@ const Projects = () => {
 			opacity: 0,
 			ease: "power1",
 
-			duration: 2,
+			duration: 1,
 		})
 
 		gsap.from([titleRef.current.childNodes], {
@@ -31,7 +31,7 @@ const Projects = () => {
 			},
 			duration: 0.8,
 			yPercent: 80,
-			delay: 2,
+			delay: 0.8,
 			opacity: 0,
 			stagger: 0.08,
 			ease: "power4.easeinout",

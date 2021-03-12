@@ -32,7 +32,7 @@ const Skill = () => {
 			duration: 0.3,
 			yPercent: 80,
 			opacity: 0,
-			delay: 1.5,
+			delay: 1,
 			stagger: 0.08,
 			ease: "power4.easeinout",
 		})

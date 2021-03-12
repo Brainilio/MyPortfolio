@@ -11,6 +11,8 @@ import { Link } from "react-scroll"
 const About = () => {
 	const textRef = React.useRef(null)
 	const titleRef = React.useRef(null)
+	const imagesRef = React.useRef(null)
+	const buttonsRef = React.useRef(null)
 
 	gsap.registerPlugin(ScrollTrigger)
 	useEffect(() => {
@@ -18,10 +20,29 @@ const About = () => {
 			scrollTrigger: {
 				trigger: textRef.current,
 			},
-			x: 500,
+			x: 300,
 			opacity: 0,
 			ease: "power1",
-			duration: 2,
+			duration: 1,
+		})
+
+		gsap.from(imagesRef.current, {
+			scrollTrigger: {
+				trigger: imagesRef.current,
+			},
+
+			opacity: 0,
+			duration: 5,
+		})
+
+		gsap.from(buttonsRef.current, {
+			scrollTrigger: {
+				trigger: imagesRef.current,
+			},
+			duration: 0.8,
+			delay: 0.6,
+			xPercent: -100,
+			opacity: 0,
 		})
 
 		gsap.from([titleRef.current.childNodes], {
@@ -31,14 +52,14 @@ const About = () => {
 			duration: 0.8,
 			yPercent: 80,
 			opacity: 0,
-			delay: 1.5,
+			delay: 0.8,
 			stagger: 0.08,
 			ease: "power4.easeinout",
 		})
 	}, [])
 
 	return (
-		<section ref={textRef} className="about">
+		<section className="about">
 			<div className="about-block">
 				<div className="about-text">
 					<span ref={titleRef} className="about-title" aria-hidden>
@@ -48,7 +69,7 @@ const About = () => {
 						<span>u</span>
 						<span>t</span>
 					</span>
-					<p aria-hidden>
+					<p ref={textRef} aria-hidden>
 						I am a creative developer driven by empathy, creativity, and
 						humility, specializing in Full-stack and UX/UI development. I aim to
 						combine these two special powers of my to create and develop
@@ -60,7 +81,7 @@ const About = () => {
 						values and work to bring ethics and empathy to the tech field.
 						Interested in talking?{" "}
 					</p>
-					<div>
+					<div ref={buttonsRef}>
 						<Link smooth={true} duration={600} offset={-500} to="contact">
 							<button className="button-lets-chat">
 								L E T ' S &nbsp; C H A T
@@ -75,7 +96,7 @@ const About = () => {
 						</a>
 					</div>
 				</div>
-				<div className="about-image">
+				<div ref={imagesRef} className="about-image">
 					<div>
 						<LazyLoad offset={100}>
 							<img
