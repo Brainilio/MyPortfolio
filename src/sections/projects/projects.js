@@ -13,30 +13,27 @@ const Projects = () => {
 	// let pr = useRef(null)
 	gsap.registerPlugin(ScrollTrigger)
 	useEffect(() => {
-		gsap.from([projectRef.current.childNodes], {
-			scrollTrigger: {
-				trigger: projectRef.current,
-				start: "top center",
-			},
-			x: -500,
-			opacity: 0,
-			ease: "power1",
-
-			duration: 1,
-		})
-
-		gsap.from([titleRef.current.childNodes], {
-			scrollTrigger: {
-				trigger: titleRef.current,
-			},
-			duration: 0.8,
-			yPercent: 80,
-			delay: 0.8,
-			opacity: 0,
-			stagger: 0.08,
-			ease: "power4.easeinout",
-		})
-
+		// gsap.from([projectRef.current.childNodes], {
+		// 	scrollTrigger: {
+		// 		trigger: projectRef.current,
+		// 		start: "top center",
+		// 	},
+		// 	x: -500,
+		// 	opacity: 0,
+		// 	ease: "power1",
+		// 	duration: 1,
+		// })
+		// gsap.from([titleRef.current.childNodes], {
+		// 	scrollTrigger: {
+		// 		trigger: titleRef.current,
+		// 	},
+		// 	duration: 0.8,
+		// 	yPercent: 80,
+		// 	delay: 0.8,
+		// 	opacity: 0,
+		// 	stagger: 0.08,
+		// 	ease: "power4.easeinout",
+		// })
 		// pr.current.scrollLeft = 0
 	}, [])
 

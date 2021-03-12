@@ -16,46 +16,42 @@ const About = () => {
 
 	gsap.registerPlugin(ScrollTrigger)
 	useEffect(() => {
-		gsap.from(textRef.current, {
-			scrollTrigger: {
-				trigger: textRef.current,
-			},
-			x: 300,
-			opacity: 0,
-			ease: "power1",
-			duration: 1,
-		})
-
-		gsap.from(imagesRef.current, {
-			scrollTrigger: {
-				trigger: imagesRef.current,
-			},
-
-			opacity: 0,
-			duration: 5,
-		})
-
-		gsap.from(buttonsRef.current, {
-			scrollTrigger: {
-				trigger: imagesRef.current,
-			},
-			duration: 0.8,
-			delay: 0.6,
-			xPercent: -100,
-			opacity: 0,
-		})
-
-		gsap.from([titleRef.current.childNodes], {
-			scrollTrigger: {
-				trigger: titleRef.current,
-			},
-			duration: 0.8,
-			yPercent: 80,
-			opacity: 0,
-			delay: 0.8,
-			stagger: 0.08,
-			ease: "power4.easeinout",
-		})
+		// gsap.from(textRef.current, {
+		// 	scrollTrigger: {
+		// 		trigger: textRef.current,
+		// 	},
+		// 	x: 300,
+		// 	opacity: 0,
+		// 	ease: "power1",
+		// 	duration: 1,
+		// })
+		// gsap.from(imagesRef.current, {
+		// 	scrollTrigger: {
+		// 		trigger: imagesRef.current,
+		// 	},
+		// 	opacity: 0,
+		// 	duration: 5,
+		// })
+		// gsap.from(buttonsRef.current, {
+		// 	scrollTrigger: {
+		// 		trigger: imagesRef.current,
+		// 	},
+		// 	duration: 0.8,
+		// 	delay: 0.6,
+		// 	xPercent: -100,
+		// 	opacity: 0,
+		// })
+		// gsap.from([titleRef.current.childNodes], {
+		// 	scrollTrigger: {
+		// 		trigger: titleRef.current,
+		// 	},
+		// 	duration: 0.8,
+		// 	yPercent: 80,
+		// 	opacity: 0,
+		// 	delay: 0.8,
+		// 	stagger: 0.08,
+		// 	ease: "power4.easeinout",
+		// })
 	}, [])
 
 	return (

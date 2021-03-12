@@ -7,6 +7,7 @@
 	opacity: 0.5;
 	top: 5%;
 	left: 5%;
+	z-index: -2;
 	transform: rotateZ(80deg);
 	animation: flying 25s ease-in-out infinite;
 

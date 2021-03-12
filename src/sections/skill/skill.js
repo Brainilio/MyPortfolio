@@ -11,31 +11,30 @@ const Skill = () => {
 	const titleRef = useRef(null)
 	gsap.registerPlugin(ScrollTrigger)
 	useEffect(() => {
-		gsap.from(skillsRef.current, {
-			scrollTrigger: {
-				trigger: skillsRef.current,
-				toggleActions: "play",
-				start: "top center",
-			},
-			duration: 0.8,
-			y: 200,
-			opacity: 0,
-		})
-
-		console.log(titleRef.current.childNodes)
-		gsap.from([titleRef.current.childNodes], {
-			scrollTrigger: {
-				trigger: skillsRef.current,
-				toggleActions: "play",
-				start: "top bottom",
-			},
-			duration: 0.3,
-			yPercent: 80,
-			opacity: 0,
-			delay: 1,
-			stagger: 0.08,
-			ease: "power4.easeinout",
-		})
+		// gsap.from(skillsRef.current, {
+		// 	scrollTrigger: {
+		// 		trigger: skillsRef.current,
+		// 		toggleActions: "play",
+		// 		start: "top center",
+		// 	},
+		// 	duration: 0.8,
+		// 	y: 200,
+		// 	opacity: 0,
+		// })
+		// console.log(titleRef.current.childNodes)
+		// gsap.from([titleRef.current.childNodes], {
+		// 	scrollTrigger: {
+		// 		trigger: skillsRef.current,
+		// 		toggleActions: "play",
+		// 		start: "top bottom",
+		// 	},
+		// 	duration: 0.3,
+		// 	yPercent: 80,
+		// 	opacity: 0,
+		// 	delay: 1,
+		// 	stagger: 0.08,
+		// 	ease: "power4.easeinout",
+		// })
 	}, [])
 
 	return (
