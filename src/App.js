@@ -68,8 +68,8 @@ function App() {
 		<div>
 			<Rocketship />
 			<div className="three-canvas">
-				<Canvas pixelRatio="1" camera={{ position: [0, 30, 500] }}>
-					<Suspense fallback="">
+				<Suspense fallback="">
+					<Canvas pixelRatio="1" camera={{ position: [0, 30, 500] }}>
 						<ambientLight position={[0, 30, 500]} />
 						<ambientLight intensity={0.2} />
 						<directionalLight intensity={1} />
@@ -78,8 +78,8 @@ function App() {
 							scrollPos={scrollPos}
 							posY={scrollPos}
 						/>
-					</Suspense>
-				</Canvas>
+					</Canvas>
+				</Suspense>
 			</div>
 			<Particles
 				className="particles-background"
