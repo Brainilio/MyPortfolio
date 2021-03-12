@@ -13,34 +13,31 @@ const Landing = () => {
 	gsap.registerPlugin(ScrollTrigger)
 
 	useEffect(() => {
-		let topass = []
-		let wholebody = document.querySelector("body")
-		for (const child of titleRef.children) {
-			topass.push(child)
-		}
-
-		gsap.from(wholebody, {
-			overflow: "hidden",
-			duration: 3,
-		})
-		gsap.from(fullPage, {
-			backgroundColor: "black",
-			duration: 3,
-		})
-
-		gsap.to(fullPage, {
-			scrollTrigger: {
-				trigger: fullPage,
-				start: "bottom bottom",
-				scrub: true,
-				toggleActions: "play none none none",
-			},
-			opacity: 0,
-			delay: 3,
-			y: -300,
-			duration: 0.8,
-		})
-
+		// let topass = []
+		// let wholebody = document.querySelector("body")
+		// for (const child of titleRef.children) {
+		// 	topass.push(child)
+		// }
+		// gsap.from(wholebody, {
+		// 	overflow: "hidden",
+		// 	duration: 3,
+		// })
+		// gsap.from(fullPage, {
+		// 	backgroundColor: "black",
+		// 	duration: 3,
+		// })
+		// gsap.to(fullPage, {
+		// 	scrollTrigger: {
+		// 		trigger: fullPage,
+		// 		start: "bottom bottom",
+		// 		scrub: true,
+		// 		toggleActions: "play none none none",
+		// 	},
+		// 	opacity: 0,
+		// 	delay: 3,
+		// 	y: -300,
+		// 	duration: 0.8,
+		// })
 		// gsap.from(topass, {
 		// 	duration: 0.6,
 		// 	yPercent: 80,
@@ -48,14 +45,12 @@ const Landing = () => {
 		// 	stagger: 0.08,
 		// 	ease: "power4.easeinout",
 		// })
-
 		// gsap.from(buttonsRef, {
 		// 	duration: 0.8,
 		// 	delay: 0.6,
 		// 	xPercent: -100,
 		// 	opacity: 0,
 		// })
-
 		// gsap.from(subTitle, {
 		// 	duration: 0.9,
 		// 	yPercent: 300,

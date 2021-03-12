@@ -25,6 +25,9 @@
 		flex-direction: column;
 		margin-left: 12em;
 		margin-bottom: 10px;
+		a {
+			display: inline-block;
+		}
 
 		@include screenl {
 			justify-content: center;
