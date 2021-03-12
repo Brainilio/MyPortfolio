@@ -22,10 +22,10 @@ const Landing = () => {
 		// 	overflow: "hidden",
 		// 	duration: 3,
 		// })
-		// gsap.from(fullPage, {
-		// 	backgroundColor: "black",
-		// 	duration: 3,
-		// })
+		gsap.from(fullPage, {
+			backgroundColor: "black",
+			duration: 5,
+		})
 		// gsap.to(fullPage, {
 		// 	scrollTrigger: {
 		// 		trigger: fullPage,

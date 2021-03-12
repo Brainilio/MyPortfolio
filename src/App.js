@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from "react"
+import React, { useState, useEffect } from "react"
 import Particles from "react-particles-js"
 import Rocketship from "./components/rocketship/rocketship"
 import { Switch, Route, useLocation } from "react-router-dom"
@@ -10,59 +10,47 @@ import Main from "./sections/main"
 import { Canvas, useFrame } from "react-three-fiber"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { Suspense } from "react"
-// import * as THREE from "three"
+import LoadingScreen from "./components/LoadingScreen/LoadingScreen"
 
-const Model = (props) => {
-	const [model, setModel] = useState(null)
+const ThreeModels = (props) => {
+	const [moon, setMoon] = useState(null)
+	const [earth, setEarth] = useState(null)
 
 	useEffect(() => {
-		new GLTFLoader().load("earth/scene.gltf", setModel)
+		new GLTFLoader().load("moon/scene.gltf", setMoon)
+		new GLTFLoader().load("earth/scene.gltf", setEarth)
 	}, [])
 
 	// Rotate mesh every frame, this is outside of React without overhead
 	useFrame(() => {
-		if (model) {
-			model.scene.rotation.y += 0.002
+		if (earth) {
+			earth.scene.rotation.y += 0.002
 		}
 	})
 
-	return model ? (
-		<primitive
-			position={[0, 0, 250 - props.scrollPos * 0.03]}
-			object={model.scene}
-		/>
-	) : null
-}
+	if (earth && moon) {
+		props.ToggleRest()
+	}
 
-const Moon = (props) => {
-	const [model, setModel] = useState()
-
-	useEffect(() => {
-		new GLTFLoader().load("moon/scene.gltf", setModel)
-	}, [])
-
-	useFrame(() => {
-		if (model) {
-			// model.scene.rotation.x -= 0.0001
-			// model.scene.position.y += 0.3
-			console.log(model.scene.position.y)
-		}
-	})
-
-	console.log()
-
-	return model ? (
-		<primitive
-			rotation={[0, 0, 0]}
-			position={[0, -800 + props.posY * 0.05, 0]}
-			object={model.scene}
-		/>
+	return earth && moon ? (
+		<>
+			<primitive
+				rotation={[0, 0, 0]}
+				position={[0, -800 + props.posY * 0.05, 0]}
+				object={moon.scene}
+			/>
+			<primitive
+				position={[0, 0, 300 - props.scrollPos * 0.04]}
+				object={earth.scene}
+			/>
+		</>
 	) : null
 }
 
 function App() {
 	let location = useLocation()
 	const [scrollPos, setScrollPos] = useState(0)
+	const [showRest, setShowRest] = useState(false)
 	ReactGA.initialize(`${process.env.REACT_APP_TRACKING_URL}`)
 	ReactGA.pageview("/")
 
@@ -73,22 +61,23 @@ function App() {
 		}
 	}, [])
 
-	const scrollhandler = () => {
-		console.log(window.pageYOffset)
-		setScrollPos(window.pageYOffset)
-	}
+	const scrollhandler = () => setScrollPos(window.pageYOffset)
+	const ToggleRest = () => setShowRest(true)
 
 	return (
 		<div>
 			<Rocketship />
 			<div className="three-canvas">
 				<Canvas pixelRatio="1" camera={{ position: [0, 30, 500] }}>
-					<ambientLight position={[0, 30, 500]} />
 					<Suspense fallback="">
+						<ambientLight position={[0, 30, 500]} />
 						<ambientLight intensity={0.2} />
 						<directionalLight intensity={1} />
-						<Model scrollPos={scrollPos} />
-						<Moon posY={scrollPos} />
+						<ThreeModels
+							ToggleRest={ToggleRest}
+							scrollPos={scrollPos}
+							posY={scrollPos}
+						/>
 					</Suspense>
 				</Canvas>
 			</div>
@@ -120,11 +109,15 @@ function App() {
 					},
 				}}
 			/>
-			<Switch location={location}>
-				<Route path="/" exact component={Main} />
-				<Route path="/projects" component={ProjectPage} />
-				<Route path="/project/:name" component={ProjectDetail}></Route>
-			</Switch>
+			{showRest ? (
+				<Switch location={location}>
+					<Route path="/" exact component={Main} />
+					<Route path="/projects" component={ProjectPage} />
+					<Route path="/project/:name" component={ProjectDetail}></Route>
+				</Switch>
+			) : (
+				<LoadingScreen />
+			)}
 		</div>
 	)
 }
