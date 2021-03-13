@@ -37,13 +37,13 @@ body {
 	overflow-x: hidden;
 	margin: 0;
 	padding: 0;
-	color: #ffffff;
+	color: #ffffffe0;
 	height: 100%;
 	max-width: 100vw;
 	background: rgb(10, 6, 10);
 	background: linear-gradient(
 		144deg,
-		rgb(42, 16, 71) 0%,
+		rgb(31, 7, 21) 0%,
 		rgb(0, 0, 0) 27%,
 		rgb(26, 18, 24) 58%,
 		rgb(0, 0, 0) 100%
@@ -91,6 +91,8 @@ a {
 	width: 100%;
 	height: 100%;
 	display: flex;
+	top: 0;
+	left: 0;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
