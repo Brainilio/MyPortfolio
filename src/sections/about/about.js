@@ -68,7 +68,7 @@ const About = () => {
 					<p ref={textRef} aria-hidden>
 						I am a creative developer driven by empathy, creativity, and
 						humility, specializing in Full-stack and UX/UI development. I aim to
-						combine these two special powers of my to create and develop
+						combine these two special powers of mine to create and develop
 						meaningful solutions for users. Applied creativity is reflected in
 						my everyday life in which I love to develop new recipes to cook,
 						play around with Arduino, draw my own comic book and be active when
