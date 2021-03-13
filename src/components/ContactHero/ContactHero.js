@@ -6,7 +6,7 @@ const ContactHero = () => {
 	return (
 		<div className="contact-hero">
 			<img src={david} alt="golden gate bridge" />
-			<h1>Enough, let's chat!</h1>
+			<h1>Let's work together!</h1>
 		</div>
 	)
 }
