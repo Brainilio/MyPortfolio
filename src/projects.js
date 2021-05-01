@@ -78,7 +78,16 @@ const projects = [
 		livePreview:
 			"http://ec2-18-156-171-101.eu-central-1.compute.amazonaws.com/",
 		gitHub: "https://github.com/Brainilio/natours",
-		tags: ["MERN", "MVC", "UX/UI", "AWS", "AdobeXD"],
+		tags: [
+			"React",
+			"MVC",
+			"ExpressJS",
+			"Stripe",
+			"Multer",
+			"MongoDB",
+			"AWS EC2 & S3",
+			"AdobeXD",
+		],
 		category: "Development",
 		description:
 			"Natours is a MERN application that lets you check out the coolest tours around the globe, book them and review them after experiencing them! As a guide/administrator you have full CRUD functionalities over users, tours and reviews, along with your own statistic dashboard. This project was develop to really combine both front-end and back-end skills. As this project is still in progress, some features are still missing such as payments and extra security protocols.",
