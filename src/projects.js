@@ -8,6 +8,7 @@ import PokeDex from "./resources/projects/pokedex.webp"
 import Leidsman from "./resources/projects/leidsman.webp"
 import MariaBeautySalon from "./resources/projects/mariabeautysalon.webp"
 import Classifier from "./resources/projects/classifier.webp"
+import BayVineMedia from "./resources/projects/bayvinemedia.webp"
 
 // pictures...
 import bb1 from "./resources/projects/burger-builder/1.webp"
@@ -148,6 +149,32 @@ const projects = [
 		dateCreated: "JULY, 2020",
 		fullImages: [s1, s2, s3, s4, s5, s6, s7, s8],
 		slug: "salvame",
+	},
+	{
+		name: "Bay Vine Media",
+		shortDescription:
+			"[WIP] I've developed a landing page, dedicated to my freelance web and creative services under the name of a brand I'm working on (Bay Vine). Bay Vine Media seeks to allow minorities and small businesses to still have a presentable brand and online presence. I've designed and developed everything using AdobeXD, React, and GSAP.",
+		previewImage: BayVineMedia,
+		livePreview: "https://bayvinemedia.com/",
+		gitHub: "https://github.com/Brainilio/bayvinemedia",
+		tags: [
+			"REACTJS",
+			"NETLIFY",
+			"GSAP",
+			"REACT HOOKS",
+			"ADOBE XD",
+			"GOOGLE ANALYTICS",
+		],
+		category: "Development",
+		description: "",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
+		additionalLinks: [],
+		dateCreated: "JANUARY, 2021",
+		fullImages: [],
+		slug: "bayvinemedia",
 	},
 	{
 		name: "Burger Builder",
