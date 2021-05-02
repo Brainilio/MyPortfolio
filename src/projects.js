@@ -8,7 +8,9 @@ import PokeDex from "./resources/projects/pokedex.webp"
 import Leidsman from "./resources/projects/leidsman.webp"
 import MariaBeautySalon from "./resources/projects/mariabeautysalon.webp"
 import Classifier from "./resources/projects/classifier.webp"
-import BayVineMedia from "./resources/projects/bayvinemedia.webp"
+import BayVineMedia from "./resources/projects/bayvine.webp"
+import Oracui from "./resources/projects/oracui.webp"
+import OldPortfolio from "./resources/projects/portfolio.webp"
 
 // pictures...
 import bb1 from "./resources/projects/burger-builder/1.webp"
@@ -69,6 +71,12 @@ import ml2 from "./resources/projects/machine/2.png"
 import ml3 from "./resources/projects/machine/3.png"
 import ml4 from "./resources/projects/machine/4.png"
 
+import or from "./resources/projects/oracui/or.webp"
+import or1 from "./resources/projects/oracui/or1.webp"
+import or3 from "./resources/projects/oracui/or3.webp"
+import or5 from "./resources/projects/oracui/or5.webp"
+import or6 from "./resources/projects/oracui/or6.webp"
+
 const projects = [
 	{
 		name: "Natours",
@@ -103,6 +111,56 @@ const projects = [
 		dateCreated: "OCTOBER, 2020",
 		fullImages: [n1, n2, n3, n4, n5, n6, n7],
 		slug: "natours",
+	},
+	{
+		name: "Oracui's MVP",
+		shortDescription:
+			"Oracui is a global mentorship platform that connects senior students with enrolling students in order to provide mentorship and build relationship. I've been mainly responsible for bringing the product's REST API to MVP ready conditions by improving documentation and adding over 20+ new business features. I've also connected 80% of all available endpoints to the front-end's redux store.",
+		previewImage: Oracui,
+		livePreview: "https://oracui.com/",
+		gitHub: null,
+		tags: ["REACTJS", "REDUX", "EXPRESSJS", "MONGODB", "NODEJS", "GOOGLE API"],
+		category: "Development",
+		description:
+			"Oracui is a global mentorship platform that connects senior students with enrolling students in order to provide mentorship and build relationship. I've been mainly responsible for bringing the product's REST API to MVP ready conditions by improving documentation and adding over 20+ new business features. I've also connected 80% of all available endpoints to the front-end's redux store. I worked on Oracui together with Joao Lucas Nina Matos, who is the responsible CTO. Together with Joao, we ensured that this product was viable enough to be used by 30+ users.",
+		process:
+			"At first when I joined Oracui, the back-end was pretty messy and everyone was aware of this. However, I quickly rolled up my sleeves and started to refactor and export reusable functions to utility files. After cleaning up the back-end, I made a list of all necessary business features to have a bird's view over everything, so that I do not end up in a mess when eventually developing it. After thinking about best engineering approaches; I applied the MVC pattern in order to separate the application into three main logical components. As I developed the back-end, I made sure to document each endpoint in Postman. When finishing most endpoints, I decided to pick up the responsibility to connect 80% of these endpoints to the front-end using Reactjs and Redux.",
+		challenges:
+			"A big challenge was integrating Google's Calendar API, as it required a service account and a lot of additional programming. The reason behind using this API, was to ensure that users could schedule their meetings on our platform and not have to rely on redundant email exchanges in order to plan and schedule a meeting.",
+		differently:
+			"Next time, I would try and be more involved with the front-end architecture and development as well, so communication between the two ends can go smoothly.",
+		takeaway:
+			"My takeaway is that developing Oracui in its early stages was a big, but necessary challenge. Not only did it allow me to grow as a developer, but it also taught me how to work on a single codebase together with another developer. Something that definitely brought me a lot of joy was having this product actually being used by 35 students at Melbourne University.",
+		additionalLinks: [],
+		dateCreated: "MARCH, 2021",
+		fullImages: [or, or1, or3, or5, or6],
+		slug: "oracui",
+	},
+	{
+		name: "Bay Vine Media",
+		shortDescription:
+			"[WIP] I've developed a landing page, dedicated to my freelance web and creative services under the name of a brand I'm working on (Bay Vine). Bay Vine Media seeks to allow minorities and small businesses to still have a presentable brand and online presence. I've designed and developed everything using AdobeXD, React, and GSAP.",
+		previewImage: BayVineMedia,
+		livePreview: "https://bayvinemedia.com/",
+		gitHub: "https://github.com/Brainilio/bayvinemedia",
+		tags: [
+			"REACTJS",
+			"NETLIFY",
+			"GSAP",
+			"REACT HOOKS",
+			"ADOBE XD",
+			"GOOGLE ANALYTICS",
+		],
+		category: "Development",
+		description: "",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
+		additionalLinks: [],
+		dateCreated: "JANUARY, 2021",
+		fullImages: [],
+		slug: "bayvinemedia",
 	},
 	{
 		name: "Salvame",
@@ -159,21 +217,15 @@ const projects = [
 		fullImages: [s1, s2, s3, s4, s5, s6, s7, s8],
 		slug: "salvame",
 	},
+
 	{
-		name: "Bay Vine Media",
+		name: "My Old Portfolio",
 		shortDescription:
-			"[WIP] I've developed a landing page, dedicated to my freelance web and creative services under the name of a brand I'm working on (Bay Vine). Bay Vine Media seeks to allow minorities and small businesses to still have a presentable brand and online presence. I've designed and developed everything using AdobeXD, React, and GSAP.",
-		previewImage: BayVineMedia,
-		livePreview: "https://bayvinemedia.com/",
-		gitHub: "https://github.com/Brainilio/bayvinemedia",
-		tags: [
-			"REACTJS",
-			"NETLIFY",
-			"GSAP",
-			"REACT HOOKS",
-			"ADOBE XD",
-			"GOOGLE ANALYTICS",
-		],
+			"Over the past couple of months, my portfolio's gone through a lot of changes. Despite the changes, I'm still incredibly proud of my previous designed and developed portfolio.",
+		previewImage: OldPortfolio,
+		livePreview: "https://dazzling-leakey-c1d429.netlify.app/",
+		gitHub: "https://github.com/Brainilio/MyPortfolio/tree/old-portfolio/src",
+		tags: ["REACTJS", "REACT HOOKS", "ADOBEXD", "GSAP"],
 		category: "Development",
 		description: "",
 		process: "",
@@ -181,10 +233,11 @@ const projects = [
 		differently: "",
 		takeaway: "",
 		additionalLinks: [],
-		dateCreated: "JANUARY, 2021",
+		dateCreated: "JULY, 2020",
 		fullImages: [],
-		slug: "bayvinemedia",
+		slug: "oldportfolio",
 	},
+
 	{
 		name: "Burger Builder",
 		shortDescription:
