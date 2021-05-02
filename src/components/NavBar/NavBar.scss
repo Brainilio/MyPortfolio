@@ -38,8 +38,12 @@ nav {
 	.nav-items {
 		padding-right: 2em;
 
-		@include screenm {
+		@include screenxs {
 			display: none;
+		}
+
+		@include screenl {
+			display: block;
 		}
 
 		ul {
@@ -85,8 +89,12 @@ nav {
 		transition: all 0.3s linear;
 		transform-origin: center;
 
-		@include screenm {
+		@include screenxs {
 			display: flex;
+		}
+
+		@include screenl {
+			display: none;
 		}
 
 		&:hover {

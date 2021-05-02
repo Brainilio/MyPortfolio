@@ -29,6 +29,7 @@
 		width: 50px;
 	}
 }
+
 section {
 	min-height: auto;
 	width: 100vw;
@@ -49,20 +50,32 @@ h2 {
 		justify-content: space-around;
 		align-items: center;
 
-		@include screenl {
+		@include screenxs {
 			text-align: justify;
 			flex-direction: column-reverse;
 		}
+
+		@include screenxl {
+			flex-direction: row;
+		}
+
 		.p-text {
 			display: flex;
-
 			flex-direction: column;
 			justify-content: space-evenly;
 			width: 40%;
 
-			@include screenl {
+			@include screenxs {
 				width: 80%;
 				text-align: center;
+			}
+
+			@include screenxl {
+				display: flex;
+				flex-direction: column;
+				justify-content: space-evenly;
+				width: 40%;
+				align-items: flex-start;
 			}
 			h1 {
 				font-size: 70px;
@@ -71,35 +84,54 @@ h2 {
 				font-size: 20px;
 				width: 100%;
 
-				@include screenl {
+				@include screenxs {
 					text-align: justify;
 				}
 			}
+
 			.p-info {
 				margin-top: 2em;
 				display: flex;
+				font-weight: 600;
 
 				div {
 					width: 100%;
 					margin-right: 5em;
-					@include screenl {
+
+					@include screenxs {
 						margin: 0 auto;
+						text-align: center;
 					}
-					h2 {
-					}
-					span {
+
+					@include screenxl {
+						width: 100%;
+						margin: 0;
+						text-align: start;
 					}
 				}
 			}
+
 			.p-buttons {
 				display: flex;
 				margin-top: 5em;
 
-				@include screenl {
+				@include screenxs {
 					justify-content: center;
 					flex-direction: column;
 					align-items: center;
 				}
+
+				@include screenm {
+					flex-direction: row;
+					align-items: center;
+				}
+
+				@include screenxl {
+					align-items: flex-start;
+					flex-direction: row;
+					align-items: center;
+				}
+
 				.project-cards-single-button {
 					cursor: pointer;
 					display: flex;
@@ -116,10 +148,16 @@ h2 {
 					transition: all 0.3s ease-in;
 					text-decoration: none;
 
-					@include screenl {
+					@include screenxs {
 						margin-right: 0;
 						margin-bottom: 1em;
 					}
+
+					@include screenm {
+						margin-right: 3em;
+						margin-bottom: 0em;
+					}
+
 					&:hover {
 						background: linear-gradient(142deg, #ffe920 0%, #be3490 100%);
 						color: white;
@@ -135,7 +173,7 @@ h2 {
 					height: 50px;
 					font-weight: 900;
 					width: 200px;
-					border: none;
+					border: 3px solid none;
 					background: linear-gradient(142deg, #35218f 0%, #cd2ad3 100%);
 					border-radius: 30px;
 					transition: all 0.3s ease-in;
@@ -162,20 +200,43 @@ h2 {
 	margin: 6em 0;
 	justify-content: space-around;
 
-	@include screenl {
+	@include screenxs {
 		flex-direction: column;
 		align-items: center;
 	}
 
+	@include screenxl {
+		justify-content: space-between;
+		flex-direction: row;
+	}
+
 	.p-process-img {
 		background-color: rgb(0, 0, 0);
-		background: url("../../resources/menu/menu-2.webp");
+		background: black;
+		border: none;
 		width: 450px;
-		height: 450px;
+		height: 500px;
 		border-radius: 25px;
+		border-top-left-radius: 0px;
+		border-bottom-left-radius: 0px;
+		width: 50%;
+
+		@include screenxs {
+			border-radius: 0px;
+			width: 100%;
+		}
+
+		@include screenxl {
+			border-radius: 25px;
+			border-top-left-radius: 0px;
+			border-bottom-left-radius: 0px;
+
+			width: 50%;
+		}
+
 		img {
 			object-fit: cover;
-			border-radius: 25px;
+			border-radius: inherit;
 			height: 100%;
 			width: 100%;
 		}
@@ -184,22 +245,23 @@ h2 {
 	.p-process-text {
 		width: 40%;
 
-		@include screenl {
+		@include screenxs {
 			margin-top: 2em;
 			text-align: center;
 			width: 80%;
 		}
+
+		@include screenxl {
+			width: 40%;
+			padding-right: 5em;
+		}
 		h1 {
 			font-size: 60px;
-			text-align: end;
+			text-align: start;
 		}
 		p {
-			text-align: end;
+			text-align: start;
 			font-size: 20px;
-
-			@include screenl {
-				text-align: justify;
-			}
 		}
 	}
 }
@@ -210,40 +272,66 @@ h2 {
 	justify-content: space-around;
 	flex-direction: row-reverse;
 
-	@include screenl {
+	@include screenxs {
 		flex-direction: column;
 		align-items: center;
 	}
 
+	@include screenxl {
+		justify-content: space-between;
+		flex-direction: row-reverse;
+	}
+
 	.p-challenges-img {
 		background-color: rgb(0, 0, 0);
-		background: url("../../resources/me.webp");
+		background: rgba(0, 0, 0, 0);
+		border: none;
 		width: 450px;
 		height: 450px;
 		border-radius: 25px;
+		border-top-right-radius: 0px;
+		border-bottom-right-radius: 0px;
+		width: 50%;
+
+		@include screenxs {
+			border-radius: 0px;
+			width: 100%;
+		}
+
+		@include screenxl {
+			border-radius: 25px;
+			border-top-right-radius: 0px;
+			border-bottom-right-radius: 0px;
+			width: 50%;
+		}
+
 		img {
 			object-fit: cover;
-			border-radius: 25px;
+			border-radius: inherit;
 			height: 100%;
 			width: 100%;
 		}
 	}
 	.p-challenges-text {
 		width: 40%;
-		@include screenl {
-			text-align: center;
+
+		@include screenxs {
 			margin-top: 2em;
+			text-align: center;
 			width: 80%;
+		}
+
+		@include screenxl {
+			width: 40%;
+			padding-left: 5em;
 		}
 		h1 {
 			font-size: 60px;
+			text-align: start;
 		}
 		p {
+			text-align: start;
 			font-size: 20px;
-
-			@include screenl {
-				text-align: justify;
-			}
 		}
 	}
 }
@@ -252,21 +340,43 @@ h2 {
 	display: flex;
 	margin: 6em 0;
 	justify-content: space-around;
-	@include screenl {
-		text-align: center;
+
+	@include screenxs {
 		flex-direction: column;
 		align-items: center;
 	}
 
+	@include screenxl {
+		justify-content: space-between;
+		flex-direction: row;
+	}
+
 	.p-different-img {
 		background-color: rgb(0, 0, 0);
-		background: url("../../resources/menu/menu-1.webp");
+		background: rgba(0, 0, 0, 0);
+		border: none;
 		width: 450px;
-		height: 450px;
+		height: 500px;
 		border-radius: 25px;
+		border-top-left-radius: 0px;
+		border-bottom-left-radius: 0px;
+		width: 50%;
+
+		@include screenxs {
+			border-radius: 0px;
+			width: 100%;
+		}
+
+		@include screenxl {
+			border-radius: 25px;
+			border-top-left-radius: 0px;
+			border-bottom-left-radius: 0px;
+			width: 50%;
+		}
+
 		img {
 			object-fit: cover;
-			border-radius: 25px;
+			border-radius: inherit;
 			height: 100%;
 			width: 100%;
 		}
@@ -275,22 +385,23 @@ h2 {
 	.p-different-text {
 		width: 40%;
 
-		@include screenl {
-			text-align: center;
+		@include screenxs {
 			margin-top: 2em;
+			text-align: center;
 			width: 80%;
+		}
+
+		@include screenxl {
+			width: 40%;
+			padding-right: 5em;
 		}
 		h1 {
 			font-size: 60px;
-			text-align: end;
+			text-align: start;
 		}
 		p {
-			text-align: end;
+			text-align: start;
 			font-size: 20px;
-
-			@include screenl {
-				text-align: justify;
-			}
 		}
 	}
 }
@@ -300,44 +411,67 @@ h2 {
 	margin: 6em 0;
 	justify-content: space-around;
 	flex-direction: row-reverse;
-	@include screenl {
-		text-align: center;
+
+	@include screenxs {
 		flex-direction: column;
 		align-items: center;
 	}
 
+	@include screenxl {
+		justify-content: space-between;
+		flex-direction: row-reverse;
+	}
+
 	.p-takeaway-img {
 		background-color: rgb(0, 0, 0);
-		background: url("../../resources/menu/menu-3.webp");
+		background: rgba(0, 0, 0, 0);
+		border: none;
 		width: 450px;
 		height: 450px;
 		border-radius: 25px;
+		border-top-right-radius: 0px;
+		border-bottom-right-radius: 0px;
+		width: 50%;
+
+		@include screenxs {
+			border-radius: 0px;
+			width: 100%;
+		}
+
+		@include screenxl {
+			border-radius: 25px;
+			border-top-right-radius: 0px;
+			border-bottom-right-radius: 0px;
+			width: 50%;
+		}
 
 		img {
-			object-position: center;
 			object-fit: cover;
-			border-radius: 25px;
+			border-radius: inherit;
 			height: 100%;
 			width: 100%;
 		}
 	}
-
 	.p-takeaway-text {
 		width: 40%;
-		@include screenl {
-			text-align: center;
+
+		@include screenxs {
 			margin-top: 2em;
+			text-align: center;
 			width: 80%;
+		}
+
+		@include screenxl {
+			width: 40%;
+			padding-left: 5em;
 		}
 		h1 {
 			font-size: 60px;
+			text-align: start;
 		}
 		p {
+			text-align: start;
 			font-size: 20px;
-
-			@include screenl {
-				text-align: justify;
-			}
 		}
 	}
 }
@@ -348,40 +482,64 @@ h2 {
 	justify-content: space-around;
 	flex-direction: row-reverse;
 
-	@include screenl {
-		text-align: center;
-		flex-direction: column-reverse;
+	@include screenxs {
+		flex-direction: column;
 		align-items: center;
+	}
+
+	@include screenxl {
+		justify-content: space-between;
+		flex-direction: row-reverse;
 	}
 
 	.p-additional-img {
 		background-color: rgb(0, 0, 0);
-		background: url("../../resources/san-fran.webp");
+		background: rgba(0, 0, 0, 0);
 		width: 450px;
 		height: 450px;
 		border-radius: 25px;
+		border-top-left-radius: 0px;
+		border-bottom-left-radius: 0px;
+		width: 50%;
+
+		@include screenxs {
+			border-radius: 0px;
+			width: 100%;
+		}
+
+		@include screenxl {
+			border-radius: 25px;
+			border-top-left-radius: 0px;
+			border-bottom-left-radius: 0px;
+			width: 50%;
+		}
 
 		img {
-			object-position: center;
-			object-fit: cover;
-			border-radius: 25px;
+			object-fit: scale-down;
+			border-radius: inherit;
 			height: 100%;
 			width: 100%;
 		}
 	}
 	.p-additional-text {
 		width: 40%;
-		@include screenl {
-			text-align: center;
+		@include screenxs {
 			margin-top: 2em;
+			text-align: center;
 			width: 80%;
 		}
+
+		@include screenxl {
+			width: 40%;
+			padding-right: 5em;
+		}
+
 		h1 {
 			font-size: 60px;
-			text-align: end;
+			text-align: start;
 		}
 		ul {
-			text-align: end;
+			text-align: start;
 			li {
 				margin: 0;
 				a {

@@ -8,16 +8,25 @@
 	margin-top: 4em;
 	margin-bottom: 4em;
 
-	@include screenl {
+	@include screenxs {
+		justify-content: space-between;
 		flex-direction: column;
 		margin: 1em auto;
+		width: 100%;
+	}
+
+	@include screenxl {
+		flex-direction: row;
+		justify-content: space-between;
+
+		box-sizing: border-box;
 	}
 
 	.project-image {
 		position: relative;
 		border-radius: 25px;
 		overflow: hidden;
-		box-shadow: 3px 3px 3px rgba(33, 7, 54, 0.219);
+		box-shadow: 3px 3px 24px rgba(54, 54, 54, 0.452);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -27,10 +36,10 @@
 			object-fit: cover;
 			transition: all 0.4s ease-in;
 			border-radius: 25px;
-			box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.219);
+			box-shadow: 3px 5px 25px rgba(141, 12, 180, 0.952);
 
-			@include screens {
-				width: 80%;
+			@include screenxs {
+				width: 100%;
 			}
 		}
 
@@ -38,32 +47,47 @@
 		&:focus .project-cards-image {
 			transform: scale(1.1);
 
-			@include screens {
+			@include screenxs {
 				transform: none;
+			}
+
+			@include screenl {
+				transform: scale(1.1);
 			}
 		}
 	}
 
 	.descriptions {
-		width: 60%;
 		display: flex;
 		margin: 0;
 		padding: 0;
-		flex-direction: column;
-		align-items: center;
+
+		@include screenxs {
+			width: 100%;
+		}
+
+		@include screenl {
+			width: 50%;
+			display: flex;
+			margin: 0;
+			padding: 0;
+			flex-direction: column;
+			align-items: center;
+		}
+
+		@include screenxl {
+			display: flex;
+		}
 
 		.project-cards-description {
-			width: 50%;
-
-			@include screens {
-				width: 100%;
-				text-align: justify;
-			}
-
-			@include screenl {
-				margin-top: 2em;
+			@include screenxs {
+				margin-top: 1em;
 				width: 100%;
 				text-align: center;
+			}
+
+			@include screenxl {
+				width: 75%;
 			}
 
 			.project-cards-description-title {
@@ -73,7 +97,7 @@
 			.project-cards-description-paragraph {
 				font-size: 20px;
 
-				@include screens {
+				@include screenxs {
 					width: 100%;
 					text-align: justify;
 				}
@@ -107,10 +131,18 @@
 			width: 100%;
 			margin-top: 5em;
 
-			@include screens {
+			@include screenxs {
 				flex-direction: column;
 				justify-content: center;
 				align-items: center;
+				margin-top: 1em;
+			}
+
+			@include screens {
+				flex-direction: row;
+				justify-content: center;
+				align-items: center;
+				margin-top: 1em;
 			}
 
 			@include screenl {
@@ -134,8 +166,12 @@
 				transition: all 0.3s ease-in;
 				text-decoration: none;
 
-				@include screens {
+				@include screenxs {
 					margin-right: 0;
+				}
+
+				@include screens {
+					margin-right: 3em;
 				}
 
 				&:hover {
@@ -150,16 +186,20 @@
 				justify-content: center;
 				align-items: center;
 				color: white;
-				height: 50px;
 				font-weight: 900;
+				height: 50px;
 				width: 200px;
 				background: linear-gradient(142deg, #35218f 0%, #cd2ad3 100%);
 				border-radius: 30px;
 				transition: all 0.3s ease-in;
 				text-decoration: none;
 
-				@include screens {
+				@include screenxs {
 					margin-top: 1em;
+				}
+
+				@include screens {
+					margin-top: 0;
 				}
 				&:hover {
 					background-color: white;

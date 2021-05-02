@@ -7,22 +7,13 @@
 
 	@include screenxs {
 		margin: 0;
+
 		margin-bottom: 2em;
 	}
 
-	@include screens {
-		margin: 0;
-		margin-bottom: 2em;
-	}
-
-	@include screenm {
-		margin: 0;
-		margin-bottom: 2em;
-	}
-
-	@include screenl {
-		margin: 0;
-		margin-bottom: 2em;
+	@include screenxl {
+		margin-top: 5em;
+		margin-bottom: 10em;
 	}
 
 	.contact-part {
@@ -32,36 +23,40 @@
 		display: flex;
 		align-items: baseline;
 		justify-content: space-evenly;
+		padding-left: 3em;
+		padding-right: 3em;
+		box-sizing: border-box;
 
 		@include screenxs {
 			flex-direction: column;
 			justify-content: center;
 			align-items: center;
-			margin-left: 2em;
-			margin-right: 2em;
+			margin: 2em 0;
 		}
 
-		@include screens {
-			flex-direction: column;
-			justify-content: center;
-			align-items: center;
-			margin-left: 2em;
-			margin-right: 2em;
-		}
-
-		@include screenl {
-			flex-direction: column;
-			justify-content: center;
-			align-items: center;
-			margin: 0 auto;
-			margin-top: 8em;
+		@include screenxl {
+			justify-content: space-between;
+			display: flex;
+			align-items: baseline;
+			flex-direction: row;
+			margin: 0;
 		}
 	}
 
 	.form {
 		display: flex;
 		flex-direction: column;
-		width: 70%;
+
+		@include screenxs {
+			width: 100%;
+		}
+
+		@include screenxl {
+			margin-top: 3em;
+			justify-content: center;
+			align-items: flex-start;
+			width: 50%;
+		}
 
 		.success-form,
 		.fail-form {
@@ -83,63 +78,47 @@
 				align-items: center;
 			}
 
-			@include screens {
-				margin-top: 5em;
-				width: 100%;
-				justify-content: center;
-				align-items: center;
+			@include screenxl {
+				display: flex;
+				align-items: flex-start;
+				margin-top: 2em;
+				flex-direction: column;
+				justify-content: start;
+				text-align: start;
+				text-align: start;
 			}
-
-			@include screenm {
-				margin-top: 5em;
-				width: 100%;
-				justify-content: center;
-				align-items: center;
-			}
-
-			@include screenl {
-				margin-top: 5em;
-				width: 100%;
-				justify-content: center;
-				align-items: center;
-			}
-		}
-
-		@include screenxxs {
-			width: 100%;
-			justify-content: center;
-			align-items: center;
-		}
-
-		@include screenxs {
-			width: 100%;
-			justify-content: center;
-			align-items: center;
-		}
-
-		@include screens {
-			margin-top: 3em;
-		}
-
-		@include screenl {
-			margin-top: 3em;
-			justify-content: center;
-			align-items: center;
 		}
 
 		h1,
 		span {
-			@include screenl {
-				text-align: center;
+			@include screenxl {
+				text-align: start;
 			}
 		}
 
 		span {
 			font-size: 20px;
+
+			@include screenxs {
+				text-align: center;
+			}
+
+			@include screenxl {
+				text-align: start;
+			}
 		}
 		h1 {
 			font-size: 35px;
 			font-weight: 900;
+
+			@include screenxs {
+				margin-top: 2em;
+				text-align: center;
+			}
+
+			@include screenxl {
+				text-align: start;
+			}
 		}
 
 		form {
@@ -151,29 +130,18 @@
 			@include screenxs {
 				margin-top: 2em;
 				display: flex;
-				width: 85vw;
+				width: 100%;
+
 				flex-direction: column;
+				justify-content: center;
 			}
 
-			@include screens {
-				margin-top: 2em;
-				display: flex;
-				width: 85vw;
-				flex-direction: column;
-			}
-
-			@include screenm {
-				margin-top: 2em;
-				display: flex;
-				width: 85vw;
-				flex-direction: column;
-			}
-
-			@include screenl {
-				margin-top: 2em;
-				display: flex;
-				width: 85vw;
-				flex-direction: column;
+			@include screenxl {
+				margin-top: 3em;
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				grid-gap: 2em;
+				width: 100%;
 			}
 
 			div {
@@ -231,12 +199,6 @@
 						}
 
 						@include screenxxs {
-							padding: 0;
-							padding-left: 1em;
-							padding-top: 1em;
-						}
-
-						@include screenxs {
 							padding: 0;
 							padding-left: 1em;
 							padding-top: 1em;

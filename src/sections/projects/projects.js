@@ -49,10 +49,7 @@ const Projects = () => {
 		<section ref={projectRef} className="projects">
 			<div className="projects-title">
 				<span ref={titleRef} className="projects-title-title" aria-hidden>
-					<span>W</span>
-					<span>o</span>
-					<span>r</span>
-					<span>k</span>
+					Featured Work
 				</span>
 
 				<NavLink

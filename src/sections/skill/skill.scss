@@ -4,6 +4,18 @@
 	display: flex;
 	flex-direction: column;
 	margin-top: 2em;
+	box-sizing: border-box;
+	padding-left: 3em;
+	padding-right: 3em;
+
+	@include screenxs {
+		padding: 0;
+	}
+
+	@include screenxl {
+		padding-left: 3em;
+		padding-right: 3em;
+	}
 
 	.skill-hero {
 		height: 450px auto;
@@ -15,12 +27,28 @@
 		background: linear-gradient(142deg, hsl(234, 82%, 57%) 0%, #ad5ee2 100%);
 		display: flex;
 		align-items: center;
+		box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.1);
+		box-sizing: border-box;
+
+		@include screenxs {
+			flex-direction: column;
+			padding: 1em;
+			margin: 2em auto;
+			width: 100%;
+			border-radius: 0px;
+		}
 
 		@include screenl {
-			flex-direction: column;
-			padding: 0.5em 0.5em;
-			margin: 2em auto;
-			width: 95%;
+			border-radius: 50px;
+			width: 80%;
+			padding: 0;
+		}
+
+		@include screenxl {
+			flex-direction: row;
+			padding-left: 3em;
+			padding-right: 3em;
+			width: 100%;
 		}
 
 		.skill-hero-text {
@@ -29,8 +57,14 @@
 			width: 50%;
 			padding-left: 2em;
 
-			@include screenxl {
+			@include screenxs {
 				width: 100%;
+				padding: 0;
+			}
+
+			@include screenxl {
+				width: 50%;
+				padding: 0;
 			}
 
 			.skills-title-block {
@@ -38,8 +72,8 @@
 				display: flex;
 				flex-direction: column;
 
-				@include screenl {
-					margin-bottom: 2em;
+				@include screenxs {
+					width: 100%;
 				}
 
 				.skills-title-title {
@@ -47,9 +81,12 @@
 					font-weight: 900;
 					overflow: hidden;
 
-					@include screenl {
+					@include screenxs {
 						margin: 0 auto;
-						justify-content: center;
+					}
+
+					@include screenxl {
+						margin: 0;
 					}
 				}
 
@@ -57,10 +94,18 @@
 					font-size: 20px;
 					width: 100%;
 
+					@include screenxs {
+						width: 100%;
+						text-align: justify;
+					}
 					@include screenl {
 						width: 80%;
-						text-align: justify;
-						margin: 0 auto;
+						margin: 1em auto;
+					}
+
+					@include screenxl {
+						width: 100%;
+						margin: 1em auto;
 					}
 				}
 			}
@@ -81,6 +126,13 @@
 						justify-content: center;
 						margin-bottom: 1em;
 					}
+
+					@include screenxl {
+						margin: 0;
+						width: 100%;
+						justify-content: center;
+						margin-bottom: 1em;
+					}
 				}
 			}
 		}
@@ -92,8 +144,13 @@
 			justify-content: flex-end;
 			margin-right: 5rem;
 
-			@include screenxl {
+			@include screenxs {
 				display: none;
+			}
+
+			@include screenxl {
+				display: flex;
+				margin-right: 0;
 			}
 		}
 	}

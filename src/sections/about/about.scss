@@ -1,52 +1,36 @@
 @import "../../styles/responsive/breakpoints.scss";
 
 .about {
-	display: flex;
 	min-height: auto !important;
-	margin-top: 15em;
-	margin-bottom: 15em;
-	margin: 0 auto;
+	margin: 5em auto !important;
+	padding-left: 3em;
+	padding-right: 3em;
+	box-sizing: border-box !important;
 
 	.about-block {
 		display: flex;
 		align-items: center;
 		justify-content: space-evenly;
-		border-radius: 25px;
-		flex-wrap: wrap;
-		margin: 0 auto;
 
 		@include screenxs {
-			margin-top: 1em;
 			margin: 0 auto;
 			justify-content: center;
 			flex-direction: column;
+			align-items: center;
 		}
 
 		@include screens {
 			margin-top: 1em;
 			margin: 0 auto;
-
 			justify-content: center;
-		}
-
-		@include screenm {
-			margin-top: 1em;
-			margin: 0 auto;
-
-			justify-content: center;
-		}
-
-		@include screenl {
-			margin-top: 1em;
-			margin: 0 auto;
-			justify-content: center;
-			flex-direction: column;
 		}
 
 		@include screenxl {
-			margin-top: 1em;
-			margin: 0 auto;
-			justify-content: center;
+			margin-top: 5em;
+			margin: 0;
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
 		}
 
 		.about-text {
@@ -55,10 +39,16 @@
 			flex-direction: column;
 			width: 35%;
 
-			@include screenxl {
-				width: 80%;
-				margin: 0 auto;
+			@include screenxs {
+				width: 100%;
 				text-align: justify;
+			}
+
+			@include screenl {
+				width: 50%;
+			}
+			@include screenxl {
+				margin-right: 2em;
 			}
 
 			.about-title {
@@ -67,36 +57,46 @@
 				font-weight: 900;
 				overflow: hidden;
 
-				@include screens {
-					margin: 2em 0 0 0;
-					justify-content: center;
-				}
-
-				@include screenm {
-					margin: 2em 0 0 0;
-					justify-content: center;
-				}
-
-				@include screenl {
+				@include screenxs {
 					margin: 2em 0 0 0;
 					justify-content: center;
 				}
 
 				@include screenxl {
-					margin: 2em 0 0 0;
-					justify-content: center;
+					justify-content: start;
 				}
 			}
 
 			div {
 				display: flex;
+				padding-left: 3em;
+				padding-right: 3em;
+				box-sizing: border-box !important;
 
-				@include screenxl {
+				@include screenxs {
 					display: flex;
 					align-items: center;
 					flex-direction: column;
 					justify-content: center;
 				}
+
+				@include screens {
+					display: flex;
+					align-items: center;
+					flex-direction: row;
+					justify-content: center;
+					margin-bottom: 2em;
+				}
+
+				@include screenxl {
+					display: flex;
+					align-items: flex-start;
+					flex-direction: row;
+					justify-content: start;
+					margin-bottom: 2em;
+					padding: 0;
+				}
+
 				button {
 					margin-top: 2em;
 					margin-bottom: 1rem;
@@ -119,7 +119,7 @@
 					}
 
 					@include screenxs {
-						margin: 1em;
+						margin: 0;
 					}
 				}
 
@@ -145,7 +145,6 @@
 
 					a {
 						margin: 0;
-						width: 150px;
 						&:hover {
 							background-color: white;
 							color: black;
@@ -153,7 +152,14 @@
 					}
 
 					@include screenxs {
-						margin: 1em;
+						margin: 0;
+						margin-top: 1em;
+						margin-bottom: 1em;
+					}
+
+					@include screens {
+						margin: 0;
+						margin-left: 2em;
 					}
 				}
 			}
@@ -163,21 +169,11 @@
 			display: flex;
 			flex-direction: column;
 
-			@include screens {
-				margin-top: 5em;
-				margin-right: 0;
-				margin: 0 auto;
-			}
-
 			@include screenxs {
-				margin-top: 5em;
 				margin-right: 0;
 				margin: 0 auto;
-			}
-
-			@include screenm {
-				margin-top: 5em;
-				margin: 0 auto;
+				justify-content: center;
+				align-items: center;
 			}
 
 			@include screenl {
@@ -186,8 +182,7 @@
 			}
 
 			@include screenxl {
-				margin-top: 5em;
-				margin: 0 auto;
+				margin: 0;
 			}
 
 			div {
@@ -198,33 +193,75 @@
 				margin: 1em;
 				border-radius: 15px;
 				object-fit: cover;
-				@include screenm {
-					margin: 0 auto;
+
+				@include screenxs {
+					margin: 0;
+				}
+				@include screenxl {
+					margin: 0;
 				}
 			}
 
 			.about-image-rotterdam {
-				@include screens {
+				@include screenxs {
+					display: none;
 					margin: 15px;
 					width: 350px;
 					object-fit: cover;
 				}
+
+				@include screenm {
+					display: block;
+					width: 620px;
+				}
+
+				@include screenl {
+					display: block;
+					width: 520px;
+				}
 			}
 			.about-image-sanfran {
-				@include screens {
+				@include screenxs {
+					display: none;
 					margin: 10px;
 					width: 165px;
 					object-fit: cover;
 				}
+				@include screenm {
+					display: block;
+					width: 300px;
+				}
+				@include screenl {
+					width: 250px;
+				}
 			}
+
 			.about-image-image {
 				transition: all 0.5s ease-in-out;
 				border-radius: 15px;
 
+				@include screenxs {
+					margin: 10px;
+					width: 220px;
+					object-fit: cover;
+					margin: 1em auto;
+				}
+
 				@include screens {
 					margin: 10px;
-					width: 170px;
+					width: 320px;
 					object-fit: cover;
+					margin: 1em auto;
+				}
+
+				@include screenm {
+					display: block;
+					width: 300px;
+					margin: 10px;
+				}
+
+				@include screenl {
+					width: 250px;
 				}
 			}
 		}
