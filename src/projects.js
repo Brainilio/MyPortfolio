@@ -77,6 +77,11 @@ import or3 from "./resources/projects/oracui/or3.webp"
 import or5 from "./resources/projects/oracui/or5.webp"
 import or6 from "./resources/projects/oracui/or6.webp"
 
+import bv1 from "./resources/projects/bayvinemedia/bv1.webp"
+import bv2 from "./resources/projects/bayvinemedia/bv2.webp"
+import bv3 from "./resources/projects/bayvinemedia/bv3.webp"
+import bv4 from "./resources/projects/bayvinemedia/bv4.webp"
+
 const projects = [
 	{
 		name: "Natours",
@@ -152,14 +157,19 @@ const projects = [
 			"GOOGLE ANALYTICS",
 		],
 		category: "Development",
-		description: "",
-		process: "",
-		challenges: "",
-		differently: "",
-		takeaway: "",
+		description:
+			"[WIP] I've developed a landing page, dedicated to my freelance web and creative services under the name of a brand I'm working on (Bay Vine). Bay Vine Media seeks to allow minorities and small businesses to still have a presentable brand and online presence. I've designed and developed everything using AdobeXD, React, and GSAP. Bay Vine Media is just one of many creative ideas I have in store for Bay Vine, and I hope to grow this brand out to multiple side projects that I can reflect my identity in.",
+		process:
+			"Before I started developing this site, I had to think properly about the brand Bay Vine. I couldn't just go and freestyle how this site looked like. I had to make sure I could use the same system in my other projects under the name Bay Vine.  An example of reusing this same system is seen back in my portfolio as well. That is why I came up with a very vibrant color-scheme that allows for scaling. Once I designed the site, I went ahead and developed it in React and used GSAP for all animations.",
+		challenges:
+			"A big challenge with Bay Vine Media, was to have everything look crisp and consistent as possible.",
+		differently:
+			"Something I would do differently is try and design out every little scenario. For example the round cursor was not meant to be in the final project, but was added later on. This caused me to re-write most of my code in order to properly use ContextAPI. The reason behind re-writing most of my code, is that I wanted to take full advantage of ContextAPI so that meant moving most of the state to the store.",
+		takeaway:
+			"A big takeaway is that there is a sea of creative opportunities. There should be no limits to a developer. One year ago I would've never imagined developing this site with all the animations and details. There is constant opportunity to learn and growth.",
 		additionalLinks: [],
 		dateCreated: "JANUARY, 2021",
-		fullImages: [],
+		fullImages: [bv1, bv2, bv3, bv4],
 		slug: "bayvinemedia",
 	},
 	{
