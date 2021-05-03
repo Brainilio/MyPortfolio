@@ -1,6 +1,6 @@
 import React, { useEffect } from "react"
 import "./about.scss"
-import profile from "../../resources/me.webp"
+import profile from "../../resources/profile.webp"
 import sanfran from "../../resources/san-fran.webp"
 import rotterdam from "../../resources/rotterdam.webp"
 import LazyLoad from "react-lazyload"
