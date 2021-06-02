@@ -1,68 +1,50 @@
 @import "../../styles/responsive/breakpoints.scss";
 @import "../../styles/index.scss";
 
-.landing {
+.landing-title {
 	display: flex;
-	min-height: 100vh;
-	scroll-snap-align: start;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
 
 	@include screenxs {
-		flex-direction: column-reverse;
+		text-align: center;
 		justify-content: center;
-		align-items: center;
 	}
 
-	@include screenm {
-		flex-direction: column-reverse;
-		justify-content: center;
-		align-items: center;
-	}
-
-	.landing-title {
+	.landing-title-text {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;
+
+		.landing-title-text-title {
+			margin-top: var(--vertical-spacing-blocks) / 2;
+			width: 85%;
+		}
+	}
+
+	.landing-title-cta-buttons {
+		display: grid;
+		margin-top: var(--vertical-spacing-blocks);
+		grid-template-columns: 1fr 1fr;
+		align-items: center;
+		grid-gap: var(--vertical-spacing-blocks);
 
 		@include screenxs {
-			text-align: center;
-			justify-content: center;
-		}
-
-		.landing-title-text {
-			display: flex;
-			flex-direction: column;
 			align-items: center;
-
-			.landing-title-text-title {
-				margin-top: var(--vertical-spacing-blocks) / 2;
-				width: 85%;
-			}
+			justify-items: center;
+			grid-template-columns: 1fr;
 		}
-
-		.landing-title-cta-buttons {
-			display: grid;
-			margin-top: var(--vertical-spacing-blocks);
+		@include screenm {
 			grid-template-columns: 1fr 1fr;
-			align-items: center;
-			grid-gap: var(--vertical-spacing-blocks);
+		}
 
-			@include screenxs {
-				align-items: center;
-				justify-items: center;
-				grid-template-columns: 1fr;
-			}
-			@include screenm {
-				grid-template-columns: 1fr 1fr;
-			}
+		.landing-title-cta-contact-me {
+			@include primaryBigButton;
+		}
 
-			.landing-title-cta-contact-me {
-				@include primaryBigButton;
-			}
-
-			.landing-title-resume {
-				@include secondaryBigButton;
-			}
+		.landing-title-resume {
+			@include secondaryBigButton;
 		}
 	}
 }

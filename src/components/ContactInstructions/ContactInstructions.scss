@@ -1,18 +1,38 @@
 @import "../../styles/responsive/breakpoints.scss";
+@import "../../styles/index.scss";
 
 .contact-instructions {
+	width: 50%;
 	display: flex;
 	flex-direction: column;
-	margin: 2em;
 	justify-content: center;
 	align-items: flex-start;
 	box-sizing: border-box;
+
+	h3 {
+		text-align: start;
+		width: 450px;
+
+		@include screenxs {
+			display: none;
+		}
+
+		@include screenl {
+			display: block;
+		}
+	}
 
 	@include screenxs {
 		align-items: center;
 		text-align: center;
 		margin: 0 auto;
 		width: 100%;
+	}
+
+	@include screenl {
+		text-align: start;
+		align-items: flex-start;
+		width: 50%;
 	}
 
 	@include screenxl {
@@ -23,60 +43,30 @@
 		width: 50%;
 	}
 
-	h1 {
-		font-weight: 900;
-		font-size: 35px;
-	}
-
-	h2 {
-		width: 80%;
-		font-size: 20px;
-		margin: 0;
-		font-weight: normal;
-
-		@include screenxs {
-			margin: 1em auto;
-			width: 100%;
-			text-align: justify;
-		}
-
-		@include screenl {
-			width: 70%;
-
-			text-align: justify;
-		}
-
-		@include screenxl {
-			margin: 0;
-			width: 80%;
-			text-align: start;
-		}
-	}
-
 	ul {
 		list-style: none;
 		margin: 0;
 		padding: 0;
 
 		li {
+			margin: var(--vertical-spacing-blocks) 0;
 			h3 {
-				font-size: 25px;
-
 				@include screenxs {
 					width: 100%;
 				}
 
+				@include screenl {
+					text-align: start;
+					align-items: flex-start;
+				}
+
 				@include screenxl {
 					width: 80%;
-					font-size: 22px;
-
 					text-align: start;
 				}
 			}
 			p {
 				width: 80%;
-				font-size: 22px;
-
 				@include screenxs {
 					text-align: justify;
 					width: 100%;
@@ -84,13 +74,11 @@
 
 				@include screenl {
 					width: 70%;
-					margin: 0 auto;
 					text-align: justify;
 				}
 
 				@include screenxl {
 					width: 80%;
-					font-size: 22px;
 					margin: 0;
 					text-align: start;
 				}

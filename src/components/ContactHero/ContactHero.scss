@@ -1,21 +1,19 @@
-.contact-hero {
-	width: 100%;
-	display: flex;
-	height: 250px;
-	justify-content: center;
-	align-items: center;
-	overflow: hidden;
+@import "../../styles/responsive/breakpoints.scss";
+@import "../../styles/index.scss";
 
-	img {
-		height: 250px;
-		width: 100%;
-		z-index: -1;
-		position: absolute;
-		object-fit: cover;
+.contact-hero {
+	display: flex;
+	height: 150px;
+	justify-content: center;
+	flex-direction: column;
+	align-items: center;
+	position: relative;
+
+	@include screenxs {
+		text-align: center;
 	}
 
-	h1 {
-		font-size: 60px;
-		text-align: center;
+	@include screenxl {
+		text-align: start;
 	}
 }

@@ -1,23 +1,9 @@
 @import "../../styles/responsive/breakpoints.scss";
 
 .all-projects {
-	min-width: 100vw;
 	display: flex;
-	align-items: center;
+	justify-content: center;
 	flex-direction: column;
-
-	@include screens {
-		width: 100vw;
-		text-align: center;
-	}
-
-	@include screenm {
-		width: 100vw;
-	}
-
-	@include screenl {
-		width: 100vw;
-	}
 
 	.link-back {
 		margin: 1em;
@@ -86,26 +72,6 @@
 	}
 
 	.projects {
-		@include screens {
-			align-items: center;
-			justify-content: center;
-		}
-
-		@include screenm {
-			align-items: center;
-			justify-content: center;
-			margin: 0 0 2em 0;
-			width: 100%;
-			text-align: center;
-		}
-
-		@include screenl {
-			align-items: center;
-			justify-content: center;
-			margin: 0 0 2em 0;
-			width: 100%;
-			text-align: center;
-		}
 	}
 
 	// TODO: fix these projects

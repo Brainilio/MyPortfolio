@@ -2,7 +2,6 @@ import React, { useState } from "react"
 import NavBar from "../components/NavBar/NavBar"
 import SideDrawer from "../components/SideDrawer/SideDrawer"
 import "./Main.scss"
-import Footer from "../sections/footer/footer"
 
 const Main = (props) => {
 	const [drawer, setsidedrawer] = useState(false)

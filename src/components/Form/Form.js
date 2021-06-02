@@ -181,7 +181,7 @@ const Form = () => {
 					Phone*
 				</label>
 				<input
-					placeholder="+1(408)-123-4565 or +31612345678"
+					placeholder="+1(408)-123-4565"
 					value={formData.phone}
 					onChange={handleChange}
 					name="phone"
@@ -207,21 +207,18 @@ const Form = () => {
 
 			<input name="bot-field" type="hidden" onChange={handleChange} />
 
-			<input
-				value="S U B M I T"
-				className="button-submit"
-				type="submit"
-			></input>
+			<input value="submit" className="button-submit" type="submit"></input>
 		</form>
 	)
 
 	return (
 		<div className="form">
-			<h1>Contact</h1>
-			<span>
+			<h2>Contact</h2>
+			<h3>
 				Please fill in the form below! I'll respond in less than 24 hours.{" "}
-				<span>* = Required</span>{" "}
-			</span>
+				<br />
+				<i>* = Required</i>{" "}
+			</h3>
 
 			{fail ? (
 				<div className="fail-form">

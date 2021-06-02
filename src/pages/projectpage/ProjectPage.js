@@ -10,7 +10,7 @@ const ProjectPage = (props) => {
 	}, [])
 
 	return (
-		<>
+		<section className="main-container">
 			<section className="all-projects">
 				<div className="project-page-title">
 					<span className="project-page-title-title" aria-hidden>
@@ -33,7 +33,7 @@ const ProjectPage = (props) => {
 
 				<Contact />
 			</section>
-		</>
+		</section>
 	)
 }
 

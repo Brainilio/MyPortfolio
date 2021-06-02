@@ -1,0 +1,15 @@
+@import "../../styles/responsive/breakpoints.scss";
+@import "../../styles/index.scss";
+
+.section-wrapper {
+	min-height: 100vh;
+	scroll-snap-align: start;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding-top: 5em;
+	width: 100%;
+	padding-bottom: 5em;
+	box-sizing: border-box;
+	overflow-x: hidden;
+}

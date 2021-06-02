@@ -3,6 +3,7 @@
 
 .projects {
 	min-height: 100vh;
+	width: 100%;
 	box-sizing: border-box;
 	scroll-snap-align: start;
 	display: flex;
@@ -19,7 +20,15 @@
 
 		p {
 			font-size: var(--subtitle);
-			width: 320px;
+			width: 60%;
+
+			@include screenxs {
+				width: 100%;
+			}
+
+			@include screenl {
+				width: 50%;
+			}
 		}
 
 		.all-projects-button {
@@ -36,5 +45,18 @@
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr;
 		grid-gap: var(--vertical-spacing-paragraphs);
+
+		@include screenxs {
+			grid-template-columns: 1fr;
+			grid-gap: var(--vertical-spacing-blocks);
+		}
+
+		@include screenl {
+			grid-template-columns: 1fr 1fr 1fr;
+		}
+
+		@include screenxl {
+			grid-gap: var(--vertical-spacing-paragraphs);
+		}
 	}
 }

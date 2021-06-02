@@ -1,0 +1,111 @@
+@import "../../styles/responsive/breakpoints.scss";
+@import "../../styles/index.scss";
+
+.my-skills {
+	margin-top: var(--vertical-spacing-paragraphs);
+	width: 100%;
+
+	.skills-title-block {
+		@include screenl {
+			text-align: center;
+		}
+
+		@include screenxl {
+			text-align: start;
+		}
+		p {
+			width: 500px;
+
+			@include screenxs {
+				width: 100%;
+			}
+
+			@include screenl {
+				width: 500px;
+				margin: 0 auto;
+				text-align: center;
+			}
+
+			@include screenxl {
+				width: 500px;
+				margin: 0;
+				text-align: start;
+			}
+		}
+	}
+
+	.skill-hero {
+		padding: var(--vertical-spacing-blocks);
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		align-items: center;
+		justify-items: center;
+		margin-top: var(--vertical-spacing-blocks);
+		height: 350px auto;
+		border-radius: var(--card-border-radius);
+		width: 650px;
+		overflow: hidden;
+		background: linear-gradient(142deg, hsl(234, 82%, 57%) 0%, #ad5ee2 100%);
+		box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.1);
+		box-sizing: border-box;
+
+		@include screenxs {
+			width: 100%;
+			grid-template-columns: 1fr;
+		}
+
+		@include screenl {
+			width: 80%;
+			margin-left: auto;
+			margin-right: auto;
+			grid-template-columns: 1fr 1fr;
+		}
+
+		@include screenxl {
+			padding: var(--vertical-spacing-blocks);
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			align-items: center;
+			justify-items: center;
+			margin-top: var(--vertical-spacing-blocks);
+			height: 350px auto;
+			border-radius: var(--card-border-radius);
+			width: 650px;
+			overflow: hidden;
+			background: linear-gradient(142deg, hsl(234, 82%, 57%) 0%, #ad5ee2 100%);
+			box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.1);
+			box-sizing: border-box;
+			margin-left: 0;
+		}
+
+		.skill-hero-text {
+			ul {
+				list-style-type: none;
+				padding: 0;
+
+				li {
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					margin-bottom: 1em;
+
+					@include screenl {
+						justify-content: flex-start;
+						text-align: start;
+						padding-left: 1.5em;
+					}
+				}
+			}
+		}
+
+		.skill-hero-img {
+			@include screenxs {
+				display: none;
+			}
+
+			@include screenl {
+				display: block;
+			}
+		}
+	}
+}

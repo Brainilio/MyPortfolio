@@ -13,9 +13,7 @@
 
 	.project-image {
 		position: relative;
-		border-radius: 25px;
-		overflow: hidden;
-		box-shadow: 3px 3px 24px rgba(54, 54, 54, 0.452);
+		height: 175px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -24,8 +22,6 @@
 			object-position: center;
 			object-fit: cover;
 			transition: all 0.1s linear;
-			border-radius: 25px;
-			box-shadow: 3px 5px 25px rgba(141, 12, 180, 0.952);
 
 			@include screenxs {
 				width: 100%;
@@ -48,7 +44,6 @@
 
 	.descriptions {
 		height: 250px;
-
 		margin-top: var(--vertical-spacing-blocks);
 
 		.project-cards-description {
@@ -57,12 +52,14 @@
 			align-items: center;
 
 			.project-cards-description-title {
-				text-align: center;
+				text-align: start;
 			}
 			.project-cards-description-paragraph {
+				text-align: start;
 			}
 
 			.read-more {
+				color: salmon;
 				text-decoration: underline;
 				font-weight: 500;
 			}

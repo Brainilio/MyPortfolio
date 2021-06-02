@@ -1,15 +1,16 @@
 import React from "react"
 import "./about.scss"
 import profile from "../../resources/profile.webp"
-import sanfran from "../../resources/san-fran.webp"
-import rotterdam from "../../resources/rotterdam.webp"
+// import sanfran from "../../resources/san-fran.webp"
+// import rotterdam from "../../resources/rotterdam.webp"
 import LazyLoad from "react-lazyload"
 import { Link } from "react-scroll"
-import Skill from "../skill/skill"
+import Skill from "../../components/Skill/skill"
+import SectionWrapper from "../../components/SectionWrapper/SectionWrapper"
 
 const About = () => {
 	return (
-		<section className="about">
+		<SectionWrapper>
 			<div className="about-block">
 				<div className="about-text">
 					<h2 className="about-title">About</h2>
@@ -17,11 +18,12 @@ const About = () => {
 						<h3>Who am I?</h3>
 						<p>
 							Hi! I’m a creative developer who’s driven by empathy and
-							creativity. In my career specialize in Front-end development, but
-							I’m not shy from back-end or UX/UI. In my work, I always aim for
-							to get the best out of myself by staying up to date with latest
-							trends and technologies, and I stand firm in my values. In my free
-							time, I’m always busy with everything arts! From cooking to
+							creativity. In my career I specialize in Front-end development,
+							yet I’m not shy from back-end or UX/UI either. I always aim to get
+							the best out of myself by staying up to date with latest trends
+							and technologies, and I stand firm in my values. I'm extremely
+							fascinated by user interfaces, and design systems in particular.
+							In my free time, I’m busy with everything arts! From cooking to
 							drawing my comics.
 						</p>
 						<div>
@@ -58,7 +60,7 @@ const About = () => {
 					</LazyLoad>
 				</div>
 			</div>
-		</section>
+		</SectionWrapper>
 	)
 }
 

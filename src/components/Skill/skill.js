@@ -1,6 +1,5 @@
 import React from "react"
 import "./skill.scss"
-
 import icons from "../../resources/icons.webp"
 
 const Skill = () => {

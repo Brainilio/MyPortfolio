@@ -1,10 +1,11 @@
 import React from "react"
 import "./landing.scss"
 import { Link } from "react-scroll"
+import SectionWrapper from "../../components/SectionWrapper/SectionWrapper"
 
 const Landing = () => {
 	return (
-		<section className="landing">
+		<SectionWrapper>
 			<div className="landing-title">
 				<div className="landing-title-text">
 					<h1 className="landing-title-text-name">Brainilio</h1>
@@ -33,7 +34,7 @@ const Landing = () => {
 					</a>
 				</div>
 			</div>
-		</section>
+		</SectionWrapper>
 	)
 }
 

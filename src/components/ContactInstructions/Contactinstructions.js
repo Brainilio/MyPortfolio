@@ -4,11 +4,11 @@ import "./ContactInstructions.scss"
 const Contactinstructions = () => {
 	return (
 		<div className="contact-instructions">
-			<h1>What can you expect from me?</h1>
-			<h2>
-				Thanks for willing to contact me, let’s get this ball rolling! There are
-				a couple of things you can expect when working together with me.
-			</h2>
+			<h2>What can you expect from me?</h2>
+			<h3>
+				There are a couple of things you can expect when working together with
+				me.
+			</h3>
 
 			<ul>
 				<li>
@@ -39,6 +39,11 @@ const Contactinstructions = () => {
 						I love hard work and possess a great deal of stamina. I take immense
 						satisfaction in being busy and productive.
 					</p>
+				</li>
+			</ul>
+			<ul>
+				<li>
+					<h3>You can also find or contact me at/on</h3>
 				</li>
 			</ul>
 		</div>

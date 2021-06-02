@@ -19,11 +19,11 @@
 	--button-border-radius: 50px;
 	--card-border-radius: 20px;
 
-	--padding-left-page-bg: 390px;
-	--padding-right-page-bg: 390px;
+	--padding-left-page-bg: 100px;
+	--padding-right-page-bg: 100px;
 
-	--padding-left-page-m: 60px;
-	--padding-right-page-m: 60px;
+	--padding-left-page-m: 20px;
+	--padding-right-page-m: 20px;
 
 	--padding-left-page-sm: 45px;
 	--padding-right-page-sm: 45px;
@@ -34,11 +34,11 @@
 	--padding-left-page-mb: 10px;
 	--padding-right-page-mb: 10px;
 
-	--body: 13px;
+	--body: 16px;
 	--comment: 12px;
 	--subtitle: 18px;
 	--title: 25px;
-	--landing-header: 85px;
+	--landing-header: 75px;
 	--purple-gradient: linear-gradient(
 		142deg,
 		hsl(234, 82%, 57%) 0%,
@@ -177,8 +177,9 @@ html {
 .main-container {
 	flex-basis: 50%;
 	max-height: 100vh;
-	overflow-y: scroll;
+	// overflow-y: scroll;
 	scrollbar-width: 0;
+	scroll-behavior: smooth;
 	scroll-snap-type: y mandatory;
 	-ms-overflow-style: none; /* IE and Edge */
 	scrollbar-width: none; /* Firefox */
@@ -192,7 +193,7 @@ body {
 	scroll-behavior: smooth;
 	margin: 0;
 	padding: 0;
-	overflow: hidden;
+	overflow-x: hidden;
 	color: #ffffffe0;
 	height: 100%;
 	max-width: 100vw;

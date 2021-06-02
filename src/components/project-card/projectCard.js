@@ -1,6 +1,6 @@
 import React from "react"
 import "./projectCard.scss"
-import { Link, NavLink } from "react-router-dom"
+import { NavLink } from "react-router-dom"
 
 const ProjectCard = (props) => {
 	return (
@@ -41,7 +41,7 @@ const ProjectCard = (props) => {
 							href={props.information.livePreview}
 							className="project-cards-single-button-2"
 						>
-							L I V E
+							Live
 						</a>
 					) : null}
 
@@ -51,7 +51,7 @@ const ProjectCard = (props) => {
 						href={props.information.gitHub}
 						className="project-cards-single-button"
 					>
-						C O D E
+						Code
 					</a>
 				</div>
 			</div>

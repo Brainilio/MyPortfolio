@@ -1,5 +1,6 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useRef, useMemo } from "react"
-import Rocketship from "./components/rocketship/rocketship"
+// import Rocketship from "./components/rocketship/rocketship"
 import { Switch, Route, useLocation } from "react-router-dom"
 import ReactGA from "react-ga"
 import ProjectPage from "./pages/projectpage/ProjectPage"
@@ -18,7 +19,6 @@ import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass"
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { Suspense } from "react"
-import { OrbitControls } from "@react-three/drei"
 import * as THREE from "three"
 extend({ EffectComposer, RenderPass, UnrealBloomPass })
 
@@ -52,7 +52,7 @@ function Bloom({ children }) {
 	)
 	useEffect(
 		() => void ref.current && composer.current.setSize(size.width, size.height),
-		[size]
+		[ref, size]
 	)
 	return (
 		<>
@@ -163,6 +163,22 @@ function App() {
 
 	return (
 		<Layout>
+			<div className="three-canvas">
+				<Canvas camera={{ position: [0, 0, 30] }}>
+					<Suspense fallback="">
+						<pointLight intensity={2} />
+						<spotLight
+							intensity={0.5}
+							position={[70, 70, 70]}
+							penumbra={5}
+							color="lightblue"
+						/>
+						<ambientLight intensity={0.3} />
+						<spotLight intensity={1} position={[0, 0, 600]} />
+						<ThreeModels scrollPos={scrollPos} posY={scrollPos} />
+					</Suspense>
+				</Canvas>
+			</div>
 			<Switch location={location}>
 				<Route path="/" exact component={Main} />
 				<Route path="/projects" component={ProjectPage} />

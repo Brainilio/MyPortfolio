@@ -4,7 +4,6 @@
 	padding-left: var(--padding-left-page-bg);
 	padding-right: var(--padding-left-page-bg);
 	box-sizing: border-box;
-
 	margin: 0 auto;
 
 	@include screenxs {
@@ -22,7 +21,7 @@
 		padding-right: var(--padding-right-page-m);
 	}
 
-	@include screenl {
+	@include screenxl {
 		padding-left: var(--padding-left-page-bg);
 		padding-right: var(--padding-right-page-bg);
 	}
