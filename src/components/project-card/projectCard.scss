@@ -1,26 +1,15 @@
 @import "../../styles/responsive/breakpoints.scss";
+@import "../../styles/index.scss";
 
 .project-cards-single-card {
+	width: 300px;
+	min-height: 550px;
 	display: flex;
-	align-items: center;
-	justify-content: space-around;
-	margin-left: 8em;
-	margin-top: 4em;
-	margin-bottom: 4em;
-
-	@include screenxs {
-		justify-content: space-between;
-		flex-direction: column;
-		margin: 1em auto;
-		width: 100%;
-	}
-
-	@include screenxl {
-		flex-direction: row;
-		justify-content: space-between;
-
-		box-sizing: border-box;
-	}
+	flex-direction: column;
+	padding: var(--vertical-spacing-blocks);
+	box-sizing: border-box;
+	background: var(--purple-gradient);
+	border-radius: var(--card-border-radius);
 
 	.project-image {
 		position: relative;
@@ -34,7 +23,7 @@
 		.project-cards-image {
 			object-position: center;
 			object-fit: cover;
-			transition: all 0.4s ease-in;
+			transition: all 0.1s linear;
 			border-radius: 25px;
 			box-shadow: 3px 5px 25px rgba(141, 12, 180, 0.952);
 
@@ -45,167 +34,69 @@
 
 		&:hover .project-cards-image,
 		&:focus .project-cards-image {
-			transform: scale(1.1);
+			transform: scale(1.05);
 
 			@include screenxs {
 				transform: none;
 			}
 
 			@include screenl {
-				transform: scale(1.1);
+				transform: scale(1.05);
 			}
 		}
 	}
 
 	.descriptions {
-		display: flex;
-		margin: 0;
-		padding: 0;
+		height: 250px;
 
-		@include screenxs {
-			width: 100%;
-		}
-
-		@include screenl {
-			width: 50%;
-			display: flex;
-			margin: 0;
-			padding: 0;
-			flex-direction: column;
-			align-items: center;
-		}
-
-		@include screenxl {
-			display: flex;
-		}
+		margin-top: var(--vertical-spacing-blocks);
 
 		.project-cards-description {
-			@include screenxs {
-				margin-top: 1em;
-				width: 100%;
-				text-align: center;
-			}
-
-			@include screenxl {
-				width: 75%;
-			}
+			display: flex;
+			flex-direction: column;
+			align-items: center;
 
 			.project-cards-description-title {
-				font-size: 35px;
-				font-weight: 900;
+				text-align: center;
 			}
 			.project-cards-description-paragraph {
-				font-size: 20px;
-
-				@include screenxs {
-					width: 100%;
-					text-align: justify;
-				}
 			}
 
 			.read-more {
-				color: rgb(226, 98, 98);
-				font-size: 20px;
-				width: 115px;
-				display: inline-block;
-
-				&::after {
-					content: "";
-					display: block;
-					width: 0;
-					height: 2px;
-					background: #fff;
-					transition: width 0.3s;
-				}
-
-				&:hover::after {
-					width: 100%;
-					transition: width 0.3s;
-				}
+				text-decoration: underline;
+				font-weight: 500;
 			}
 		}
+	}
 
-		.project-cards-buttons {
-			z-index: 2;
-			display: flex;
-			width: 100%;
-			margin-top: 5em;
+	.project-cards-buttons {
+		margin-top: var(--vertical-spacing-blocks);
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		grid-gap: 10px;
 
-			@include screenxs {
-				flex-direction: column;
-				justify-content: center;
-				align-items: center;
-				margin-top: 1em;
-			}
+		@include screenxs {
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+		}
 
-			@include screens {
-				flex-direction: row;
-				justify-content: center;
-				align-items: center;
-				margin-top: 1em;
-			}
+		@include screens {
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+		}
 
-			@include screenl {
-				margin-top: 3em;
-				justify-content: center;
-			}
+		@include screenl {
+			justify-content: center;
+		}
 
-			.project-cards-single-button {
-				cursor: pointer;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				color: #be3490;
-				height: 50px;
-				font-weight: 900;
-				width: 200px;
-				margin-right: 3em;
-				background: none;
-				border: 3px solid #be3490;
-				border-radius: 30px;
-				transition: all 0.3s ease-in;
-				text-decoration: none;
+		.project-cards-single-button {
+			@include secondarySmallButton;
+		}
 
-				@include screenxs {
-					margin-right: 0;
-				}
-
-				@include screens {
-					margin-right: 3em;
-				}
-
-				&:hover {
-					background: linear-gradient(142deg, #ffe920 0%, #be3490 100%);
-					color: white;
-				}
-			}
-
-			.project-cards-single-button-2 {
-				cursor: pointer;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				color: white;
-				font-weight: 900;
-				height: 50px;
-				width: 200px;
-				background: linear-gradient(142deg, #35218f 0%, #cd2ad3 100%);
-				border-radius: 30px;
-				transition: all 0.3s ease-in;
-				text-decoration: none;
-
-				@include screenxs {
-					margin-top: 1em;
-				}
-
-				@include screens {
-					margin-top: 0;
-				}
-				&:hover {
-					background-color: white;
-					color: black;
-				}
-			}
+		.project-cards-single-button-2 {
+			@include primarySmallButton;
 		}
 	}
 }

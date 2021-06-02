@@ -1,141 +1,40 @@
 @import "../../styles/responsive/breakpoints.scss";
+@import "../../styles/index.scss";
 
 .projects {
+	min-height: 100vh;
+	box-sizing: border-box;
+	scroll-snap-align: start;
 	display: flex;
 	flex-direction: column;
-	margin-top: 5em;
-	padding-left: 3em;
-	padding-right: 3em;
-	box-sizing: border-box;
-
-	@include screenxs {
-		width: 100vw;
-	}
-
-	@include screenm {
-		margin-top: 0em;
-		width: 100vw;
-	}
-
-	@include screenl {
-		margin-top: 0em;
-		width: 100vw;
-	}
+	align-items: center;
+	justify-content: center;
 
 	.projects-title {
 		display: flex;
 		flex-direction: column;
+		justify-content: center;
+		text-align: center;
+		align-items: center;
 
-		margin-bottom: 10px;
-		a {
-			display: inline-block;
-		}
-
-		@include screenxs {
-			justify-content: center;
-			text-align: center;
-			margin: 0 auto;
-		}
-
-		@include screenxl {
-			margin: 0;
-			text-align: start;
-			justify-content: start;
-			align-items: flex-start;
-		}
-
-		.projects-title-title {
-			font-weight: 900;
-			font-size: 50px;
-		}
-
-		.projects-paragraph {
-			width: 50%;
-			font-size: 20px;
-
-			@include screens {
-				width: 100%;
-				text-align: justify;
-			}
-
-			@include screenm {
-				width: 100%;
-			}
-
-			@include screenl {
-				width: 80%;
-				text-align: justify;
-				margin: 0 auto;
-				margin-top: 2em;
-			}
+		p {
+			font-size: var(--subtitle);
+			width: 320px;
 		}
 
 		.all-projects-button {
-			margin: 2em 0;
-			font-size: 15px;
-			cursor: pointer;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			color: white;
-			height: 50px;
-			width: 200px;
-			border-radius: 30px;
-			font-weight: 900;
-			background: linear-gradient(142deg, #337ce9 0%, #e846fd 100%);
-			transition: all 0.3s ease;
-			text-decoration: none;
-			border: none;
-
-			&:hover {
-				color: black;
-			}
-
-			@include screenxs {
-				margin: 2em auto;
-				text-align: center;
-			}
-
-			@include screenm {
-				margin: 2em auto;
-				text-align: center;
-			}
-
-			@include screenl {
-				margin: 2em auto;
-				text-align: center;
-			}
+			@include primaryBigButton;
+			width: 13em;
+			margin-top: var(--vertical-spacing-blocks);
+			margin-bottom: var(--vertical-spacing-paragraphs);
 		}
 	}
 
 	.project-cards {
-		width: 100%;
-		display: flex;
-		flex-direction: column;
-
-		@include screenxs {
-			display: flex;
-			margin: 0 auto;
-			flex-direction: column;
-			width: 100%;
-		}
-
-		@include screenm {
-			margin: 0 auto;
-			grid-template-columns: 1fr;
-			grid-gap: 2em;
-		}
-
-		@include screenl {
-			margin: 0 auto;
-			grid-template-columns: 1fr;
-			grid-gap: 2em;
-		}
-
-		@include screenxl {
-			margin: 0 auto;
-			grid-gap: 2em;
-			grid-template-columns: 1fr 1fr;
-		}
+		justify-items: center;
+		align-items: center;
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+		grid-gap: var(--vertical-spacing-paragraphs);
 	}
 }

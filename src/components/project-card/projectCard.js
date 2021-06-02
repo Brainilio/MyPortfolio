@@ -1,6 +1,6 @@
 import React from "react"
 import "./projectCard.scss"
-import { Link } from "react-router-dom"
+import { Link, NavLink } from "react-router-dom"
 
 const ProjectCard = (props) => {
 	return (
@@ -15,46 +15,44 @@ const ProjectCard = (props) => {
 				</div>
 
 				<div className="descriptions">
-					<div className="project-cards-description">
-						<span className="project-cards-description-title">
-							{props.information.name}
-						</span>
-						<p className="project-cards-description-paragraph">
-							{props.information.shortDescription}
-						</p>
+					<h3 className="project-cards-description-title">
+						{props.information.name}
+					</h3>
+					<p className="project-cards-description-paragraph">
+						{props.information.shortDescription}
+					</p>
 
-						<Link
-							to={{
-								pathname: `/project/${props.information.slug}`,
-								project: props.information,
-							}}
+					<NavLink
+						className="read-more"
+						to={{
+							pathname: `/project/${props.information.slug}`,
+							project: props.information,
+						}}
+					>
+						Read more
+					</NavLink>
+				</div>
+
+				<div className="project-cards-buttons">
+					{props.information.livePreview ? (
+						<a
+							rel="noopener noreferrer"
+							target="_blank"
+							href={props.information.livePreview}
+							className="project-cards-single-button-2"
 						>
-							<span className="read-more">READ MORE</span>
-						</Link>
+							L I V E
+						</a>
+					) : null}
 
-						<div className="project-cards-buttons">
-							<a
-								rel="noopener noreferrer"
-								target="_blank"
-								href={props.information.gitHub}
-								className="project-cards-single-button"
-							>
-								C O D E
-							</a>
-
-							{props.information.livePreview ? (
-								<a
-									rel="noopener noreferrer"
-									target="_blank"
-									href={props.information.livePreview}
-									className="project-cards-single-button-2"
-								>
-									L I V E
-								</a>
-							) : null}
-						</div>
-					</div>
-					{/* </Link> */}
+					<a
+						rel="noopener noreferrer"
+						target="_blank"
+						href={props.information.gitHub}
+						className="project-cards-single-button"
+					>
+						C O D E
+					</a>
 				</div>
 			</div>
 		</>

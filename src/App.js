@@ -5,6 +5,7 @@ import ReactGA from "react-ga"
 import ProjectPage from "./pages/projectpage/ProjectPage"
 import ProjectDetail from "./sections/projects/projectDetail"
 import Main from "./sections/main"
+import Layout from "./layout/Main"
 import {
 	Canvas,
 	extend,
@@ -21,13 +22,34 @@ import { OrbitControls } from "@react-three/drei"
 import * as THREE from "three"
 extend({ EffectComposer, RenderPass, UnrealBloomPass })
 
+/*
+ <div className="three-canvas">
+				<Canvas camera={{ position: [0, 0, 30] }}>
+					<Suspense fallback="">
+						<OrbitControls />
+						<pointLight intensity={2} />
+						<spotLight
+							intensity={0.5}
+							position={[70, 70, 70]}
+							penumbra={5}
+							color="lightblue"
+						/>
+						<ambientLight intensity={0.3} />
+						<spotLight intensity={1} position={[0, 0, 600]} />
+						<ThreeModels scrollPos={scrollPos} posY={scrollPos} />
+					</Suspense>
+				</Canvas>
+			</div>
+*/
+
 function Bloom({ children }) {
 	const { gl, camera, size } = useThree()
 	const ref = useResource()
 	const composer = useRef()
-	const aspect = useMemo(() => new THREE.Vector2(size.width, size.height), [
-		size,
-	])
+	const aspect = useMemo(
+		() => new THREE.Vector2(size.width, size.height),
+		[size]
+	)
 	useEffect(
 		() => void ref.current && composer.current.setSize(size.width, size.height),
 		[size]
@@ -140,31 +162,13 @@ function App() {
 	const scrollhandler = () => setScrollPos(window.pageYOffset)
 
 	return (
-		<div>
-			<Rocketship />
-			<div className="three-canvas">
-				<Canvas camera={{ position: [0, 0, 30] }}>
-					<Suspense fallback="">
-						<OrbitControls />
-						<pointLight intensity={2} />
-						<spotLight
-							intensity={0.5}
-							position={[70, 70, 70]}
-							penumbra={5}
-							color="lightblue"
-						/>
-						<ambientLight intensity={0.3} />
-						<spotLight intensity={1} position={[0, 0, 600]} />
-						<ThreeModels scrollPos={scrollPos} posY={scrollPos} />
-					</Suspense>
-				</Canvas>
-			</div>
+		<Layout>
 			<Switch location={location}>
 				<Route path="/" exact component={Main} />
 				<Route path="/projects" component={ProjectPage} />
 				<Route path="/project/:name" component={ProjectDetail}></Route>
 			</Switch>
-		</div>
+		</Layout>
 	)
 }
 

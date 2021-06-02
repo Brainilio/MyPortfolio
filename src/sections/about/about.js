@@ -1,129 +1,61 @@
-import React, { useEffect } from "react"
+import React from "react"
 import "./about.scss"
 import profile from "../../resources/profile.webp"
 import sanfran from "../../resources/san-fran.webp"
 import rotterdam from "../../resources/rotterdam.webp"
 import LazyLoad from "react-lazyload"
-import gsap from "gsap"
-import { ScrollTrigger } from "gsap/all"
 import { Link } from "react-scroll"
+import Skill from "../skill/skill"
 
 const About = () => {
-	const textRef = React.useRef(null)
-	const titleRef = React.useRef(null)
-	const imagesRef = React.useRef(null)
-	const buttonsRef = React.useRef(null)
-
-	gsap.registerPlugin(ScrollTrigger)
-	useEffect(() => {
-		// gsap.from(textRef.current, {
-		// 	scrollTrigger: {
-		// 		trigger: textRef.current,
-		// 	},
-		// 	x: 300,
-		// 	opacity: 0,
-		// 	ease: "power1",
-		// 	duration: 1,
-		// })
-		// gsap.from(imagesRef.current, {
-		// 	scrollTrigger: {
-		// 		trigger: imagesRef.current,
-		// 	},
-		// 	opacity: 0,
-		// 	duration: 5,
-		// })
-		// gsap.from(buttonsRef.current, {
-		// 	scrollTrigger: {
-		// 		trigger: imagesRef.current,
-		// 	},
-		// 	duration: 0.8,
-		// 	delay: 0.6,
-		// 	xPercent: -100,
-		// 	opacity: 0,
-		// })
-		// gsap.from([titleRef.current.childNodes], {
-		// 	scrollTrigger: {
-		// 		trigger: titleRef.current,
-		// 	},
-		// 	duration: 0.8,
-		// 	yPercent: 80,
-		// 	opacity: 0,
-		// 	delay: 0.8,
-		// 	stagger: 0.08,
-		// 	ease: "power4.easeinout",
-		// })
-	}, [])
-
 	return (
 		<section className="about">
 			<div className="about-block">
 				<div className="about-text">
-					<span ref={titleRef} className="about-title" aria-hidden>
-						<span>A</span>
-						<span>b</span>
-						<span>o</span>
-						<span>u</span>
-						<span>t</span>
-					</span>
-					<p ref={textRef} aria-hidden>
-						I am a creative developer driven by empathy, creativity, and
-						humility, specializing in Full-stack and UX/UI development. I aim to
-						combine these two special powers of mine to create and develop
-						meaningful solutions for users. Applied creativity is reflected in
-						my everyday life in which I love to develop new recipes to cook,
-						play around with Arduino, draw my own comic book and be active when
-						it comes to playing instruments. My strengths reflect a desire for
-						achievement, responsibility, and collaboration. I stand firm in my
-						values and work to bring ethics and empathy to the tech field.
-						Interested in talking?{" "}
-					</p>
-					<div ref={buttonsRef}>
-						<Link smooth={true} duration={600} offset={-500} to="contact">
-							<button className="button-lets-chat">
-								L E T ' S &nbsp; C H A T
-							</button>
-						</Link>
-						<a
-							rel="noopener noreferrer"
-							target="_blank"
-							href="https://drive.google.com/file/d/1TgOjKdYPxZr7SmBChUm1osO84EPkXSA8/view?usp=sharing"
-						>
-							<button className="button-resume-chat">R E S U M E</button>
-						</a>
+					<h2 className="about-title">About</h2>
+					<div className="short-bio">
+						<h3>Who am I?</h3>
+						<p>
+							Hi! I’m a creative developer who’s driven by empathy and
+							creativity. In my career specialize in Front-end development, but
+							I’m not shy from back-end or UX/UI. In my work, I always aim for
+							to get the best out of myself by staying up to date with latest
+							trends and technologies, and I stand firm in my values. In my free
+							time, I’m always busy with everything arts! From cooking to
+							drawing my comics.
+						</p>
+						<div>
+							<Link
+								className="button-lets-chat"
+								smooth={true}
+								duration={600}
+								offset={-500}
+								to="contact"
+							>
+								Contact me
+							</Link>
+							<a
+								className="button-resume-chat"
+								rel="noopener noreferrer"
+								target="_blank"
+								href="https://drive.google.com/file/d/1TgOjKdYPxZr7SmBChUm1osO84EPkXSA8/view?usp=sharing"
+							>
+								Resume
+							</a>
+						</div>
 					</div>
+					<Skill />
 				</div>
-				<div ref={imagesRef} className="about-image">
-					<div>
-						<LazyLoad offset={100}>
-							<img
-								width="250"
-								height="300"
-								className="about-image-sanfran"
-								alt="san francisco"
-								src={sanfran}
-							/>
-						</LazyLoad>
-						<LazyLoad offset={100}>
-							<img
-								width="250"
-								height="300"
-								className="about-image-image"
-								alt="brainilio"
-								src={profile}
-							/>
-						</LazyLoad>
-					</div>
-					<div>
-						<LazyLoad offset={100}>
-							<img
-								width="530"
-								height="300"
-								className="about-image-rotterdam"
-								alt="rotterdam"
-								src={rotterdam}
-							/>
-						</LazyLoad>
-					</div>
+				<div className="about-image">
+					<LazyLoad offset={100}>
+						<img
+							width="250"
+							height="300"
+							className="about-image-image"
+							alt="brainilio"
+							src={profile}
+						/>
+					</LazyLoad>
 				</div>
 			</div>
 		</section>
