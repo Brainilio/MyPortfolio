@@ -25,4 +25,9 @@
 		padding-left: var(--padding-left-page-bg);
 		padding-right: var(--padding-right-page-bg);
 	}
+
+	@include screenxxl {
+		padding-left: var(--padding-left-page-xxl);
+		padding-right: var(--padding-right-page-xxl);
+	}
 }
