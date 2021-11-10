@@ -10,7 +10,7 @@ import FallingStars from "../components/falling-stars/fallingStars"
 import CrescentMoon from "../components/crescentmoon/crescentMoon"
 import NavBar from "../components/NavBar/NavBar"
 import SideDrawer from "../components/SideDrawer/SideDrawer"
-import { Canvas, useFrame } from "react-three-fiber"
+import { Canvas, useFrame } from "@react-three/fiber"
 import { useAnimations, useGLTF } from "@react-three/drei"
 
 const Main = () => {

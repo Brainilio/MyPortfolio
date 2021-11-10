@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useMemo } from "react"
 import Rocketship from "./components/rocketship/rocketship"
 import { Switch, Route, useLocation } from "react-router-dom"
@@ -6,12 +7,13 @@ import ProjectPage from "./pages/projectpage/ProjectPage"
 import ProjectDetail from "./sections/projects/projectDetail"
 import Main from "./sections/main"
 import {
+	primitive,
 	Canvas,
 	extend,
 	useFrame,
 	useResource,
 	useThree,
-} from "react-three-fiber"
+} from "@react-three/fiber"
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer"
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass"
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass"
@@ -19,29 +21,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { Suspense } from "react"
 import { OrbitControls } from "@react-three/drei"
 import * as THREE from "three"
-extend({ EffectComposer, RenderPass, UnrealBloomPass })
-
-function Bloom({ children }) {
-	const { gl, camera, size } = useThree()
-	const ref = useResource()
-	const composer = useRef()
-	const aspect = useMemo(() => new THREE.Vector2(size.width, size.height), [
-		size,
-	])
-	useEffect(
-		() => void ref.current && composer.current.setSize(size.width, size.height),
-		[size]
-	)
-	return (
-		<>
-			<scene ref={ref}>{children}</scene>
-			<effectComposer ref={composer} args={[gl]}>
-				<unrealBloomPass attachArray="passes" args={[aspect, 6, 2, 3]} />
-			</effectComposer>
-		</>
-	)
-}
-
+ 
 const ThreeModels = (props) => {
 	const [moon, setMoon] = useState(null)
 	const [space, setSpace] = useState(null)
@@ -142,7 +122,7 @@ function App() {
 	return (
 		<div>
 			<Rocketship />
-			<div className="three-canvas">
+			{/* <div className="three-canvas">
 				<Canvas camera={{ position: [0, 0, 30] }}>
 					<Suspense fallback="">
 						<OrbitControls />
@@ -158,7 +138,7 @@ function App() {
 						<ThreeModels scrollPos={scrollPos} posY={scrollPos} />
 					</Suspense>
 				</Canvas>
-			</div>
+			</div> */}
 			<Switch location={location}>
 				<Route path="/" exact component={Main} />
 				<Route path="/projects" component={ProjectPage} />

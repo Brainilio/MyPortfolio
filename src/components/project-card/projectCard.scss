@@ -143,6 +143,7 @@
 				justify-content: center;
 				align-items: center;
 				margin-top: 1em;
+				gap: 2em;
 			}
 
 			@include screenl {
@@ -159,7 +160,7 @@
 				height: 50px;
 				font-weight: 900;
 				width: 200px;
-				margin-right: 3em;
+				
 				background: none;
 				border: 3px solid #be3490;
 				border-radius: 30px;
@@ -171,7 +172,7 @@
 				}
 
 				@include screens {
-					margin-right: 3em;
+					// margin-right: 3em;
 				}
 
 				&:hover {

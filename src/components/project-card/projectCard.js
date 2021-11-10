@@ -41,7 +41,6 @@ const ProjectCard = (props) => {
 							>
 								C O D E
 							</a>
-
 							{props.information.livePreview ? (
 								<a
 									rel="noopener noreferrer"
