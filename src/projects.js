@@ -1,16 +1,16 @@
-import BurgerBuilder from "./resources/projects/burger-builder.webp"
-import Salvame from "./resources/projects/salvame.webp"
-import Lolmfc from "./resources/projects/lolmfc.webp"
-import Natours from "./resources/projects/natours.webp"
-import Thanosrunner from "./resources/projects/thanosrunner.webp"
-import Paperinvaders from "./resources/projects/paperinvaders.webp"
+import BurgerBuilder from "./resources/projects/burger-builder.png"
+import Salvame from "./resources/projects/salvame.png"
+import Lolmfc from "./resources/projects/lolmfc.png"
+import Natours from "./resources/projects/natours.png"
+import Thanosrunner from "./resources/projects/thanosrunner.png"
+import Paperinvaders from "./resources/projects/paperinvaders.png"
 import PokeDex from "./resources/projects/pokedex.webp"
-import Leidsman from "./resources/projects/leidsman.webp"
-import MariaBeautySalon from "./resources/projects/mariabeautysalon.webp"
-import Classifier from "./resources/projects/classifier.webp"
-import BayVineMedia from "./resources/projects/bayvine.webp"
-import Oracui from "./resources/projects/oracui.webp"
-import OldPortfolio from "./resources/projects/portfolio.webp"
+import Leidsman from "./resources/projects/leidsman.png"
+import MariaBeautySalon from "./resources/projects/mariabeautysalon.png"
+import Classifier from "./resources/projects/classifier.png"
+import BayVineMedia from "./resources/projects/bayvine.png"
+import Oracui from "./resources/projects/oracui.png"
+import OldPortfolio from "./resources/projects/portfolio.png"
 
 // pictures...
 import bb1 from "./resources/projects/burger-builder/1.webp"
@@ -88,8 +88,7 @@ const projects = [
 		shortDescription:
 			"Natours is a full-stack web-application website that lets users check out and book the most exciting tours ever! Features include examples like CRUD operations for admins, payments using stripe, file upload handling and authorization",
 		previewImage: Natours,
-		livePreview:
-			"http://ec2-18-156-171-101.eu-central-1.compute.amazonaws.com/",
+		livePreview: null,
 		gitHub: "https://github.com/Brainilio/natours",
 		tags: [
 			"React",
@@ -120,7 +119,7 @@ const projects = [
 	{
 		name: "Oracui's MVP",
 		shortDescription:
-			"Oracui is a global mentorship platform that connects senior students with enrolling students in order to provide mentorship and build relationship. I've been mainly responsible for bringing the product's REST API to MVP ready conditions by improving documentation and adding over 20+ new business features. I've also connected 80% of all available endpoints to the front-end's redux store.",
+			"Oracui is a global mentorship platform that connects senior students with enrolling students in order to provide mentorship and build relationship. I've been mainly responsible for bringing the product's REST API to MVP ready conditions by improving documentation and adding over 20+ new business features.",
 		previewImage: Oracui,
 		livePreview: "https://oracui.com/",
 		gitHub: null,
@@ -144,7 +143,7 @@ const projects = [
 	{
 		name: "Bay Vine Media",
 		shortDescription:
-			"[WIP] I've developed a landing page, dedicated to my freelance web and creative services under the name of a brand I'm working on (Bay Vine). Bay Vine Media seeks to allow minorities and small businesses to still have a presentable brand and online presence. I've designed and developed everything using AdobeXD, React, and GSAP.",
+			"[WIP] I've developed a landing page, dedicated to my freelance web and creative services under the name of a brand I'm working on (Bay Vine). Bay Vine Media seeks to allow minorities and small businesses to still have a presentable brand and online presence. ",
 		previewImage: BayVineMedia,
 		livePreview: "https://bayvinemedia.com/",
 		gitHub: "https://github.com/Brainilio/bayvinemedia",
@@ -193,33 +192,27 @@ const projects = [
 			"This is definitely how I want to approach every project. It is SO important to create something that is meaningful to your users, especially marginalized communities. Salvame was a project that allowed me to talk to fellow Latin(o/a/x)s and get to know more about their stories and experiences. I loved everything from the entrepreneurial side all the way to the technology aspects of it. ",
 		additionalLinks: [
 			{
-				link:
-					"https://drive.google.com/file/d/1nwHwIIIn6-dzKIlBzooOL5XXjlql2UK7/view?usp=sharing",
+				link: "https://drive.google.com/file/d/1nwHwIIIn6-dzKIlBzooOL5XXjlql2UK7/view?usp=sharing",
 				name: "Teaser trailer",
 			},
 			{
-				link:
-					"https://docs.google.com/document/d/12sID1tdnp5DRrCH0kw9jucZTqgWUZTiBcZcCAA-QBNU/edit?usp=sharing",
+				link: "https://docs.google.com/document/d/12sID1tdnp5DRrCH0kw9jucZTqgWUZTiBcZcCAA-QBNU/edit?usp=sharing",
 				name: "User stories",
 			},
 			{
-				link:
-					"https://docs.google.com/presentation/d/1kgoKBqwh1GhQosHqDB0XlKh-0hEbrd1vAJxy1KWRR9I/edit?usp=sharing",
+				link: "https://docs.google.com/presentation/d/1kgoKBqwh1GhQosHqDB0XlKh-0hEbrd1vAJxy1KWRR9I/edit?usp=sharing",
 				name: "Pitch deck",
 			},
 			{
-				link:
-					"https://drive.google.com/file/d/1yoR-Z9RDGxQXIaVY_V2IwmC8XrcRbVb2/view?usp=sharing",
+				link: "https://drive.google.com/file/d/1yoR-Z9RDGxQXIaVY_V2IwmC8XrcRbVb2/view?usp=sharing",
 				name: "Pitch in front of dragons",
 			},
 			{
-				link:
-					"https://drive.google.com/drive/folders/1Fpd3B_ogXf3KyZdbbQuaGJba8qjwfJar?usp=sharing",
+				link: "https://drive.google.com/drive/folders/1Fpd3B_ogXf3KyZdbbQuaGJba8qjwfJar?usp=sharing",
 				name: "Frame your design challenge",
 			},
 			{
-				link:
-					"https://drive.google.com/file/d/1NrkKX2QYba0TBcbk4SsJxwdLKppaHY2A/view?usp=sharing",
+				link: "https://drive.google.com/file/d/1NrkKX2QYba0TBcbk4SsJxwdLKppaHY2A/view?usp=sharing",
 				name: "Executive Summary",
 			},
 		],
@@ -285,7 +278,7 @@ const projects = [
 		shortDescription:
 			"LOL: My Favorite Champ is a MERN-stack application in which users can preview their favorite League of Legends champions and see their in-game pros and cons. This is a project that I made in 2018 and decided to remake in React.",
 		previewImage: Lolmfc,
-		livePreview: "http://ec2-18-157-186-6.eu-central-1.compute.amazonaws.com/",
+		livePreview: null,
 		gitHub: "https://github.com/Brainilio/lol-my-fav-champ",
 		tags: ["REACTJS", "EXPRESS", "MONGODB", "AWS", "NODEJS"],
 		category: "Development",
@@ -331,8 +324,7 @@ const projects = [
 			"Really sticking to certain OOP principles is important to ensure best practices.",
 		additionalLinks: [
 			{
-				link:
-					"https://raw.githubusercontent.com/Brainilio/ThanosRunner/master/UMLklassendiagram.png",
+				link: "https://raw.githubusercontent.com/Brainilio/ThanosRunner/master/UMLklassendiagram.png",
 				name: "UML Diagram",
 			},
 		],
