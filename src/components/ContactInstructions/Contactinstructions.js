@@ -5,10 +5,6 @@ const Contactinstructions = () => {
 	return (
 		<div className="contact-instructions">
 			<h2>What can you expect from me?</h2>
-			<h3>
-				There are a couple of things you can expect when working together with
-				me.
-			</h3>
 
 			<ul>
 				<li>
@@ -21,8 +17,8 @@ const Contactinstructions = () => {
 				<li>
 					<h3>Deliberation</h3>
 					<p>
-						Before I make decisions or choices, I take serious care thinking and
-						anticipating obstacles.
+						Before I make decisions or choices, I take serious care in thinking
+						about, and anticipating obstacles.
 					</p>
 				</li>
 				<li>

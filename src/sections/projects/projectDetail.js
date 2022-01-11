@@ -1,7 +1,9 @@
 import React, { useEffect } from "react"
 import "./projectDetail.scss"
 import { Redirect, useHistory } from "react-router-dom"
+
 import Contact from "../contact/contact"
+import Markdown from "../../components/Markdown/Markdown"
 
 const ProjectDetail = (props) => {
 	//props.location.project == project you're working with.
@@ -16,8 +18,10 @@ const ProjectDetail = (props) => {
 		props.location.project &&
 		props.location.project.category === "Development"
 	) {
+		// content = <Markdown source="test" />
+
 		content = (
-			<>
+			<section className="project-detail-wrapper">
 				<button onClick={history.goBack} className="project-detail-close-modal">
 					X
 				</button>
@@ -157,8 +161,8 @@ const ProjectDetail = (props) => {
 					</>
 				) : null}
 
-				<Contact />
-			</>
+				<Contact className="no-snap" />
+			</section>
 		)
 	}
 

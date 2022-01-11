@@ -1,75 +1,27 @@
-/* eslint-disable no-unused-vars */
-import React, { useState, useEffect, useRef, useMemo } from "react"
-// import Rocketship from "./components/rocketship/rocketship"
+import React, { useState, useEffect } from "react"
 import { Switch, Route, useLocation } from "react-router-dom"
+import Rocketship from "./components/rocketship/rocketship"
+
 import ReactGA from "react-ga"
 import ProjectPage from "./pages/projectpage/ProjectPage"
 import ProjectDetail from "./sections/projects/projectDetail"
 import Main from "./sections/main"
 import Layout from "./layout/Main"
-import {
-	Canvas,
-	extend,
-	useFrame,
-	useResource,
-	useThree,
-} from "react-three-fiber"
+import { Canvas, extend, useFrame } from "react-three-fiber"
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer"
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass"
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { Suspense } from "react"
-import * as THREE from "three"
+
 extend({ EffectComposer, RenderPass, UnrealBloomPass })
-
-/*
- <div className="three-canvas">
-				<Canvas camera={{ position: [0, 0, 30] }}>
-					<Suspense fallback="">
-						<OrbitControls />
-						<pointLight intensity={2} />
-						<spotLight
-							intensity={0.5}
-							position={[70, 70, 70]}
-							penumbra={5}
-							color="lightblue"
-						/>
-						<ambientLight intensity={0.3} />
-						<spotLight intensity={1} position={[0, 0, 600]} />
-						<ThreeModels scrollPos={scrollPos} posY={scrollPos} />
-					</Suspense>
-				</Canvas>
-			</div>
-*/
-
-function Bloom({ children }) {
-	const { gl, camera, size } = useThree()
-	const ref = useResource()
-	const composer = useRef()
-	const aspect = useMemo(
-		() => new THREE.Vector2(size.width, size.height),
-		[size]
-	)
-	useEffect(
-		() => void ref.current && composer.current.setSize(size.width, size.height),
-		[ref, size]
-	)
-	return (
-		<>
-			<scene ref={ref}>{children}</scene>
-			<effectComposer ref={composer} args={[gl]}>
-				<unrealBloomPass attachArray="passes" args={[aspect, 6, 2, 3]} />
-			</effectComposer>
-		</>
-	)
-}
 
 const ThreeModels = (props) => {
 	const [moon, setMoon] = useState(null)
 	const [space, setSpace] = useState(null)
 	const [earth, setEarth] = useState(null)
 	const [astro, setAstro] = useState(null)
-	const { camera } = useThree()
+	// const { camera } = useThree()
 	const [shouldTurn, setShouldTurn] = useState(false)
 
 	useEffect(() => {
@@ -146,11 +98,10 @@ const ThreeModels = (props) => {
 	) : null
 }
 
-function App() {
-	let location = useLocation()
+const ThreeJsCanvas = () => {
 	const [scrollPos, setScrollPos] = useState(0)
-	ReactGA.initialize(`${process.env.REACT_APP_TRACKING_URL}`)
-	ReactGA.pageview("/")
+
+	const scrollhandler = () => setScrollPos(window.pageYOffset)
 
 	React.useEffect(() => {
 		window.addEventListener("scroll", scrollhandler)
@@ -159,32 +110,43 @@ function App() {
 		}
 	}, [])
 
-	const scrollhandler = () => setScrollPos(window.pageYOffset)
+	return (
+		<div className="three-canvas">
+			<Canvas camera={{ position: [0, 0, 30] }}>
+				<Suspense fallback="">
+					<pointLight intensity={2} />
+					<spotLight
+						intensity={0.5}
+						position={[70, 70, 70]}
+						penumbra={5}
+						color="lightblue"
+					/>
+					<ambientLight intensity={0.3} />
+					<spotLight intensity={1} position={[0, 0, 600]} />
+					<ThreeModels scrollPos={scrollPos} posY={scrollPos} />
+				</Suspense>
+			</Canvas>
+		</div>
+	)
+}
+
+function App() {
+	let location = useLocation()
+	ReactGA.initialize(`${process.env.REACT_APP_TRACKING_URL}`)
+	ReactGA.pageview("/")
 
 	return (
-		<Layout>
-			<div className="three-canvas">
-				<Canvas camera={{ position: [0, 0, 30] }}>
-					<Suspense fallback="">
-						<pointLight intensity={2} />
-						<spotLight
-							intensity={0.5}
-							position={[70, 70, 70]}
-							penumbra={5}
-							color="lightblue"
-						/>
-						<ambientLight intensity={0.3} />
-						<spotLight intensity={1} position={[0, 0, 600]} />
-						<ThreeModels scrollPos={scrollPos} posY={scrollPos} />
-					</Suspense>
-				</Canvas>
-			</div>
-			<Switch location={location}>
-				<Route path="/" exact component={Main} />
-				<Route path="/projects" component={ProjectPage} />
-				<Route path="/project/:name" component={ProjectDetail}></Route>
-			</Switch>
-		</Layout>
+		<div>
+			<Rocketship />
+			<ThreeJsCanvas />
+			<Layout>
+				<Switch location={location}>
+					<Route path="/" exact component={Main} />
+					<Route path="/projects" component={ProjectPage} />
+					<Route path="/project/:name" component={ProjectDetail}></Route>
+				</Switch>
+			</Layout>
+		</div>
 	)
 }
 

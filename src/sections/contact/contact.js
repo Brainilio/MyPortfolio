@@ -5,17 +5,19 @@ import Form from "../../components/Form/Form"
 import SectionWrapper from "../../components/SectionWrapper/SectionWrapper"
 import "./contact.scss"
 
-const Contact = () => {
+const Contact = ({ className }) => {
 	return (
-		<SectionWrapper>
-			<section className="contact">
-				<ContactHero />
-				<div className="contact-part">
-					<Contactinstructions />
-					<Form />
-				</div>
-			</section>
-		</SectionWrapper>
+		<section className="background-black-reverse">
+			<SectionWrapper className={className}>
+				<section className="contact">
+					<ContactHero />
+					<div className="contact-part">
+						<Contactinstructions />
+						<Form />
+					</div>
+				</section>
+			</SectionWrapper>
+		</section>
 	)
 }
 

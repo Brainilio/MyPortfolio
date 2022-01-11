@@ -13,6 +13,7 @@
 		@include screenxl {
 			text-align: start;
 		}
+
 		p {
 			width: 500px;
 
@@ -30,6 +31,7 @@
 				width: 500px;
 				margin: 0;
 				text-align: start;
+				margin-top: calc(var(--vertical-spacing-paragraphs) / 10);
 			}
 		}
 	}
@@ -67,10 +69,10 @@
 			grid-template-columns: 1fr 1fr;
 			align-items: center;
 			justify-items: center;
-			margin-top: var(--vertical-spacing-blocks);
+			margin-top: calc(var(--vertical-spacing-blocks) * 1.5);
 			height: 350px auto;
 			border-radius: var(--card-border-radius);
-			width: 650px;
+			width: 900px;
 			overflow: hidden;
 			background: linear-gradient(142deg, hsl(234, 82%, 57%) 0%, #ad5ee2 100%);
 			box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.1);

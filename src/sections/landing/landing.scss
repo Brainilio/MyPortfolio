@@ -1,6 +1,17 @@
 @import "../../styles/responsive/breakpoints.scss";
 @import "../../styles/index.scss";
 
+.background-black {
+	background-image: linear-gradient(rgb(0, 0, 0), rgba(0, 0, 0, 0.033));
+}
+
+.background-black-reverse {
+	background-image: linear-gradient(
+		rgba(0, 0, 0, 0),
+		rgba(0, 0, 0, 0.334),
+		rgb(0, 0, 0)
+	);
+}
 .landing-title {
 	display: flex;
 	flex-direction: column;
@@ -10,6 +21,16 @@
 	@include screenxs {
 		text-align: center;
 		justify-content: center;
+	}
+
+	.landing-title-text-name {
+		font-size: 10em;
+		pointer-events: none;
+		user-select: none; /* supported by Chrome and Opera */
+		-webkit-user-select: none; /* Safari */
+		-khtml-user-select: none; /* Konqueror HTML */
+		-moz-user-select: none; /* Firefox */
+		-ms-user-select: none; /* Internet Explorer/Edge */
 	}
 
 	.landing-title-text {
@@ -25,7 +46,7 @@
 
 	.landing-title-cta-buttons {
 		display: grid;
-		margin-top: var(--vertical-spacing-blocks);
+		margin-top: calc(var(--vertical-spacing-blocks) * 2);
 		grid-template-columns: 1fr 1fr;
 		align-items: center;
 		grid-gap: var(--vertical-spacing-blocks);

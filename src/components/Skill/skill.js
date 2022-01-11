@@ -6,12 +6,14 @@ const Skill = () => {
 	return (
 		<section className="my-skills">
 			<div className="skills-title-block">
-				<h3>My skill set</h3>
+				<h3>Skill set</h3>
 				<p>
-					I am at my best when developing fullstack applications using
-					Javascript and UX/UI designing. However, I don't like limiting myself
-					to a particular stack. I am constantly learning and adapting to
-					whatever end-users need.{" "}
+					I'm proficient at translating modern and complex UX/UI designs into
+					functional and consumable Front-end applications. I use modern
+					Front-end technologies such as React, NextJs, Sass, HTML,
+					GraphQL/Apollo, Redux, Framer, and ThreeJS. However, I don't like
+					limiting myself to a particular stack, so I am constantly learning and
+					adapting to end-user needs.
 				</p>
 			</div>
 			<div className="skill-hero">
@@ -21,14 +23,15 @@ const Skill = () => {
 							<span>
 								<strong>Languages</strong>
 							</span>
-							<span>JavaScript, TypeScript, (No)SQL, PHP</span>
+							<span>JavaScript, TypeScript, (No)SQL</span>
 						</li>
 						<li>
 							<span>
 								<strong>Front-End</strong>
 							</span>
 							<span>
-								React, HTML5, CSS3, VueJS, Bootstrap, Apollo, Material UI, THREE
+								React, NextJS, Framer, GSAP, HTML5, CSS3, VueJS, Apollo,
+								Component Libraries, THREE, StencilJS, StorybookJS
 							</span>
 						</li>
 						<li>
@@ -43,21 +46,19 @@ const Skill = () => {
 							<span>
 								<strong>Back-End</strong>
 							</span>
-							<span>NodeJS, MongoDB, ExpressJS, Laravel, GraphQL, MySQL</span>
+							<span>NodeJS, MongoDB, ExpressJS, GraphQL, MySQL</span>
 						</li>
 						<li>
 							<span>
 								<strong>Tools</strong>
 							</span>
-							<span>
-								Jest/Enzyme, Terminal, AWS, Wordpress, Digital Ocean, Git
-							</span>
+							<span>Jest/Enzyme, AWS, Digital Ocean, Git</span>
 						</li>
 					</ul>
 				</div>
 
 				<div className="skill-hero-img">
-					<img src={icons} width="200" alt="icons of different technologies" />
+					<img src={icons} width="250" alt="icons of different technologies" />
 				</div>
 			</div>
 		</section>

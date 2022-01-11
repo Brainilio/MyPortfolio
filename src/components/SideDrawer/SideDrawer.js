@@ -1,14 +1,14 @@
 import React, { useState, useRef, useEffect } from "react"
 import "./SideDrawer.scss"
 import p1 from "../../resources/menu/menu-1.webp"
-import p2 from "../../resources/menu/menu-2.webp"
+// import p2 from "../../resources/menu/menu-2.webp"
 import p3 from "../../resources/menu/menu-3.webp"
 import p4 from "../../resources/menu/menu-4.webp"
 import gsap from "gsap"
 import { Link } from "react-scroll"
 
-const staggerText = (node1, node2, node3, node4) => {
-	gsap.from([node1, node2, node3, node4], {
+const staggerText = (node1, node2, node4) => {
+	gsap.from([node1, node2, node4], {
 		duration: 0.8,
 		opacity: 0,
 		y: 100,
@@ -25,7 +25,6 @@ const SideDrawer = (props) => {
 	let attachedClasses1 = ["menu2", "closed"]
 	let line1 = useRef(null)
 	let line2 = useRef(null)
-	let line3 = useRef(null)
 	let line4 = useRef(null)
 
 	let [currentImage, setcurrentImage] = useState("")
@@ -43,7 +42,7 @@ const SideDrawer = (props) => {
 
 	useEffect(() => {
 		if (props.show) {
-			staggerText(line1, line2, line3, line4)
+			staggerText(line1, line2, line4)
 		}
 	}, [props.show])
 
@@ -93,24 +92,7 @@ const SideDrawer = (props) => {
 								</h1>
 							</Link>
 						</li>
-						<li>
-							<Link
-								activeClass="link-active"
-								to="my-skills"
-								smooth={true}
-								offset={-150}
-								duration={600}
-							>
-								<h1
-									ref={(el) => (line3 = el)}
-									onMouseLeave={resetImage}
-									onMouseOver={() => backgroundHandler(p2)}
-									onClick={props.clicked}
-								>
-									Skills
-								</h1>
-							</Link>
-						</li>
+
 						<li>
 							<Link
 								activeClass="link-active"

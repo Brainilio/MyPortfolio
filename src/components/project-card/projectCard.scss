@@ -28,18 +28,18 @@
 			}
 		}
 
-		&:hover .project-cards-image,
-		&:focus .project-cards-image {
-			transform: scale(1.05);
+		// &:hover .project-cards-image,
+		// &:focus .project-cards-image {
+		// 	transform: scale(1.05);
 
-			@include screenxs {
-				transform: none;
-			}
+		// 	@include screenxs {
+		// 		transform: none;
+		// 	}
 
-			@include screenl {
-				transform: scale(1.05);
-			}
-		}
+		// 	@include screenl {
+		// 		transform: scale(1.05);
+		// 	}
+		// }
 	}
 
 	.descriptions {
@@ -57,12 +57,25 @@
 			.project-cards-description-paragraph {
 				text-align: start;
 			}
+		}
+	}
 
-			.read-more {
-				color: salmon;
-				text-decoration: underline;
-				font-weight: 500;
-			}
+	.read-more {
+		color: rgb(241, 176, 169);
+		font-weight: 500;
+
+		&::after {
+			content: "";
+			display: block;
+			width: 0;
+			height: 2px;
+			background: rgb(241, 176, 169);
+			transition: width 0.3s;
+		}
+
+		&:hover::after {
+			width: 100%;
+			transition: width 0.3s;
 		}
 	}
 

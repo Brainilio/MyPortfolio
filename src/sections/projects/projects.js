@@ -14,11 +14,8 @@ const Projects = () => {
 						Featured Work
 					</h2>
 					<p>
-						Here are some of my featured projects. I love to develop front-end
-						applications in React.{" "}
-						<i>
-							Nonetheless, my projects range from PHP to MERN stack applications
-						</i>
+						Here are some of my featured projects. I primarily develop front-end
+						applications using React and modern JavaScript technologies.
 					</p>
 					<NavLink
 						className="all-projects-button"

@@ -37,9 +37,16 @@
 	--padding-left-page-mb: 10px;
 	--padding-right-page-mb: 10px;
 
+	--page-max-width-xxl: 1440px;
+	--page-max-width-bg: 1200px;
+	--page-max-width-m: 768px;
+	--page-max-width-sm: 480px;
+	--page-max-width-tb: 375px;
+	--page-max-width-mb: 320px;
+
 	--body: 16px;
 	--comment: 12px;
-	--subtitle: 18px;
+	--subtitle: 20px;
 	--title: 25px;
 	--landing-header: 75px;
 	--purple-gradient: linear-gradient(
@@ -133,17 +140,18 @@
 
 a {
 	display: block;
-
 	text-decoration: none;
 	color: white;
+	width: fit-content;
 }
+
 span,
 a,
 p,
 button {
 	margin: 0;
 	padding: 0;
-	font-weight: 200;
+	font-weight: 500;
 	font-size: var(--body);
 }
 
@@ -155,7 +163,7 @@ h5,
 h6 {
 	margin: 0;
 	padding: 0;
-	font-weight: 200;
+	font-weight: 800;
 }
 
 h1 {
@@ -174,26 +182,31 @@ h3 {
 }
 
 html {
-	scroll-behavior: smooth;
-}
-
-.main-container {
-	flex-basis: 50%;
-	max-height: 100vh;
-	// overflow-y: scroll;
 	scrollbar-width: 0;
 	scroll-behavior: smooth;
-	scroll-snap-type: y mandatory;
 	-ms-overflow-style: none; /* IE and Edge */
 	scrollbar-width: none; /* Firefox */
 
 	&::-webkit-scrollbar {
 		display: none;
 	}
+
+	@include screenxs {
+		scroll-snap-type: y proximity;
+	}
+
+	@include screenxxl {
+		scroll-snap-type: y proximity;
+	}
+}
+
+.main-container {
+	flex-basis: 50%;
+	max-height: 100vh;
+	// overflow-y: scroll;
 }
 
 body {
-	scroll-behavior: smooth;
 	margin: 0;
 	padding: 0;
 	overflow-x: hidden;

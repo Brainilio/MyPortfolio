@@ -11,20 +11,20 @@ import SectionWrapper from "../../components/SectionWrapper/SectionWrapper"
 const About = () => {
 	return (
 		<SectionWrapper>
-			<div className="about-block">
+			<div className="about about-block">
 				<div className="about-text">
 					<h2 className="about-title">About</h2>
 					<div className="short-bio">
 						<h3>Who am I?</h3>
 						<p>
-							Hi! I’m a creative developer who’s driven by empathy and
-							creativity. In my career I specialize in Front-end development,
-							yet I’m not shy from back-end or UX/UI either. I always aim to get
-							the best out of myself by staying up to date with latest trends
-							and technologies, and I stand firm in my values. I'm extremely
-							fascinated by user interfaces, and design systems in particular.
-							In my free time, I’m busy with everything arts! From cooking to
-							drawing my comics.
+							Hello there! I’m a creative developer who’s driven by user needs
+							and creativity. In my career I specialize in Front-end
+							development, but I'm also considerably exposed to Back-end dev and
+							UX/UI. I always aim to get the best out of myself by staying up to
+							date with latest trends and technologies, and standing firm in my
+							values. I'm extremely fascinated by state of the art user
+							interfaces, and WebGL in particular. In my free time, I’m busy
+							with everything arts, from culinary to comics.
 						</p>
 						<div>
 							<Link
