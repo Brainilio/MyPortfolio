@@ -3,7 +3,7 @@ import "./projectDetail.scss"
 import { Redirect, useHistory } from "react-router-dom"
 
 import Contact from "../contact/contact"
-import Markdown from "../../components/Markdown/Markdown"
+// import Markdown from "../../components/Markdown/Markdown"
 
 const ProjectDetail = (props) => {
 	//props.location.project == project you're working with.
