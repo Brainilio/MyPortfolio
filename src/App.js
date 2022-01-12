@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { Switch, Route, useLocation } from "react-router-dom"
-import Rocketship from "./components/rocketship/rocketship"
+// import Rocketship from "./components/rocketship/rocketship"
 
 import ReactGA from "react-ga"
 import ProjectPage from "./pages/projectpage/ProjectPage"
@@ -13,7 +13,7 @@ import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass"
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { Suspense } from "react"
-import FallingStars from "./components/falling-stars/fallingStars"
+// import FallingStars from "./components/falling-stars/fallingStars"
 
 extend({ EffectComposer, RenderPass, UnrealBloomPass })
 
