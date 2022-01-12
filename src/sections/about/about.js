@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useRef } from "react"
 import "./about.scss"
 import profile from "../../resources/profile.webp"
 // import sanfran from "../../resources/san-fran.webp"
@@ -7,12 +7,54 @@ import LazyLoad from "react-lazyload"
 import { Link } from "react-scroll"
 import Skill from "../../components/Skill/skill"
 import SectionWrapper from "../../components/SectionWrapper/SectionWrapper"
+import { ScrollTrigger } from "gsap/all"
+import gsap from "gsap"
+
+const slideFromLeft = (nodes) => {
+	gsap.from(nodes, {
+		scrollTrigger: {
+			trigger: ".about",
+			toggleActions: "restart",
+		},
+		duration: 1.2,
+		opacity: 0,
+		autoAlpha: 0,
+		x: -100,
+		ease: "power3.inOut",
+		stagger: {
+			amount: 0.3,
+		},
+	})
+}
+
+const fadeIn = (nodes) => {
+	gsap.from([nodes], {
+		scrollTrigger: {
+			trigger: ".about",
+			toggleActions: "restart",
+		},
+		duration: 1.2,
+		opacity: 0,
+		autoAlpha: 0,
+		delay: 0.5,
+		ease: "power3.inOut",
+	})
+}
 
 const About = () => {
+	let line1 = useRef(null)
+	let line2 = useRef(null)
+	gsap.registerPlugin(ScrollTrigger)
+
+	useEffect(() => {
+		slideFromLeft(line1.childNodes)
+		fadeIn(line2)
+	}, [])
+
 	return (
 		<SectionWrapper>
 			<div className="about about-block">
-				<div className="about-text">
+				<div className="about-text" ref={(el) => (line1 = el)}>
 					<h2 className="about-title">About</h2>
 					<div className="short-bio">
 						<h3>Who am I?</h3>
@@ -48,7 +90,7 @@ const About = () => {
 					</div>
 					<Skill />
 				</div>
-				<div className="about-image">
+				<div className="about-image" ref={(el) => (line2 = el)}>
 					<LazyLoad offset={100}>
 						<img
 							width="250"

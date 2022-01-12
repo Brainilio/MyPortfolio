@@ -8,9 +8,12 @@ import SectionWrapper from "../../components/SectionWrapper/SectionWrapper"
 const StoryPart = ({ imageSrc, text, title, children, isVideo }) => {
 	return (
 		<div className="project-detail-story">
-			<div className="p-story-img">
-				<img src={imageSrc} width="350px" height="350px" alt="" />
-			</div>
+			{imageSrc && (
+				<div className="p-story-img">
+					<img src={imageSrc} width="350px" height="350px" alt="" />
+				</div>
+			)}
+
 			<div className="p-story-text">
 				<h2>{title}</h2>
 				<p>{text}</p>
@@ -33,8 +36,6 @@ const ProjectDetail = (props) => {
 		props.location.project &&
 		props.location.project.category === "Development"
 	) {
-		// content = <Markdown source="test" />
-
 		content = (
 			<div className="full-page-project-detail">
 				<SectionWrapper className="project-detail-wrapper no-snap">
@@ -94,27 +95,35 @@ const ProjectDetail = (props) => {
 							/>
 						</div>
 					</div>
+					{props.location.project.process && (
+						<StoryPart
+							imageSrc={props.location.project.fullImages[0]}
+							title={"Process"}
+							text={props.location.project.process}
+						/>
+					)}
+					{props.location.project.challenges && (
+						<StoryPart
+							imageSrc={props.location.project.fullImages[1]}
+							title="Challenges"
+							text={props.location.project.challenges}
+						/>
+					)}
+					{props.location.project.differently && (
+						<StoryPart
+							imageSrc={props.location.project.fullImages[2]}
+							title="What would I do differently?"
+							text={props.location.project.differently}
+						/>
+					)}
+					{props.location.project.takeaway && (
+						<StoryPart
+							imageSrc={props.location.project.fullImages[3]}
+							title="My take away"
+							text={props.location.project.takeaway}
+						/>
+					)}
 
-					<StoryPart
-						imageSrc={props.location.project.fullImages[0]}
-						title={"Process"}
-						text={props.location.project.process}
-					/>
-					<StoryPart
-						imageSrc={props.location.project.fullImages[1]}
-						title="Challenges"
-						text={props.location.project.challenges}
-					/>
-					<StoryPart
-						imageSrc={props.location.project.fullImages[2]}
-						title="What would I do differently?"
-						text={props.location.project.differently}
-					/>
-					<StoryPart
-						imageSrc={props.location.project.fullImages[3]}
-						title="My take away"
-						text={props.location.project.takeaway}
-					/>
 					{props.location.project.additionalLinks.length > 0 && (
 						<StoryPart
 							imageSrc={props.location.project.fullImages[4]}

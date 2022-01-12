@@ -35,6 +35,11 @@
 		-moz-user-select: none; /* Firefox */
 		-ms-user-select: none; /* Internet Explorer/Edge */
 
+		span {
+			font-size: inherit;
+			font-weight: inherit;
+		}
+
 		@include screenm {
 			font-size: 10em;
 		}
