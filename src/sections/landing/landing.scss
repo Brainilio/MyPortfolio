@@ -24,13 +24,17 @@
 	}
 
 	.landing-title-text-name {
-		font-size: 10em;
+		font-size: 5em;
 		pointer-events: none;
 		user-select: none; /* supported by Chrome and Opera */
 		-webkit-user-select: none; /* Safari */
 		-khtml-user-select: none; /* Konqueror HTML */
 		-moz-user-select: none; /* Firefox */
 		-ms-user-select: none; /* Internet Explorer/Edge */
+
+		@include screenm {
+			font-size: 10em;
+		}
 	}
 
 	.landing-title-text {
@@ -40,7 +44,10 @@
 
 		.landing-title-text-title {
 			margin-top: var(--vertical-spacing-blocks) / 2;
-			width: 85%;
+
+			@include screenm {
+				width: 85%;
+			}
 		}
 	}
 

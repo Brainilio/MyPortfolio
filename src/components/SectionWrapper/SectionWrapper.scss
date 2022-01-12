@@ -3,8 +3,6 @@
 
 .section-wrapper {
 	min-height: 100vh;
-
-	scroll-snap-align: start;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -32,6 +30,8 @@
 	}
 
 	@include screenm {
+		scroll-snap-align: start;
+
 		max-width: 768px;
 		padding-left: 20px;
 		padding-right: 20px;

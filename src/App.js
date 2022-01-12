@@ -13,6 +13,7 @@ import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass"
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { Suspense } from "react"
+import FallingStars from "./components/falling-stars/fallingStars"
 
 extend({ EffectComposer, RenderPass, UnrealBloomPass })
 
@@ -138,6 +139,7 @@ function App() {
 	return (
 		<div>
 			<Rocketship />
+			<FallingStars />
 			<ThreeJsCanvas />
 			<Layout>
 				<Switch location={location}>
