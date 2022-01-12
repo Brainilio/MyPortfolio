@@ -138,10 +138,10 @@ function App() {
 
 	return (
 		<div>
-			<Rocketship />
-			<FallingStars />
 			<ThreeJsCanvas />
 			<Layout>
+				{/* <Rocketship />
+				<FallingStars /> */}
 				<Switch location={location}>
 					<Route path="/" exact component={Main} />
 					<Route path="/projects" component={ProjectPage} />
