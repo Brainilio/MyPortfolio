@@ -88,8 +88,7 @@ const projects = [
 		shortDescription:
 			"Natours is a full-stack web-application website that lets users check out and book the most exciting tours ever! Features include examples like CRUD operations for admins, payments using stripe, file upload handling and authorization",
 		previewImage: Natours,
-		livePreview:
-			"http://ec2-18-156-171-101.eu-central-1.compute.amazonaws.com/",
+		livePreview: "http://147.182.169.131:3000/",
 		gitHub: "https://github.com/Brainilio/natours",
 		tags: [
 			"React",
