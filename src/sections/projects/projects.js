@@ -12,7 +12,6 @@ const staggerText = (node1, node2, node4) => {
 	gsap.from([node1, node2, node4], {
 		scrollTrigger: {
 			trigger: ".project-cards",
-			toggleActions: "restart",
 		},
 		autoAlpha: 0,
 		duration: 1.2,
@@ -31,7 +30,6 @@ const fadeIn = (nodes) => {
 		autoAlpha: 0,
 		scrollTrigger: {
 			trigger: ".project-cards",
-			toggleActions: "restart",
 		},
 		duration: 1.2,
 		opacity: 0,

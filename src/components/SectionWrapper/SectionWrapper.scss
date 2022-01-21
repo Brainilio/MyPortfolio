@@ -10,11 +10,11 @@
 	width: 100%;
 	// padding-bottom: 0em;
 	box-sizing: border-box;
-	overflow-x: hidden;
+	overflow: hidden;
 	margin: 0 auto;
 
 	&.no-snap {
-		scroll-snap-align: unset;
+		// scroll-snap-align: unset;
 	}
 
 	@include screenxs {
@@ -30,7 +30,7 @@
 	}
 
 	@include screenm {
-		scroll-snap-align: start;
+		// 	scroll-snap-align: start;
 
 		max-width: 768px;
 		padding-left: 20px;

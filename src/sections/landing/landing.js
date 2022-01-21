@@ -9,7 +9,6 @@ const staggerText = (nodes) => {
 	gsap.from([...nodes], {
 		scrollTrigger: {
 			trigger: ".landing-title",
-			toggleActions: "restart",
 		},
 		duration: 1.2,
 		autoAlpha: 0,

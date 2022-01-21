@@ -14,7 +14,6 @@ const slideFromLeft = (nodes) => {
 	gsap.from(nodes, {
 		scrollTrigger: {
 			trigger: ".about",
-			toggleActions: "restart",
 		},
 		duration: 1.2,
 		opacity: 0,
@@ -31,7 +30,6 @@ const fadeIn = (nodes) => {
 	gsap.from([nodes], {
 		scrollTrigger: {
 			trigger: ".about",
-			toggleActions: "restart",
 		},
 		duration: 1.2,
 		opacity: 0,

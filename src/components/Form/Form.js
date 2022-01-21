@@ -207,7 +207,7 @@ const Form = () => {
 
 			<input name="bot-field" type="hidden" onChange={handleChange} />
 
-			<input value="submit" className="button-submit" type="submit"></input>
+			<input value="Submit" className="button-submit" type="submit"></input>
 		</form>
 	)
 
