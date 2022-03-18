@@ -124,7 +124,7 @@ const projects = [
 		shortDescription:
 			"During my employment at DPDK, I've had the opportunity to contribute to HKLiving's rebrand and new look! This included a revamped webshop for all of their unique furniture. I worked on ensuring responsiveness, and green lighthouse scores, translated designs into code, and attended review sessions to optimize our application.",
 		previewImage: HKLiving,
-		livePreview: "https:/hkliving.com/",
+		livePreview: "https://hkliving.com/",
 		gitHub: null,
 		tags: ["REACTJS", "SASS", "NEXTJS", "PRISMIC"],
 		category: "Development",
