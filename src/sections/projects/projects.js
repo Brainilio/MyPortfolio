@@ -29,7 +29,7 @@ const fadeIn = (nodes) => {
 	gsap.from(nodes, {
 		autoAlpha: 0,
 		scrollTrigger: {
-			trigger: ".project-cards",
+			trigger: ".projects",
 		},
 		duration: 1.2,
 		opacity: 0,
