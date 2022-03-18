@@ -1,23 +1,23 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "34656390efae8111cf999535fdd29cf0",
+    "revision": "6f911ee064259925d5e36ace53492e01",
     "url": "/index.html"
   },
   {
-    "revision": "5c6d24797399f986c8b7",
-    "url": "/static/css/main.ff44a761.chunk.css"
+    "revision": "026e1061dbe0dda6d9e3",
+    "url": "/static/css/main.c1b115ef.chunk.css"
   },
   {
-    "revision": "712582361f770c404606",
-    "url": "/static/js/2.56e5e8e1.chunk.js"
+    "revision": "2d9d24b72fc480751147",
+    "url": "/static/js/2.93dd0424.chunk.js"
   },
   {
-    "revision": "26fa182c0559ed1b721a0a499c6abafd",
-    "url": "/static/js/2.56e5e8e1.chunk.js.LICENSE.txt"
+    "revision": "d7471bcce56b26a2a77e53fa1956982c",
+    "url": "/static/js/2.93dd0424.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "5c6d24797399f986c8b7",
-    "url": "/static/js/main.6e179a1a.chunk.js"
+    "revision": "026e1061dbe0dda6d9e3",
+    "url": "/static/js/main.7bbf309c.chunk.js"
   },
   {
     "revision": "e5fbfb2a56a4c1b5d4b7",
@@ -216,12 +216,28 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/media/8.ecca31a7.webp"
   },
   {
-    "revision": "b2e03aee5a9e4cbbab3d133334c7eb76",
-    "url": "/static/media/bayvinemedia.b2e03aee.webp"
+    "revision": "2573ac5761fd96156150183473903967",
+    "url": "/static/media/bayvine.2573ac57.webp"
   },
   {
     "revision": "55c54cad0bcb5c00ed0542a58d55e6b1",
     "url": "/static/media/burger-builder.55c54cad.webp"
+  },
+  {
+    "revision": "a8bc016fdd06d9fcf01a4927b12ad59d",
+    "url": "/static/media/bv1.a8bc016f.webp"
+  },
+  {
+    "revision": "c88279d5692365081bb4400f1c61c0ad",
+    "url": "/static/media/bv2.c88279d5.webp"
+  },
+  {
+    "revision": "04a2ae2a01d462c6d144a5090173b613",
+    "url": "/static/media/bv3.04a2ae2a.webp"
+  },
+  {
+    "revision": "5a87501593c8f6b56a171455619719a6",
+    "url": "/static/media/bv4.5a875015.webp"
   },
   {
     "revision": "f5d2780806f63157f4ad3ecfad565432",
@@ -252,10 +268,6 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/media/mariabeautysalon.4e5195b4.webp"
   },
   {
-    "revision": "3a6435fbadf35cb1c00273ff9624fc78",
-    "url": "/static/media/me.3a6435fb.webp"
-  },
-  {
     "revision": "d4a43fc04638e8f80502ff2b5aa988b4",
     "url": "/static/media/menu-1.d4a43fc0.webp"
   },
@@ -276,12 +288,44 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/media/natours.48926d88.webp"
   },
   {
+    "revision": "29c6f4eaa70ea1af2bda52ec8befe87c",
+    "url": "/static/media/or.29c6f4ea.webp"
+  },
+  {
+    "revision": "5e63f4651ea96d23f1901d431a837c06",
+    "url": "/static/media/or1.5e63f465.webp"
+  },
+  {
+    "revision": "6fa3723d1aa717301966300cb6ae9884",
+    "url": "/static/media/or3.6fa3723d.webp"
+  },
+  {
+    "revision": "c1fc808851a0ab2c33ca595baf58cb67",
+    "url": "/static/media/or5.c1fc8088.webp"
+  },
+  {
+    "revision": "bcb0a84c5ec1ab68b85f6d4dd4e27a52",
+    "url": "/static/media/or6.bcb0a84c.webp"
+  },
+  {
+    "revision": "72a694fa7318ed9b5f3de6d4cdc713b1",
+    "url": "/static/media/oracui.72a694fa.webp"
+  },
+  {
     "revision": "e3f88d1cb184e28233cb41050ccdefae",
     "url": "/static/media/paperinvaders.e3f88d1c.webp"
   },
   {
     "revision": "0ab438b10e175b0ef9902ec6c307b134",
     "url": "/static/media/pokedex.0ab438b1.webp"
+  },
+  {
+    "revision": "5153abec9c88d431b9acc40812324da7",
+    "url": "/static/media/portfolio.5153abec.webp"
+  },
+  {
+    "revision": "b62b0917a0072088c7edff303a9446b6",
+    "url": "/static/media/profile.b62b0917.webp"
   },
   {
     "revision": "f12fe377e09ea756e052b2f2e9e58fc4",
