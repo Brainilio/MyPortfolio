@@ -3,8 +3,57 @@
 
 .contact {
 	min-height: 100vh;
+	width: 100%;
 	color: white;
-	// scroll-snap-align: start;
+	padding-bottom: 5rem;
+
+	margin: 0 auto;
+
+	@include screenxs {
+		max-width: 320px;
+		padding-left: 10px;
+		padding-right: 10px;
+	}
+
+	@include screens {
+		max-width: 375px;
+		padding-left: 10px;
+		padding-right: 10px;
+	}
+
+	@include screenm {
+		// 	scroll-snap-align: start;
+
+		max-width: 768px;
+		padding-left: 20px;
+		padding-right: 20px;
+	}
+
+	@include screenl {
+		max-width: 1024px;
+	}
+
+	@include screenxl {
+		max-width: 1200px;
+		padding-left: 50px;
+		padding-right: 50px;
+	}
+
+	@include screenxxl {
+		max-width: 1440px;
+	}
+
+	@include screenxs {
+		flex-direction: column-reverse;
+		justify-content: center;
+		align-items: center;
+	}
+
+	@include screenxl {
+		align-items: unset;
+		flex-direction: row;
+		justify-content: center;
+	}
 
 	.contact-part {
 		display: flex;

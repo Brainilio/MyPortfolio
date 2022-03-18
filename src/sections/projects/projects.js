@@ -46,7 +46,7 @@ const Projects = () => {
 	useEffect(() => {
 		staggerText(line1.childNodes)
 		fadeIn(line2)
-	}, [])
+	}, [line1, line2])
 
 	return (
 		<SectionWrapper>

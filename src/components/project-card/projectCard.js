@@ -34,7 +34,7 @@ const ProjectCard = (props) => {
 				</div>
 
 				<div className="project-cards-buttons">
-					{props.information.livePreview ? (
+					{props.information.livePreview && (
 						<a
 							rel="noopener noreferrer"
 							target="_blank"
@@ -43,16 +43,18 @@ const ProjectCard = (props) => {
 						>
 							Live
 						</a>
-					) : null}
+					)}
 
-					<a
-						rel="noopener noreferrer"
-						target="_blank"
-						href={props.information.gitHub}
-						className="project-cards-single-button"
-					>
-						Code
-					</a>
+					{props.information.gitHub && (
+						<a
+							rel="noopener noreferrer"
+							target="_blank"
+							href={props.information.gitHub}
+							className="project-cards-single-button"
+						>
+							Code
+						</a>
+					)}
 				</div>
 			</div>
 		</>

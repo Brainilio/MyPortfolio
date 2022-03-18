@@ -8,7 +8,7 @@ import gsap from "gsap"
 const staggerText = (nodes) => {
 	gsap.from([...nodes], {
 		scrollTrigger: {
-			trigger: ".landing-title",
+			trigger: ".section-wrapper",
 		},
 		duration: 1.2,
 		autoAlpha: 0,
@@ -24,11 +24,6 @@ const staggerText = (nodes) => {
 
 const fadeIn = (nodes) => {
 	gsap.from(nodes, {
-		scrollTrigger: {
-			trigger: ".landing-title",
-			toggleActions: "restart",
-		},
-		autoAlpha: 0,
 		duration: 1.2,
 		opacity: 0,
 		delay: 0.5,
@@ -46,7 +41,7 @@ const Landing = () => {
 		staggerText(line1.childNodes)
 		fadeIn(line2)
 		fadeIn(line3)
-	}, [])
+	}, [line2, line3, line1])
 
 	return (
 		<section className="background-black">

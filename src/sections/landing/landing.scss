@@ -60,6 +60,7 @@
 	}
 
 	.landing-title-cta-buttons {
+		opacity: 1;
 		display: grid;
 		margin-top: calc(var(--vertical-spacing-blocks) * 2);
 		grid-template-columns: 1fr 1fr;

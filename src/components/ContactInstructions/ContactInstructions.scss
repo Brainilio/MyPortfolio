@@ -13,10 +13,6 @@
 		text-align: start;
 		width: 450px;
 
-		@include screenxs {
-			display: none;
-		}
-
 		@include screenl {
 			display: block;
 		}
@@ -43,6 +39,32 @@
 		width: 50%;
 	}
 
+	.socials-row {
+		display: flex;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		gap: 2rem;
+		padding-bottom: 2rem;
+
+		@include screenxxs {
+			justify-content: center;
+		}
+
+		@include screenl {
+			justify-content: flex-start;
+		}
+
+		ol {
+			margin: 0;
+			padding: 0;
+
+			&:hover {
+				opacity: 0.5;
+			}
+		}
+	}
+
 	ul {
 		list-style: none;
 		margin: 0;
@@ -65,8 +87,10 @@
 					text-align: start;
 				}
 			}
+
 			p {
 				width: 80%;
+
 				@include screenxs {
 					text-align: justify;
 					width: 100%;

@@ -1,18 +1,13 @@
 import React from "react"
 import "./footer.scss"
-// import austronaut from "../../resources/astronaut.svg"
-// import { ReactSVG } from "react-svg"
 
 const Footer = () => {
 	return (
-		<>
-			{/* <ReactSVG className="astro" src={austronaut} /> */}
-			<footer className="footer">
-				<span className="text-footer" aria-hidden>
-					Developed and Designed with 🖤 by Brainilio
-				</span>
-			</footer>
-		</>
+		<footer className="footer">
+			<span className="text-footer" aria-hidden>
+				© 2022 | Created with 🖤 by Brainilio
+			</span>
+		</footer>
 	)
 }
 

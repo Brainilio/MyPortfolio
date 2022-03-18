@@ -8,12 +8,12 @@ const Skill = () => {
 			<div className="skills-title-block">
 				<h3>Skill set</h3>
 				<p>
-					I'm proficient at translating modern and complex UX/UI designs into
-					functional and consumable Front-end applications. I use modern
-					Front-end technologies such as React, NextJs, Sass, HTML,
-					GraphQL/Apollo, Redux, Framer, and ThreeJS. However, I don't like
-					limiting myself to a particular stack, so I am constantly learning and
-					adapting to end-user needs.
+					I'm excellent at translating modern and complex UX/UI designs into
+					functional and consumable Front-end applications. I use modern,
+					industry-level Front-end technologies such as React, NextJs, Sass,
+					HTML, GraphQL/Apollo, Redux, Framer, and ThreeJS. However, I don't
+					like limiting myself to a particular stack, so I am constantly
+					learning and adapting to end-user needs.
 				</p>
 			</div>
 			<div className="skill-hero">

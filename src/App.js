@@ -140,8 +140,6 @@ function App() {
 		<div>
 			<ThreeJsCanvas />
 			<Layout>
-				{/* <Rocketship />
-				<FallingStars /> */}
 				<Switch location={location}>
 					<Route path="/" exact component={Main} />
 					<Route path="/projects" component={ProjectPage} />
