@@ -1,204 +1,87 @@
 @import "../../styles/responsive/breakpoints.scss";
+@import "../../styles/index.scss";
 
-.landing {
+.background-black {
+	width: 100%;
+
+	background-image: linear-gradient(rgb(0, 0, 0), rgba(0, 0, 0, 0.033));
+}
+
+.background-black-reverse {
+	width: 100%;
+	background-image: linear-gradient(
+		rgba(0, 0, 0, 0),
+		rgba(0, 0, 0, 0.334),
+		rgb(0, 0, 0)
+	);
+}
+.landing-title {
 	display: flex;
+	flex-direction: column;
 	align-items: center;
-	min-height: 100vh;
-	justify-content: space-around;
-	max-width: 100vw;
+	justify-content: center;
 
 	@include screenxs {
-		flex-direction: column-reverse;
+		text-align: center;
 		justify-content: center;
-		align-items: center;
 	}
 
-	@include screenm {
-		flex-direction: column-reverse;
-		justify-content: center;
-		align-items: center;
-	}
+	.landing-title-text-name {
+		font-size: 5em;
+		pointer-events: none;
+		user-select: none; /* supported by Chrome and Opera */
+		-webkit-user-select: none; /* Safari */
+		-khtml-user-select: none; /* Konqueror HTML */
+		-moz-user-select: none; /* Firefox */
+		-ms-user-select: none; /* Internet Explorer/Edge */
 
-	.landing-title {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-
-		@include screenxs {
-			text-align: center;
-			justify-content: center;
-		}
-
-		.landing-title-text {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-
-			.landing-title-text-name {
-				font-size: 9vw;
-				font-weight: 900;
-				transition: all 0.5s ease-in-out;
-				overflow: hidden;
-				margin: 0;
-
-				@include screenxs {
-					font-size: 80px;
-				}
-
-				span {
-					margin: 0;
-					display: inline-block;
-				}
-			}
-			.landing-title-text-title {
-				font-size: 23px;
-				margin: 0;
-			}
-		}
-
-		.landing-title-cta-buttons {
-			margin-top: 5em;
-			display: flex;
-
-			@include screenxs {
-				margin-top: 3em;
-				display: flex;
-				flex-direction: column;
-				justify-content: center;
-				align-items: center;
-			}
-			@include screenm {
-				margin-top: 3em;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				flex-direction: row;
-			}
-
-			.landing-title-cta-contact-me {
-				cursor: pointer;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				color: white;
-				margin-right: 15px;
-				height: 50px;
-				margin-top: 1em;
-				border: 3px solid white;
-				width: 200px;
-				border-radius: 30px;
-				background: none;
-				transition: all 0.3s ease-in;
-				text-decoration: none;
-
-				&:hover {
-					color: black;
-					background: white;
-					a {
-						color: black;
-
-						text-decoration: none;
-					}
-				}
-
-				a {
-					text-decoration: none;
-				}
-			}
-
-			.landing-title-cta-my-work {
-				cursor: pointer;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				color: white;
-				margin-right: 20px;
-				height: 50px;
-				border-radius: 30px;
-				width: 200px;
-				border: none;
-				background: linear-gradient(142deg, #e99a33 0%, #be3490 100%);
-				transition: all 0.3s ease-in;
-				text-decoration: none;
-				margin-top: 1em;
-
-				&:hover {
-					background-color: white;
-					color: black;
-				}
-			}
-		}
-	}
-	.landing-icon {
-		@include screens {
-			margin-bottom: 2em;
+		span {
+			font-size: inherit;
+			font-weight: inherit;
 		}
 
 		@include screenm {
-			margin-bottom: 2em;
-		}
-
-		@include screenl {
-			margin-bottom: 2em;
-		}
-
-		.landing-icon-first {
-			transform: translate(-50px, -50px);
-			position: absolute;
-			width: 150px;
-			height: 150px;
-			background: none;
-			border: 1px solid white;
-		}
-		.landing-icon-second {
-			width: 150px;
-			height: 150px;
-			background: none;
-			border: 1px solid white;
+			font-size: 10em;
 		}
 	}
 
-	.read-more {
-		cursor: pointer;
-		position: absolute;
-		bottom: 1em;
+	.landing-title-text {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 
-		animation: upanddown 3s ease-in-out infinite;
+		.landing-title-text-title {
+			margin-top: var(--vertical-spacing-blocks) / 2;
 
-		@keyframes upanddown {
-			0% {
-				transform: translateY(0px);
-			}
-			50% {
-				transform: translateY(-20px);
-			}
-			100% {
-				transform: translateY(0px);
-			}
-		}
-
-		.read-more-text {
-			margin-bottom: 3px;
-
-			@include screens {
-				display: none;
-			}
 			@include screenm {
-				display: none;
-			}
-			@include screenl {
-				display: none;
+				width: 85%;
 			}
 		}
+	}
 
-		.read-more-line {
-			width: 1px;
-			height: 30px;
-			background-color: white;
+	.landing-title-cta-buttons {
+		opacity: 1;
+		display: grid;
+		margin-top: calc(var(--vertical-spacing-blocks) * 2);
+		grid-template-columns: 1fr 1fr;
+		align-items: center;
+		grid-gap: var(--vertical-spacing-blocks);
+
+		@include screenxs {
+			align-items: center;
+			justify-items: center;
+			grid-template-columns: 1fr;
+		}
+		@include screenm {
+			grid-template-columns: 1fr 1fr;
+		}
+
+		.landing-title-cta-contact-me {
+			@include primaryBigButton;
+		}
+
+		.landing-title-resume {
+			@include secondaryBigButton;
 		}
 	}
 }

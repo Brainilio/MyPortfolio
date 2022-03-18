@@ -2,16 +2,20 @@ import React from "react"
 import ContactHero from "../../components/ContactHero/ContactHero"
 import Contactinstructions from "../../components/ContactInstructions/Contactinstructions"
 import Form from "../../components/Form/Form"
+import Footer from "../footer/footer"
 import "./contact.scss"
 
-const Contact = () => {
+const Contact = ({ className }) => {
 	return (
-		<section className="contact">
-			<ContactHero />
-			<div className="contact-part">
-				<Contactinstructions />
-				<Form />
-			</div>
+		<section className="background-black-reverse">
+			<section className="contact">
+				<ContactHero />
+				<div className="contact-part">
+					<Contactinstructions />
+					<Form />
+				</div>
+			</section>
+			<Footer />
 		</section>
 	)
 }

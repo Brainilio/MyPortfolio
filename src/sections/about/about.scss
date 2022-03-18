@@ -1,268 +1,145 @@
 @import "../../styles/responsive/breakpoints.scss";
+@import "../../styles/index.scss";
 
-.about {
-	min-height: auto !important;
-	margin: 5em auto !important;
-	padding-left: 3em;
-	padding-right: 3em;
-	box-sizing: border-box !important;
+.about-block {
+	padding-top: 3em;
+	width: 100%;
+	min-height: 100vh;
 
-	.about-block {
-		display: flex;
+	display: flex;
+	justify-content: space-between;
+	// align-items: center;
+	margin: 0 auto;
+
+	@include screenxs {
+		max-width: 320px;
+		padding-left: 10px;
+		padding-right: 10px;
+	}
+
+	@include screens {
+		max-width: 375px;
+		padding-left: 10px;
+		padding-right: 10px;
+	}
+
+	@include screenm {
+		// 	scroll-snap-align: start;
+
+		max-width: 768px;
+		padding-left: 20px;
+		padding-right: 20px;
+	}
+
+	@include screenl {
+		max-width: 1024px;
+	}
+
+	@include screenxl {
+		max-width: 1200px;
+		padding-left: 50px;
+		padding-right: 50px;
+	}
+
+	@include screenxxl {
+		max-width: 1440px;
+	}
+
+	@include screenxs {
+		flex-direction: column-reverse;
+		justify-content: center;
 		align-items: center;
-		justify-content: space-evenly;
+	}
 
+	@include screenxl {
+		align-items: unset;
+		flex-direction: row;
+		justify-content: center;
+	}
+
+	.about-text {
 		@include screenxs {
-			margin: 0 auto;
-			justify-content: center;
-			flex-direction: column;
-			align-items: center;
+			margin-top: var(--vertical-spacing-blocks);
+			width: 100%;
 		}
 
-		@include screens {
-			margin-top: 1em;
-			margin: 0 auto;
-			justify-content: center;
+		@include screenl {
+			text-align: center;
 		}
 
 		@include screenxl {
-			margin-top: 5em;
-			margin: 0;
-			display: flex;
-			flex-direction: row;
-			justify-content: space-between;
+			width: unset;
+			text-align: start;
 		}
 
-		.about-text {
-			font-size: 20px;
+		.short-bio {
+			margin-top: var(--vertical-spacing-blocks);
 			display: flex;
+			justify-content: flex-start;
+			align-items: flex-start;
 			flex-direction: column;
-			width: 35%;
-
-			@include screenxs {
-				width: 100%;
-				text-align: justify;
-			}
 
 			@include screenl {
-				width: 50%;
-			}
-			@include screenxl {
-				margin-right: 2em;
-			}
-
-			.about-title {
-				display: flex;
-				font-size: 50px;
-				font-weight: 900;
-				overflow: hidden;
-
-				@include screenxs {
-					margin: 2em 0 0 0;
-					justify-content: center;
-				}
-
-				@include screenxl {
-					justify-content: start;
-				}
-			}
-
-			div {
-				display: flex;
-				padding-left: 3em;
-				padding-right: 3em;
-				box-sizing: border-box !important;
-
-				@include screenxs {
-					display: flex;
-					align-items: center;
-					flex-direction: column;
-					justify-content: center;
-				}
-
-				@include screens {
-					display: flex;
-					align-items: center;
-					flex-direction: row;
-					justify-content: center;
-					margin-bottom: 2em;
-				}
-
-				@include screenxl {
-					display: flex;
-					align-items: flex-start;
-					flex-direction: row;
-					justify-content: start;
-					margin-bottom: 2em;
-					padding: 0;
-				}
-
-				button {
-					margin-top: 2em;
-					margin-bottom: 1rem;
-					margin-right: 2em;
-					font-size: 15px;
-					cursor: pointer;
-					color: white;
-					height: 50px;
-					width: 200px;
-					border-radius: 30px;
-					font-weight: 900;
-					background: linear-gradient(142deg, #e99a33 0%, #be3490 100%);
-					text-decoration: none;
-					border: none;
-					transition: all 0.3s ease-in-out;
-
-					&:hover {
-						background-color: white;
-						color: black;
-					}
-
-					@include screenxs {
-						margin: 0;
-					}
-				}
-
-				.button-resume-chat {
-					margin-top: 2em;
-					margin-bottom: 2em;
-					margin-right: 2em;
-					font-size: 15px;
-					cursor: pointer;
-					color: white;
-					height: 50px;
-					width: 200px;
-					border-radius: 30px;
-					font-weight: 900;
-					background: none;
-					border: 3px solid white;
-					transition: all 0.3s ease-in-out;
-
-					&:hover {
-						background-color: white;
-						color: black;
-					}
-
-					a {
-						margin: 0;
-						&:hover {
-							background-color: white;
-							color: black;
-						}
-					}
-
-					@include screenxs {
-						margin: 0;
-						margin-top: 1em;
-						margin-bottom: 1em;
-					}
-
-					@include screens {
-						margin: 0;
-						margin-left: 2em;
-					}
-				}
-			}
-		}
-
-		.about-image {
-			display: flex;
-			flex-direction: column;
-
-			@include screenxs {
-				margin-right: 0;
-				margin: 0 auto;
 				justify-content: center;
 				align-items: center;
 			}
 
-			@include screenl {
-				margin-top: 5em;
-				margin: 0 auto;
+			@include screenxl {
+				margin-top: var(--vertical-spacing-blocks);
+				display: flex;
+				justify-content: flex-start;
+				align-items: flex-start;
+				flex-direction: column;
 			}
 
-			@include screenxl {
-				margin: 0;
+			p {
+				width: 500px;
+				@include screenxs {
+					width: 100%;
+				}
+
+				@include screenl {
+					width: 500px;
+					margin-top: calc(var(--vertical-spacing-paragraphs) / 10);
+				}
 			}
 
 			div {
-				display: flex;
-			}
+				margin-top: var(--vertical-spacing-blocks);
+				display: grid;
+				align-items: center;
+				grid-template-columns: 1fr 1fr;
+				grid-gap: var(--vertical-spacing-blocks);
 
-			img {
-				margin: 1em;
-				border-radius: 15px;
-				object-fit: cover;
-
-				@include screenxs {
-					margin: 0;
-				}
-				@include screenxl {
-					margin: 0;
-				}
-			}
-
-			.about-image-rotterdam {
-				@include screenxs {
-					display: none;
-					margin: 15px;
-					width: 350px;
-					object-fit: cover;
+				.button-lets-chat {
+					@include primarySmallButton;
 				}
 
-				@include screenm {
-					display: block;
-					width: 620px;
-				}
-
-				@include screenl {
-					display: block;
-					width: 520px;
+				.button-resume-chat {
+					@include secondarySmallButton;
 				}
 			}
-			.about-image-sanfran {
-				@include screenxs {
-					display: none;
-					margin: 10px;
-					width: 165px;
-					object-fit: cover;
-				}
-				@include screenm {
-					display: block;
-					width: 300px;
-				}
-				@include screenl {
-					width: 250px;
-				}
+		}
+	}
+
+	.about-image {
+		padding-top: 8rem;
+		img {
+			border-radius: 50%;
+			object-fit: cover;
+			transform: rotate(90deg);
+
+			@include screenxs {
+				width: 200px;
+				height: 200px;
 			}
 
-			.about-image-image {
-				transition: all 0.5s ease-in-out;
-				border-radius: 15px;
+			@include screenl {
+				height: 320px;
+				width: 320px;
+			}
 
-				@include screenxs {
-					margin: 10px;
-					width: 220px;
-					object-fit: cover;
-					margin: 1em auto;
-				}
-
-				@include screens {
-					margin: 10px;
-					width: 320px;
-					object-fit: cover;
-					margin: 1em auto;
-				}
-
-				@include screenm {
-					display: block;
-					width: 300px;
-					margin: 10px;
-				}
-
-				@include screenl {
-					width: 250px;
-				}
+			@include screenxl {
 			}
 		}
 	}

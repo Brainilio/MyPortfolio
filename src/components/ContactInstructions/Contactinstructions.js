@@ -1,14 +1,11 @@
 import React from "react"
 import "./ContactInstructions.scss"
+import { FaLinkedin, FaTwitter, FaEnvelope } from "react-icons/fa"
 
 const Contactinstructions = () => {
 	return (
 		<div className="contact-instructions">
-			<h1>What can you expect from me?</h1>
-			<h2>
-				Thanks for willing to contact me, let’s get this ball rolling! There are
-				a couple of things you can expect when working together with me.
-			</h2>
+			<h2>What can you expect from me?</h2>
 
 			<ul>
 				<li>
@@ -21,8 +18,8 @@ const Contactinstructions = () => {
 				<li>
 					<h3>Deliberation</h3>
 					<p>
-						Before I make decisions or choices, I take serious care thinking and
-						anticipating obstacles.
+						Before I make decisions or choices, I take serious care in thinking
+						about, and anticipating obstacles.
 					</p>
 				</li>
 				<li>
@@ -39,6 +36,40 @@ const Contactinstructions = () => {
 						I love hard work and possess a great deal of stamina. I take immense
 						satisfaction in being busy and productive.
 					</p>
+				</li>
+			</ul>
+			<ul>
+				<li>
+					<h3>You can also find or contact me at</h3>
+				</li>
+				<li className="socials-row">
+					<ol>
+						<a
+							href="mailto:brainilioir@gmail.com"
+							rel="noopener noreferrer"
+							target="_blank"
+						>
+							<FaEnvelope size={30} />
+						</a>
+					</ol>
+					<ol>
+						<a
+							href="https://linkedin.com/in/brainilio"
+							rel="noopener noreferrer"
+							target="_blank"
+						>
+							<FaLinkedin size={30} />
+						</a>
+					</ol>
+					<ol>
+						<a
+							href="https://twitter.com/brainilio"
+							rel="noopener noreferrer"
+							target="_blank"
+						>
+							<FaTwitter size={30} />
+						</a>
+					</ol>
 				</li>
 			</ul>
 		</div>

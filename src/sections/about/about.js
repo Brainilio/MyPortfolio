@@ -1,132 +1,99 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useRef } from "react"
 import "./about.scss"
 import profile from "../../resources/profile.webp"
-import sanfran from "../../resources/san-fran.webp"
-import rotterdam from "../../resources/rotterdam.webp"
+// import sanfran from "../../resources/san-fran.webp"
+// import rotterdam from "../../resources/rotterdam.webp"
 import LazyLoad from "react-lazyload"
-import gsap from "gsap"
-import { ScrollTrigger } from "gsap/all"
 import { Link } from "react-scroll"
+import Skill from "../../components/Skill/skill"
+import { ScrollTrigger } from "gsap/all"
+import gsap from "gsap"
+
+const slideFromLeft = (nodes) => {
+	gsap.from(nodes, {
+		scrollTrigger: {
+			trigger: ".about",
+		},
+		duration: 1.2,
+		autoAlpha: 0,
+		x: -100,
+		ease: "power3.inOut",
+		stagger: {
+			amount: 0.3,
+		},
+	})
+}
+
+const fadeIn = (nodes) => {
+	gsap.from(nodes, {
+		duration: 1.2,
+		autoAlpha: 0,
+		opacity: 0,
+		delay: 0.5,
+		ease: "power3.inOut",
+	})
+}
 
 const About = () => {
-	const textRef = React.useRef(null)
-	const titleRef = React.useRef(null)
-	const imagesRef = React.useRef(null)
-	const buttonsRef = React.useRef(null)
-
+	let line1 = useRef(null)
+	let line2 = useRef(null)
 	gsap.registerPlugin(ScrollTrigger)
+
 	useEffect(() => {
-		// gsap.from(textRef.current, {
-		// 	scrollTrigger: {
-		// 		trigger: textRef.current,
-		// 	},
-		// 	x: 300,
-		// 	opacity: 0,
-		// 	ease: "power1",
-		// 	duration: 1,
-		// })
-		// gsap.from(imagesRef.current, {
-		// 	scrollTrigger: {
-		// 		trigger: imagesRef.current,
-		// 	},
-		// 	opacity: 0,
-		// 	duration: 5,
-		// })
-		// gsap.from(buttonsRef.current, {
-		// 	scrollTrigger: {
-		// 		trigger: imagesRef.current,
-		// 	},
-		// 	duration: 0.8,
-		// 	delay: 0.6,
-		// 	xPercent: -100,
-		// 	opacity: 0,
-		// })
-		// gsap.from([titleRef.current.childNodes], {
-		// 	scrollTrigger: {
-		// 		trigger: titleRef.current,
-		// 	},
-		// 	duration: 0.8,
-		// 	yPercent: 80,
-		// 	opacity: 0,
-		// 	delay: 0.8,
-		// 	stagger: 0.08,
-		// 	ease: "power4.easeinout",
-		// })
-	}, [])
+		slideFromLeft(line1.childNodes)
+		fadeIn(line2)
+	}, [line2, line1])
 
 	return (
-		<section className="about">
-			<div className="about-block">
-				<div className="about-text">
-					<span ref={titleRef} className="about-title" aria-hidden>
-						<span>A</span>
-						<span>b</span>
-						<span>o</span>
-						<span>u</span>
-						<span>t</span>
-					</span>
-					<p ref={textRef} aria-hidden>
-						I am a creative developer driven by empathy, creativity, and
-						humility, specializing in Full-stack and UX/UI development. I aim to
-						combine these two special powers of mine to create and develop
-						meaningful solutions for users. Applied creativity is reflected in
-						my everyday life in which I love to develop new recipes to cook,
-						play around with Arduino, draw my own comic book and be active when
-						it comes to playing instruments. My strengths reflect a desire for
-						achievement, responsibility, and collaboration. I stand firm in my
-						values and work to bring ethics and empathy to the tech field.
-						Interested in talking?{" "}
+		<div className="about about-block">
+			<div className="about-text" ref={(el) => (line1 = el)}>
+				<h2 className="about-title">About</h2>
+				<div className="short-bio">
+					<h3>Who am I?</h3>
+					<p>
+						Hello there! I’m a creative developer who’s driven by user needs and
+						creativity. Professionally, I specialize in Front-end development,
+						but I'm also considerably exposed to Back-end dev and UX/UI. I
+						always aim to get the best out of myself by staying up to date with
+						latest trends and technologies, and standing firm in my values. I'm
+						extremely fascinated by state of the art user interfaces, and WebGL
+						in particular. In my free time, I’m busy with everything arts, from
+						culinary to comics.
 					</p>
-					<div ref={buttonsRef}>
-						<Link smooth={true} duration={600} offset={-500} to="contact">
-							<button className="button-lets-chat">
-								L E T ' S &nbsp; C H A T
-							</button>
+					<div>
+						<Link
+							className="button-lets-chat"
+							smooth={true}
+							duration={600}
+							offset={-500}
+							to="contact"
+						>
+							Contact me
 						</Link>
 						<a
+							className="button-resume-chat"
 							rel="noopener noreferrer"
 							target="_blank"
 							href="https://drive.google.com/file/d/1TgOjKdYPxZr7SmBChUm1osO84EPkXSA8/view?usp=sharing"
 						>
-							<button className="button-resume-chat">R E S U M E</button>
+							Resume
 						</a>
 					</div>
 				</div>
-				<div ref={imagesRef} className="about-image">
-					<div>
-						<LazyLoad offset={100}>
-							<img
-								width="250"
-								height="300"
-								className="about-image-sanfran"
-								alt="san francisco"
-								src={sanfran}
-							/>
-						</LazyLoad>
-						<LazyLoad offset={100}>
-							<img
-								width="250"
-								height="300"
-								className="about-image-image"
-								alt="brainilio"
-								src={profile}
-							/>
-						</LazyLoad>
-					</div>
-					<div>
-						<LazyLoad offset={100}>
-							<img
-								width="530"
-								height="300"
-								className="about-image-rotterdam"
-								alt="rotterdam"
-								src={rotterdam}
-							/>
-						</LazyLoad>
-					</div>
-				</div>
+				<Skill />
 			</div>
-		</section>
+			<div className="about-image" offset={100} ref={(el) => (line2 = el)}>
+				<LazyLoad>
+					<img
+						width="250"
+						height="300"
+						className="about-image-image"
+						alt="brainilio"
+						src={profile}
+					/>
+				</LazyLoad>
+			</div>
+		</div>
 	)
 }
 

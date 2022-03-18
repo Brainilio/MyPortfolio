@@ -1,0 +1,34 @@
+@import "../styles/responsive/breakpoints.scss";
+
+.layout {
+	// padding-left: var(--padding-left-page-bg);
+	// padding-right: var(--padding-left-page-bg);
+	box-sizing: border-box;
+	// scroll-snap-type: y mandatory;
+	margin: 0 auto;
+
+	// @include screenxs {
+	// 	padding-left: var(--padding-left-page-mb);
+	// 	padding-right: var(--padding-right-page-mb);
+	// }
+
+	// @include screens {
+	// 	padding-left: var(--padding-left-page-tb);
+	// 	padding-right: var(--padding-right-page-tb);
+	// }
+
+	// @include screenm {
+	// 	padding-left: var(--padding-left-page-m);
+	// 	padding-right: var(--padding-right-page-m);
+	// }
+
+	// @include screenxl {
+	// 	padding-left: var(--padding-left-page-bg);
+	// 	padding-right: var(--padding-right-page-bg);
+	// }
+
+	// @include screenxxl {
+	// 	padding-left: var(--padding-left-page-xxl);
+	// 	padding-right: var(--padding-right-page-xxl);
+	// }
+}

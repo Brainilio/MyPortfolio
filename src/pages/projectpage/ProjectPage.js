@@ -4,13 +4,14 @@ import "./ProjectPage.scss"
 import ProjectCard from "../../components/project-card/projectCard"
 import projects from "../../projects"
 import Contact from "../../sections/contact/contact"
+
 const ProjectPage = (props) => {
 	React.useEffect(() => {
 		window.scrollTo(0, 0)
 	}, [])
 
 	return (
-		<>
+		<section className="main-container">
 			<section className="all-projects">
 				<div className="project-page-title">
 					<span className="project-page-title-title" aria-hidden>
@@ -31,9 +32,9 @@ const ProjectPage = (props) => {
 					</div>
 				</div>
 
-				<Contact />
+				<Contact className="no-snap" />
 			</section>
-		</>
+		</section>
 	)
 }
 

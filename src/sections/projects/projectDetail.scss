@@ -1,4 +1,18 @@
 @import "../../styles/responsive/breakpoints.scss";
+@import "../../styles/index.scss";
+
+.full-page-project-detail {
+	background-color: black;
+	padding: 5em 0;
+}
+.project-detail-wrapper {
+	position: relative;
+	background-color: black;
+	display: flex;
+	flex-direction: column;
+	gap: 5em;
+	margin-bottom: 10em;
+}
 
 .project-detail-close-modal {
 	position: fixed;
@@ -6,7 +20,7 @@
 	top: 5%;
 	right: 5%;
 	cursor: pointer;
-	background: none;
+	background: black;
 	border-radius: 50%;
 	font-weight: 500;
 	font-size: 25px;
@@ -30,514 +44,160 @@
 	}
 }
 
-section {
-	min-height: auto;
-	width: 100vw;
-}
+.p-landing {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	border-bottom: 1px solid rgba(227, 227, 227, 0.43);
+	padding-bottom: 5em;
+	width: 100%;
 
-h1,
-h2 {
-	margin: 0;
-}
+	@include screenxs {
+		text-align: justify;
+		flex-direction: column-reverse;
+	}
 
-.p-header {
-	margin-top: 5em;
-	margin-bottom: 15em;
-	height: 70vh auto;
+	@include screenxl {
+		flex-direction: row;
+	}
 
-	.p-landing {
+	.p-text {
 		display: flex;
-		justify-content: space-around;
-		align-items: center;
+		flex-direction: column;
+		justify-content: space-evenly;
+		width: 40%;
 
 		@include screenxs {
-			text-align: justify;
-			flex-direction: column-reverse;
+			width: 100%;
+			text-align: center;
 		}
 
 		@include screenxl {
-			flex-direction: row;
-		}
-
-		.p-text {
 			display: flex;
 			flex-direction: column;
 			justify-content: space-evenly;
 			width: 40%;
+			align-items: flex-start;
+		}
+
+		h1 {
+			width: 100%;
+			text-align: start;
+		}
+
+		p {
+			font-size: 20px;
+			width: 100%;
 
 			@include screenxs {
-				width: 80%;
-				text-align: center;
+				text-align: justify;
 			}
+		}
 
-			@include screenxl {
-				display: flex;
-				flex-direction: column;
-				justify-content: space-evenly;
-				width: 40%;
-				align-items: flex-start;
-			}
-			h1 {
-				font-size: 70px;
-			}
-			p {
-				font-size: 20px;
+		.p-info {
+			margin-top: 2em;
+			display: flex;
+			font-weight: 600;
+
+			div {
 				width: 100%;
+				margin-right: 5em;
 
 				@include screenxs {
-					text-align: justify;
-				}
-			}
-
-			.p-info {
-				margin-top: 2em;
-				display: flex;
-				font-weight: 600;
-
-				div {
-					width: 100%;
-					margin-right: 5em;
-
-					@include screenxs {
-						margin: 0 auto;
-						text-align: center;
-					}
-
-					@include screenxl {
-						width: 100%;
-						margin: 0;
-						text-align: start;
-					}
-				}
-			}
-
-			.p-buttons {
-				display: flex;
-				margin-top: 5em;
-
-				@include screenxs {
-					justify-content: center;
-					flex-direction: column;
-					align-items: center;
-				}
-
-				@include screenm {
-					flex-direction: row;
-					align-items: center;
+					margin: 0 auto;
+					text-align: center;
 				}
 
 				@include screenxl {
-					align-items: flex-start;
-					flex-direction: row;
-					align-items: center;
-				}
-
-				.project-cards-single-button {
-					cursor: pointer;
-					display: flex;
-					justify-content: center;
-					align-items: center;
-					color: #be3490;
-					height: 50px;
-					font-weight: 900;
-					width: 200px;
-					margin-right: 3em;
-					background: none;
-					border: 3px solid #be3490;
-					border-radius: 30px;
-					transition: all 0.3s ease-in;
-					text-decoration: none;
-
-					@include screenxs {
-						margin-right: 0;
-						margin-bottom: 1em;
-					}
-
-					@include screenm {
-						margin-right: 3em;
-						margin-bottom: 0em;
-					}
-
-					&:hover {
-						background: linear-gradient(142deg, #ffe920 0%, #be3490 100%);
-						color: white;
-					}
-				}
-
-				.project-cards-single-button-2 {
-					cursor: pointer;
-					display: flex;
-					justify-content: center;
-					align-items: center;
-					color: white;
-					height: 50px;
-					font-weight: 900;
-					width: 200px;
-					border: 3px solid none;
-					background: linear-gradient(142deg, #35218f 0%, #cd2ad3 100%);
-					border-radius: 30px;
-					transition: all 0.3s ease-in;
-					text-decoration: none;
-
-					&:hover {
-						background-color: white;
-						color: black;
-					}
+					width: 100%;
+					margin: 0;
+					text-align: start;
 				}
 			}
 		}
 
-		.p-image {
-			img {
-				object-fit: contain;
+		.p-buttons {
+			display: flex;
+			margin-top: 5em;
+			gap: 2em;
+
+			@include screenxs {
+				justify-content: center;
+				flex-direction: column;
+				align-items: center;
 			}
+
+			@include screenm {
+				flex-direction: row;
+				align-items: center;
+			}
+
+			@include screenxl {
+				align-items: flex-start;
+				flex-direction: row;
+				align-items: center;
+			}
+
+			.project-cards-single-button {
+				@include secondaryBigButton;
+			}
+
+			.project-cards-single-button-2 {
+				@include primaryBigButton;
+			}
+		}
+	}
+
+	.p-image {
+		img {
+			object-fit: contain;
 		}
 	}
 }
 
-.p-process {
+.project-detail-story {
 	display: flex;
-	margin: 6em 0;
-	justify-content: space-around;
+	flex-direction: column;
+	align-items: center;
+	gap: 3rem;
 
-	@include screenxs {
-		flex-direction: column;
-		align-items: center;
-	}
-
-	@include screenxl {
-		justify-content: space-between;
-		flex-direction: row;
-	}
-
-	.p-process-img {
+	.p-story-img {
 		background-color: rgb(0, 0, 0);
 		background: black;
-		border: none;
-		width: 450px;
-		height: 500px;
-		border-radius: 25px;
-		border-top-left-radius: 0px;
-		border-bottom-left-radius: 0px;
-		width: 50%;
 
 		@include screenxs {
-			border-radius: 0px;
 			width: 100%;
 		}
 
 		@include screenxl {
-			border-radius: 25px;
-			border-top-left-radius: 0px;
-			border-bottom-left-radius: 0px;
-
 			width: 50%;
 		}
 
 		img {
 			object-fit: contain;
-			border-radius: inherit;
 			height: 100%;
 			width: 100%;
 		}
 	}
 
-	.p-process-text {
-		width: 40%;
-
-		@include screenxs {
-			margin-top: 2em;
-			text-align: center;
-			width: 80%;
-		}
-
-		@include screenxl {
-			width: 40%;
-			padding-right: 5em;
-		}
-		h1 {
-			font-size: 60px;
-			text-align: start;
-		}
-		p {
-			text-align: start;
-			font-size: 20px;
-		}
-	}
-}
-
-.p-challenges {
-	display: flex;
-	margin: 6em 0;
-	justify-content: space-around;
-	flex-direction: row-reverse;
-
-	@include screenxs {
+	.p-story-text {
+		display: flex;
 		flex-direction: column;
-		align-items: center;
-	}
 
-	@include screenxl {
-		justify-content: space-between;
-		flex-direction: row-reverse;
-	}
-
-	.p-challenges-img {
-		background-color: rgb(0, 0, 0);
-		background: rgba(0, 0, 0, 0);
-		border: none;
-		width: 450px;
-		height: 450px;
-		border-radius: 25px;
-		border-top-right-radius: 0px;
-		border-bottom-right-radius: 0px;
-		width: 50%;
-
-		@include screenxs {
-			border-radius: 0px;
+		h2 {
+			font-size: 30px;
+			margin-bottom: 5px;
 			width: 100%;
 		}
 
-		@include screenxl {
-			border-radius: 25px;
-			border-top-right-radius: 0px;
-			border-bottom-right-radius: 0px;
-			width: 50%;
+		@include screenxxs {
+			width: 320px;
 		}
 
-		img {
-			object-fit: contain;
-			border-radius: inherit;
-			height: 100%;
-			width: 100%;
-		}
-	}
-	.p-challenges-text {
-		width: 40%;
-
-		@include screenxs {
-			margin-top: 2em;
-			text-align: center;
-			width: 80%;
+		@include screenm {
+			width: 750px;
 		}
 
-		@include screenxl {
-			width: 40%;
-			padding-left: 5em;
-		}
-		h1 {
-			font-size: 60px;
-			text-align: start;
-		}
-		p {
-			text-align: start;
-			font-size: 20px;
-		}
-	}
-}
-
-.p-different {
-	display: flex;
-	margin: 6em 0;
-	justify-content: space-around;
-
-	@include screenxs {
-		flex-direction: column;
-		align-items: center;
-	}
-
-	@include screenxl {
-		justify-content: space-between;
-		flex-direction: row;
-	}
-
-	.p-different-img {
-		background-color: rgb(0, 0, 0);
-		background: rgba(0, 0, 0, 0);
-		border: none;
-		width: 450px;
-		height: 500px;
-		border-radius: 25px;
-		border-top-left-radius: 0px;
-		border-bottom-left-radius: 0px;
-		width: 50%;
-
-		@include screenxs {
-			border-radius: 0px;
-			width: 100%;
-		}
-
-		@include screenxl {
-			border-radius: 25px;
-			border-top-left-radius: 0px;
-			border-bottom-left-radius: 0px;
-			width: 50%;
-		}
-
-		img {
-			object-fit: contain;
-			border-radius: inherit;
-			height: 100%;
-			width: 100%;
-		}
-	}
-
-	.p-different-text {
-		width: 40%;
-
-		@include screenxs {
-			margin-top: 2em;
-			text-align: center;
-			width: 80%;
-		}
-
-		@include screenxl {
-			width: 40%;
-			padding-right: 5em;
-		}
-		h1 {
-			font-size: 60px;
-			text-align: start;
-		}
-		p {
-			text-align: start;
-			font-size: 20px;
-		}
-	}
-}
-
-.p-takeaway {
-	display: flex;
-	margin: 6em 0;
-	justify-content: space-around;
-	flex-direction: row-reverse;
-
-	@include screenxs {
-		flex-direction: column;
-		align-items: center;
-	}
-
-	@include screenxl {
-		justify-content: space-between;
-		flex-direction: row-reverse;
-	}
-
-	.p-takeaway-img {
-		background-color: rgb(0, 0, 0);
-		background: rgba(0, 0, 0, 0);
-		border: none;
-		width: 450px;
-		height: 450px;
-		border-radius: 25px;
-		border-top-right-radius: 0px;
-		border-bottom-right-radius: 0px;
-		width: 50%;
-
-		@include screenxs {
-			border-radius: 0px;
-			width: 100%;
-		}
-
-		@include screenxl {
-			border-radius: 25px;
-			border-top-right-radius: 0px;
-			border-bottom-right-radius: 0px;
-			width: 50%;
-		}
-
-		img {
-			object-fit: contain;
-			border-radius: inherit;
-			height: 100%;
-			width: 100%;
-		}
-	}
-	.p-takeaway-text {
-		width: 40%;
-
-		@include screenxs {
-			margin-top: 2em;
-			text-align: center;
-			width: 80%;
-		}
-
-		@include screenxl {
-			width: 40%;
-			padding-left: 5em;
-		}
-		h1 {
-			font-size: 60px;
-			text-align: start;
-		}
-		p {
-			text-align: start;
-			font-size: 20px;
-		}
-	}
-}
-
-.p-additional {
-	display: flex;
-	margin: 6em 0;
-	justify-content: space-around;
-	flex-direction: row-reverse;
-
-	@include screenxs {
-		flex-direction: column;
-		align-items: center;
-	}
-
-	@include screenxl {
-		justify-content: space-between;
-		flex-direction: row-reverse;
-	}
-
-	.p-additional-img {
-		background-color: rgb(0, 0, 0);
-		background: rgba(0, 0, 0, 0);
-		width: 450px;
-		height: 450px;
-		border-radius: 25px;
-		border-top-left-radius: 0px;
-		border-bottom-left-radius: 0px;
-		width: 50%;
-
-		@include screenxs {
-			border-radius: 0px;
-			width: 100%;
-		}
-
-		@include screenxl {
-			border-radius: 25px;
-			border-top-left-radius: 0px;
-			border-bottom-left-radius: 0px;
-			width: 50%;
-		}
-
-		img {
-			object-fit: contain;
-			border-radius: inherit;
-			height: 100%;
-			width: 100%;
-		}
-	}
-	.p-additional-text {
-		width: 40%;
-		@include screenxs {
-			margin-top: 2em;
-			text-align: center;
-			width: 80%;
-		}
-
-		@include screenxl {
-			width: 40%;
-			padding-right: 5em;
-		}
-
-		h1 {
-			font-size: 60px;
-			text-align: start;
-		}
 		ul {
 			text-align: start;
 			li {

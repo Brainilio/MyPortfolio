@@ -1,16 +1,19 @@
-import BurgerBuilder from "./resources/projects/burger-builder.webp"
-import Salvame from "./resources/projects/salvame.webp"
-import Lolmfc from "./resources/projects/lolmfc.webp"
-import Natours from "./resources/projects/natours.webp"
-import Thanosrunner from "./resources/projects/thanosrunner.webp"
-import Paperinvaders from "./resources/projects/paperinvaders.webp"
+import BurgerBuilder from "./resources/projects/burger-builder.png"
+import Salvame from "./resources/projects/salvame.png"
+import Lolmfc from "./resources/projects/lolmfc.png"
+import Natours from "./resources/projects/natours.png"
+import Thanosrunner from "./resources/projects/thanosrunner.png"
+import Paperinvaders from "./resources/projects/paperinvaders.png"
 import PokeDex from "./resources/projects/pokedex.webp"
-import Leidsman from "./resources/projects/leidsman.webp"
-import MariaBeautySalon from "./resources/projects/mariabeautysalon.webp"
-import Classifier from "./resources/projects/classifier.webp"
-import BayVineMedia from "./resources/projects/bayvine.webp"
-import Oracui from "./resources/projects/oracui.webp"
-import OldPortfolio from "./resources/projects/portfolio.webp"
+import Leidsman from "./resources/projects/leidsman.png"
+import MariaBeautySalon from "./resources/projects/mariabeautysalon.png"
+import Classifier from "./resources/projects/classifier.png"
+import BayVineMedia from "./resources/projects/bayvine.png"
+import Oracui from "./resources/projects/oracui.png"
+import OldPortfolio from "./resources/projects/portfolio.png"
+import MaxRevive from "./resources/projects/maxrevive.png"
+import SoboltComponents from "./resources/projects/SoboltComponentLibrary.png"
+import HKLiving from "./resources/projects/HKLiving.png"
 
 // pictures...
 import bb1 from "./resources/projects/burger-builder/1.webp"
@@ -88,7 +91,7 @@ const projects = [
 		shortDescription:
 			"Natours is a full-stack web-application website that lets users check out and book the most exciting tours ever! Features include examples like CRUD operations for admins, payments using stripe, file upload handling and authorization",
 		previewImage: Natours,
-		livePreview: null,
+		livePreview: "http://147.182.169.131:3000/",
 		gitHub: "https://github.com/Brainilio/natours",
 		tags: [
 			"React",
@@ -117,28 +120,68 @@ const projects = [
 		slug: "natours",
 	},
 	{
-		name: "Oracui's MVP",
+		name: "HK Living",
 		shortDescription:
-			"Oracui is a global mentorship platform that connects senior students with enrolling students in order to provide mentorship and build relationship. I've been mainly responsible for bringing the product's REST API to MVP ready conditions by improving documentation and adding over 20+ new business features.",
-		previewImage: Oracui,
-		livePreview: "https://oracui.com/",
+			"During my employment at DPDK, I've had the opportunity to contribute to HKLiving's rebrand and new look! This included a revamped webshop for all of their unique furniture. I worked on ensuring responsiveness, and green lighthouse scores, translated designs into code, and attended review sessions to optimize our application.",
+		previewImage: HKLiving,
+		livePreview: "https://hkliving.com/",
 		gitHub: null,
-		tags: ["REACTJS", "REDUX", "EXPRESSJS", "MONGODB", "NODEJS", "GOOGLE API"],
+		tags: ["REACTJS", "SASS", "NEXTJS", "PRISMIC"],
 		category: "Development",
-		description:
-			"Oracui is a global mentorship platform that connects senior students with enrolling students in order to provide mentorship and build relationship. I've been mainly responsible for bringing the product's REST API to MVP ready conditions by improving documentation and adding over 20+ new business features. I've also connected 80% of all available endpoints to the front-end's redux store. I worked on Oracui together with Joao Lucas Nina Matos, who is the responsible CTO. Together with Joao, we ensured that this product was viable enough to be used by 30+ users.",
-		process:
-			"At first when I joined Oracui, the back-end was pretty messy and everyone was aware of this. However, I quickly rolled up my sleeves and started to refactor and export reusable functions to utility files. After cleaning up the back-end, I made a list of all necessary business features to have a bird's view over everything, so that I do not end up in a mess when eventually developing it. After thinking about best engineering approaches; I applied the MVC pattern in order to separate the application into three main logical components. As I developed the back-end, I made sure to document each endpoint in Postman. When finishing most endpoints, I decided to pick up the responsibility to connect 80% of these endpoints to the front-end using Reactjs and Redux.",
-		challenges:
-			"A big challenge was integrating Google's Calendar API, as it required a service account and a lot of additional programming. The reason behind using this API, was to ensure that users could schedule their meetings on our platform and not have to rely on redundant email exchanges in order to plan and schedule a meeting.",
-		differently:
-			"Next time, I would try and be more involved with the front-end architecture and development as well, so communication between the two ends can go smoothly.",
-		takeaway:
-			"My takeaway is that developing Oracui in its early stages was a big, but necessary challenge. Not only did it allow me to grow as a developer, but it also taught me how to work on a single codebase together with another developer. Something that definitely brought me a lot of joy was having this product actually being used by 35 students at Melbourne University.",
+		description: "",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
 		additionalLinks: [],
-		dateCreated: "MARCH, 2021",
-		fullImages: [or, or1, or3, or5, or6],
-		slug: "oracui",
+		dateCreated: "FEB, 2022",
+		fullImages: [],
+		slug: "hkliving",
+	},
+	{
+		name: "Max Revive Campaign Site",
+		shortDescription:
+			"In a collaborative setting, I've worked on bringing life to Max Revive's campaign site. Max Revive is a crypto platform that allows you to stake your rugged tokens and recover your investments. My work consisted of setting up the architecture, translating 65% of the design into code, and I was also in charge of the animations and deployment. ",
+		previewImage: MaxRevive,
+		livePreview: "https://maxrevive.io/",
+		gitHub: null,
+		tags: ["REACTJS", "FRAMER", "SASS", "NETLIFY", "GOOGLE ANALYTICS"],
+		category: "Development",
+		description: "",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
+		additionalLinks: [],
+		dateCreated: "JAN, 2022",
+		fullImages: [],
+		slug: "maxrevive",
+	},
+	{
+		name: "Sobolt Component Library",
+		shortDescription:
+			"I've had the privilege to intern at Sobolt. During this time, I was in charge of developing Sobolt's component library, which could be consumed within their projects. I used Stencil, TypeScript and Sass to code it out, Storybook to document these components, and deployed it on npm, so it can be accessed by developers.",
+		previewImage: SoboltComponents,
+		livePreview: "https://sobolt-components.web.app/",
+		gitHub: null,
+		tags: [
+			"REACTJS",
+			"STORYBOOK",
+			"SASS",
+			"GOOGLE FIREBASE",
+			"NPM",
+			"TYPESCRIPT",
+		],
+		category: "Development",
+		description: "",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
+		additionalLinks: [],
+		dateCreated: "JULY, 2021",
+		fullImages: [],
+		slug: "sobolt-components",
 	},
 	{
 		name: "Bay Vine Media",
@@ -220,7 +263,30 @@ const projects = [
 		fullImages: [s1, s2, s3, s4, s5, s6, s7, s8],
 		slug: "salvame",
 	},
-
+	{
+		name: "Oracui's MVP",
+		shortDescription:
+			"Oracui is a global mentorship platform that connects senior students with enrolling students in order to provide mentorship and build relationship. I've been mainly responsible for bringing the product's REST API to MVP ready conditions by improving documentation and adding over 20+ new business features.",
+		previewImage: Oracui,
+		livePreview: null,
+		gitHub: null,
+		tags: ["REACTJS", "REDUX", "EXPRESSJS", "MONGODB", "NODEJS", "GOOGLE API"],
+		category: "Development",
+		description:
+			"Oracui is a global mentorship platform that connects senior students with enrolling students in order to provide mentorship and build relationship. I've been mainly responsible for bringing the product's REST API to MVP ready conditions by improving documentation and adding over 20+ new business features. I've also connected 80% of all available endpoints to the front-end's redux store. I worked on Oracui together with Joao Lucas Nina Matos, who is the responsible CTO. Together with Joao, we ensured that this product was viable enough to be used by 30+ users.",
+		process:
+			"At first when I joined Oracui, the back-end was pretty messy and everyone was aware of this. However, I quickly rolled up my sleeves and started to refactor and export reusable functions to utility files. After cleaning up the back-end, I made a list of all necessary business features to have a bird's view over everything, so that I do not end up in a mess when eventually developing it. After thinking about best engineering approaches; I applied the MVC pattern in order to separate the application into three main logical components. As I developed the back-end, I made sure to document each endpoint in Postman. When finishing most endpoints, I decided to pick up the responsibility to connect 80% of these endpoints to the front-end using Reactjs and Redux.",
+		challenges:
+			"A big challenge was integrating Google's Calendar API, as it required a service account and a lot of additional programming. The reason behind using this API, was to ensure that users could schedule their meetings on our platform and not have to rely on redundant email exchanges in order to plan and schedule a meeting.",
+		differently:
+			"Next time, I would try and be more involved with the front-end architecture and development as well, so communication between the two ends can go smoothly.",
+		takeaway:
+			"My takeaway is that developing Oracui in its early stages was a big, but necessary challenge. Not only did it allow me to grow as a developer, but it also taught me how to work on a single codebase together with another developer. Something that definitely brought me a lot of joy was having this product actually being used by 35 students at Melbourne University.",
+		additionalLinks: [],
+		dateCreated: "MARCH, 2021",
+		fullImages: [or, or1, or3, or5, or6],
+		slug: "oracui",
+	},
 	{
 		name: "My Old Portfolio",
 		shortDescription:

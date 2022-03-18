@@ -10,10 +10,9 @@ nav {
 	align-items: center;
 	position: fixed;
 	justify-content: space-between;
-	background-color: rgba(17, 17, 17, 0.404);
-	padding-left: 2em;
 
 	.logo {
+		margin: 0 2em;
 		span {
 			cursor: pointer;
 			font-size: 25px;
@@ -36,8 +35,6 @@ nav {
 	}
 
 	.nav-items {
-		padding-right: 2em;
-
 		@include screenxs {
 			display: none;
 		}
@@ -78,7 +75,7 @@ nav {
 	}
 
 	.hamburger-menu {
-		padding-right: 3em;
+		margin: 0 2em;
 		width: 30px;
 		height: 30px;
 		display: none;

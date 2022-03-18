@@ -51,17 +51,7 @@ const NavBar = (props) => {
 							<span>About</span>
 						</Link>
 					</li>
-					<li>
-						<Link
-							activeClass="link-active"
-							to="my-skills"
-							smooth={true}
-							offset={50}
-							duration={600}
-						>
-							<span>Skills</span>
-						</Link>
-					</li>
+					
 					<li>
 						<Link
 							activeClass="link-active"

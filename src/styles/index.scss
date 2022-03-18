@@ -1,61 +1,215 @@
 @import "./responsive/breakpoints.scss";
 
-html {
-	scroll-behavior: smooth;
+:root {
+	--vertical-spacing-paragraphs: 100px;
+	--vertical-spacing-blocks: 20px;
+	--horizontal-spacing-blocks: 130px;
+
+	--primary-color: #c270f5;
+	--secondary-color: #fd560b;
+	--tertiary-color: #ffffff;
+	--background-color: #000000;
+
+	--width-small-button: 120px;
+	--height-small-button: 30px;
+
+	--width-big-button: 150px;
+	--height-big-button: 45px;
+
+	--button-border-radius: 50px;
+	--card-border-radius: 20px;
+
+	--padding-left-page-xxl: 300px;
+	--padding-right-page-xxl: 300px;
+
+	--padding-left-page-bg: 100px;
+	--padding-right-page-bg: 100px;
+
+	--padding-left-page-m: 20px;
+	--padding-right-page-m: 20px;
+
+	--padding-left-page-sm: 45px;
+	--padding-right-page-sm: 45px;
+
+	--padding-left-page-tb: 25px;
+	--padding-right-page-tb: 25px;
+
+	--padding-left-page-mb: 10px;
+	--padding-right-page-mb: 10px;
+
+	--page-max-width-xxl: 1440px;
+	--page-max-width-bg: 1200px;
+	--page-max-width-m: 768px;
+	--page-max-width-sm: 480px;
+	--page-max-width-tb: 375px;
+	--page-max-width-mb: 320px;
+
+	--body: 16px;
+	--comment: 12px;
+	--subtitle: 20px;
+	--title: 25px;
+	--landing-header: 75px;
+	--purple-gradient: linear-gradient(
+		142deg,
+		hsl(234, 82%, 57%) 0%,
+		#ad5ee2 100%
+	);
 }
 
-.spinning-text {
-	opacity: 0.5;
-	position: absolute;
-	left: 60%;
-	top: 50%;
-	padding: 5em;
-	height: 540px;
-	transform-origin: center center;
-	animation: spin 8s infinite linear;
+@mixin primaryBigButton {
+	font-size: var(--subtitle);
+	width: var(--width-big-button);
+	height: var(--height-big-button);
+	border-radius: var(--button-border-radius);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-weight: 900;
+	background: linear-gradient(
+		142deg,
+		var(--primary-color) 0%,
+		var(--secondary-color) 100%
+	);
+	cursor: pointer;
+	transition: all 0.1s linear;
 
-	@include screenm {
+	&:hover {
+		transform: translateY(-2px);
+	}
+}
+
+@mixin secondaryBigButton {
+	font-size: var(--subtitle);
+	width: var(--width-big-button);
+	height: var(--height-big-button);
+	border-radius: var(--button-border-radius);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-weight: 900;
+	background: none;
+	border: 2px solid white;
+	cursor: pointer;
+	transition: all 0.1s linear;
+
+	&:hover {
+		transform: translateY(-2px);
+	}
+}
+
+@mixin primarySmallButton {
+	font-size: var(--body);
+	width: var(--width-small-button);
+	height: var(--height-small-button);
+	border-radius: var(--button-border-radius);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-weight: 900;
+	background: linear-gradient(
+		142deg,
+		var(--primary-color) 0%,
+		var(--secondary-color) 100%
+	);
+	cursor: pointer;
+	transition: all 0.1s linear;
+
+	&:hover {
+		transform: translateY(-2px);
+	}
+}
+
+@mixin secondarySmallButton {
+	font-size: var(--body);
+	width: var(--width-small-button);
+	height: var(--height-small-button);
+	border-radius: var(--button-border-radius);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-weight: 900;
+	background: none;
+	border: 2px solid white;
+	cursor: pointer;
+	transition: all 0.1s linear;
+
+	&:hover {
+		transform: translateY(-2px);
+	}
+}
+
+a {
+	display: block;
+	text-decoration: none;
+	color: white;
+	width: fit-content;
+}
+
+span,
+a,
+p,
+button {
+	margin: 0;
+	padding: 0;
+	font-weight: 500;
+	font-size: var(--body);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin: 0;
+	padding: 0;
+	font-weight: 800;
+}
+
+h1 {
+	font-weight: 900;
+	font-size: var(--landing-header);
+}
+
+h2 {
+	font-weight: 600;
+	font-size: var(--title);
+}
+
+h3 {
+	font-weight: 600;
+	font-size: var(--subtitle);
+}
+
+html {
+	scrollbar-width: 0;
+	scroll-behavior: smooth;
+	-ms-overflow-style: none; /* IE and Edge */
+	scrollbar-width: none; /* Firefox */
+
+	&::-webkit-scrollbar {
 		display: none;
 	}
-}
 
-@keyframes spin {
-	from {
-		transform: rotate(360deg);
-	}
-	to {
-		transform: rotate(0);
+	@include screenxxl {
+		//	scroll-snap-type: y proximity;
 	}
 }
 
-span {
-	display: inline-block;
+.main-container {
+	flex-basis: 50%;
+	max-height: 100vh;
+	// overflow-y: scroll;
 }
 
 body {
-	scroll-behavior: smooth;
-	overflow-x: hidden;
 	margin: 0;
 	padding: 0;
+	overflow-x: hidden;
 	color: #ffffffe0;
 	height: 100%;
 	max-width: 100vw;
 	background: rgb(10, 6, 10);
-	background: linear-gradient(
-		144deg,
-		rgb(31, 7, 21) 0%,
-		rgb(0, 0, 0) 27%,
-		rgb(26, 18, 24) 58%,
-		rgb(0, 0, 0) 100%
-	);
-
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-		Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-}
-
-a {
-	font-size: 15px;
-	text-decoration: none;
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
 		Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
@@ -63,28 +217,6 @@ a {
 svg {
 	color: white;
 	fill: white;
-}
-
-section {
-	position: relative;
-	min-height: 100vh;
-	max-width: 100vw;
-	overflow-x: hidden;
-}
-
-a {
-	color: white;
-
-	&:visited {
-		color: white;
-	}
-}
-
-.particles-background {
-	width: 100%;
-	height: 100%;
-	position: fixed;
-	z-index: -3;
 }
 
 .three-canvas {

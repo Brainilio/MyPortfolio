@@ -1,12 +1,11 @@
 import React from "react"
 import "./ContactHero.scss"
-import david from "../../resources/david.jpg"
 
 const ContactHero = () => {
 	return (
 		<div className="contact-hero">
-			<img src={david} alt="golden gate bridge" />
-			<h1>Let's work together!</h1>
+			<h2>Let's work together!</h2>
+			<h3>And make something beautiful. Together.</h3>
 		</div>
 	)
 }
