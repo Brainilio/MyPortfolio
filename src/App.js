@@ -1,33 +1,18 @@
-
-import React, { useState, useEffect, useRef, useMemo } from "react"
+import React, { useState, useEffect } from "react"
 import Rocketship from "./components/rocketship/rocketship"
 import { Switch, Route, useLocation } from "react-router-dom"
 import ReactGA from "react-ga"
 import ProjectPage from "./pages/projectpage/ProjectPage"
 import ProjectDetail from "./sections/projects/projectDetail"
 import Main from "./sections/main"
-import {
-	primitive,
-	Canvas,
-	extend,
-	useFrame,
-	useResource,
-	useThree,
-} from "@react-three/fiber"
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer"
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass"
-import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass"
+import { useFrame } from "@react-three/fiber"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
-import { Suspense } from "react"
-import { OrbitControls } from "@react-three/drei"
-import * as THREE from "three"
- 
 const ThreeModels = (props) => {
 	const [moon, setMoon] = useState(null)
 	const [space, setSpace] = useState(null)
 	const [earth, setEarth] = useState(null)
 	const [astro, setAstro] = useState(null)
-	const { camera } = useThree()
+
 	const [shouldTurn, setShouldTurn] = useState(false)
 
 	useEffect(() => {
