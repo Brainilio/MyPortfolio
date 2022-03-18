@@ -25,9 +25,10 @@ const staggerText = (nodes) => {
 const fadeIn = (nodes) => {
 	gsap.from(nodes, {
 		duration: 1.2,
-		opacity: 0,
 		delay: 0.5,
 		ease: "power3.inOut",
+		autoAlpha: 0,
+		opacity: 0,
 	})
 }
 

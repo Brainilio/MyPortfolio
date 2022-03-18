@@ -3,19 +3,21 @@ import "./about.scss"
 import profile from "../../resources/profile.webp"
 // import sanfran from "../../resources/san-fran.webp"
 // import rotterdam from "../../resources/rotterdam.webp"
-import LazyLoad from "react-lazyload"
+// import LazyLoad from "react-lazyload"
 import { Link } from "react-scroll"
 import Skill from "../../components/Skill/skill"
 import { ScrollTrigger } from "gsap/all"
 import gsap from "gsap"
 
 const slideFromLeft = (nodes) => {
-	gsap.from(nodes, {
+	gsap.from([nodes], {
 		scrollTrigger: {
 			trigger: ".about",
 		},
 		duration: 1.2,
 		autoAlpha: 0,
+		delay: 0.2,
+		opacity: 0,
 		x: -100,
 		ease: "power3.inOut",
 		stagger: {
@@ -83,15 +85,13 @@ const About = () => {
 				<Skill />
 			</div>
 			<div className="about-image" offset={100} ref={(el) => (line2 = el)}>
-				<LazyLoad>
-					<img
-						width="250"
-						height="300"
-						className="about-image-image"
-						alt="brainilio"
-						src={profile}
-					/>
-				</LazyLoad>
+				<img
+					width="250"
+					height="300"
+					className="about-image-image"
+					alt="brainilio"
+					src={profile}
+				/>
 			</div>
 		</div>
 	)

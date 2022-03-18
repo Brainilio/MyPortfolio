@@ -14,6 +14,7 @@ const staggerText = (node1, node2, node4) => {
 			trigger: ".project-cards",
 		},
 		autoAlpha: 0,
+
 		duration: 1.2,
 		opacity: 0,
 		y: 100,

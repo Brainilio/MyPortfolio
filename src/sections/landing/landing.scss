@@ -36,6 +36,7 @@
 		-ms-user-select: none; /* Internet Explorer/Edge */
 
 		span {
+			visibility: hidden;
 			font-size: inherit;
 			font-weight: inherit;
 		}
@@ -51,6 +52,7 @@
 		align-items: center;
 
 		.landing-title-text-title {
+			visibility: hidden;
 			margin-top: var(--vertical-spacing-blocks) / 2;
 
 			@include screenm {
@@ -60,6 +62,7 @@
 	}
 
 	.landing-title-cta-buttons {
+		visibility: hidden;
 		opacity: 1;
 		display: grid;
 		margin-top: calc(var(--vertical-spacing-blocks) * 2);
