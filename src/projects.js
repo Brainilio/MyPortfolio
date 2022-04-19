@@ -14,6 +14,7 @@ import OldPortfolio from "./resources/projects/portfolio.png"
 import MaxRevive from "./resources/projects/maxrevive.png"
 import SoboltComponents from "./resources/projects/SoboltComponentLibrary.png"
 import HKLiving from "./resources/projects/HKLiving.png"
+import trendtrade from "./resources/projects/trendtrade.png"
 
 // pictures...
 import bb1 from "./resources/projects/burger-builder/1.webp"
@@ -156,6 +157,25 @@ const projects = [
 		dateCreated: "JAN, 2022",
 		fullImages: [],
 		slug: "maxrevive",
+	},
+	{
+		name: "Trend Trade App",
+		shortDescription:
+			"In collaboration with 2 agencies and the client, I worked on delivering an MVP iOS application.Trend Trade allows you to lend and rent out fashion apparel for a fraction of the original price. The application includes authentication, notifications, payments, a fresh and custom built UI, user onboarding, etc. This application was built using Apollo, React, GraphQL, Expo, and Stripe.",
+		previewImage: trendtrade,
+		livePreview: null,
+		gitHub: null,
+		tags: ["REACTJS", "FRAMER", "SASS", "NETLIFY", "GOOGLE ANALYTICS"],
+		category: "Development",
+		description: "",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
+		additionalLinks: [],
+		dateCreated: "FEB, 2022",
+		fullImages: [],
+		slug: "trendtrade",
 	},
 	{
 		name: "Sobolt Component Library",
