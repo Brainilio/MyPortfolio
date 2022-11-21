@@ -24,7 +24,7 @@
 		"react-particles-js": "^3.3.0",
 		"react-router": "^5.2.0",
 		"react-router-dom": "^5.2.0",
-		"react-scripts": "^3.4.4",
+		"react-scripts": "^5.0.1",
 		"react-scroll": "^1.8.1",
 		"react-svg": "^11.0.40",
 		"react-three-fiber": "^5.3.18",
