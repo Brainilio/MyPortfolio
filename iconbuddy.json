@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "provider": "Iconbuddy",
+  "collection": "tabler",
+  "author": "Pawe\u0142 Kuna",
+  "license": "MIT",
+  "style": {
+    "color": "currentColor",
+    "defaultSize": 16
+  },
+  "icons": {
+    "github": {
+      "source": "https://files.svgcdn.io/tabler/brand-github.svg",
+      "path": "public/icons/iconbuddy/github.svg"
+    },
+    "mail": {
+      "source": "https://files.svgcdn.io/tabler/mail.svg",
+      "path": "public/icons/iconbuddy/mail.svg"
+    },
+    "arrow-up-right": {
+      "source": "https://files.svgcdn.io/tabler/arrow-up-right.svg",
+      "path": "public/icons/iconbuddy/arrow-up-right.svg"
+    }
+  }
+}

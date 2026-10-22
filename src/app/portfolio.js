@@ -1,33 +1,23 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import Icon from './iconbuddy-icon';
+import dynamic from 'next/dynamic';
+const HelmetPreview = dynamic(() => import('./helmet-preview'), { ssr: false });
 import { motion, useScroll, useTransform, useReducedMotion } from 'motion/react';
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
 
 const ease = [0.22, 1, 0.36, 1];
-function Arrow({ diagonal = false }) { return <span aria-hidden="true">{diagonal ? '↗' : '↓'}</span>; }
-function SocialIcon({ type }) {
-  const paths = {
-    github: <path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.86c-2.78.6-3.37-1.18-3.37-1.18-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02A9.6 9.6 0 0 1 12 6.82c.85 0 1.71.11 2.51.34 1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.76c0 .27.18.58.69.48A10 10 0 0 0 12 2Z" />,
-    mail: <><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" strokeWidth="1.7"/><path d="m3 6 9 7 9-7" fill="none" stroke="currentColor" strokeWidth="1.7"/></>,
-  };
-  return <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">{paths[type]}</svg>;
-}
-function LocalTime() {
-  const [time, setTime] = useState('');
-  useEffect(() => {
-    const update = () => setTime(new Intl.DateTimeFormat('en-US', { timeZone: 'America/Denver', hour: '2-digit', minute: '2-digit', hour12: true }).format(new Date()));
-    update(); const interval = setInterval(update, 1000 * 30); return () => clearInterval(interval);
-  }, []);
-  return <span className="local-time">{time || 'MOUNTAIN TIME'} <span className="time-dot" /></span>;
-}
+function Arrow() { return <span aria-hidden="true"><Icon name="arrow-up-right"/></span>; }
+function SocialIcon({ type }) { return <Icon name={type}/>; }
 function Reveal({ children, className = '', delay = 0 }) {
   const reduced = useReducedMotion();
   return <motion.div className={className} initial={reduced ? false : { opacity: 0, y: 32 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.9, delay, ease }}>{children}</motion.div>;
 }
 export default function Portfolio({ projects }) {
   const hero = useRef(null);
+  const [helmetVersion, setHelmetVersion] = useState(2);
   const reduced = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: hero, offset: ['start start', 'end start'] });
   const nameY = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
@@ -64,17 +54,20 @@ export default function Portfolio({ projects }) {
         </motion.div>
         <motion.aside className="right-info" style={reduced ? {} : { y: sideY }} {...intro(0.95)}>
           <p>I enjoy exploring ideas,<br className="desktop-break"/> building products, and<br className="desktop-break"/> finding ways technology<br className="desktop-break"/> can make a positive impact.</p>
-          <span className="short-rule"/>
-          <div className="location">COLORADO SPRINGS, CO<LocalTime/></div>
         </motion.aside>
-        <motion.a className="scroll-cue" href="#about" {...intro(1.2)}><span>SCROLL TO EXPLORE</span><Arrow/></motion.a>
         <motion.span className="hero-caption" {...intro(1.2)}>A LITTLE CURIOUS. ALWAYS BUILDING.</motion.span>
       </main>
     </section>
     <section id="about" className="about dark-section">
+      <div className="about-helmet" aria-hidden="true"><HelmetPreview scrollDriven decorative followPointer={helmetVersion === 2}/></div>
       <div className="section-label"><span>01 <i/></span><span>ABOUT ME</span></div>
+      <div className="helmet-versions" role="group" aria-label="Helmet animation version">
+        <button type="button" aria-pressed={helmetVersion === 1} onClick={() => setHelmetVersion(1)}>V1 · Scroll spin</button>
+        <button type="button" aria-pressed={helmetVersion === 2} onClick={() => setHelmetVersion(2)}>V2 · Follow movement</button>
+      </div>
       <Reveal className="about-statement"><h2>I’m a software developer who <span>builds digital products, explores new ideas,</span> and tries to leave the world a little better than I found it.</h2></Reveal>
       <Reveal className="about-detail"><p>I care about clean interfaces, thoughtful architecture, and meaningful experiences. I’m always learning, always building, and always curious about what’s next.</p><a href="mailto:brainilioir@gmail.com" className="pill light-pill">Get to know me <Arrow diagonal/></a></Reveal>
+      <small className="about-helmet-credit"><a href="https://sketchfab.com/3d-models/astronaut-helmet-315605194a474c7b95cd2a9083985d22" target="_blank" rel="noreferrer">Helmet by Medhatelo</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a></small>
     </section>
     <section id="projects" className="projects dark-section">
       <div className="section-label"><span>02 <i/></span><span>SELECTED WORK</span></div>
