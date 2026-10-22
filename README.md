@@ -1,72 +1,31 @@
-# brainilio.netflify.com
+# Brainilio Portfolio
 
----
+Modern Next.js App Router portfolio with a layered portrait hero, staggered intro, scroll parallax, Lenis smooth scrolling, and reduced-motion support.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Run locally
 
-## Available Scripts
+Use Node.js 24 (`nvm use`), then:
 
-In the project directory, you can run:
+```sh
+npm install
+npm run dev
+```
 
-### `npm start`
+`npm run build` creates the static website in `out/`. Netlify is configured to build and serve that directory. Preview the export with any static server, for example `python3 -m http.server 3000 --directory out`.
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Content and assets
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+- `src/app/portfolio.js`: home page, motion, social links, and Mountain Time clock.
+- `src/app/globals.css`: responsive styling and reduced-motion treatment.
+- `src/lib/projects.js`: preserved project archive and case-study content.
+- `public/legacy/projects/`: preserved project imagery.
+- `public/images/portrait-cutout.png`: transparent portrait derived from the supplied photo using built-in imagegen. Prompt: “Remove only the entire background to genuine transparency. Preserve the exact man's identity, face, glasses, hair, expression, skin, black shirt, pose and framing. Clean natural hair edges. No retouching, changed features or added elements.”
+- `public/images/portrait-original.png`: original supplied photo.
 
-### `npm test`
+The original 2022 React application source, including pre-existing local edits, is preserved in `legacy/src-2022/` for reference; it is not bundled by Next.js. Obsolete CRA, node-sass, React Router, Three.js, and unused dependencies have been removed from the active package manifest.
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+The homepage uses the existing GitHub address and contact email. Colorado Springs and the Mountain Time clock follow the supplied design. Update these if needed before publication. Existing historical project content is preserved as supplied.
 
-### `npm run build`
+Hero scenery: `public/images/mountain-trees.webp`, generated with built-in imagegen. Prompt: Photorealistic Colorado foothills with blue-gray Rocky Mountain ridgelines, evergreen pines and sunlit golden-green trees along the lower edge; warm near-white sky for typography; muted natural colors, clear landscape texture, no people, buildings or text.
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+Active checkout: `/Users/brainiliorodrigues/Desktop/MyPortfolio2022`. Original 2022 application source is preserved in `legacy/src-2022/`.

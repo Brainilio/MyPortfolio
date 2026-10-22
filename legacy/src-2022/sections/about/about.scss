@@ -1,0 +1,147 @@
+@import "../../styles/responsive/breakpoints.scss";
+@import "../../styles/index.scss";
+
+.about-block {
+	padding-top: 3em;
+	width: 100%;
+	min-height: 100vh;
+
+	display: flex;
+	justify-content: space-between;
+	// align-items: center;
+	margin: 0 auto;
+
+	@include screenxs {
+		max-width: 320px;
+		padding-left: 10px;
+		padding-right: 10px;
+	}
+
+	@include screens {
+		max-width: 375px;
+		padding-left: 10px;
+		padding-right: 10px;
+	}
+
+	@include screenm {
+		// 	scroll-snap-align: start;
+
+		max-width: 768px;
+		padding-left: 20px;
+		padding-right: 20px;
+	}
+
+	@include screenl {
+		max-width: 1024px;
+	}
+
+	@include screenxl {
+		max-width: 1200px;
+		padding-left: 50px;
+		padding-right: 50px;
+	}
+
+	@include screenxxl {
+		max-width: 1440px;
+	}
+
+	@include screenxs {
+		flex-direction: column-reverse;
+		justify-content: center;
+		align-items: center;
+	}
+
+	@include screenxl {
+		align-items: unset;
+		flex-direction: row;
+		justify-content: center;
+	}
+
+	.about-text {
+		@include screenxs {
+			margin-top: var(--vertical-spacing-blocks);
+			width: 100%;
+		}
+
+		@include screenl {
+			text-align: center;
+		}
+
+		@include screenxl {
+			width: unset;
+			text-align: start;
+		}
+
+		.short-bio {
+			margin-top: var(--vertical-spacing-blocks);
+			display: flex;
+			justify-content: flex-start;
+			align-items: flex-start;
+			flex-direction: column;
+
+			@include screenl {
+				justify-content: center;
+				align-items: center;
+			}
+
+			@include screenxl {
+				margin-top: var(--vertical-spacing-blocks);
+				display: flex;
+				justify-content: flex-start;
+				align-items: flex-start;
+				flex-direction: column;
+			}
+
+			p {
+				width: 500px;
+				@include screenxs {
+					width: 100%;
+				}
+
+				@include screenl {
+					width: 500px;
+					margin-top: calc(var(--vertical-spacing-paragraphs) / 10);
+				}
+			}
+
+			div {
+				margin-top: var(--vertical-spacing-blocks);
+				display: grid;
+				align-items: center;
+				grid-template-columns: 1fr 1fr;
+				grid-gap: var(--vertical-spacing-blocks);
+
+				.button-lets-chat {
+					@include primarySmallButton;
+				}
+
+				.button-resume-chat {
+					@include secondarySmallButton;
+				}
+			}
+		}
+	}
+
+	.about-image {
+		padding-top: 8rem;
+
+		img {
+			border-radius: 50%;
+			object-fit: cover;
+			transform: rotate(90deg);
+
+			@include screenxs {
+				width: 200px;
+				height: 200px;
+			}
+
+			@include screenl {
+				height: 320px;
+				width: 320px;
+			}
+
+			@include screenxl {
+			}
+		}
+	}
+}
