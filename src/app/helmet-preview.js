@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 
@@ -17,7 +18,7 @@ export default function HelmetPreview({
     follow.current = followPointer;
   }, [followPointer]);
   const [spinning, setSpinning] = useState(true);
-  const [status, setStatus] = useState("Loading your helmet…");
+  const [status, setStatus] = useState("Loading astronaut…");
   useEffect(() => {
     const mount = host.current;
     let disposed = false;
@@ -39,7 +40,7 @@ export default function HelmetPreview({
     else
       renderer.domElement.setAttribute(
         "aria-label",
-        "Spinning astronaut helmet. Drag to rotate.",
+        "Spinning astronaut. Drag to rotate.",
       );
     mount.appendChild(renderer.domElement);
     const scene = new THREE.Scene();
@@ -81,8 +82,8 @@ export default function HelmetPreview({
           material.dispose();
         });
       });
-    new GLTFLoader().load(
-      "/astronaut_helmet/scene.gltf",
+    new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).load(
+      "/models/astronaut.glb",
       (gltf) => {
         if (disposed) {
           disposeModel(gltf.scene);
@@ -102,7 +103,7 @@ export default function HelmetPreview({
       () => {
         if (!disposed)
           setStatus(
-            "The helmet could not load. Switch back to your portrait and try again.",
+            "The astronaut could not load. Try refreshing the page.",
           );
       },
     );
@@ -242,19 +243,19 @@ export default function HelmetPreview({
           </button>
           <small className="helmet-credit">
             <a
-              href="https://sketchfab.com/3d-models/astronaut-helmet-315605194a474c7b95cd2a9083985d22"
+              href="https://modelviewer.dev/examples/stagingandcameras/"
               target="_blank"
               rel="noreferrer"
             >
-              Helmet by Medhatelo
+              Astronaut by Poly
             </a>{" "}
             ·{" "}
             <a
-              href="https://creativecommons.org/licenses/by/4.0/"
+              href="https://creativecommons.org/licenses/by/2.0/"
               target="_blank"
               rel="noreferrer"
             >
-              CC BY 4.0
+              CC BY 2.0
             </a>
           </small>
         </div>

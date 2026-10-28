@@ -7,3 +7,11 @@ out/
 .DS_Store
 *.tsbuildinfo
 build/
+
+# Local asset preparation and downloaded source packs
+work/
+
+# Isolated production verification while the dev server is running
+.next-verify/
+
+.story-check/

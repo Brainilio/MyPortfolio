@@ -1,0 +1,39 @@
+{
+  "rocket": {
+    "bytes": 12540,
+    "triangles": 572,
+    "primitives": 5,
+    "textures": []
+  },
+  "astronaut": {
+    "bytes": 86152,
+    "triangles": 1604,
+    "primitives": 1,
+    "textures": [
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "mime": "image/webp"
+      }
+    ]
+  },
+  "astronautRigged": {
+    "bytes": 423864,
+    "triangles": 10558,
+    "primitives": 13,
+    "bones": [
+      62,
+      62,
+      62,
+      62
+    ],
+    "animations": [
+      "CharacterArmature|Idle",
+      "CharacterArmature|Idle_Neutral",
+      "CharacterArmature|Wave"
+    ],
+    "textures": []
+  }
+}
