@@ -21,7 +21,8 @@ export function createRocketBoosters() {
   smoke.instanceMatrix.setUsage(THREE.DynamicDrawUsage);group.add(smoke);
   const puff=new THREE.Object3D();
   return {group,update(time,reduced){
-    const pulse=reduced?1:1+Math.sin(time*12)*.12;
+    // A gentle flicker; a strong pulse reads as flashing once bloom is on.
+    const pulse=reduced?1:1+Math.sin(time*12)*.04;
     outer.scale.set(.16,.46*pulse,.16);core.scale.set(.085,.24*pulse,.085);
     smoke.visible=!reduced;
     if(reduced)return;

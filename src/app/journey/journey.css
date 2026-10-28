@@ -1,0 +1,77 @@
+.journey{color:#f0eff8;position:relative}
+body:has(.journey){background:#04050d}
+.journey-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;background:#9cc4ea}
+.journey-canvas canvas{display:block;width:100%;height:100%}
+.journey-flash{position:fixed;inset:0;z-index:3;background:#fff;opacity:0;pointer-events:none}
+
+/* Chrome: wordmark, availability, altimeter. Quiet, so the type and the scene carry the page. */
+.journey-top{position:fixed;top:0;left:0;right:0;z-index:4;mix-blend-mode:difference;display:flex;justify-content:space-between;align-items:center;padding:24px var(--gutter);pointer-events:none}
+.journey-top>*{pointer-events:auto}
+.journey-wordmark{font-weight:750;font-size:20px;letter-spacing:-1px}.journey-wordmark span{color:var(--accent)}
+.journey-available{display:inline-flex;align-items:center;gap:9px;font-size:12px;letter-spacing:.02em}
+.journey-available i{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 10px #4ade80}
+.journey-altimeter{position:fixed;left:18px;top:50%;transform:translateY(-50%);z-index:4;display:flex;flex-direction:column;gap:14px;font-size:10px;letter-spacing:.06em}
+.journey-altimeter a{display:flex;flex-direction:column;opacity:.4;border-left:1px solid rgba(255,255,255,.25);padding-left:10px;transition:opacity .4s,border-color .4s}
+.journey-altimeter a[aria-current]{opacity:1;border-color:var(--accent)}
+.journey-altimeter b{font-weight:500;font-size:11px}
+.journey-altimeter a:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.journey-debug{position:fixed;right:16px;bottom:16px;z-index:5;font:12px ui-monospace,monospace;background:rgba(0,0,0,.7);padding:6px 10px;border-radius:6px}
+
+.journey-chapters{position:relative;z-index:2;pointer-events:none}
+.journey-chapter{position:relative;padding:0 var(--content-gutter) 0 max(var(--content-gutter),150px)}
+
+/* Editorial type: large, unboxed, readable over the scene with a soft shadow. */
+.type{position:sticky;top:0;height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:10svh;max-width:min(1100px,82vw);pointer-events:none;text-shadow:0 2px 40px rgba(2,3,10,.55)}
+.type>*{pointer-events:auto}
+.type .eyebrow{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#bfb6e8;margin-bottom:18px}
+.type h2,.type h3{font-size:clamp(52px,8vw,136px);font-weight:500;letter-spacing:-.05em;line-height:.92;margin:0}
+.type em,.journey-final em{font-style:normal;color:var(--accent)}
+.type p{max-width:420px;margin:22px 0 0;font-size:17px;line-height:1.55;color:#cfcde0}
+.type .type-list{max-width:none;font-size:clamp(18px,1.8vw,26px);letter-spacing:-.02em;color:#e7e4f5}
+.type.intro{position:relative;height:auto;display:block;padding:58svh 0 0;color:#0b0b18;text-shadow:none;max-width:none}
+.type.intro .eyebrow{color:#3c2d84}
+.type.intro h1{font-size:clamp(84px,15vw,250px);font-weight:700;letter-spacing:-.055em;line-height:.85;margin:0}
+.journey-scroll{display:inline-block;margin-top:28px;font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+
+/* Projects: one giant title per beat, alternating sides. */
+.type.project{position:absolute;height:auto;display:block;padding:0;left:max(var(--content-gutter),150px);pointer-events:auto}
+.type.project.right{left:auto;right:var(--content-gutter);text-align:right}
+.type.project h3{font-size:clamp(48px,7vw,120px);transition:color .4s}
+.type.project h3 span{font-size:.45em;vertical-align:.6em;color:var(--accent)}
+.type.project:hover h3{color:#d9ccff}
+.type-tags{display:block;margin-top:14px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#a9a5c4}
+.type.project:focus-visible{outline:2px solid var(--accent);outline-offset:10px}
+
+/* Contact: big heading, underline fields, a text-link send. */
+.type.contact form{display:flex;flex-direction:column;gap:18px;max-width:760px}
+.type.contact .fields{display:flex;gap:28px;margin-top:22px}
+.type.contact input{flex:1;font:inherit;font-size:20px;color:inherit;background:none;border:none;border-bottom:1px solid rgba(255,255,255,.3);padding:10px 0;border-radius:0;text-shadow:none}
+.type.contact input::placeholder{color:#8f8aa8}
+.type.contact input:focus{outline:none;border-color:var(--accent)}
+.type.contact button{align-self:flex-start;font:inherit;font-size:clamp(22px,2.4vw,34px);letter-spacing:-.03em;background:none;border:none;color:#f0eff8;padding:6px 0;cursor:pointer;border-bottom:1px solid var(--accent)}
+.type.contact button span{display:inline-block;transition:transform .4s}.type.contact button:hover span{transform:translateX(8px)}
+.type.contact button:focus-visible{outline:2px solid var(--accent);outline-offset:6px}
+
+.journey-final{position:fixed;inset:auto 0 12svh;z-index:4;text-align:center;opacity:0;transition:opacity 1.2s;pointer-events:none}
+.journey-final[data-visible=true]{opacity:1;pointer-events:auto}
+.journey-final h2{font-size:clamp(48px,7vw,110px);font-weight:500;letter-spacing:-.05em;line-height:.95;margin:0 0 22px}
+.journey-final a{font-size:13px;letter-spacing:.14em;text-transform:uppercase;border-bottom:1px solid currentColor;padding-bottom:4px}
+
+/* About: a frameless glowing cutout of the photo beside the helmet; copy and photo fade in with the close-up. */
+.journey-hologram{--about:0;--daze:0;--photo:clamp(0,calc((var(--about) - .12) * 5),1);position:fixed;inset:0;z-index:2;pointer-events:none;opacity:var(--daze);transition:opacity .6s}
+.holo-photo{position:absolute;right:calc(var(--content-gutter) - 20px);top:12svh;width:min(30vw,380px);margin:0;opacity:var(--photo);transform:translateY(calc((1 - var(--photo)) * 14px));filter:drop-shadow(0 0 40px rgba(140,110,255,.35))}
+.holo-photo img{width:100%;height:auto;display:block;-webkit-mask-image:linear-gradient(#000 65%,transparent);mask-image:linear-gradient(#000 65%,transparent)}
+.about-panel{opacity:var(--daze,1);transition:opacity .6s}
+
+/* Moon pass: giant words drifting across the top of the frame as he glides beneath them. */
+.journey-rail{position:sticky;top:0;height:100svh;overflow:hidden;pointer-events:none}
+.journey-rail-track{position:absolute;top:10svh;white-space:nowrap;padding-left:100vw;font-size:clamp(90px,15vw,260px);font-weight:600;letter-spacing:-.05em;line-height:1;color:transparent;-webkit-text-stroke:1px rgba(240,239,248,.55);transform:translateX(calc(var(--rail,0) * -100%));will-change:transform}
+
+@media(max-width:700px){
+  .journey-altimeter{display:none}
+  .journey-chapter{padding:0 24px}
+  .type{max-width:none}
+  .type.project,.type.project.right{left:24px;right:24px;text-align:left}
+  .type.contact .fields{flex-direction:column;gap:12px}
+  .holo-photo{width:42vw;right:16px}
+}

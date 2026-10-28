@@ -35,3 +35,10 @@ The opening now uses a procedural Earth horizon (two 64 × 32 sphere meshes, oce
 - Changes: retained the 62-joint skeleton shared by four skinned suit parts and Idle, Idle_Neutral, Wave clips; removed unused clips; deduplicated, welded and pruned unused resources; Meshopt compression. No flattening or static joining of the skinned hierarchy.
 - Output: `astronaut-rigged.glb`, 423,864 bytes, 10,558 triangles, 13 primitives, no textures. Full statistics in model-stats.json. The rig is slightly over the preferred 60-bone target, with a small total geometry budget.
 - Evaluated with a custom skeletal float cycle and a source wave. This model is currently unused; the active story uses the original Poly astronaut.
+
+## NASA maps (journey prototype, `public/textures/`)
+NASA imagery is generally not subject to copyright in the United States; NASA asks for a "NASA" credit and no implied endorsement (per NASA's media usage guidelines). No claim of endorsement.
+- `moon-2k.jpg`: NASA Scientific Visualization Studio, CGI Moon Kit, LRO colour map `lroc_color_2k.jpg` (2048 × 1024), https://svs.gsfc.nasa.gov/4720. Unmodified.
+- `earth-day-4k.jpg`: NASA Visible Earth, Blue Marble: Next Generation, `world.topo.bathy.200412.3x5400x2700.jpg`, downloaded from https://eoimages.gsfc.nasa.gov/images/imagerecords/73000/73909/. Resized to 4096 × 2048, JPEG quality 70. 4096 px exceeds the 1024 px default because the orbital camera sits close to the surface; shader-side noise adds finer grain.
+- `earth-night-2k.jpg`: NASA Earth Observatory, Black Marble 2016, `BlackMarble_2016_01deg.jpg`, downloaded from https://eoimages.gsfc.nasa.gov/images/imagerecords/144000/144898/. Resized to 2048 × 1024, JPEG quality 80.
+Originals are kept in the ignored `work/nasa/` folder.

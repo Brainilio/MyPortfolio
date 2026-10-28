@@ -3,7 +3,7 @@ import * as THREE from 'three';
 // Stylized gravitational lensing and plasma, without ray marching or bloom passes.
 export function createBlackHole() {
   const group=new THREE.Group();
-  const uniforms={uTime:{value:0},uPull:{value:0}};
+  const uniforms={uTime:{value:0},uPull:{value:0},uOpacity:{value:1}};
   const material=new THREE.ShaderMaterial({
     uniforms,transparent:true,depthWrite:false,toneMapped:false,
     vertexShader:`varying vec2 vUv;
@@ -13,6 +13,7 @@ export function createBlackHole() {
       varying vec2 vUv;
       uniform float uTime;
       uniform float uPull;
+      uniform float uOpacity;
       float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
       float noise(vec2 p){
         vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);
@@ -26,12 +27,13 @@ export function createBlackHole() {
         // Differential rotation and turbulent bands in the thin accretion disk.
         vec2 diskP=vec2(p.x,p.y*7.5);
         float dr=length(diskP),da=atan(diskP.y,diskP.x);
-        float turbulence=noise(vec2(dr*35.-t*3.,sin(da)*6.+t));
-        float filaments=.55+.25*sin(dr*210.+da*4.-t*10.)+.2*turbulence;
+        // Soft turbulent streaks along the orbit rather than hard grooves.
+        float turbulence=noise(vec2(dr*22.-t*2.,sin(da)*5.+t))*.6+noise(vec2(dr*60.-t*4.,sin(da)*12.-t))*.4;
+        float filaments=.62+.12*sin(dr*90.+da*3.-t*6.)+.26*turbulence;
         float disk=smoothstep(.28,.37,dr)*(1.-smoothstep(.65,1.42,dr));
         disk*=filaments*(.65+.35*cos(da-.6));
         vec3 warm=mix(vec3(.55,.24,.13),vec3(1.,.84,.52),exp(-max(dr-.3,0.)*2.8));
-        vec3 color=warm*disk*1.6;
+        vec3 color=warm*disk*2.1;
         float alpha=disk;
         // The back of the disk appears bent above/below the event horizon.
         float bend=exp(-pow((r-.335)/.027,2.));
@@ -51,7 +53,7 @@ export function createBlackHole() {
         color+=vec3(.85,.44,.18)*equatorialGlow;
         alpha=max(alpha,equatorialGlow);
         alpha*=smoothstep(0.,.06,vUv.x)*smoothstep(0.,.06,1.-vUv.x)*smoothstep(0.,.08,vUv.y)*smoothstep(0.,.08,1.-vUv.y);
-        gl_FragColor=vec4(color,alpha);
+        gl_FragColor=vec4(color,alpha*uOpacity);
       }`,
   });
   const disk=new THREE.Mesh(new THREE.PlaneGeometry(24,16),material);
@@ -65,13 +67,13 @@ export function createBlackHole() {
   geometry.setAttribute('seed',new THREE.BufferAttribute(seeds,1));
   const particleMaterial=new THREE.ShaderMaterial({
     uniforms,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,toneMapped:false,
-    vertexShader:`attribute float seed;uniform float uTime;uniform float uPull;varying float fade;
+    vertexShader:`attribute float seed;uniform float uTime;uniform float uPull;uniform float uOpacity;varying float fade;
       void main(){
         float phase=fract(seed+uTime*(.035+uPull*.035));
         float radius=mix(10.5,2.55,phase*phase);
         float angle=seed*165.0+phase*phase*8.0+uTime*.1;
         vec3 p=vec3(cos(angle)*radius,sin(angle)*radius*.45,sin(seed*50.)*.8);
-        fade=sin(phase*3.14159)*(.3+uPull*.5)*smoothstep(2.6,3.1,length(p.xy));
+        fade=sin(phase*3.14159)*(.3+uPull*.5)*smoothstep(2.6,3.1,length(p.xy))*uOpacity;
         vec4 mv=modelViewMatrix*vec4(p,1.);
         gl_Position=projectionMatrix*mv;
         gl_PointSize=clamp(23./max(1.,-mv.z),1.,3.);
