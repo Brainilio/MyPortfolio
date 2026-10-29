@@ -7,6 +7,7 @@ import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { clone as cloneSkinned } from "three/addons/utils/SkeletonUtils.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { random, createBearMaterial, createFish, bakeProp } from "./island-parts";
+import { paintGeometry, createForestPine, createSnag, createTuft, createLupine, createDaisy, createSwayMaterial } from "./forest-parts";
 
 // Skills as a road trip through a national park: a loaded wagon idles on a winding road through deep forest under
 // granite walls, past hot springs to a geyser at the end. Park entrance signs along the road each name a skill group. Clicking the car
@@ -31,37 +32,6 @@ function createHalfDome(rng) {
   const face=new THREE.Mesh(new THREE.CircleGeometry(1,28,0,Math.PI).scale(1,1.15,1),new THREE.MeshStandardMaterial({color:"#9a948a",roughness:1,side:THREE.DoubleSide}));
   const group=new THREE.Group();group.add(dome,face);return group;
 }
-// A tall forest pine (height 1): a long bare trunk, then six drooping tiers of boughs narrowing to a spire.
-function paintGeometry(g,hex){const c=new THREE.Color(hex),n=g.attributes.position.count,a=new Float32Array(n*3);for(let i=0;i<n;i++)a.set([c.r,c.g,c.b],i*3);g.setAttribute("color",new THREE.BufferAttribute(a,3));return g;}
-function mergeFlat(parts){const merged=mergeGeometries(parts.map(g=>{const flat=g.index?g.toNonIndexed():g;flat.deleteAttribute("uv");flat.deleteAttribute("normal");return flat;}));merged.computeVertexNormals();return merged;}
-function createForestPine(rng) {
-  const parts=[paintGeometry(new THREE.CylinderGeometry(.012,.026,1,5).translate(0,.5,0),"#6e3f26")];
-  for(let k=0;k<6;k++){const f=k/6,radius=.2*(1-f*.8),height=.2-f*.05;
-    parts.push(paintGeometry(new THREE.ConeGeometry(radius*(.9+rng()*.2),height,7).rotateY(rng()*2).translate(0,.3+f*.6+height/2,0),k%2?"#3f6b2c":"#4f7d33"));}
-  return mergeFlat(parts);
-}
-function createSnag() {
-  const parts=[paintGeometry(new THREE.CylinderGeometry(.006,.022,1,5).translate(0,.5,0),"#7a4a30")];
-  for(let k=0;k<5;k++){const y=.35+k*.12,a=k*2.4;parts.push(paintGeometry(new THREE.CylinderGeometry(.003,.006,.12,4).rotateZ(Math.PI/2.3).rotateY(a).translate(Math.cos(a)*.05,y,-Math.sin(a)*.05),"#7a4a30"));}
-  return mergeFlat(parts);
-}
-// Undergrowth: a tuft of grass blades, a lupine spike and a daisy (normals point up so they light evenly).
-function upright(g){const n=g.attributes.position.count,a=new Float32Array(n*3);for(let i=0;i<n;i++)a.set([0,1,0],i*3);g.setAttribute("normal",new THREE.BufferAttribute(a,3));return g;}
-function createTuft(rng) {
-  const pos=[],col=[],base=new THREE.Color("#3e6a27"),tip=new THREE.Color("#a9c95a");
-  for(let k=0;k<6;k++){const a=rng()*Math.PI*2,h=.16+rng()*.2,lean=.06+rng()*.08,w=.03,x=Math.cos(a)*.06,z=Math.sin(a)*.06,c=Math.cos(a+1.57)*w,d=Math.sin(a+1.57)*w;
-    pos.push(x-c,0,z-d,x+c,0,z+d,x+Math.cos(a)*lean,h,z+Math.sin(a)*lean);col.push(base.r,base.g,base.b,base.r,base.g,base.b,tip.r,tip.g,tip.b);}
-  const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.Float32BufferAttribute(pos,3));g.setAttribute("color",new THREE.Float32BufferAttribute(col,3));return upright(g);
-}
-function createLupine() {
-  const stem=paintGeometry(new THREE.CylinderGeometry(.008,.01,.45,3).translate(0,.22,0),"#4b7a2e"),spike=paintGeometry(new THREE.ConeGeometry(.05,.24,5).translate(0,.55,0),"#8b6fd6");
-  return upright(mergeGeometries([stem,spike].map(g=>{g.deleteAttribute("uv");g.deleteAttribute("normal");return g.index?g.toNonIndexed():g;})));
-}
-function createDaisy() {
-  const stem=paintGeometry(new THREE.CylinderGeometry(.006,.008,.28,3).translate(0,.14,0),"#4b7a2e"),petals=paintGeometry(new THREE.CircleGeometry(.06,6).rotateX(-Math.PI/2).translate(0,.285,0),"#f6f3ea"),eye=paintGeometry(new THREE.CircleGeometry(.022,5).rotateX(-Math.PI/2).translate(0,.29,0),"#f2c13a");
-  return upright(mergeGeometries([stem,petals,eye].map(g=>{g.deleteAttribute("uv");g.deleteAttribute("normal");return g.index?g.toNonIndexed():g;})));
-}
-
 // A national-park entrance sign: a dark-stained plank board with a routed cream border and lettering, held up by two
 // log posts set in a stone footing. Lettering is Bitter (Google Fonts, OFL), a sturdy slab close to park signage.
 // Every line is measured and shrunk to fit inside the border, and a long tool list wraps onto two lines.
@@ -132,7 +102,7 @@ export default function RoadTripScene({ state, skills, onCar }) {
     // On screen while the director has the Skills section (2) live.
     const onScreen=()=>state.current.live.includes(2);
     const scene=new THREE.Scene();scene.fog=new THREE.Fog("#ead2b8",40,210);
-    const camera=new THREE.PerspectiveCamera(42,1,.1,500);
+    const camera=new THREE.PerspectiveCamera(42,1,.1,900);
     const rng=random(9);
 
     // Golden hour: a low warm sun from the side of the valley, so the pines lay long soft shadows across the road
@@ -147,7 +117,9 @@ export default function RoadTripScene({ state, skills, onCar }) {
     // the far end, with the Merced-style river carved into the floor beside the road.
     const roadPoints=ROAD.getSpacedPoints(140);
     const nearest=(points,x,z)=>{let best=1e9;for(const p of points){const d=(p.x-x)**2+(p.z-z)**2;if(d<best)best=d;}return Math.sqrt(best);};
-    const roadDistance=(x,z)=>nearest(roadPoints,x,z);
+    // The valley carries on straight past the end of the road (no road on it), so it opens toward the peaks.
+    const valleyPoints=[...roadPoints,...(()=>{const p=ROAD.getPointAt(1),t=ROAD.getTangentAt(.999);return Array.from({length:70},(_,i)=>p.clone().addScaledVector(t,4+i*3));})()];
+    const roadDistance=(x,z)=>nearest(valleyPoints,x,z);
     // The river runs alongside the road, on its right, meandering a little.
     const riverPoints=roadPoints.map((p,i)=>{const t=ROAD.getTangentAt(Math.min(i/(roadPoints.length-1),.999)),s=new THREE.Vector3(-t.z,0,t.x);return p.clone().addScaledVector(s,8+2.2*Math.sin(i*.12));});
     const riverDistance=(x,z)=>nearest(riverPoints,x,z);
@@ -156,9 +128,9 @@ export default function RoadTripScene({ state, skills, onCar }) {
     const rawHeight=(x,z)=>{
       const rd=roadDistance(x,z),vd=riverDistance(x,z);
       const ridges=.6+.4*Math.sin(x*.045+z*.03)*Math.cos(z*.04-x*.02)+.12*Math.sin(x*.13+z*.11);
-      const valley=Math.pow(smooth((rd-9)/42),1.5)*50*ridges,end=smooth((-z-150)/45)*34;
+      const valley=Math.pow(smooth((rd-9)/42),1.5)*50*ridges;
       const floor=.22*Math.sin(x*.15+z*.1)*smooth((rd-4)/8),channel=-1.1*smooth(1-vd/3.4);
-      return (floor+valley+end)*smooth((rd-2.2)/2.5)+channel;
+      return (floor+valley)*smooth((rd-2.2)/2.5)+channel;
     };
     // The basins sit on level sinter terraces.
     basins.forEach(b=>{b.y=rawHeight(b.at.x,b.at.y);});
@@ -213,7 +185,7 @@ export default function RoadTripScene({ state, skills, onCar }) {
       const road=new THREE.Mesh(g,material);road.receiveShadow=true;scene.add(road);
     }
     // Half Dome on the far ridge.
-    const halfDome=createHalfDome(rng);halfDome.scale.setScalar(30);halfDome.position.set(16,heightAt(16,-205)-6,-205);halfDome.rotation.y=-Math.PI/2-.4;scene.add(halfDome);
+    const halfDome=createHalfDome(rng);halfDome.scale.setScalar(30);halfDome.position.set(62,heightAt(62,-185)-6,-185);halfDome.rotation.y=-Math.PI/2-.4;scene.add(halfDome);
     // Deep forest: tall pines packed right up to the road shoulders and on up the slopes, with dead snags among them,
     // grass, lupine and daisies underfoot, rocks and split-rail fences. Clearings stay open for the river, the
     // hot springs, the signs and the antelope meadows. Phones get a thinner forest.
@@ -230,8 +202,10 @@ export default function RoadTripScene({ state, skills, onCar }) {
         if(rd<5.4||rd>78||rng()>(rd<40?.92:.55)||open(px,pz))continue;
         // A ragged treeline partway up the walls, so bare granite and the peaks behind show above the forest.
         const y=heightAt(px,pz);if(y>11+5*Math.sin(px*.21+pz*.13)+rng()*3)continue;
-        const height=(7+rng()*6)*(rd>40?1.3:1),pick=rng();
-        if(rd<34&&pick<.2)autumnSpots.push([px,y,pz,(4+rng()*3)*(pick<.11?1:1.15),pick<.11?0:1]);else(pick>.93?snags:trees).push([px,y,pz,height]);
+        // Younger, shorter trees line the road so the peaks show over them; the old giants stand further back.
+        const height=(rd<11?4.5+rng()*3:7+rng()*6)*(rd>40?1.3:1),pick=rng();
+        // The kit's autumn trees and birches are detailed, so only a couple of hundred, near the road.
+        if(rd<16&&pick<.2&&autumnSpots.length<200)autumnSpots.push([px,y,pz,(4+rng()*3)*(pick<.11?1:1.15),pick<.11?0:1]);else(pick>.93?snags:trees).push([px,y,pz,height]);
       }
       const place=(geometry,spots,tint)=>{const mesh=new THREE.InstancedMesh(geometry,new THREE.MeshStandardMaterial({vertexColors:true,flatShading:true,roughness:.95}),spots.length),d=new THREE.Object3D(),c=new THREE.Color();
         spots.forEach(([x,y,z,h],i)=>{d.position.set(x,y-.15,z);d.rotation.set((rng()-.5)*.06,rng()*6,(rng()-.5)*.06);d.scale.set(h*(.85+rng()*.3),h,h*(.85+rng()*.3));d.updateMatrix();mesh.setMatrixAt(i,d.matrix);
@@ -247,14 +221,15 @@ export default function RoadTripScene({ state, skills, onCar }) {
         ["CommonTree_Autumn","BirchTree"].forEach((name,kind)=>{const node=find(name);if(!node)return;const g=bake(node),h=g.boundingBox.max.y;
           place(g,autumnSpots.filter(f=>f[4]===kind).map(([x,y,z,size])=>[x,y,z,size/h]),false);});
         const peak=find("Mountain");if(!peak)return;
-        const g=bake(peak),h=g.boundingBox.max.y,haze=new THREE.MeshStandardMaterial({vertexColors:true,flatShading:true,roughness:1,fog:false,color:"#f3dccd",emissive:"#d9a28f",emissiveIntensity:.25});
-        for(const [x,z,size,turn] of [[-150,-250,120,.3],[-40,-300,150,1.2],[90,-285,135,2.1],[190,-210,110,2.9],[-210,-140,100,4],[200,-90,90,5]]){
-          const m=new THREE.Mesh(g,haze);m.scale.setScalar(size/h);m.position.set(x,-6,z);m.rotation.y=turn;scene.add(m);}
+        const g=bake(peak),h=g.boundingBox.max.y,haze=new THREE.MeshStandardMaterial({vertexColors:true,flatShading:true,roughness:1,fog:false,color:"#ffffff",emissive:"#dfe4f0",emissiveIntensity:.55});
+        // A ring of big snowy peaks around the valley, and the tallest right behind the geyser at the end of the road.
+        const end=new THREE.Vector2().copy(geyserAt).sub(new THREE.Vector2(0,-50)).normalize();
+        const ring=[...Array(9)].map((_,i)=>{const a=i/9*Math.PI*2+.3;return [Math.cos(a)*300,-50+Math.sin(a)*300,200+(i*37%5)*22,i*1.7];});
+        for(const [x,z,size,turn] of [[geyserAt.x+end.x*360,geyserAt.y+end.y*360,135,.6],...ring]){
+          const m=new THREE.Mesh(g,haze);m.scale.setScalar(size/h);m.position.set(x,-12,z);m.rotation.y=turn;scene.add(m);}
       },undefined,()=>{});
       // Undergrowth sways in the breeze (vertex shader, per-instance phase).
-      const swaying=()=>{const m=new THREE.MeshStandardMaterial({vertexColors:true,roughness:1,side:THREE.DoubleSide});
-        m.onBeforeCompile=shader=>{shader.uniforms.uTime=swayTime;shader.vertexShader=shader.vertexShader.replace("#include <common>","#include <common>\nuniform float uTime;").replace("#include <begin_vertex>",`#include <begin_vertex>
-          vec3 root=vec3(instanceMatrix[3]);float k=transformed.y*transformed.y;transformed.x+=sin(uTime*1.7+root.x*.35+root.z*.27)*.25*k;transformed.z+=cos(uTime*1.3+root.x*.21)*.12*k;`);};return m;};
+      const swaying=()=>createSwayMaterial(swayTime);
       const scatter=(geometry,count,minD,maxD,scale)=>{const mesh=new THREE.InstancedMesh(geometry,swaying(),count),d=new THREE.Object3D();let n=0;
         for(let k=0;k<count*6&&n<count;k++){const along=ROAD.getPointAt(rng()),x=along.x+(rng()-.5)*maxD*2,z=along.z+(rng()-.5)*maxD*2,rd=roadDistance(x,z);
           if(rd<minD||rd>maxD||riverDistance(x,z)<2.2||basinDistance(x,z)<2)continue;
@@ -333,7 +308,7 @@ export default function RoadTripScene({ state, skills, onCar }) {
         fragmentShader:spriteFragment}));
       spray.frustumCulled=false;spray.renderOrder=3;scene.add(spray);
     }
-    const geyser={t:-1,wait:8},geyserFocus=new THREE.Vector3(geyserAt.x,basins.at(-1).y+4,geyserAt.y);
+    const geyser={t:-1,wait:8},geyserFocus=new THREE.Vector3(geyserAt.x,basins.at(-1).y+9,geyserAt.y);
     const erupt=()=>{if(geyser.t<0)geyser.t=0;};
     // Skill signs at each stop, beside the road on alternating sides, angled toward the approaching car.
     const frame={p:new THREE.Vector3(),t:new THREE.Vector3(),s:new THREE.Vector3()};
@@ -505,9 +480,9 @@ export default function RoadTripScene({ state, skills, onCar }) {
       // Chase camera: behind and above, swinging away from the sign so car and sign share the frame.
       const nearest=Math.round(q),sign=signs[nearest],side=sign?.userData.side??1,near=smooth(1-Math.abs(u-STATIONS[nearest])*30);
       offset.copy(frame.t).multiplyScalar(tall?-10:-8).addScaledVector(frame.s,-side*(2.5+near*1.5)).add({x:0,y:tall?4.4:3.6,z:0});
-      look.copy(car.position).addScaledVector(frame.t,4.5).addScaledVector(frame.s,side*near*2.2);look.y+=.9+near*.8;
+      look.copy(car.position).addScaledVector(frame.t,4.5).addScaledVector(frame.s,side*near*2.2);look.y+=1.5+near*.8;
       // At the finale the camera backs off to the right and frames the wagon and the geyser together.
-      if(drift>.01){const k=Math.min(1,drift);look.lerp(geyserFocus,.32*k);offset.addScaledVector(frame.t,-4*k).addScaledVector(frame.s,3*k).add({x:0,y:1.2*k,z:0});}
+      if(drift>.01){const k=Math.min(1,drift);look.lerp(geyserFocus,.42*k);offset.addScaledVector(frame.t,-4*k).addScaledVector(frame.s,3*k).add({x:0,y:.6*k,z:0});}
       if(first){camPos.copy(car.position).add(offset);camLook.copy(look);first=false;}
       camPos.lerp(car.position.clone().add(offset),1-Math.exp(-dt*3));camLook.lerp(look,1-Math.exp(-dt*3.5));
       camera.position.copy(camPos);camera.lookAt(camLook);

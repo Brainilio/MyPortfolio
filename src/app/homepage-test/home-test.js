@@ -6,6 +6,7 @@ import "./home-test.css";
 const IslandScene = dynamic(() => import("./island-scene"), { ssr: false });
 const PrairieScene = dynamic(() => import("./prairie-scene"), { ssr: false });
 const RoadTripScene = dynamic(() => import("./roadtrip-scene"), { ssr: false });
+const HikeScene = dynamic(() => import("./hike-scene"), { ssr: false });
 const work = allProjects.filter(project => project.slug && project.previewImage).slice(0, 5);
 
 // Skill groups, drawn from the stacks in the project list. Each one is a roadside sign on the road trip.
@@ -17,6 +18,14 @@ export const SKILLS = [
   { title: "Product", items: ["UX/UI", "User research", "Pitching"] },
 ];
 
+// Career, newest first. PLACEHOLDER entries: replace each with the real role, company, dates and a line on the work.
+export const EXPERIENCE = [
+  { years: "20XX — Now", role: "Current role", org: "Company", summary: "Placeholder: one line on what you build there and the difference it makes.", tags: ["React", "Node"] },
+  { years: "20XX — 20XX", role: "Previous role", org: "Company", summary: "Placeholder: the product, your part in it, one result worth naming.", tags: ["TypeScript", "Three.js"] },
+  { years: "20XX — 20XX", role: "Earlier role", org: "Company", summary: "Placeholder: what you shipped and what you learned.", tags: ["Laravel", "MongoDB"] },
+  { years: "20XX — 20XX", role: "First role", org: "Company or school", summary: "Placeholder: where it started.", tags: ["JavaScript"] },
+];
+
 // Sections are full-screen worlds stacked on top of each other, driven by ordinary page scrolling. Each one owns a
 // stretch of scroll (in viewport heights); where two meet, a crossover zone scrubs the hand-off: the outgoing scene
 // drifts up and fades, the next rises in, the giant titles move slower (parallax) and the skies crossfade.
@@ -25,6 +34,7 @@ const SECTIONS = [
   { id: "home", label: "Home", length: 1.2, steps: 1 },
   { id: "work", label: "Work", length: .8 + work.length * .6, steps: work.length },
   { id: "skills", label: "Skills", length: 1 + SKILLS.length * .6, steps: SKILLS.length },
+  { id: "experience", label: "Experience", length: 1 + EXPERIENCE.length * .55, steps: EXPERIENCE.length, fadeIn: 2.5 },
 ];
 const CROSS = .8;
 const START = SECTIONS.reduce((list, section, i) => [...list, i ? list[i - 1] + SECTIONS[i - 1].length : 0], []);
@@ -35,9 +45,13 @@ const scrollFor = (s, q) => START[s] + q * (SECTIONS[s].length - (s === SECTIONS
 export default function HomeTest() {
   const [where, setWhere] = useState({ section: 0, stop: 0 }), [menu, setMenu] = useState(false);
   // Shared with the 3D scenes (read every frame): which sections are on screen and how far through each one we are.
-  const scene = useRef({ section: 0, live: [0], progress: [0, 0, 0] });
+  const scene = useRef({ section: 0, live: [0], progress: [0, 0, 0, 0] });
+  const altitude = useRef(null);
   const layers = useRef([]);
   const { section, stop } = where;
+  // Each 3D scene is built only once its section is next door to the one on screen (then kept), so the first load
+  // builds just the island and the prairie.
+  const [built, setBuilt] = useState(() => SECTIONS.map((_, i) => i < 2));
 
   const scrollToSection = useCallback((s, q = 0) => {
     window.scrollTo({ top: scrollFor(s, q) * window.innerHeight + 2, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
@@ -56,15 +70,16 @@ export default function HomeTest() {
         // 0 → fully on screen; negative → still rising in from below; positive → drifting up and out.
         const enter = i === 0 ? 1 : Math.min(1, Math.max(0, (p - (begin - CROSS)) / CROSS));
         const leave = isLast ? 0 : Math.min(1, Math.max(0, (p - (end - CROSS)) / CROSS));
-        const amount = Math.min(enter, 1 - leave), shift = leave > 0 ? leave : enter < 1 ? -(1 - enter) : 0;
+        const amount = Math.min(1, Math.min(enter * (x.fadeIn ?? 1), 1 - leave)), shift = leave > 0 ? leave : enter < 1 ? -(1 - enter) : 0;
         const q = Math.min(1, Math.max(0, (p - begin) / (x.length - (isLast ? 1 : CROSS))));
         scene.current.progress[i] = q;
         if (amount > 0.001) live.push(i);
         if (amount > best) { best = amount; dominant = i; }
         const el = layers.current[i];
-        if (el) { el.style.opacity = amount.toFixed(3); el.style.visibility = amount > 0.001 ? "visible" : "hidden"; el.style.setProperty("--shift", shift.toFixed(4)); }
+        if (el) { el.style.opacity = amount.toFixed(3); el.style.visibility = amount > 0.001 ? "visible" : "hidden"; el.style.setProperty("--shift", shift.toFixed(4)); el.style.setProperty("--enter", enter.toFixed(4)); el.style.setProperty("--q", q.toFixed(4)); }
       });
       scene.current.live = live;scene.current.section = dominant;
+      setBuilt(was => was.some((b, i) => !b && Math.abs(i - dominant) <= 1) ? was.map((b, i) => b || Math.abs(i - dominant) <= 1) : was);
       const q = scene.current.progress[dominant], steps = SECTIONS[dominant].steps, at = Math.min(steps - 1, Math.round(q * (steps - 1)));
       const key = `${dominant}:${at}`;
       if (key !== last) {
@@ -98,10 +113,11 @@ export default function HomeTest() {
         <nav aria-label="Main">
           <a href="#work" onClick={event => { event.preventDefault(); jump(1); }}>Work</a>
           <a href="#skills" onClick={event => { event.preventDefault(); jump(2); }}>Skills</a>
+          <a href="#experience" onClick={event => { event.preventDefault(); jump(3); }}>Experience</a>
           <a href="/journey/">Lab</a>
           <a href="mailto:brainilioir@gmail.com">Contact</a>
         </nav>
-        <span className="ht-available"><i aria-hidden="true" /> Available for work</span>
+        {/* <span className="ht-available"><i aria-hidden="true" /> Available for work</span> */}
       </header>
 
       <section className="ht-layer ht-home" ref={el => (layers.current[0] = el)} aria-label="Introduction">
@@ -138,7 +154,7 @@ export default function HomeTest() {
       <section className="ht-layer ht-skills" ref={el => (layers.current[2] = el)} aria-labelledby="ht-skills-title">
         <div className="ht-valley-sky" aria-hidden="true" />
         <p className="ht-ghost ht-title" aria-hidden="true">Skills</p>
-        <div className="ht-move"><RoadTripScene state={scene} skills={SKILLS} onCar={onCar} /></div>
+        <div className="ht-move">{built[2] && <RoadTripScene state={scene} skills={SKILLS} onCar={onCar} />}</div>
         <div className="ht-head ht-move-soft">
           <span className="ht-eyebrow">On the road</span>
           <h2 id="ht-skills-title">What I bring along<span>.</span></h2>
@@ -146,6 +162,33 @@ export default function HomeTest() {
         </div>
         <div className="ht-finish" aria-hidden="true" />
         <ul className="ht-sr">{SKILLS.map(skill => <li key={skill.title}>{skill.title}: {skill.items.join(", ")}</li>)}</ul>
+      </section>
+
+      {/* Experience: the hike. The scene runs on its own; scrolling moves the trail log on the left. Arriving, the
+          valley goes dark for a beat before the mountain fades up. */}
+      <section className="ht-layer ht-experience" ref={el => (layers.current[3] = el)} aria-labelledby="ht-experience-title">
+        <div className="ht-mountain-sky" aria-hidden="true" />
+        <div className="ht-move">{built[3] && <HikeScene state={scene} altitude={altitude} />}</div>
+        <div className="ht-scrim" aria-hidden="true" />
+        <div className="ht-head ht-move-soft">
+          <span className="ht-eyebrow">The trail so far</span>
+          <h2 id="ht-experience-title">My experience<span>.</span></h2>
+        </div>
+        <div className="ht-trail-log">
+          <ol className="ht-log">
+            {EXPERIENCE.map((job, i) => (
+              <li key={i} className={section === 3 && stop === i ? "is-here" : undefined}>
+                <span className="ht-log-years">{job.years}</span>
+                <h3>{job.role} <em>· {job.org}</em></h3>
+                <p>{job.summary}</p>
+                <span className="ht-log-tags">{job.tags.join(" · ")}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+        <span className="ht-altitude" aria-hidden="true">▲ <b ref={altitude}>4,200 ft</b></span>
+        <div className="ht-finish" aria-hidden="true" />
+        <div className="ht-blackout" aria-hidden="true" />
       </section>
 
       {/* Where you are, and a way to jump anywhere. */}
