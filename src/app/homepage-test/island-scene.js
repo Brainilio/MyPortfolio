@@ -9,8 +9,8 @@ import { PALETTE, MOUNTAIN, outline, heightAt, riverDistance, random, createIsla
 
 // Animal sizes (world units tall) and gaits (units per second).
 const ANIMALS={stag:{height:1.55,walk:.75,run:3.6},deer:{height:1.2,walk:.65,run:3.3},fox:{height:.66,walk:.8,run:3.8},bear:{height:1.3,walk:.6,run:3.2}};
-// The bear has no rig: each gait is a leg swing (radians), a stride rate and a bob (model units).
-const BEAR_GAITS={Idle:[0,2,.08],Eating:[0,1.4,.12],Walk:[.32,5.5,.18],Gallop:[.6,11,.5]};
+// The bear has no rig: each gait is a leg swing (radians), a stride rate and a bob (fraction of body height).
+const BEAR_GAITS={Idle:[0,2,.004],Eating:[0,1.4,.006],Walk:[.45,5.5,.012],Gallop:[.72,10,.035]};
 const MOUNTAIN_SCALE=1.9,MOUNTAIN_CLEAR=3.6;
 
 export default function IslandScene({ onEvent } = {}) {

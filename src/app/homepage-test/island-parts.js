@@ -237,11 +237,11 @@ export function createBearMaterial(geometry) {
   const box=geometry.boundingBox,hip=box.min.y+(box.max.y-box.min.y)*.36,mid=(box.min.z+box.max.z)/2,pos=geometry.attributes.position;
   let front=0,back=0,nf=0,nb=0;
   for(let i=0;i<pos.count;i++){const y=pos.getY(i),z=pos.getZ(i);if(y<hip*.7){if(z>mid){front+=z;nf++;}else{back+=z;nb++;}}}
-  const uniforms={uPhase:{value:0},uSwing:{value:0},uBob:{value:0},uHip:{value:hip},uMid:{value:mid},uFront:{value:nf?front/nf:mid+1},uBack:{value:nb?back/nb:mid-1},uCenterX:{value:(box.min.x+box.max.x)/2}};
+  const uniforms={uPhase:{value:0},uSwing:{value:0},uBob:{value:0},uHeight:{value:box.max.y-box.min.y},uHip:{value:hip},uMid:{value:mid},uFront:{value:nf?front/nf:mid+1},uBack:{value:nb?back/nb:mid-1},uCenterX:{value:(box.min.x+box.max.x)/2}};
   const material=new THREE.MeshStandardMaterial({vertexColors:true,flatShading:true,roughness:.95});
   material.onBeforeCompile=shader=>{
     Object.assign(shader.uniforms,uniforms);
-    shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nuniform float uPhase,uSwing,uBob,uHip,uMid,uFront,uBack,uCenterX;')
+    shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nuniform float uPhase,uSwing,uBob,uHeight,uHip,uMid,uFront,uBack,uCenterX;')
       .replace('#include <begin_vertex>',`#include <begin_vertex>
         if(transformed.y<uHip){
           bool front=transformed.z>uMid,left=transformed.x>uCenterX;
@@ -251,7 +251,8 @@ export function createBearMaterial(geometry) {
           float pivot=front?uFront:uBack,dy=transformed.y-uHip,dz=transformed.z-pivot;
           transformed.z=pivot+dz*cos(a)-dy*sin(a);transformed.y=uHip+dz*sin(a)+dy*cos(a);
         }
-        transformed.y+=uBob;`);
+        // Bob is a fraction of body height (the compressed mesh lives in its own small unit space).
+        transformed.y+=uBob*uHeight;`);
   };
   return {material,uniforms};
 }
