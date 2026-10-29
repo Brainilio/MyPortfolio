@@ -15,12 +15,15 @@ body:has(.journey){background:#04050d}
 .journey-altimeter a[aria-current]{opacity:1;border-color:var(--accent)}
 .journey-altimeter b{font-weight:500;font-size:11px}
 .journey-altimeter a:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
-.journey-debug{position:fixed;right:16px;bottom:16px;z-index:5;font:12px ui-monospace,monospace;background:rgba(0,0,0,.7);padding:6px 10px;border-radius:6px}
+.journey-debug{position:fixed;left:50%;top:16px;transform:translateX(-50%);z-index:5;font:12px ui-monospace,monospace;background:rgba(0,0,0,.7);padding:6px 10px;border-radius:6px}
 
 .journey-chapters{position:relative;z-index:2;pointer-events:none}
-/* Chapter text fades out while a transition plays and back in once the new scene has settled. */
-.journey-chapters{transition:opacity .4s ease}
-.journey-chapters[data-hidden=true]{opacity:0;transition-duration:.3s}
+/* Hero: the homepage hero with no runway: it scrolls straight off, uncovering the About scene behind it.
+   Its own header stands in for the fixed chrome until the hero hands off. */
+.journey .launch-runway{height:auto}
+.journey-top,.journey-altimeter{transition:opacity .5s}
+.journey[data-stage="0"] .journey-top,.journey[data-stage="0"] .journey-altimeter{opacity:0;pointer-events:none}
+.journey[data-stage="0"] .journey-top>*{pointer-events:none}
 .journey-chapter{position:relative;padding:0 var(--content-gutter) 0 max(var(--content-gutter),150px)}
 
 /* Editorial type: large, unboxed, readable over the scene with a soft shadow. */
@@ -32,13 +35,15 @@ body:has(.journey){background:#04050d}
 .type p{max-width:420px;margin:22px 0 0;font-size:17px;line-height:1.55;color:#cfcde0}
 .type .type-list{max-width:none;font-size:clamp(18px,1.8vw,26px);letter-spacing:-.02em;color:#e7e4f5}
 .type.intro{position:relative;height:auto;display:block;padding:58svh 0 0;color:#0b0b18;text-shadow:none;max-width:none}
+/* About: the copy keeps to the left so the astronaut owns the centre. */
+.about-panel{max-width:min(560px,36vw)}
+.about-panel h2{font-size:clamp(44px,5.2vw,88px)}
 .type.intro .eyebrow{color:#3c2d84}
 .type.intro h1{font-size:clamp(84px,15vw,250px);font-weight:700;letter-spacing:-.055em;line-height:.85;margin:0}
 .journey-scroll{display:inline-block;margin-top:28px;font-size:12px;letter-spacing:.14em;text-transform:uppercase}
 
 /* Projects: one giant title per beat, alternating sides. */
 .type.project{position:absolute;height:auto;display:block;padding:0;left:max(var(--content-gutter),150px);pointer-events:auto}
-.type.project.right{left:auto;right:var(--content-gutter);text-align:right}
 .type.project h3{font-size:clamp(48px,7vw,120px);transition:color .4s}
 .type.project h3 span{font-size:.45em;vertical-align:.6em;color:var(--accent)}
 .type.project:hover h3{color:#d9ccff}
@@ -60,11 +65,33 @@ body:has(.journey){background:#04050d}
 .journey-final h2{font-size:clamp(48px,7vw,110px);font-weight:500;letter-spacing:-.05em;line-height:.95;margin:0 0 22px}
 .journey-final a{font-size:13px;letter-spacing:.14em;text-transform:uppercase;border-bottom:1px solid currentColor;padding-bottom:4px}
 
-/* About: a frameless glowing cutout of the photo beside the helmet; copy and photo fade in with the close-up. */
-.journey-hologram{--about:0;--daze:0;--photo:clamp(0,calc((var(--about) - .12) * 5),1);position:fixed;inset:0;z-index:2;pointer-events:none;opacity:var(--daze);transition:opacity .6s}
-.holo-photo{position:absolute;right:calc(var(--content-gutter) - 20px);top:12svh;width:min(30vw,380px);margin:0;opacity:var(--photo);transform:translateY(calc((1 - var(--photo)) * 14px));filter:drop-shadow(0 0 40px rgba(140,110,255,.35))}
-.holo-photo img{width:100%;height:auto;display:block;-webkit-mask-image:linear-gradient(#000 65%,transparent);mask-image:linear-gradient(#000 65%,transparent)}
-.about-panel{opacity:var(--daze,1);transition:opacity .6s}
+/* Liquid cards: the DOM image holds layout, alt text and hover; its WebGL twin draws it once ready. */
+img[data-liquid]{display:block;object-fit:cover;border-radius:10px;background:rgba(255,255,255,.04)}
+img[data-liquid][data-liquid-ready]{opacity:0;background:none}
+.about-cards{position:absolute;inset:0;pointer-events:none}
+.about-card{position:absolute;pointer-events:auto}
+.about-card-portrait{right:7vw;top:16svh;width:min(16vw,250px);aspect-ratio:4/5;height:auto}
+.about-card-place{right:19vw;bottom:13svh;width:min(13vw,210px);aspect-ratio:3/2;height:auto}
+.project-shot{width:min(30vw,360px);aspect-ratio:3/2;height:auto;margin-bottom:22px}
+
+/* Projects: cards flow down the left on a curve (set from scroll); the rocket owns the right. */
+.type.project{transform-origin:0 50%;will-change:transform}
+.type.project h3{font-size:clamp(44px,5.6vw,96px)}
+
+/* Aliens: the whole sticky frame takes clicks (a crosshair) for the game; copy stays readable. */
+.aliens-panel{pointer-events:auto;cursor:crosshair;max-width:none;padding-right:var(--content-gutter)}
+.aliens-panel>*{max-width:min(560px,40vw)}
+.aliens-score{display:inline-block;margin-top:18px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#9dffb0}
+
+/* Sound: one quiet toggle, always reachable. */
+.sound-toggle{position:fixed;right:var(--gutter);bottom:22px;z-index:6;display:inline-flex;align-items:center;gap:10px;padding:9px 14px;border:1px solid rgba(255,255,255,.35);border-radius:100px;background:none;color:#fff;mix-blend-mode:difference;font:inherit;font-size:11px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer}
+.sound-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.sound-bars{display:inline-flex;align-items:flex-end;gap:2px;height:11px}
+.sound-bars i{width:2px;height:3px;background:currentColor;border-radius:1px;transition:height .4s}
+.sound-bars[data-playing=true] i{animation:sound-bar 1.1s ease-in-out infinite alternate}
+.sound-bars[data-playing=true] i:nth-child(2){animation-delay:-.4s}.sound-bars[data-playing=true] i:nth-child(3){animation-delay:-.8s}.sound-bars[data-playing=true] i:nth-child(4){animation-delay:-.2s}
+@keyframes sound-bar{from{height:3px}to{height:11px}}
+@media(prefers-reduced-motion:reduce){.sound-bars[data-playing=true] i{animation:none;height:7px}}
 
 /* Moon pass: giant words drifting across the top of the frame as he glides beneath them. */
 .journey-rail{position:sticky;top:0;height:100svh;overflow:hidden;pointer-events:none}
@@ -74,7 +101,11 @@ body:has(.journey){background:#04050d}
   .journey-altimeter{display:none}
   .journey-chapter{padding:0 24px}
   .type{max-width:none}
-  .type.project,.type.project.right{left:24px;right:24px;text-align:left}
+  .about-panel{max-width:none}
+  .about-card-portrait{right:20px;top:13svh;width:28vw}
+  .about-cards .about-card-place{display:none}
+  .project-shot{width:62vw}
+  .sound-toggle{right:16px;bottom:16px}
+  .type.project{left:24px;right:24px}
   .type.contact .fields{flex-direction:column;gap:12px}
-  .holo-photo{width:42vw;right:16px}
 }

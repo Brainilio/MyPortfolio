@@ -9,14 +9,18 @@ import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
 import { createRocketBoosters } from "../rocket-boosters";
 import { createBlackHole } from "../black-hole";
-import { storyAt, chapterProgress, smooth, clamp, reveal, CHAPTERS } from "./timeline";
-import { SUMMIT_SPOT, LAUNCH_PAD, ROCKET_HEIGHT, ASTRONAUT_HEIGHT, EARTH_CENTER, EARTH_RADIUS, EARTH_POLE, MOON, MOON_RADIUS, HOLE, LAST, frameAt, createFrame, pathIndex, rocketLead, shotAt, closeUp, orbitBlend } from "./flight";
+import { restS, smooth, clamp, reveal, CHAPTERS } from "./timeline";
+import { LAUNCH_PAD, ROCKET_HEIGHT, ASTRONAUT_HEIGHT, EARTH_CENTER, EARTH_RADIUS, EARTH_POLE, MOON, MOON_RADIUS, HOLE, LAST, frameAt, createFrame, pathIndex, rocketLead, shotAt } from "./flight";
 import { createStars, createClouds, createMilkyWay, createAurora } from "./sky";
 import { createGround, createEarth } from "./earth";
-import { glowTexture, createFader, createSaturn, createMars, createSun, createMoon, createMoonJumper, createPortal, createAliens } from "./set-pieces";
+import { glowTexture, createFader, createSaturn, createMars, createSun, createMoon, createMoonJumper } from "./set-pieces";
+import { createAlienGame } from "./alien-game";
 import { createGalaxy, GALAXY } from "./galaxy";
+import { GlitchShader } from "./glitch";
+import { createLiquidLayer } from "./liquid";
 import { createRocket } from "./rocket";
 
 const bell=(s,from,peak,to)=>s<peak?smooth((s-from)/(peak-from)):1-smooth((s-peak)/(to-peak));
@@ -37,7 +41,7 @@ function createJetpack() {
   return {group,flame};
 }
 
-export default function JourneyScene({ sectionsRef, controls, flashRef, hudRef, aboutRef, onPhase }) {
+export default function JourneyScene({ controls, flashRef, hudRef, scoreRef, onPhase }) {
   const host=useRef(null),phase=useRef(onPhase);
   phase.current=onPhase;
   useEffect(()=>{
@@ -56,11 +60,11 @@ export default function JourneyScene({ sectionsRef, controls, flashRef, hudRef, 
     const resources=[];
     const pmrem=new THREE.PMREMGenerator(renderer),room=new RoomEnvironment(),environment=pmrem.fromScene(room,.04);
     scene.environment=environment.texture;scene.environmentIntensity=.6;room.dispose();pmrem.dispose();resources.push(environment);
-    let composer,bloom;
-    if(!low){
-      composer=new EffectComposer(renderer);composer.addPass(new RenderPass(scene,camera));
-      bloom=new UnrealBloomPass(new THREE.Vector2(256,256),.85,.55,1);composer.addPass(bloom);composer.addPass(new OutputPass());
-    }
+    // Bloom on capable screens; the glitch pass only while a section cut plays (low tier renders directly otherwise).
+    const composer=new EffectComposer(renderer);composer.addPass(new RenderPass(scene,camera));
+    let bloom;if(!low){bloom=new UnrealBloomPass(new THREE.Vector2(256,256),.85,.55,1);composer.addPass(bloom);}
+    composer.addPass(new OutputPass());
+    const glitch=new ShaderPass(GlitchShader);glitch.enabled=false;composer.addPass(glitch);
     const preference=matchMedia('(prefers-reduced-motion: reduce)');
     const glow=glowTexture();resources.push(glow);
 
@@ -76,23 +80,18 @@ export default function JourneyScene({ sectionsRef, controls, flashRef, hudRef, 
     const sunGlow=createSun(glow);scene.add(sunGlow.group,sunGlow.flares);sunGlow.occlude(EARTH_CENTER,EARTH_RADIUS*1.02);sunGlow.occlude(MOON,MOON_RADIUS);
     const moon=createMoon(glow);world.add(moon.group);resources.push(moon.map);
     const jumper=createMoonJumper(moon.group);world.add(jumper.sprite);resources.push(jumper.texture);
-    const portal=createPortal();world.add(portal.group);
-    const aliens=createAliens(glow);world.add(aliens.group);
+    const game=createAlienGame(glow);world.add(game.group);
     const blackHole=createBlackHole();blackHole.group.position.copy(HOLE);blackHole.group.scale.setScalar(24);world.add(blackHole.group);
-    const holeFade=createFader(blackHole.group),alienFade=createFader(aliens.group);
+    const holeFade=createFader(blackHole.group);
     const galaxy=createGalaxy(glow);scene.add(galaxy.group);
 
     // Actors.
     const rocket=new THREE.Group(),astronaut=new THREE.Group(),rocketModel=createRocket();rocket.add(rocketModel.group);scene.add(rocket,astronaut);
-    // A soft puff when the hatch blows.
-    const puff=new THREE.Sprite(new THREE.SpriteMaterial({map:glow,color:0xe8e4ff,transparent:true,opacity:0,depthWrite:false}));scene.add(puff);
     const rocketFlame=createRocketBoosters();scene.add(rocketFlame.group);
     const jetpack=createJetpack();astronaut.add(jetpack.group);
     const boots=[createRocketBoosters(),createRocketBoosters()];boots.forEach(boot=>scene.add(boot.group));
     const tether=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]),new THREE.LineBasicMaterial({color:new THREE.Color(1.6,1,3.2),toneMapped:false}));
     tether.frustumCulled=false;tether.visible=false;scene.add(tether);
-    // "Seeing stars" after the ejection: three tiny glints circling the helmet.
-    const dizzy=[0,1,2].map(()=>{const star=new THREE.Sprite(new THREE.SpriteMaterial({map:glow,color:0xfff0b8,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));star.scale.setScalar(.045);scene.add(star);return star;});
     let mixer,actions={},current,headBone,headRest,limbs=[],rest=[];
     const release=object=>object.traverse(child=>{
       child.geometry?.dispose();
@@ -115,18 +114,20 @@ export default function JourneyScene({ sectionsRef, controls, flashRef, hudRef, 
       for(const clip of gltf.animations)actions[clip.name.split('|').pop()]=mixer.clipAction(clip);
       renderer.compile(gltf.scene,camera);
       headBone=gltf.scene.getObjectByName('Head');headRest=headBone?.quaternion.clone();
+      // GLTFLoader strips '.' from node names, so the rig's "UpperArm.L" arrives as "UpperArmL".
       // Flight pose targets in body space (+Y head, +Z chest, +X the astronaut's left): elbows down at his
       // sides with hands up at the chest gripping the jetpack straps; legs trailing with a slight knee bend.
       const bone=name=>gltf.scene.getObjectByName(name);
       limbs=['L','R'].flatMap(side=>{const x=side==='L'?1:-1;return [
-        // [bone, child, flying direction, limp drifting direction]
-        [bone(`UpperArm.${side}`),bone(`LowerArm.${side}`),new THREE.Vector3(.22*x,-.75,.35),new THREE.Vector3(.85*x,-.35,.15)],
-        [bone(`LowerArm.${side}`),bone(`Wrist.${side}`),new THREE.Vector3(-.3*x,.85,.45),new THREE.Vector3(.75*x,.05,.3)],
-        [bone(`UpperLeg.${side}`),bone(`LowerLeg.${side}`),new THREE.Vector3(.1*x,-1,-.1),new THREE.Vector3(.28*x,-1,.08)],
-        [bone(`LowerLeg.${side}`),bone(`Foot.${side}`),new THREE.Vector3(.08*x,-1,-.5),new THREE.Vector3(.2*x,-1,-.25)],
-      ];}).filter(([a,b])=>a&&b).map(([a,b,f,d])=>[a,b,f.normalize(),d.normalize()]);
+        // [bone, child, flying direction, floating direction (arms eased out)]. Legs always keep the idle pose:
+        // aiming the shins stretches and twists the boots.
+        [bone(`UpperArm${side}`),bone(`LowerArm${side}`),new THREE.Vector3(.22*x,-.75,.35),new THREE.Vector3(.42*x,-.9,.14)],
+        [bone(`LowerArm${side}`),bone(`Wrist${side}`),new THREE.Vector3(-.3*x,.85,.45),new THREE.Vector3(.35*x,-.45,.55)],
+        [bone(`UpperLeg${side}`),bone(`LowerLeg${side}`),null,null],
+        [bone(`LowerLeg${side}`),bone(`Foot${side}`),null,null],
+      ];}).filter(([a,b])=>a&&b).map(([a,b,f,d])=>[a,b,f?.normalize(),d?.normalize()]);
       rest=[...new Set(limbs.map(l=>l[0]))].map(b=>[b,b.quaternion.clone()]);
-      boots.feet=[bone('Foot.L'),bone('Foot.R')];
+      boots.feet=[bone('FootL'),bone('FootR')];
       // The helmet's facing direction in Head-bone space, so the head can be aimed at things.
       if(headBone){gltf.scene.updateMatrixWorld(true);faceLocal.set(0,0,1).applyQuaternion(headBone.getWorldQuaternion(qw).invert().multiply(gltf.scene.getWorldQuaternion(qp)));}
       // Glossy visor glass so the close-up catches highlights instead of reading as a flat black hole.
@@ -136,48 +137,86 @@ export default function JourneyScene({ sectionsRef, controls, flashRef, hudRef, 
 
     const clock=new THREE.Clock(),ctx={s:0,time:0,astro:new THREE.Vector3(),rocket:new THREE.Vector3(),rocketPath:new THREE.Vector3(),moon:moon.group.position,frame:createFrame(),tmp:new THREE.Vector3()};
     const rframe=createFrame(),camPos=new THREE.Vector3(),camLook=new THREE.Vector3(),targetPos=new THREE.Vector3(),targetLook=new THREE.Vector3();
-    const v1=new THREE.Vector3(),v2=new THREE.Vector3(),dir=new THREE.Vector3(),heading=new THREE.Vector3(),hatch=new THREE.Vector3(),faceLocal=new THREE.Vector3(0,0,1),Y=new THREE.Vector3(0,1,0),Z=new THREE.Vector3(0,0,1);
+    const v1=new THREE.Vector3(),v2=new THREE.Vector3(),dir=new THREE.Vector3(),heading=new THREE.Vector3(),faceLocal=new THREE.Vector3(0,0,1),Y=new THREE.Vector3(0,1,0),Z=new THREE.Vector3(0,0,1);
     const head=new THREE.Vector3(),qGlide=new THREE.Quaternion(),qStand=new THREE.Quaternion(),qFly=new THREE.Quaternion(),qHole=new THREE.Quaternion(),qExtra=new THREE.Quaternion(),qTarget=new THREE.Quaternion(),basis=new THREE.Matrix4();
-    const ax=new THREE.Vector3(),ay=new THREE.Vector3(),az=new THREE.Vector3(),tumbleAxis=new THREE.Vector3(1,.4,.2).normalize();
+    const ax=new THREE.Vector3(),ay=new THREE.Vector3(),az=new THREE.Vector3(),camRight=new THREE.Vector3(),camUp=new THREE.Vector3();
     const skyLow=new THREE.Color(0x9cc4ea),skyHigh=new THREE.Color(0x2c5d99),space=new THREE.Color(0x04050d),alienSky=new THREE.Color(0x060b10),holeSky=new THREE.Color(0x0a0412);
-    const view={s:0,about:0},pose={fly:0,drift:0};
-    // A dark veil over the 3D (not the page UI) that softens hard camera cuts.
-    const veil=document.createElement('div');veil.style.cssText='position:absolute;inset:0;background:#030409;opacity:0;pointer-events:none';mount.appendChild(veil);
-    // Cloud mist for the climb: soft white banks that drift down past the lens as the rocket rises.
-    const mist=document.createElement('div');
-    mist.style.cssText='position:absolute;inset:-20% 0;opacity:0;pointer-events:none;background:radial-gradient(45% 30% at 25% 30%,#fff 0,rgba(255,255,255,0) 70%),radial-gradient(50% 28% at 75% 55%,#f4f7fc 0,rgba(244,247,252,0) 70%),radial-gradient(40% 25% at 40% 80%,#fff 0,rgba(255,255,255,0) 70%),rgba(226,234,245,.92);will-change:transform,opacity';
-    mount.appendChild(mist);
-    let lastShot='',cutAt=-1e9;
-    let first=true,time=0,endingStart=0,lastPhase='',started=false,seenStart=-1;const from={s:0,about:0};
+    const view={s:0},pose={fly:0,drift:0};
+    // About: he floats just above the atmosphere, Earth below him, facing the camera. Off to one side of the
+    // launch, so he's out of frame until the camera drifts over to him.
+    const ABOUT_SPOT=new THREE.Vector3(-25,184,38),qSway=new THREE.Euler();
+    // The Sun is behind him there, so a soft key from the camera side keeps his visor and suit readable.
+    const fill=new THREE.DirectionalLight(0xdcd6ff,0);fill.position.copy(ABOUT_SPOT).add(new THREE.Vector3(-3,2.5,-8));fill.target.position.copy(ABOUT_SPOT);scene.add(fill,fill.target);
+    // Close-up: helmet and shoulders, straight on. The camera rides half of his float, so he bobs gently in
+    // frame. On portrait screens a little further back, with the helmet above the copy.
+    const aboutShot=(pos,look)=>{const tall=camera.aspect<.8,bob=(ctx.astro.y-ABOUT_SPOT.y)*.5;
+      pos.copy(ABOUT_SPOT).add(v1.set(0,(tall?.5:.72)+bob,tall?-4.6:-2.1));look.copy(ABOUT_SPOT).add(v1.set(0,(tall?-.15:.6)+bob,0));};
+    // Section changes play a transition (glitch, liquid or fade) as the final post pass, swapping the scene at
+    // its peak. Sections that share a shot ('same') just continue.
+    const CUTS={cut:[0,760],liquid:[1,1300],fade:[2,1100]};
+    let shown=-1,cutAt=0,cutMode=0,cutLength=760,swapped=true;
+    // Skills: a rocket streaks across behind him (left to right on screen); he watches, then drifts off after it,
+    // mostly into the distance so he stays in the narrow close-up frame as he goes.
+    const FLY_A=ABOUT_SPOT.clone().add(new THREE.Vector3(48,7,80)),FLY_B=ABOUT_SPOT.clone().add(new THREE.Vector3(-70,1,55));
+    const departDir=new THREE.Vector3(-.28,.04,1).normalize(),qDepart=new THREE.Quaternion();
+    // Aliens: he hangs back on the path, the rocket is parked ahead, and saucers arrive out of deep space beyond it.
+    const alienFrame=createFrame(),alienAt=new THREE.Vector3(),alienRocket=new THREE.Vector3(),portalAt=new THREE.Vector3(),muzzle=new THREE.Vector3(),toTarget=new THREE.Vector3();
+    frameAt(8.3,alienFrame);alienAt.copy(alienFrame.position);
+    frameAt(8.5,rframe);alienRocket.copy(rframe.position).addScaledVector(rframe.side,1).addScaledVector(rframe.up,4);
+    frameAt(9.6,rframe);portalAt.copy(rframe.position).addScaledVector(rframe.up,14);
+    const mouseLook={x:0,y:0};
+    const liquid=createLiquidLayer(renderer,document.querySelector('.journey')??document.body);
+    let first=true,time=0,endingStart=0,lastPhase='',started=false;
     const setPhase=value=>{if(value!==lastPhase){lastPhase=value;phase.current?.(value);}};
+    // Pointer parallax: the camera leans slowly toward the mouse (mouse only; touch and reduced motion stay still).
+    const pointer={x:0,y:0},lean={x:0,y:0};
+    const onPointer=event=>{if(event.pointerType!=='mouse')return;pointer.x=event.clientX/window.innerWidth*2-1;pointer.y=event.clientY/window.innerHeight*2-1;};
+    window.addEventListener('pointermove',onPointer,{passive:true});
     const rocketRise=(s,out)=>{const t=(s-1.08)/.56,rise=t<=0?0:t<=1?Math.pow(t,2.2):1+(t-1)*2.2;return out.copy(LAUNCH_PAD).setY(ROCKET_HEIGHT/2+rise*188);};
     const pa=new THREE.Vector3(),pb=new THREE.Vector3(),qd=new THREE.Quaternion(),qw=new THREE.Quaternion(),qp=new THREE.Quaternion(),qI=new THREE.Quaternion();
     // Rotate a bone (in world space) so it points along `direction`, blended by `weight`.
     const applyWorld=(bone,rotation)=>{bone.getWorldQuaternion(qw).premultiply(rotation);bone.parent.getWorldQuaternion(qp);bone.quaternion.copy(qp.invert().multiply(qw));bone.updateMatrixWorld(true);};
     const aimBone=(bone,child,direction,weight)=>{bone.getWorldPosition(pa);child.getWorldPosition(pb);qd.setFromUnitVectors(pb.sub(pa).normalize(),direction);applyWorld(bone,qI.identity().slerp(qd,weight));};
     // Turn the head (by `weight`) so the helmet faces `direction`.
-    const aimHead=(direction,weight)=>{pa.copy(faceLocal).applyQuaternion(headBone.getWorldQuaternion(qw));qd.setFromUnitVectors(pa,v2.copy(direction).normalize());applyWorld(headBone,qI.identity().slerp(qd,weight));};
+    // The head never turns past NECK radians from where his body faces (no owl turns when the body swings away).
+    const NECK=1,bodyFace=new THREE.Vector3(),qn=new THREE.Quaternion(),neckAxis=new THREE.Vector3();
+    const limitNeck=direction=>{
+      bodyFace.set(0,0,1).applyQuaternion(astronaut.quaternion);direction.normalize();
+      const angle=bodyFace.angleTo(direction);if(angle<=NECK)return direction;
+      neckAxis.crossVectors(bodyFace,direction).normalize();
+      return direction.copy(bodyFace).applyQuaternion(qn.setFromAxisAngle(neckAxis,NECK));
+    };
+    const aimHead=(direction,weight)=>{limitNeck(direction);pa.copy(faceLocal).applyQuaternion(headBone.getWorldQuaternion(qw));qd.setFromUnitVectors(pa,v2.copy(direction).normalize());applyWorld(headBone,qI.identity().slerp(qd,weight));};
     const basisQuat=(q,up,forwardDown)=>{ay.copy(up).normalize();az.copy(forwardDown).addScaledVector(ay,-forwardDown.dot(ay)).normalize();ax.crossVectors(ay,az);basis.makeBasis(ax,ay,az);return q.setFromRotationMatrix(basis);};
 
     function draw(){raf=requestAnimationFrame(draw);if(!document.hidden)render(Math.min(clock.getDelta(),.05));}
     function render(dt) {
       const reduced=preference.matches,now=performance.now();
       if(!reduced)time+=dt;
-      // Story time comes from the director: timed transitions between chapters, and inside a tall chapter
-      // a gently eased scrub of its internal scroll.
       const story=controls.current.story;
-      if(story.start!==seenStart){seenStart=story.start;from.s=view.s;from.about=view.about;}
-      const progress=reduced?.5:chapterProgress(sectionsRef.current?.[story.index]);
-      const cue=storyAt(story,from,now,progress);
-      if(cue.active||first||reduced){view.s=cue.s;view.about=cue.about;}
-      else{view.s+=(cue.s-view.s)*(1-Math.exp(-dt*3));view.about=cue.about;}
-      const s=view.s,about=view.about;
+      let cut=0,snap=first;
+      if(cutAt){
+        const k=(now-cutAt)/cutLength;
+        if(!swapped&&k>=.45){shown=story.index;swapped=true;snap=true;}
+        cut=k<.45?smooth(k/.45):1-smooth((k-.45)/.55);
+        if(k>=1)cutAt=0;
+      } else if(story.index!==shown){
+        const next=story.index,enter=next===shown+1?CHAPTERS[next].enter:next===shown-1&&CHAPTERS[shown].enter==='same'?'same':'cut';
+        if(first||reduced||shown<0){shown=next;snap=true;}
+        else if(enter==='same')shown=next;
+        else{[cutMode,cutLength]=CUTS[enter]??CUTS.cut;cutAt=now;swapped=false;}
+      }
+      const id=CHAPTERS[shown]?.id,closeUp=id==='summit'||id==='about'||id==='skills',aliensStage=id==='aliens',projectsStage=id==='projects';
+      const progress=reduced?.5:story.progress[shown]??0;
+      // Skills: idle, then the rocket streaks past (flyby), then he goes after it (depart).
+      const skills=id==='skills'?progress:0,flyby=clamp((skills-.35)/.33,0,1),depart=reduced?0:clamp((skills-.7)/.3,0,1);
+      // Sections rest at their story time, easing through it while their copy scrolls.
+      const target=restS(shown,progress);
+      view.s=snap?target:view.s+(target-view.s)*(1-Math.exp(-dt*2.5));
+      const s=view.s;
       ctx.s=s;ctx.time=time;
-      // The About beat holds story time at 2.0. The push-in to the helmet starts during the end of the
-      // ejection (s 1.82→2.0) so there's no dead zone, then eases back out at the end of the chapter.
-      // Scenes, not blends: the drift (s 1.64–1.9), the helmet close-up (until About is 90% read), then flight.
-      // Each change is a cut covered by a short fade.
-      const daze=s>=1.9&&s<2.001&&about<.9?1:0,flying=about>=.9||s>2.001?1:0;
+      const flying=s>2.001&&!aliensStage?1:0;
+      fill.intensity+=((closeUp?1.8:0)-fill.intensity)*(snap?1:1-Math.exp(-dt*3));
 
       // Ending: triggered by Contact submit, cancelled by scrolling back up.
       const c=controls.current;
@@ -187,13 +226,15 @@ export default function JourneyScene({ sectionsRef, controls, flashRef, hudRef, 
       const e=endingStart?(reduced?9:(now-endingStart)/1000):-1,galaxyMode=e>2.75;
       if(galaxyMode&&e>4.3)setPhase('galaxy');
       // Pose weights ease over time (not scroll), so scene cuts never pop his limbs.
-      const easeIn=first||reduced?1:1-Math.exp(-dt*5);
-      pose.fly+=(flying*(galaxyMode?0:1)-pose.fly)*easeIn;pose.drift+=((s>1.64&&!flying?1:0)-pose.drift)*easeIn;
+      const easeIn=snap||reduced?1:1-Math.exp(-dt*5);
+      // Floating (close-up, aliens) he hangs relaxed; chasing, he flies.
+      const flyWant=closeUp?smooth(depart*1.4):flying*(galaxyMode?0:1);
+      pose.fly+=(flyWant-pose.fly)*easeIn;pose.drift+=((closeUp||aliensStage?1:0)-pose.drift)*easeIn;
 
       const k=s<1.78?0:pathIndex(s);frameAt(k,ctx.frame);const fr=ctx.frame;
       const pull=smooth((s-6)/.95);
 
-      // Rocket: on the pad, rising, then flying ahead along the path, finally orbiting the black hole.
+      // Rocket: on the pad, flying ahead along the path (figure-eights in Projects), finally orbiting the black hole.
       const lift=smooth((s-1.66)/.3),orbit=smooth((s-5.95)/.35),orbitAngle=time*.35;
       rocketRise(Math.max(s,1.08),ctx.rocket);
       frameAt(Math.min(k+rocketLead(s),LAST),rframe);
@@ -209,23 +250,24 @@ export default function JourneyScene({ sectionsRef, controls, flashRef, hudRef, 
       dir.copy(Y).lerp(heading,lift).lerp(v1.set(-Math.sin(orbitAngle),0,Math.cos(orbitAngle)*.65),orbit).normalize();
       // Idle: a slow, gentle bob while it flies.
       if(!reduced)ctx.rocket.addScaledVector(rframe.up,Math.sin(time*.5)*.12*lift*(1-orbit));
+      let rocketShown=true,thrust=s>1.02?1:0;
+      if(closeUp){
+        // The flyby: a straight streak across the background, nose first.
+        ctx.rocket.copy(FLY_A).lerp(FLY_B,flyby);dir.copy(FLY_B).sub(FLY_A).normalize();rocketShown=flyby>0&&flyby<1;
+      } else if(aliensStage){
+        // Parked ahead, hovering on a low flame.
+        ctx.rocket.copy(alienRocket);if(!reduced)ctx.rocket.y+=Math.sin(time*.8)*.25;dir.copy(Y);thrust=.45;
+      }
 
-      // Astronaut: summit, boards the rocket, gets thrown off, then flies the path.
-      // Astronaut: walks to the pad and climbs aboard (hidden inside for the launch), is blown out of the
-      // hatch at the ejection, tumbles clear, then flies the path.
-      const standing=v2.copy(SUMMIT_SPOT).setY(ASTRONAUT_HEIGHT/2),aboard=s>1.05&&s<1.64;
-      hatch.copy(ctx.rocket).add(rocketModel.exit);
-      // He hops from the summit into the open hatch as the camera turns to the rocket.
-      if(s<.9)ctx.astro.copy(standing);
-      else if(s<1.64){const hop=smooth((s-.9)/.15);ctx.astro.copy(standing).lerp(hatch,hop);ctx.astro.y+=Math.sin(hop*Math.PI)*2.2;}
-      // The ejection itself happens under the blackout: when the picture returns he's already adrift.
-      else if(s<1.78){frameAt(0,rframe);ctx.astro.copy(rframe.position);}
+      // Astronaut: floating in the close-up, flying the path, holding the line by the ship.
+      if(closeUp){
+        ctx.astro.copy(ABOUT_SPOT);if(!reduced)ctx.astro.y+=Math.sin(time*.55)*.12;
+        ctx.astro.addScaledVector(departDir,smooth(depart)*16);
+      } else if(aliensStage){ctx.astro.copy(alienAt);if(!reduced)ctx.astro.y+=Math.sin(time*.55)*.15;}
       else ctx.astro.copy(fr.position);
-      rocketModel.setHatch(bell(s,.82,.94,1.08));
-      puff.visible=false;
+      rocketModel.setHatch(0);
       ctx.astro.lerp(HOLE,pull*.06);
 
-      // Idle float: a slow drift up and down, in the close-up and in flight alike.
       // A barely-there float in flight; nothing that rocks back and forth.
       if(!reduced)ctx.astro.y+=Math.sin(time*.6)*.04*pose.fly;
 
@@ -245,38 +287,39 @@ export default function JourneyScene({ sectionsRef, controls, flashRef, hudRef, 
         galaxyT=smooth((e-2.75)/6);const g=clamp((e-2.75)/10,0,1);
         ctx.rocket.copy(GALAXY).add(v1.set(-120+g*260,35,90-g*150));dir.set(260,0,-150).normalize();
       }
-      rocket.position.copy(ctx.rocket);rocket.quaternion.setFromUnitVectors(Y,dir).multiply(qExtra.setFromAxisAngle(Y,reduced?0:time*.4*smooth((s-1.9)/.3)+Math.cos(theta)*1.1*eight));
-      rocket.scale.setScalar(galaxyMode?1:1-dive*.95);
+      rocket.position.copy(ctx.rocket);rocket.quaternion.setFromUnitVectors(Y,dir).multiply(qExtra.setFromAxisAngle(Y,reduced||closeUp?0:time*.4*smooth((s-1.9)/.3)+Math.cos(theta)*1.1*eight));
+      rocket.scale.setScalar(galaxyMode?1:1-dive*.95);rocket.visible=rocketShown||galaxyMode;
       rocketFlame.group.position.copy(ctx.rocket).addScaledVector(dir,-ROCKET_HEIGHT*.45*rocket.scale.x);rocketFlame.group.quaternion.copy(rocket.quaternion);
-      rocketFlame.group.scale.setScalar(ROCKET_HEIGHT/2.3*smooth((s-1.02)/.06)*rocket.scale.x*(galaxyMode?1:1));rocketFlame.group.visible=s>1.02||galaxyMode;
+      rocketFlame.group.scale.setScalar(ROCKET_HEIGHT/2.3*thrust*rocket.scale.x);rocketFlame.group.visible=(thrust>0&&rocket.visible)||galaxyMode;
       rocketFlame.update(time,reduced);
 
-      // Orientation: standing → tumbling → superman flight → fighting the black hole.
+      // Orientation: floating → superman flight → fighting the black hole.
       astronaut.position.copy(ctx.astro);
-      qStand.setFromAxisAngle(Y,Math.atan2(camera.position.x-ctx.astro.x,camera.position.z-ctx.astro.z));
+      // The close-up camera sits straight in front of him (-Z); elsewhere he turns to the camera, or (aliens) to the ship.
+      if(aliensStage){toTarget.copy(alienRocket).sub(ctx.astro);qStand.setFromAxisAngle(Y,Math.atan2(toTarget.x,toTarget.z));}
+      else qStand.setFromAxisAngle(Y,closeUp?Math.PI:Math.atan2(camera.position.x-ctx.astro.x,camera.position.z-ctx.astro.z));
       basisQuat(qFly,fr.tangent,v1.copy(fr.up).negate());
       basisQuat(qHole,v2.copy(ctx.astro).sub(HOLE),v1);
-      // Moon pass: classic side-on "superman" flight across the frame: body level, chest down,
-      // head end raised slightly, so the profile camera sees the full horizontal silhouette.
-      const glide=smooth((s-4.04)/.14)*(1-smooth((s-4.86)/.14));
-      basisQuat(qGlide,v2.copy(fr.tangent).addScaledVector(Y,.22),v1.set(0,-1,0));
-      qTarget.copy(qStand).slerp(qFly,pose.fly).slerp(qGlide,glide).slerp(qHole,pull*.9);
-      if(!reduced){
-        // Weightless drift after the ejection: a slow, self-running roll and pitch (calmed in the close-up).
-        const limp=pose.drift*(1-daze);
-        // One slow, continuous tumble (a full turn every ~25 s) that never reverses direction.
-        qTarget.multiply(qExtra.setFromAxisAngle(tumbleAxis,(time*.25)%(Math.PI*2)*limp));
-      }
-      // Close-up: he faces the camera, still.
-      if(daze>0)qTarget.slerp(qStand,daze);
-      if(first||reduced)astronaut.quaternion.copy(qTarget);else astronaut.quaternion.slerp(qTarget,1-Math.exp(-dt*6));
+      basisQuat(qDepart,departDir,v1.set(0,-1,0));
+      qTarget.copy(qStand).slerp(qFly,closeUp?0:pose.fly).slerp(qDepart,closeUp?smooth(depart*1.2)*.85:0).slerp(qHole,pull*.9);
+      // A slow, weightless sway while he floats; never a tumble.
+      if(closeUp&&!reduced)qTarget.multiply(qExtra.setFromEuler(qSway.set(Math.sin(time*.33)*.05,Math.sin(time*.21)*.08*(1-depart),Math.sin(time*.4)*.05)));
+      if(snap||reduced)astronaut.quaternion.copy(qTarget);else astronaut.quaternion.slerp(qTarget,1-Math.exp(-dt*(closeUp?3:6)));
       const fly=pose.fly;
       const shrink=1-dive*.95;astronaut.scale.set(shrink*(1-pull*.15),shrink*(1+pull*.45),shrink*(1-pull*.15));
-      astronaut.visible=!galaxyMode&&!aboard;
-      // The jetpack ignites with a quick ramp rather than popping on.
-      jetpack.flame.group.visible=fly>.02&&!galaxyMode;jetpack.flame.group.scale.setScalar(.42*fly*(1+pull*.9));jetpack.flame.update(time,reduced);
+      astronaut.visible=!galaxyMode&&!!mixer;
+      // The jetpack only shows once he's going somewhere; it ignites with a quick ramp rather than popping on.
+      jetpack.group.visible=!(closeUp&&depart===0);jetpack.flame.group.visible=fly>.02&&!galaxyMode;jetpack.flame.group.scale.setScalar(.42*fly*(1+pull*.9));jetpack.flame.update(time,reduced);
+      // Aliens: the game moves with the section's scroll; he tracks the nearest saucer.
+      muzzle.copy(ctx.astro).addScaledVector(Y,.25).addScaledVector(toTarget.copy(alienRocket).sub(ctx.astro).normalize(),.6);
+      const threat=aliensStage?game.update({p:progress,time,now,from:portalAt,to:alienRocket,muzzle,reduced}):null;
+      game.group.visible=aliensStage;
+      if(aliensStage)for(const shot of c.shots.splice(0))if(game.shoot(shot.x,shot.y,camera,window.innerWidth,window.innerHeight,now)&&scoreRef.current)scoreRef.current.textContent=`${game.zapped} zapped by you`;
+      else c.shots.length=0;
+      // The head follows the mouse a little, lagging well behind it.
+      const lag=reduced?1:1-Math.exp(-dt*.9);mouseLook.x+=(lean.x-mouseLook.x)*lag;mouseLook.y+=(lean.y-mouseLook.y)*lag;
       if(mixer){
-        const want=s<.85&&!reduced?'Wave':'Idle';
+        const want='Idle';
         if(want!==current&&actions[want]){actions[want].reset().fadeIn(.4).play();actions[current]?.fadeOut(.4);current=want;}
         if(headBone)headBone.quaternion.copy(headRest);
         rest.forEach(([b,q])=>b.quaternion.copy(q));
@@ -284,14 +327,20 @@ export default function JourneyScene({ sectionsRef, controls, flashRef, hudRef, 
         // Blend into the flying pose: limbs aimed in body space, head tipped up to look where he's going.
         if(fly>.001||pose.drift>.001){
           astronaut.updateMatrixWorld(true);
-          if(pose.drift>.001)for(const [b,child,,limp] of limbs)aimBone(b,child,v1.copy(limp).applyQuaternion(astronaut.quaternion),pose.drift*(1-fly));
-          for(const [b,child,local] of limbs)aimBone(b,child,v1.copy(local).applyQuaternion(astronaut.quaternion),fly);
-          // Look where he's going; on the Moon pass, look back at Earth, then up at the Moon.
-          if(headBone){
-            aimHead(fr.tangent,.45*fly*(1-glide));
-            const toMoon=smooth((s-4.38)/.2);
-            v1.copy(EARTH_CENTER).addScaledVector(Y,EARTH_RADIUS*.75).lerp(MOON,toMoon).sub(astronaut.position);
-            if(glide>.001)aimHead(v1,.8*glide);
+          if(pose.drift>.001)for(const [b,child,,limp] of limbs)if(limp)aimBone(b,child,v1.copy(limp).applyQuaternion(astronaut.quaternion),pose.drift*(1-fly));
+          for(const [b,child,local] of limbs)if(local)aimBone(b,child,v1.copy(local).applyQuaternion(astronaut.quaternion),fly);
+          if(headBone&&!closeUp)aimHead(fr.tangent,.45*fly);
+        }
+        if(headBone&&(closeUp||aliensStage)){
+          astronaut.updateMatrixWorld(true);headBone.getWorldPosition(head);
+          if(aliensStage){if(threat)aimHead(v1.copy(threat).sub(head),.8);}
+          else{
+            // At the camera, nudged toward the mouse and the odd idle glance; then at the rocket as it passes.
+            const glance=reduced?0:.45;
+            v1.copy(camPos).sub(head).add(v2.set((Math.sin(time*.23)*1.5+Math.sin(time*.071)*.9)*glance-mouseLook.x*1.6,Math.sin(time*.17+.6)*.6*glance-mouseLook.y*.9,0));
+            const watch=closeUp?smooth(flyby*4)*(1-smooth(depart*3)):0;
+            if(watch>0)v1.lerp(v2.copy(flyby<1?ctx.rocket:FLY_B).sub(head).normalize().multiplyScalar(v1.length()),watch);
+            aimHead(v1,.85*(1-smooth(depart*1.5)*.6));
           }
         }
       }
@@ -301,34 +350,41 @@ export default function JourneyScene({ sectionsRef, controls, flashRef, hudRef, 
         foot.getWorldPosition(boot.group.position);boot.group.quaternion.copy(astronaut.quaternion);boot.group.scale.setScalar(.14*fly*(1+pull*.6));boot.update(time+i*.37,reduced);});
       // Aim at the helmet's centre: the Head bone sits at the neck, so lift along the body's up axis.
       if(headBone)headBone.getWorldPosition(head).add(v2.copy(Y).applyQuaternion(astronaut.quaternion).multiplyScalar(.17));else head.copy(ctx.astro).addScaledVector(Y,.8);
-      dizzy.forEach((star,i)=>{const a=time*3+i*2.09;star.position.copy(head).add(v1.set(Math.cos(a)*.34,.3+Math.sin(a*2)*.03,Math.sin(a)*.34));star.material.opacity=daze*.75;star.visible=daze>.01&&!reduced;});
-
-      // Camera: blended shots, damped like a game chase cam, with sway and shake.
+      // Camera: each section's own shot, damped like a dolly on rails.
+      const tall=camera.aspect<.8;
       if(galaxyMode){
         camPos.copy(GALAXY).add(v1.set(0,25+galaxyT*275,260-galaxyT*220));camLook.copy(GALAXY).add(v1.set(0,10-galaxyT*10,-60+galaxyT*60));
       } else {
-        const shot=daze?'closeup':shotAt(ctx,targetPos,targetLook);if(daze)shotAt(ctx,targetPos,targetLook);
-        if(daze>0){closeUp(ctx,head,v1,v2);orbitBlend(head,targetPos,v1,daze,targetPos);targetLook.lerp(v2,daze);}
+        if(closeUp)aboutShot(targetPos,targetLook);
+        else if(projectsStage){
+          // Close behind him at first; after the first project the camera eases over to the rocket and keeps it
+          // on the right (centred on portrait screens), the cards flowing down the left.
+          const toRocket=smooth((progress-.16)/.22),offset=tall?0:9;
+          v1.copy(ctx.astro).addScaledVector(fr.tangent,-4.2).addScaledVector(fr.up,1.1);
+          v2.copy(ctx.astro).addScaledVector(fr.tangent,8).addScaledVector(fr.up,.4);
+          targetPos.copy(ctx.rocketPath).addScaledVector(fr.tangent,-30).addScaledVector(fr.up,3).addScaledVector(fr.side,-offset*.35);
+          targetLook.copy(ctx.rocketPath).addScaledVector(fr.tangent,10).addScaledVector(fr.up,1.6).addScaledVector(fr.side,-offset);
+          targetPos.lerp(v1,1-toRocket);targetLook.lerp(v2,1-toRocket);
+        } else if(aliensStage){
+          // Over his left shoulder: him in the right foreground (clear of the copy), the ship and its swarm
+          // upper centre.
+          targetPos.copy(alienAt).addScaledVector(alienFrame.tangent,tall?-12:-4.2).addScaledVector(alienFrame.side,tall?-1.6:-2.4).addScaledVector(alienFrame.up,tall?2.2:1.2);
+          targetLook.copy(alienRocket).addScaledVector(alienFrame.side,tall?0:-1).addScaledVector(alienFrame.up,tall?-4.5:-3.2);
+        } else shotAt(ctx,targetPos,targetLook);
         if(e>0)targetLook.lerp(HOLE,smooth((e-1)/1.2));
-        // Hard cut: jump straight to the new framing and fade up from dark.
-        const cut=!first&&shot!==lastShot;lastShot=shot;
-        // One soft dip per cut; cuts close together (e.g. during a snap glide) share it instead of flashing.
-        if(cut&&!reduced&&now-cutAt>700&&cue.mist<.3&&cue.dark<.3)cutAt=now;
-        if(first||reduced||cut){camPos.copy(targetPos);camLook.copy(targetLook);}
-        // Heavily damped, like a dolly on rails: no shake, no sway.
-        // The launch camera is locked to the climbing rocket (lagging behind it reads as jitter); elsewhere it glides.
-        else{const rate=shot==='launch'?14:2.8;camPos.lerp(targetPos,1-Math.exp(-dt*rate));camLook.lerp(targetLook,1-Math.exp(-dt*(rate+.4)));}
+        if(snap||reduced){camPos.copy(targetPos);camLook.copy(targetLook);}
+        else{const rate=2.2;camPos.lerp(targetPos,1-Math.exp(-dt*rate));camLook.lerp(targetLook,1-Math.exp(-dt*(rate+.4)));}
       }
-      camera.position.copy(camPos);camera.lookAt(camLook);
-      camera.fov=THREE.MathUtils.lerp(50+(reduced?0:pull*6)+(galaxyMode?6:0),34,daze);camera.updateProjectionMatrix();camera.updateMatrixWorld();
-      // Drives the About photo card and panel fades.
-      if(aboutRef.current){
-        const el=aboutRef.current.style;
-        el.setProperty('--about',about.toFixed(3));el.setProperty('--daze',daze.toFixed(3));
-        document.documentElement.style.setProperty('--daze',daze.toFixed(3));
-      }
+      // Lean toward the pointer: a small pan, proportional to how far away the subject is.
+      const follow=reduced?0:1-Math.exp(-dt*1.4);
+      lean.x+=((reduced?0:pointer.x)-lean.x)*(reduced?1:follow);lean.y+=((reduced?0:pointer.y)-lean.y)*(reduced?1:follow);
+      dir.copy(camLook).sub(camPos);const reach=dir.length()*.035;dir.normalize();
+      camRight.crossVectors(dir,Y).normalize();camUp.crossVectors(camRight,dir);
+      camera.position.copy(camPos).addScaledVector(camRight,lean.x*reach).addScaledVector(camUp,-lean.y*reach*.6);
+      camera.lookAt(v1.copy(camLook).addScaledVector(camRight,lean.x*reach*.35).addScaledVector(camUp,-lean.y*reach*.2));
+      camera.fov=(closeUp?34:50)+(reduced?0:pull*6)+(galaxyMode?6:0);camera.updateProjectionMatrix();camera.updateMatrixWorld();
 
-      // Sky, fog and stars follow altitude; the portal tints the sky.
+      // Sky, fog and stars follow altitude; the alien zone tints the sky.
       const y=camPos.y;
       if(y<60)scene.background.copy(skyLow).lerp(skyHigh,smooth(y/60));
       else scene.background.copy(skyHigh).lerp(space,smooth((y-60)/110));
@@ -339,7 +395,8 @@ export default function JourneyScene({ sectionsRef, controls, flashRef, hudRef, 
       // Glow belongs to space: no bloom against the bright daytime sky and snow.
       // Softer key light once we're in space, so white suits and hulls don't clip into bloom.
       sun.intensity=THREE.MathUtils.lerp(2.6,1.7,smooth((y-110)/70));
-      if(bloom)bloom.strength=galaxyMode?1.1:.85*smooth((y-110)/70)*(1-daze*.75);
+      // The close-up fills the frame with white suit, so bloom is mostly off there.
+      if(bloom)bloom.strength=galaxyMode?1.1:.85*smooth((y-110)/70)*(closeUp?.2:aliensStage?.55:1);
 
       world.visible=!galaxyMode;galaxy.group.visible=galaxyMode;galaxy.update(time,smooth((e-2.75)/1.4));
       // Clouds thin out as we climb past them instead of vanishing at a fixed height.
@@ -350,29 +407,25 @@ export default function JourneyScene({ sectionsRef, controls, flashRef, hudRef, 
       // `presence` fades pieces in while the camera is still looking elsewhere (the path curls back on itself).
       // Deep space backdrop: Saturn and Mars ahead, the Moon and Sun back home. Faded with altitude.
       const deep=smooth((y-110)/80);
-      // Saturn and Mars belong to our side of the portal; they're gone once you're through it.
+      // Saturn and Mars fade out as we head into the alien zone.
       const home=deep*smooth((s-2.3)/.5)*(1-smooth((s-5.18)/.14));
       saturn.fade(home);saturn.update(time);mars.fade(home);
       moon.update(camera,deep);
-      sunGlow.update(camera,galaxyMode?0:smooth((y-120)/70),reduced);
       jumper.update(s,camera,1);
-      portal.update(time,camera);if(s>5.6)portal.group.visible=false;
-      alienFade(s>6.4?0:reveal(camera.position.distanceTo(portal.group.position),150,380));v1.copy(ctx.astro).addScaledVector(fr.tangent,.8);aliens.update(time,s,v1);
       // The black hole only emerges once the alien zone is behind us.
       holeFade(reveal(camera.position.distanceTo(HOLE),380,720)*smooth((s-5.8)/.3));blackHole.update(time,Math.max(pull,dive),camera,reduced);
       // Tilt the disk into a diagonal sweep, rising to the right like Gargantua.
       blackHole.group.quaternion.multiply(qExtra.setFromAxisAngle(Z,.42));
 
-      // Covers: the director's cuts (dark or cloud), plus a short dip on camera cuts inside a transition.
-      veil.style.opacity=String(Math.max(cue.dark,.7*(1-smooth((now-cutAt)/700))));
-      mist.style.opacity=String(cue.mist);if(cue.mist>0)mist.style.transform=`translateY(${((now-story.start)/story.duration-.65)*30}%)`;
       if(flashRef.current)flashRef.current.style.opacity=e>0?String(bell(e,2.3,2.75,3.5)):'0';
-      if(hudRef.current)hudRef.current.textContent=`s ${s.toFixed(3)} · ${CHAPTERS[story.index].id}${about>0&&about<1?` · about ${about.toFixed(2)}`:''}${galaxyMode?' · galaxy':''}`;
-      if(composer)composer.render(dt);else renderer.render(scene,camera);
+      if(hudRef.current)hudRef.current.textContent=`s ${s.toFixed(3)} · ${id}${id==='skills'?` · ${skills.toFixed(2)}`:''}${galaxyMode?' · galaxy':''}`;
+      glitch.enabled=cut>.001;glitch.uniforms.uAmount.value=cut;glitch.uniforms.uMode.value=cutMode;glitch.uniforms.uTime.value=now/1000;
+      if(bloom||glitch.enabled)composer.render(dt);else renderer.render(scene,camera);
+      liquid.render(dt,time,reduced);
       first=false;
       if(!started){started=true;mount.dataset.ready='true';}
     }
-    const resize=()=>{const w=window.innerWidth,h=window.innerHeight;renderer.setSize(w,h);composer?.setSize(w,h);bloom?.resolution.set(w/2,h/2);camera.aspect=w/h;camera.updateProjectionMatrix();};
+    const resize=()=>{const w=window.innerWidth,h=window.innerHeight;renderer.setSize(w,h);composer.setSize(w,h);liquid.resize(w,h);bloom?.resolution.set(w/2,h/2);camera.aspect=w/h;camera.updateProjectionMatrix();};
     window.addEventListener('resize',resize);
     resize();
     // Compile every shader up front (hidden pieces included) so nothing hitches when it first appears.
@@ -382,10 +435,10 @@ export default function JourneyScene({ sectionsRef, controls, flashRef, hudRef, 
     // ?debug: render frames on demand (background tabs throttle requestAnimationFrame).
     if(new URLSearchParams(window.location.search).has('debug')){window.__journeyStep=(frames=60)=>{for(let i=0;i<frames;i++)render(1/30);};window.__journey={scene,camera,clouds,ground,rocket,astronaut};}
     return()=>{
-      disposed=true;cancelAnimationFrame(raf);delete window.__journeyStep;delete window.__journey;veil.remove();mist.remove();
-      window.removeEventListener('resize',resize);
-      mixer?.stopAllAction();release(scene);resources.forEach(resource=>resource.dispose());composer?.dispose();renderer.dispose();renderer.domElement.remove();
+      disposed=true;cancelAnimationFrame(raf);delete window.__journeyStep;delete window.__journey;liquid.dispose();
+      window.removeEventListener('resize',resize);window.removeEventListener('pointermove',onPointer);
+      mixer?.stopAllAction();release(scene);resources.forEach(resource=>resource.dispose());composer.dispose();renderer.dispose();renderer.domElement.remove();
     };
-  },[sectionsRef,controls,flashRef,hudRef,aboutRef]);
+  },[controls,flashRef,hudRef,scoreRef]);
   return <div className="journey-canvas" ref={host} aria-hidden="true" />;
 }

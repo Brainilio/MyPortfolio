@@ -1,6 +1,5 @@
 import * as THREE from 'three';
-import { frameAt, createFrame, pathIndex, PORTAL_K, MOON, MOON_RADIUS, SATURN, MARS, SUN_DIRECTION, SUN_DISTANCE } from './flight';
-import { reveal } from './timeline';
+import { MOON, MOON_RADIUS, SATURN, MARS, SUN_DIRECTION, SUN_DISTANCE } from './flight';
 
 const hash=n=>{const s=Math.sin(n*91.7)*43758.5453;return s-Math.floor(s);};
 export function glowTexture() {
@@ -154,58 +153,5 @@ export function createMoonJumper(moon) {
       .addScaledVector(up,(-.7+1.05*Math.sin(Math.PI*j))*MOON_RADIUS);
     material.rotation=(.5-j)*.55;
     material.opacity=Math.min(1,j/.05,(1-j)/.05)*dimmed;
-  }};
-}
-
-export function createPortal() {
-  const group=new THREE.Group(),frame=createFrame();frameAt(PORTAL_K,frame);
-  const uniforms={uTime:{value:0},uOpacity:{value:1}};
-  const ring=new THREE.Mesh(new THREE.TorusGeometry(7.5,.32,16,120),new THREE.MeshBasicMaterial({color:new THREE.Color(1.6,.9,3.2),toneMapped:false}));
-  const disc=new THREE.Mesh(new THREE.CircleGeometry(7.5,96),new THREE.ShaderMaterial({uniforms,transparent:true,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,
-    vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-    fragmentShader:`varying vec2 vUv;uniform float uTime;uniform float uOpacity;void main(){vec2 p=vUv-.5;float r=length(p)*2.,a=atan(p.y,p.x);
-      float swirl=sin(a*5.+r*16.-uTime*3.)*.5+.5,swirl2=sin(-a*3.+r*9.+uTime*2.)*.5+.5;
-      vec3 color=mix(vec3(.15,.9,.8),vec3(.7,.35,1.),swirl)*(.4+swirl2*.6);
-      float core=exp(-r*3.)*1.5;float edge=smoothstep(1.,.86,r);
-      gl_FragColor=vec4((color*(1.-r*.4)+vec3(.9,.85,1.)*core)*edge*uOpacity,edge*.85*uOpacity);}`,
-  }));
-  group.add(ring,disc);group.position.copy(frame.position);
-  group.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),frame.tangent);
-  const fade=createFader(group);
-  return {group,update(time,camera){uniforms.uTime.value=time;ring.rotation.z=time*.3;fade(reveal(camera.position.distanceTo(group.position),150,380));}};
-}
-
-// Alien saucers that get zapped as you scroll through the zone (interactive shooting comes later).
-export function createAliens(texture) {
-  const count=14,group=new THREE.Group(),frame=createFrame();
-  const saucerGeometry=new THREE.SphereGeometry(1.4,24,12);saucerGeometry.scale(1,.3,1);
-  const domeGeometry=new THREE.SphereGeometry(.62,16,8,0,Math.PI*2,0,Math.PI/2);domeGeometry.translate(0,.25,0);
-  const saucers=new THREE.InstancedMesh(saucerGeometry,new THREE.MeshStandardMaterial({color:0x9aa3b5,metalness:.75,roughness:.3}),count);
-  const domes=new THREE.InstancedMesh(domeGeometry,new THREE.MeshBasicMaterial({color:new THREE.Color(.35,1.9,.7),toneMapped:false}),count);
-  saucers.frustumCulled=domes.frustumCulled=false;group.add(saucers,domes);
-  const aliens=[...Array(count)].map((_,i)=>{
-    const k=9.5+i*.125;frameAt(k,frame);
-    const home=frame.position.clone().addScaledVector(frame.side,(i%2?1:-1)*(3+hash(i)*6)).addScaledVector(frame.up,-2+hash(i+9)*6);
-    // Each alien is zapped when the astronaut is ~0.6 path units behind it.
-    let die=5.3;while(die<7&&pathIndex(die)<k-.6)die+=.002;
-    const boom=new THREE.Sprite(new THREE.SpriteMaterial({map:texture,color:0x9dffb0,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:0}));
-    group.add(boom);return {home,die,boom,phase:hash(i+3)*6};
-  });
-  const laserPositions=new Float32Array(count*6);
-  const laserGeometry=new THREE.BufferGeometry();laserGeometry.setAttribute('position',new THREE.BufferAttribute(laserPositions,3));
-  const lasers=new THREE.LineSegments(laserGeometry,new THREE.LineBasicMaterial({color:new THREE.Color(.6,3,.9),toneMapped:false}));lasers.frustumCulled=false;group.add(lasers);
-  const dummy=new THREE.Object3D(),p=new THREE.Vector3();
-  return {group,update(time,s,muzzle){
-    aliens.forEach((alien,i)=>{
-      const alive=1-THREE.MathUtils.smoothstep(s,alien.die,alien.die+.012);
-      p.copy(alien.home);p.y+=Math.sin(time*1.6+alien.phase)*.6;
-      dummy.position.copy(p);dummy.rotation.set(Math.sin(time+alien.phase)*.15,time*1.5+alien.phase,0);dummy.scale.setScalar(Math.max(alive,.0001));dummy.updateMatrix();
-      saucers.setMatrixAt(i,dummy.matrix);domes.setMatrixAt(i,dummy.matrix);
-      const firing=s>alien.die-.03&&s<alien.die+.004;
-      (firing?muzzle:p).toArray(laserPositions,i*6);p.toArray(laserPositions,i*6+3);
-      const blast=THREE.MathUtils.clamp((s-alien.die)/.05,0,1);
-      alien.boom.position.copy(p);alien.boom.scale.setScalar(2+blast*9);alien.boom.material.opacity=blast>0&&blast<1?(1-blast)*1.2:0;
-    });
-    saucers.instanceMatrix.needsUpdate=domes.instanceMatrix.needsUpdate=true;laserGeometry.attributes.position.needsUpdate=true;
   }};
 }
