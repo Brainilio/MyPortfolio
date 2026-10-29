@@ -383,14 +383,12 @@ export default function IslandScene({ onEvent, active, onReady } = {}) {
     canvas.addEventListener("pointermove",onMove);canvas.addEventListener("pointerdown",onDown);window.addEventListener("pointerup",onUp);
     canvas.addEventListener("pointerleave",()=>{pointerInside=false;});
 
-    // Framing: the island sits right of the headline on wide screens and centred on tall ones.
+    // Framing: the island centred, a little low, under the name.
     let tall=false;
     function frame(){
       const w=mount.clientWidth,h=mount.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;tall=camera.aspect<.85;
-      const distance=tall?60:31;scene.fog.near=distance+3;scene.fog.far=distance*2.2+8;camera.position.set(.32,.36,.88).normalize().multiplyScalar(distance);
-      camera.lookAt(0,tall?1.6:-.4,0);
-      if(tall)camera.clearViewOffset();else camera.setViewOffset(w,h,-w*.17,h*.02,w,h);
-      camera.updateProjectionMatrix();needsRender=true;
+      const distance=tall?60:36;scene.fog.near=distance+3;scene.fog.far=distance*2.2+8;camera.position.set(.32,.36,.88).normalize().multiplyScalar(distance);
+      camera.lookAt(0,tall?.2:2.2,0);camera.clearViewOffset();camera.updateProjectionMatrix();needsRender=true;
     }
     const resize=new ResizeObserver(frame);resize.observe(mount);frame();
     const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;});observer.observe(mount);

@@ -197,8 +197,8 @@ export default function Home() {
             <p className="ht-lede">Full-stack, from REST APIs to 3D on the web. I explore new ideas and try to leave the world a little better than I found it.</p>
             <p className="ht-stack">React · Node · TypeScript · Three.js</p>
             <div className="ht-links">
-              <a href="#work" onClick={event => { event.preventDefault(); jump(1); }}>See my work <span aria-hidden="true">↓</span></a>
-              <a href="mailto:brainilioir@gmail.com">Say hello <span aria-hidden="true">↗</span></a>
+              <a className="ht-button" href="#work" onClick={event => { event.preventDefault(); jump(1); }}>See my work <span aria-hidden="true">↓</span></a>
+              <a className="ht-button ht-button-ghost" href="mailto:brainilioir@gmail.com">Say hello <span aria-hidden="true">↗</span></a>
             </div>
           </div>
         </div>

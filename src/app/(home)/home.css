@@ -30,10 +30,10 @@ html:has(.ht)::-webkit-scrollbar{display:none}
 .ht-canvas[data-ready=true]{opacity:1}
 .ht-canvas canvas{display:block;width:100%;height:100%}
 
-/* The name sits in front of the island's dangling roots; clicks pass through to the scene. */
-.ht .ht-name{position:absolute;z-index:3;left:0;right:0;bottom:7svh;display:block;margin:0;text-align:center;pointer-events:none;
+/* The name: big, across the top and behind the island (under the canvas), so the peaks rise in front of it. */
+.ht .ht-name{position:absolute;z-index:1;left:0;right:0;top:clamp(96px,15svh,150px);display:block;margin:0;text-align:center;pointer-events:none;
   font-family:var(--font-display),'Inter',sans-serif;font-weight:900;
-  font-size:clamp(56px,18.5vw,360px);line-height:.8;letter-spacing:-.06em;color:var(--cream);
+  font-size:clamp(64px,15vw,280px);line-height:.8;letter-spacing:-.06em;color:var(--cream);
   text-shadow:0 0 80px rgba(255,190,170,.25)}
 
 /* Finish: film grain, a soft vignette and a warm light leak, so the scene reads as one graded image. */
@@ -51,19 +51,26 @@ html:has(.ht)::-webkit-scrollbar{display:none}
 .ht-wordmark{font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:22px;letter-spacing:-.04em}
 .ht-wordmark span,.ht-roles span{color:var(--violet)}
 .ht-header nav{display:flex;gap:44px}
-.ht-header nav a,.ht-links a{position:relative}
-.ht-header nav a:after,.ht-links a:after{content:'';position:absolute;left:0;right:100%;bottom:-5px;height:1px;background:currentColor;transition:right .35s}
-.ht-header nav a:hover:after,.ht-links a:hover:after{right:0}
+.ht-header nav a{position:relative}
+.ht-header nav a:after{content:'';position:absolute;left:0;right:100%;bottom:-5px;height:1px;background:currentColor;transition:right .35s}
+.ht-header nav a:hover:after{right:0}
 .ht-available{display:inline-flex;align-items:center;gap:9px;padding:9px 15px;border:1px solid rgba(251,247,255,.28);border-radius:100px;font-size:12px;backdrop-filter:blur(6px)}
 .ht-available i{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 10px #4ade80}
 
-.ht-intro{position:absolute;z-index:4;left:var(--gutter);top:clamp(116px,17svh,180px);max-width:430px;pointer-events:none}
+/* The intro and its buttons sit bottom-left, under the island. */
+.ht-intro{position:absolute;z-index:4;left:var(--gutter);bottom:clamp(36px,7svh,72px);max-width:360px;pointer-events:none}
 .ht-eyebrow{display:block;margin-bottom:18px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(251,247,255,.6)}
 .ht-intro a{pointer-events:auto}
-.ht-roles{margin:0;font-family:var(--font-display),'Inter',sans-serif;font-weight:700;font-size:clamp(30px,3.1vw,48px);line-height:1.02;letter-spacing:-.045em}
+.ht-roles{margin:0;font-family:var(--font-display),'Inter',sans-serif;font-weight:700;font-size:clamp(24px,2.2vw,34px);line-height:1.02;letter-spacing:-.045em}
 .ht-stack{margin:16px 0 0;font-size:12px;letter-spacing:.08em;color:rgba(251,247,255,.55)}
-.ht-lede{margin:26px 0 0;font-family:var(--font-display),'Inter',sans-serif;font-weight:500;font-size:16px;line-height:1.55;color:rgba(251,247,255,.72)}
-.ht-links{display:flex;gap:28px;margin-top:26px;font-size:13px}
+.ht-lede{margin:14px 0 0;font-family:var(--font-display),'Inter',sans-serif;font-weight:500;font-size:16px;line-height:1.55;color:rgba(251,247,255,.72)}
+.ht-links{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+/* Buttons, matching the contact email: a solid primary and a frosted secondary. */
+.ht-button{display:inline-flex;align-items:center;gap:8px;padding:14px 22px;border-radius:12px;background:var(--cream);color:#1d1233;font-weight:600;font-size:15px;pointer-events:auto;
+  box-shadow:0 10px 30px rgba(20,8,40,.28);transition:transform .3s,background .3s,box-shadow .3s}
+.ht-button:hover{transform:translateY(-2px);background:#fff;box-shadow:0 14px 36px rgba(20,8,40,.36)}
+.ht-button-ghost{background:rgba(29,18,51,.42);color:var(--cream);border:1px solid rgba(251,247,255,.4);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.ht-button-ghost:hover{background:rgba(29,18,51,.6)}
 .ht a:focus-visible{outline:2px solid var(--violet);outline-offset:6px}
 
 /* Work and Skills: sky, a giant translucent title behind the scene, the scene, then the heading. */
@@ -168,12 +175,13 @@ html.ht-locked{overflow:hidden}
   .ht-head{left:20px;top:78px}
   .ht-pill{right:16px;bottom:16px}
   .ht-header nav{display:none}
-  .ht-intro{left:20px;right:20px;top:92px;max-width:none}
-  .ht-roles{font-size:28px}
+  .ht-intro{left:20px;right:20px;bottom:84px;max-width:none}
+  .ht-roles{font-size:24px}
   .ht-eyebrow{margin-bottom:10px}
   .ht-stack{margin-top:10px}
     .ht-lede{font-size:14px;margin-top:12px;max-width:320px}
   .ht-links{margin-top:14px}
+  .ht-button{padding:12px 18px;font-size:14px}
   .ht-scrim{width:auto;right:0;bottom:auto;height:66svh;background:linear-gradient(180deg,rgba(243,240,228,.88) 0%,rgba(243,240,228,.6) 60%,rgba(243,240,228,0) 100%);-webkit-mask-image:linear-gradient(180deg,#000 55%,transparent);mask-image:linear-gradient(180deg,#000 55%,transparent)}
   .ht-trail-log{left:16px;right:16px;width:auto;-webkit-mask-image:linear-gradient(180deg,transparent 18svh,#000 24svh,#000 52svh,transparent 60svh);mask-image:linear-gradient(180deg,transparent 18svh,#000 24svh,#000 52svh,transparent 60svh)}
   .ht-log{top:25svh;transform:translateY(calc(var(--q,0) * (22svh - 100%)))}

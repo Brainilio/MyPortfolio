@@ -110,6 +110,8 @@ export default function PrairieScene({ state, projects, onReady }) {
     const HIDES=[[-18,-27,6,8.5,2,.06],[-6,-35,5,7.5,1.8,-.04],[6,-31,6.5,9,2.2,.05],[19,-37,5.5,8,1.8,-.07],[-7.2,1.5,2.4,8.5,1.4,.05],[6.6,-10.5,2.8,10,1.6,-.06]];
     const BACKDROP=[[-36,-72,12,17,3,.08],[-23,-86,6,10,2,-.1],[31,-80,14,19,3.2,-.06],[44,-66,6,9,2,.1],[8,-108,9,12,2.5,-.03]];
     [...HIDES,...BACKDROP].forEach(([x,z,w,h,d,lean])=>{const fin=createFin(rng,w,h,d);fin.position.set(x,groundY(x,z)-.4,z);fin.rotation.set(0,(rng()-.5)*.5,lean);scene.add(fin);});
+    // Tall screens use a narrower ring that misses both spires, so they get one of their own just inside its back arc.
+    const narrowSpire=createFin(random(11),2.4,9,1.3);narrowSpire.position.set(-1.9,groundY(-1.9,-7.6)-.4,-7.6);narrowSpire.rotation.set(0,.2,.05);narrowSpire.visible=false;scene.add(narrowSpire);
     // Junipers clustered at the rocks and dotted across the hills; sagebrush clumps in the grass.
     {
       const spots=[];
@@ -337,7 +339,7 @@ export default function PrairieScene({ state, projects, onReady }) {
     let tall=false;
     // The section hand-off slides the view inside the camera (no canvas edge shows), by the same amount as the others.
     const view={w:1,h:1},applyView=()=>{const shift=state.current.shift?.[1]??0;camera.setViewOffset(view.w,view.h,0,shift*view.h*.28,view.w,view.h);};
-    function frame(){const w=mount.clientWidth,h=mount.clientHeight;view.w=w;view.h=h;renderer.setSize(w,h,false);camera.aspect=w/h;tall=camera.aspect<.85;camera.fov=tall?46:35;camera.updateProjectionMatrix();}
+    function frame(){const w=mount.clientWidth,h=mount.clientHeight;view.w=w;view.h=h;renderer.setSize(w,h,false);camera.aspect=w/h;tall=camera.aspect<.85;narrowSpire.visible=tall;camera.fov=tall?46:35;camera.updateProjectionMatrix();}
     const resize=new ResizeObserver(frame);resize.observe(mount);frame();
 
     const clock=new THREE.Clock();let time=0;
