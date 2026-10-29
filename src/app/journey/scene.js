@@ -11,7 +11,7 @@ import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js"
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import { createRocketBoosters } from "../rocket-boosters";
 import { createBlackHole } from "../black-hole";
-import { readStory, smooth, clamp, track, reveal, CHAPTERS } from "./timeline";
+import { storyAt, chapterProgress, smooth, clamp, reveal, CHAPTERS } from "./timeline";
 import { SUMMIT_SPOT, LAUNCH_PAD, ROCKET_HEIGHT, ASTRONAUT_HEIGHT, EARTH_CENTER, EARTH_RADIUS, EARTH_POLE, MOON, MOON_RADIUS, HOLE, LAST, frameAt, createFrame, pathIndex, rocketLead, shotAt, closeUp, orbitBlend } from "./flight";
 import { createStars, createClouds, createMilkyWay, createAurora } from "./sky";
 import { createGround, createEarth } from "./earth";
@@ -143,8 +143,12 @@ export default function JourneyScene({ sectionsRef, controls, flashRef, hudRef, 
     const view={s:0,about:0},pose={fly:0,drift:0};
     // A dark veil over the 3D (not the page UI) that softens hard camera cuts.
     const veil=document.createElement('div');veil.style.cssText='position:absolute;inset:0;background:#030409;opacity:0;pointer-events:none';mount.appendChild(veil);
+    // Cloud mist for the climb: soft white banks that drift down past the lens as the rocket rises.
+    const mist=document.createElement('div');
+    mist.style.cssText='position:absolute;inset:-20% 0;opacity:0;pointer-events:none;background:radial-gradient(45% 30% at 25% 30%,#fff 0,rgba(255,255,255,0) 70%),radial-gradient(50% 28% at 75% 55%,#f4f7fc 0,rgba(244,247,252,0) 70%),radial-gradient(40% 25% at 40% 80%,#fff 0,rgba(255,255,255,0) 70%),rgba(226,234,245,.92);will-change:transform,opacity';
+    mount.appendChild(mist);
     let lastShot='',cutAt=-1e9;
-    let first=true,time=0,endingStart=0,lastPhase='',started=false;
+    let first=true,time=0,endingStart=0,lastPhase='',started=false,seenStart=-1;const from={s:0,about:0};
     const setPhase=value=>{if(value!==lastPhase){lastPhase=value;phase.current?.(value);}};
     const rocketRise=(s,out)=>{const t=(s-1.08)/.56,rise=t<=0?0:t<=1?Math.pow(t,2.2):1+(t-1)*2.2;return out.copy(LAUNCH_PAD).setY(ROCKET_HEIGHT/2+rise*188);};
     const pa=new THREE.Vector3(),pb=new THREE.Vector3(),qd=new THREE.Quaternion(),qw=new THREE.Quaternion(),qp=new THREE.Quaternion(),qI=new THREE.Quaternion();
@@ -159,9 +163,14 @@ export default function JourneyScene({ sectionsRef, controls, flashRef, hudRef, 
     function render(dt) {
       const reduced=preference.matches,now=performance.now();
       if(!reduced)time+=dt;
-      // The story eases toward the scroll position instead of being bound to it frame by frame.
-      const story=readStory(sectionsRef.current||[],reduced),ease=first||reduced?1:1-Math.exp(-dt*2.4);
-      view.s+=(story.s-view.s)*ease;view.about+=((story.holds.about||0)-view.about)*ease;
+      // Story time comes from the director: timed transitions between chapters, and inside a tall chapter
+      // a gently eased scrub of its internal scroll.
+      const story=controls.current.story;
+      if(story.start!==seenStart){seenStart=story.start;from.s=view.s;from.about=view.about;}
+      const progress=reduced?.5:chapterProgress(sectionsRef.current?.[story.index]);
+      const cue=storyAt(story,from,now,progress);
+      if(cue.active||first||reduced){view.s=cue.s;view.about=cue.about;}
+      else{view.s+=(cue.s-view.s)*(1-Math.exp(-dt*3));view.about=cue.about;}
       const s=view.s,about=view.about;
       ctx.s=s;ctx.time=time;
       // The About beat holds story time at 2.0. The push-in to the helmet starts during the end of the
@@ -206,12 +215,13 @@ export default function JourneyScene({ sectionsRef, controls, flashRef, hudRef, 
       // hatch at the ejection, tumbles clear, then flies the path.
       const standing=v2.copy(SUMMIT_SPOT).setY(ASTRONAUT_HEIGHT/2),aboard=s>1.05&&s<1.64;
       hatch.copy(ctx.rocket).add(rocketModel.exit);
-      if(s<1.0)ctx.astro.copy(standing);
-      else if(s<1.64)ctx.astro.copy(standing).lerp(v1.copy(LAUNCH_PAD).setY(ASTRONAUT_HEIGHT/2).addScaledVector(v1.clone().sub(standing).setY(0).normalize(),-1.6),smooth((s-1.0)/.05));
+      // He hops from the summit into the open hatch as the camera turns to the rocket.
+      if(s<.9)ctx.astro.copy(standing);
+      else if(s<1.64){const hop=smooth((s-.9)/.15);ctx.astro.copy(standing).lerp(hatch,hop);ctx.astro.y+=Math.sin(hop*Math.PI)*2.2;}
       // The ejection itself happens under the blackout: when the picture returns he's already adrift.
       else if(s<1.78){frameAt(0,rframe);ctx.astro.copy(rframe.position);}
       else ctx.astro.copy(fr.position);
-      rocketModel.setHatch(smooth((s-1.6)/.05));
+      rocketModel.setHatch(bell(s,.82,.94,1.08));
       puff.visible=false;
       ctx.astro.lerp(HOLE,pull*.06);
 
@@ -303,7 +313,7 @@ export default function JourneyScene({ sectionsRef, controls, flashRef, hudRef, 
         // Hard cut: jump straight to the new framing and fade up from dark.
         const cut=!first&&shot!==lastShot;lastShot=shot;
         // One soft dip per cut; cuts close together (e.g. during a snap glide) share it instead of flashing.
-        if(cut&&!reduced&&now-cutAt>700)cutAt=now;
+        if(cut&&!reduced&&now-cutAt>700&&cue.mist<.3&&cue.dark<.3)cutAt=now;
         if(first||reduced||cut){camPos.copy(targetPos);camLook.copy(targetLook);}
         // Heavily damped, like a dolly on rails: no shake, no sway.
         // The launch camera is locked to the climbing rocket (lagging behind it reads as jitter); elsewhere it glides.
@@ -353,11 +363,11 @@ export default function JourneyScene({ sectionsRef, controls, flashRef, hudRef, 
       // Tilt the disk into a diagonal sweep, rising to the right like Gargantua.
       blackHole.group.quaternion.multiply(qExtra.setFromAxisAngle(Z,.42));
 
-      // Scroll-driven blackout over the ejection (launch → drift), plus the short dip on other cuts.
-      const blackout=reduced?0:smooth((s-1.54)/.07)*(1-smooth((s-1.71)/.08));
-      veil.style.opacity=String(Math.max(blackout,.7*(1-smooth((now-cutAt)/700))));
+      // Covers: the director's cuts (dark or cloud), plus a short dip on camera cuts inside a transition.
+      veil.style.opacity=String(Math.max(cue.dark,.7*(1-smooth((now-cutAt)/700))));
+      mist.style.opacity=String(cue.mist);if(cue.mist>0)mist.style.transform=`translateY(${((now-story.start)/story.duration-.65)*30}%)`;
       if(flashRef.current)flashRef.current.style.opacity=e>0?String(bell(e,2.3,2.75,3.5)):'0';
-      if(hudRef.current)hudRef.current.textContent=`s ${s.toFixed(3)} · ${CHAPTERS[story.current].id}${about>0&&about<1?` · about ${about.toFixed(2)}`:''}${galaxyMode?' · galaxy':''}`;
+      if(hudRef.current)hudRef.current.textContent=`s ${s.toFixed(3)} · ${CHAPTERS[story.index].id}${about>0&&about<1?` · about ${about.toFixed(2)}`:''}${galaxyMode?' · galaxy':''}`;
       if(composer)composer.render(dt);else renderer.render(scene,camera);
       first=false;
       if(!started){started=true;mount.dataset.ready='true';}
@@ -372,7 +382,7 @@ export default function JourneyScene({ sectionsRef, controls, flashRef, hudRef, 
     // ?debug: render frames on demand (background tabs throttle requestAnimationFrame).
     if(new URLSearchParams(window.location.search).has('debug')){window.__journeyStep=(frames=60)=>{for(let i=0;i<frames;i++)render(1/30);};window.__journey={scene,camera,clouds,ground,rocket,astronaut};}
     return()=>{
-      disposed=true;cancelAnimationFrame(raf);delete window.__journeyStep;delete window.__journey;veil.remove();
+      disposed=true;cancelAnimationFrame(raf);delete window.__journeyStep;delete window.__journey;veil.remove();mist.remove();
       window.removeEventListener('resize',resize);
       mixer?.stopAllAction();release(scene);resources.forEach(resource=>resource.dispose());composer?.dispose();renderer.dispose();renderer.domElement.remove();
     };

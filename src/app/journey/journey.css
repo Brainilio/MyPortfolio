@@ -18,6 +18,9 @@ body:has(.journey){background:#04050d}
 .journey-debug{position:fixed;right:16px;bottom:16px;z-index:5;font:12px ui-monospace,monospace;background:rgba(0,0,0,.7);padding:6px 10px;border-radius:6px}
 
 .journey-chapters{position:relative;z-index:2;pointer-events:none}
+/* Chapter text fades out while a transition plays and back in once the new scene has settled. */
+.journey-chapters{transition:opacity .4s ease}
+.journey-chapters[data-hidden=true]{opacity:0;transition-duration:.3s}
 .journey-chapter{position:relative;padding:0 var(--content-gutter) 0 max(var(--content-gutter),150px)}
 
 /* Editorial type: large, unboxed, readable over the scene with a soft shadow. */
