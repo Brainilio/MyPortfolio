@@ -1,0 +1,57 @@
+/* Satoshi (Indian Type Foundry, ITF Free Font License) is served by Fontshare's API, so the font files are never
+   redistributed from this repository. */
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@500,700,900&f[]=satoshi@500i&display=swap');
+/* Homepage test: one dusk palette, the brand violet, a giant name under a floating island. */
+.ht{--font-display:'Satoshi';--sky-top:#1b1335;--violet:#a78bfa;--cream:#fbf7ff;background:var(--sky-top);color:var(--cream)}
+body:has(.ht){background:#1b1335}
+.ht-hero{position:relative;height:100svh;min-height:640px;overflow:hidden;isolation:isolate}
+.ht-sky{position:absolute;inset:0;z-index:0;background:
+  radial-gradient(60% 45% at 78% 74%,rgba(255,196,160,.55),transparent 70%),
+  linear-gradient(180deg,#1b1335 0%,#33225a 34%,#6e4a8f 60%,#c9849c 82%,#f3b89c 100%)}
+.ht-canvas{position:absolute;inset:0;z-index:1;opacity:0;transition:opacity 1.8s ease}
+.ht-canvas[data-ready=true]{opacity:1}
+.ht-canvas canvas{display:block;width:100%;height:100%}
+
+/* The name sits in front of the island's dangling roots; clicks pass through to the scene. */
+.ht .ht-name{position:absolute;z-index:2;left:0;right:0;bottom:-.06em;display:block;margin:0;text-align:center;pointer-events:none;
+  font-family:var(--font-display),'Inter',sans-serif;font-weight:900;
+  font-size:clamp(56px,18.5vw,360px);line-height:.8;letter-spacing:-.06em;color:var(--cream);
+  text-shadow:0 0 80px rgba(255,190,170,.25)}
+
+/* Finish: film grain, a soft vignette and a warm light leak, so the scene reads as one graded image. */
+.ht-finish{position:absolute;inset:0;z-index:3;pointer-events:none;
+  background:radial-gradient(120% 90% at 60% 45%,transparent 55%,rgba(14,7,28,.55) 100%),radial-gradient(40% 30% at 84% 70%,rgba(255,200,160,.16),transparent 70%)}
+.ht-finish:after{content:'';position:absolute;inset:-60%;opacity:.14;mix-blend-mode:overlay;animation:ht-grain .9s steps(5) infinite;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.4 -.2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+@keyframes ht-grain{0%{transform:translate(0,0)}20%{transform:translate(-4%,3%)}40%{transform:translate(3%,-5%)}60%{transform:translate(-6%,-2%)}80%{transform:translate(5%,4%)}100%{transform:translate(0,0)}}
+
+.ht-header{position:absolute;z-index:4;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:28px var(--gutter);font-size:13px}
+.ht-wordmark{font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:22px;letter-spacing:-.04em}
+.ht-wordmark span,.ht-roles span{color:var(--violet)}
+.ht-header nav{display:flex;gap:44px}
+.ht-header nav a,.ht-links a{position:relative}
+.ht-header nav a:after,.ht-links a:after{content:'';position:absolute;left:0;right:100%;bottom:-5px;height:1px;background:currentColor;transition:right .35s}
+.ht-header nav a:hover:after,.ht-links a:hover:after{right:0}
+.ht-available{display:inline-flex;align-items:center;gap:9px;padding:9px 15px;border:1px solid rgba(251,247,255,.28);border-radius:100px;font-size:12px;backdrop-filter:blur(6px)}
+.ht-available i{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 10px #4ade80}
+
+.ht-intro{position:absolute;z-index:4;left:var(--gutter);top:clamp(116px,17svh,180px);max-width:430px;pointer-events:none}
+.ht-eyebrow{display:block;margin-bottom:18px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(251,247,255,.6)}
+.ht-intro a{pointer-events:auto}
+.ht-roles{margin:0;font-family:var(--font-display),'Inter',sans-serif;font-weight:700;font-size:clamp(30px,3.1vw,48px);line-height:1.02;letter-spacing:-.045em}
+.ht-stack{margin:16px 0 0;font-size:12px;letter-spacing:.08em;color:rgba(251,247,255,.55)}
+.ht-lede{margin:26px 0 0;font-family:var(--font-display),'Inter',sans-serif;font-weight:500;font-size:16px;line-height:1.55;color:rgba(251,247,255,.72)}
+.ht-links{display:flex;gap:28px;margin-top:26px;font-size:13px}
+.ht a:focus-visible{outline:2px solid var(--violet);outline-offset:6px}
+
+@media(max-width:760px){
+  .ht-header{padding:20px 20px}
+  .ht-header nav{display:none}
+  .ht-intro{left:20px;right:20px;top:92px;max-width:none}
+  .ht-roles{font-size:28px}
+  .ht-eyebrow{margin-bottom:10px}
+  .ht-stack{margin-top:10px}
+    .ht-lede{font-size:14px;margin-top:12px;max-width:320px}
+  .ht-links{margin-top:14px}
+  }
+@media(prefers-reduced-motion:reduce){.ht-finish:after{animation:none}.ht-canvas{transition:none}}

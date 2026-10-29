@@ -42,3 +42,14 @@ NASA imagery is generally not subject to copyright in the United States; NASA as
 - `earth-day-4k.jpg`: NASA Visible Earth, Blue Marble: Next Generation, `world.topo.bathy.200412.3x5400x2700.jpg`, downloaded from https://eoimages.gsfc.nasa.gov/images/imagerecords/73000/73909/. Resized to 4096 × 2048, JPEG quality 70. 4096 px exceeds the 1024 px default because the orbital camera sits close to the surface; shader-side noise adds finer grain.
 - `earth-night-2k.jpg`: NASA Earth Observatory, Black Marble 2016, `BlackMarble_2016_01deg.jpg`, downloaded from https://eoimages.gsfc.nasa.gov/images/imagerecords/144000/144898/. Resized to 2048 × 1024, JPEG quality 80.
 Originals are kept in the ignored `work/nasa/` folder.
+
+## Floating island hero (`/homepage-test`, `public/models/island/`)
+All by Quaternius, via Poly Pizza, license CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/). Originals are kept under ignored `work/island/src/`; build script `work/island/build.mjs`.
+- `stag.glb` — "Stag", https://poly.pizza/m/tQdzbZ1Cmw. Kept Idle, Eating, Walk, Gallop (dropped other clips and the duplicate `AnimalArmature|` copies); resampled, deduplicated, welded, pruned, Meshopt (high). 3,667 tris, 38 joints.
+- `deer.glb` — "Deer", https://poly.pizza/m/T6Cs7tmMHJ. Same processing. 2,096 tris, 46 joints.
+- `fox.glb` — "Fox", https://poly.pizza/m/Bc97C66HKi. Same processing. 1,848 tris, 51 joints.
+- `kit.glb` — one named node per prop: "Mountains" (https://poly.pizza/m/w9VBrh7Nz0), "Autumn Tree" (https://poly.pizza/m/2lRubrT6Na), "Birch Tree" (https://poly.pizza/m/k6cozoNfLH), "Rock" (https://poly.pizza/m/4MUaQTcDdc), "Rocks" (https://poly.pizza/m/Gl3pcrdnpW). Merged, flattened, joined, welded, pruned, Meshopt. 7,250 tris, 11 primitives, no textures.
+- `bear.glb` — "Black bear" by Poly by Google, https://poly.pizza/m/56ym_pyVnel, license CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/). Changes: the 2048px texture was baked into flat per-face vertex colours and removed; welded, pruned, Meshopt. 666 tris. Walk/run is a vertex-shader leg swing (the model has no rig). Build script `work/island/bake.mjs`.
+- `eagle.glb` — "Eagle" (bald eagle, perched) by Poly by Google, https://poly.pizza/m/d7CSLvsHULY, license CC BY 3.0. Same texture-to-vertex-colour bake. 499 tris. Used perched; the flying eagle is a procedural stand-in.
+- Attribution for the two CC BY models is displayed in the `/homepage-test` hero. No endorsement implied.
+The island terrain, river, waterfall, pines, clouds, birds and the flying eagle are procedural (Three.js), with no external assets.

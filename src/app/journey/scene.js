@@ -164,7 +164,9 @@ export default function JourneyScene({ controls, flashRef, hudRef, scoreRef, onP
     frameAt(8.3,alienFrame);alienAt.copy(alienFrame.position);
     frameAt(8.5,rframe);alienRocket.copy(rframe.position).addScaledVector(rframe.side,1).addScaledVector(rframe.up,4);
     frameAt(9.6,rframe);portalAt.copy(rframe.position).addScaledVector(rframe.up,14);
-    const mouseLook={x:0,y:0};
+    const mouseLook={x:0,y:0},watch={x:0,v:0};
+    // Critically damped spring toward `target`: eases off, glides and settles in about 3.3×`lag` seconds.
+    const spring=(state,target,lag,dt)=>{const w=2/lag,x=w*dt,decay=1/(1+x+.48*x*x+.235*x*x*x),change=state.x-target,temp=(state.v+w*change)*dt;state.v=(state.v-w*temp)*decay;state.x=target+(change+temp)*decay;};
     const liquid=createLiquidLayer(renderer,document.querySelector('.journey')??document.body);
     let first=true,time=0,endingStart=0,lastPhase='',started=false;
     const setPhase=value=>{if(value!==lastPhase){lastPhase=value;phase.current?.(value);}};
@@ -338,8 +340,10 @@ export default function JourneyScene({ controls, flashRef, hudRef, scoreRef, onP
             // At the camera, nudged toward the mouse and the odd idle glance; then at the rocket as it passes.
             const glance=reduced?0:.45;
             v1.copy(camPos).sub(head).add(v2.set((Math.sin(time*.23)*1.5+Math.sin(time*.071)*.9)*glance-mouseLook.x*1.6,Math.sin(time*.17+.6)*.6*glance-mouseLook.y*.9,0));
-            const watch=closeUp?smooth(flyby*4)*(1-smooth(depart*3)):0;
-            if(watch>0)v1.lerp(v2.copy(flyby<1?ctx.rocket:FLY_B).sub(head).normalize().multiplyScalar(v1.length()),watch);
+            // The flyby: one smooth turn (on its own clock, not the scroll) to stare where the rocket is headed,
+            // held until he sets off after it, instead of tracking the rocket back and forth.
+            if(reduced)watch.x=0;else spring(watch,closeUp&&flyby>0&&depart<.34?1:0,.6,dt);
+            if(watch.x>.001)v1.lerp(v2.copy(FLY_B).sub(head).normalize().multiplyScalar(v1.length()),clamp(watch.x,0,1));
             aimHead(v1,.85*(1-smooth(depart*1.5)*.6));
           }
         }
