@@ -51,5 +51,9 @@ All by Quaternius, via Poly Pizza, license CC0 1.0 (https://creativecommons.org/
 - `kit.glb` — one named node per prop: "Mountains" (https://poly.pizza/m/w9VBrh7Nz0), "Autumn Tree" (https://poly.pizza/m/2lRubrT6Na), "Birch Tree" (https://poly.pizza/m/k6cozoNfLH), "Rock" (https://poly.pizza/m/4MUaQTcDdc), "Rocks" (https://poly.pizza/m/Gl3pcrdnpW). Merged, flattened, joined, welded, pruned, Meshopt. 7,250 tris, 11 primitives, no textures.
 - `bear.glb` — "Black bear" by Poly by Google, https://poly.pizza/m/56ym_pyVnel, license CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/). Changes: the 2048px texture was baked into flat per-face vertex colours and removed; welded, pruned, Meshopt. 666 tris. Walk/run is a vertex-shader leg swing (the model has no rig). Build script `work/island/bake.mjs`.
 - `eagle.glb` — "Eagle" (bald eagle, perched) by Poly by Google, https://poly.pizza/m/d7CSLvsHULY, license CC BY 3.0. Same texture-to-vertex-colour bake. 499 tris. Used perched; the flying eagle is a procedural stand-in.
-- Attribution for the two CC BY models is displayed in the `/homepage-test` hero. No endorsement implied.
-The island terrain, river, waterfall, pines, clouds, birds and the flying eagle are procedural (Three.js), with no external assets.
+- `bison.glb` — "Bison" by Poly by Google, https://poly.pizza/m/9sTrha-TxdS, CC BY 3.0. 2048px texture baked to vertex colours; Meshopt. 1,492 tris. Walk is the shared vertex-shader leg swing.
+- `prairiedog.glb` — "Gopher" by Poly by Google, https://poly.pizza/m/2IatILCJa3X, CC BY 3.0, used as a prairie dog. Texture baked to vertex colours. 616 tris.
+- `boulder.glb` — "Desert boulder" by Leigh Garland, https://poly.pizza/m/dJvxGOx16m0, CC BY 3.0. Meshopt; recoloured at runtime. 192 tris.
+- `hawk.glb` — "Hawk Lp Rigged" by Sherkiz, https://poly.pizza/m/RkN6MEbP6g, CC BY 3.0. Fly clip kept; 1024px texture baked to vertex colours; Meshopt. 9,956 tris, 58 joints.
+- Attribution for the CC BY models above is required wherever the page is published (currently pending on `/homepage-test`). No endorsement implied.
+The island terrain, river, waterfall, pines, clouds, birds and the flying eagle, and the prairie's ground, Garden-of-the-Gods sandstone fins, junipers and sagebrush, are procedural (Three.js), with no external assets.

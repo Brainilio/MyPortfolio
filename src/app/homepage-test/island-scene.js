@@ -314,7 +314,7 @@ export default function IslandScene({ onEvent } = {}) {
         // Ease into the gait; stride rate follows the actual pace.
         const [swing,rate,bob]=BEAR_GAITS[animal.current]??BEAR_GAITS.Idle,pace=animal.state==="walk"||animal.state==="flee"||animal.state==="emerge"?Math.max(.4,animal.speed/(animal.current==="Gallop"?ANIMALS.bear.run:ANIMALS.bear.walk)):1;
         const ease=1-Math.exp(-dt*6);animal.swing+=(swing-animal.swing)*ease;animal.bob+=(bob-animal.bob)*ease;animal.phase+=dt*rate*pace;
-        const u=animal.gait.uniforms;u.uPhase.value=animal.phase;u.uSwing.value=animal.swing;u.uBob.value=animal.swing>.05?Math.abs(Math.sin(animal.phase))*animal.bob:Math.sin(animal.phase*.5)*animal.bob*.5;
+        const u=animal.gait.uniforms;u.uPhase.value=animal.phase;u.uSwing.value=animal.swing;u.uKnee.value=animal.swing*1.1;u.uLift.value=animal.swing*.05*u.uHeight.value;u.uNod.value=animal.swing*.15;u.uBob.value=animal.swing>.05?Math.abs(Math.sin(animal.phase))*animal.bob:Math.sin(animal.phase*.5)*animal.bob*.5;
       }
       const p=animal.root.position;
       if(animal.state==="idle"||animal.state==="eat"){animal.timer-=dt;if(animal.timer<=0)wander(animal);}

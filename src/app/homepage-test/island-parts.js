@@ -231,25 +231,55 @@ export function createEagle() {
   return eagle;
 }
 
-// The bear has no rig: its legs swing in the vertex shader (each quarter below the hips pivots at its hip).
-export function createBearMaterial(geometry) {
+// Rig-free four-legged walk (bear, bison). Below the hip line the mesh splits into four legs by quarter; each
+// swings from its hip on its own beat (a four-beat walk), lifts and folds at the knee while it swings forward,
+// and the head nods with the stride. `hip` is where the legs meet the body, as a fraction of height.
+export function createBearMaterial(geometry,{hip:hipFraction=.36}={}) {
   geometry.computeBoundingBox();
-  const box=geometry.boundingBox,hip=box.min.y+(box.max.y-box.min.y)*.36,mid=(box.min.z+box.max.z)/2,pos=geometry.attributes.position;
+  const box=geometry.boundingBox,height=box.max.y-box.min.y,length=box.max.z-box.min.z,hip=box.min.y+height*hipFraction,mid=(box.min.z+box.max.z)/2,pos=geometry.attributes.position;
   let front=0,back=0,nf=0,nb=0;
-  for(let i=0;i<pos.count;i++){const y=pos.getY(i),z=pos.getZ(i);if(y<hip*.7){if(z>mid){front+=z;nf++;}else{back+=z;nb++;}}}
-  const uniforms={uPhase:{value:0},uSwing:{value:0},uBob:{value:0},uHeight:{value:box.max.y-box.min.y},uHip:{value:hip},uMid:{value:mid},uFront:{value:nf?front/nf:mid+1},uBack:{value:nb?back/nb:mid-1},uCenterX:{value:(box.min.x+box.max.x)/2}};
+  for(let i=0;i<pos.count;i++){const y=pos.getY(i),z=pos.getZ(i);if(y<box.min.y+(hip-box.min.y)*.6){if(z>mid){front+=z;nf++;}else{back+=z;nb++;}}}
+  const uniforms={uPhase:{value:0},uSwing:{value:0},uKnee:{value:0},uLift:{value:0},uNod:{value:0},uHeadDown:{value:0},uHeadTurn:{value:0},uTail:{value:0},uTailZ:{value:box.min.z+length*.07},uBob:{value:0},uHeight:{value:height},
+    uHip:{value:hip},uKneeY:{value:box.min.y+(hip-box.min.y)*.5},uLegTop:{value:(hip-box.min.y)*.35},uMid:{value:mid},uFront:{value:nf?front/nf:mid+1},uBack:{value:nb?back/nb:mid-1},
+    uCenterX:{value:(box.min.x+box.max.x)/2},uHeadZ:{value:box.max.z-length*.24},uNeckY:{value:hip+height*.35}};
   const material=new THREE.MeshStandardMaterial({vertexColors:true,flatShading:true,roughness:.95});
   material.onBeforeCompile=shader=>{
     Object.assign(shader.uniforms,uniforms);
-    shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nuniform float uPhase,uSwing,uBob,uHeight,uHip,uMid,uFront,uBack,uCenterX;')
+    shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nuniform float uPhase,uSwing,uKnee,uLift,uNod,uHeadDown,uHeadTurn,uTail,uTailZ,uBob,uHeight,uHip,uKneeY,uLegTop,uMid,uFront,uBack,uCenterX,uHeadZ,uNeckY;')
       .replace('#include <begin_vertex>',`#include <begin_vertex>
         if(transformed.y<uHip){
           bool front=transformed.z>uMid,left=transformed.x>uCenterX;
-          // Diagonal pairs move together, like a trot.
-          float offset=(front==left)?0.:3.14159;
-          float a=sin(uPhase+offset)*uSwing*smoothstep(uHip,uHip*.55,transformed.y);
-          float pivot=front?uFront:uBack,dy=transformed.y-uHip,dz=transformed.z-pivot;
+          // Four-beat walk: left hind, left front, right hind, right front.
+          float offset=front?(left?1.5708:4.7124):(left?0.:3.14159);
+          float s=uPhase+offset,lift=max(0.,cos(s));
+          float pivot=front?uFront:uBack;
+          // Knee: the lower leg folds back while the leg swings forward.
+          if(transformed.y<uKneeY){
+            float k=-lift*uKnee*smoothstep(uKneeY,uKneeY-uLegTop*.4,transformed.y);
+            float dy=transformed.y-uKneeY,dz=transformed.z-pivot;
+            transformed.z=pivot+dz*cos(k)-dy*sin(k);transformed.y=uKneeY+dz*sin(k)+dy*cos(k);
+          }
+          transformed.y+=lift*uLift*smoothstep(uHip,uKneeY,transformed.y);
+          // Hip: the whole leg swings, fading out toward the body so the belly doesn't tear.
+          float a=sin(s)*uSwing*smoothstep(uHip,uHip-uLegTop,transformed.y);
+          float dy=transformed.y-uHip,dz=transformed.z-pivot;
           transformed.z=pivot+dz*cos(a)-dy*sin(a);transformed.y=uHip+dz*sin(a)+dy*cos(a);
+        }
+        // Head nods twice per stride, and lowers to graze (uHeadDown).
+        if(transformed.z>uHeadZ-.1){
+          float n=(sin(uPhase*2.)*uNod-uHeadDown)*smoothstep(uHeadZ-.1,uHeadZ+.15,transformed.z);
+          float dy=transformed.y-uNeckY,dz=transformed.z-uHeadZ;
+          transformed.z=uHeadZ+dz*cos(n)-dy*sin(n);transformed.y=uNeckY+dz*sin(n)+dy*cos(n);
+          // ...and turns to glance aside.
+          float turn=uHeadTurn*smoothstep(uHeadZ-.1,uHeadZ+.15,transformed.z);
+          float hx=transformed.x-uCenterX,hz=transformed.z-uHeadZ;
+          transformed.x=uCenterX+hx*cos(turn)+hz*sin(turn);transformed.z=uHeadZ-hx*sin(turn)+hz*cos(turn);
+        }
+        // Tail swish: the rear tip, above the hips, swings side to side.
+        if(transformed.z<uTailZ&&transformed.y>uHip){
+          float w=uTail*smoothstep(uTailZ,uTailZ-.12,transformed.z);
+          float tx=transformed.x-uCenterX,tz=transformed.z-uTailZ;
+          transformed.x=uCenterX+tx*cos(w)+tz*sin(w);transformed.z=uTailZ-tx*sin(w)+tz*cos(w);
         }
         // Bob is a fraction of body height (the compressed mesh lives in its own small unit space).
         transformed.y+=uBob*uHeight;`);
