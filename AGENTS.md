@@ -35,9 +35,9 @@ Applies whenever adding or changing models, loaders, WebGL scenes, or animation 
 - Profile actual frames/draw calls/texture memory on representative mobile and desktop hardware. Do not claim locked 60/120 FPS without measurement.
 
 ### Current assets
-- `public/models/rocket.glb`: Kenney Space Kit rocket parts, CC0; assembled/optimized; see `CREDITS.md` and `model-stats.json`.
-- `public/models/astronaut.glb`: Astronaut by Poly, CC BY 2.0, from Google's model-viewer shared assets; optimized with a 1024px WebP texture and Meshopt.
-- Retain required visible attribution when redistributing CC BY models.
+- `public/models/island/`: the homepage's models (Poly Pizza, Quaternius CC0 and Poly by Google CC BY 3.0, among others); optimized with glTF Transform and Meshopt; build scripts in ignored `work/island/`. See `CREDITS.md`.
+- `public/models/astronaut-rigged.glb`: Quaternius, CC0; used by the Lab (`/journey`).
+- Retain required visible attribution when redistributing CC BY models (the homepage's Contact section lists them).
 
 References: https://gltf-transform.dev/cli and https://threejs.org/docs/pages/GLTFLoader.html
 

@@ -1,40 +1,13 @@
 # 3D asset credits
 
-## Rocket
-- Creator: Kenney (https://kenney.nl).
-- Source: https://kenney.nl/assets/space-kit
-- Source download: https://kenney.nl/media/pages/assets/space-kit/20874c75ac-1677698978/kenney_space-kit.zip
-- License: CC0 1.0, https://creativecommons.org/publicdomain/zero/1.0/
-- Changes: assembled rocket_baseA, rocket_sidesA and rocket_topA; flattened, deduplicated, joined compatible primitives, welded, pruned, and Meshopt-compressed into one GLB. No textures or rig.
-
-## Astronaut
-- Title/creator: Astronaut by Poly.
-- Original source: https://poly.google.com/view/dLHpzNdygsg (historic source).
-- Redistribution source: https://modelviewer.dev/shared-assets/models/Astronaut.glb
-- License evidence: https://github.com/google/model-viewer/blob/master/packages/modelviewer.dev/ATTRIBUTIONS.md
-- License: CC BY 2.0, https://creativecommons.org/licenses/by/2.0/
-- Changes: flattened and optimized static geometry; texture resized to 1024px and converted to WebP; geometry Meshopt-compressed. No claim of endorsement.
-- Attribution is displayed in the About section.
-
-Measured output sizes, triangle counts, and primitive counts are in model-stats.json. Primitive counts do not include the rocket's two instanced exhaust draw calls (four flame cones and 24 fading smoke puffs). Decoder and JavaScript bundle sizes are additional to model bytes.
-
-## Scroll-story prototype
-The homepage reuses the same optimized rocket and astronaut in one shared perspective scene. Clouds use a shared procedural texture; stars use one Points draw call; planets are texture-free low-poly geometry. The black-hole ring is procedural. Movement follows scroll, with an explicit 2.3-second ending preview. The prototype does not submit contact messages.
-
-The contact black hole uses an original procedural shader for stylized lensing, a turbulent warm accretion disk, a photon ring and soft analytic glow. One Points draw call animates 240 inward particles. It is an artistic effect, not a physical simulation or a film asset. Only the visible contact chapter runs a continuous animation; reduced motion freezes the effect and disables particle movement.
-
-The current simplified story omits the planet and Nika events. Its rocket stays upright and centered during Projects, then recedes. Boosters use two small rounded flame meshes and one instanced draw call for 24 expanding/fading smoke puffs; there is no arrow/cone trail. Boosters animate only while the rocket is visible and stop for reduced motion.
-
-The opening now uses a procedural Earth horizon (two 64 × 32 sphere meshes, ocean/land/cloud shader and thin blue atmosphere), authored in Three.js without external assets. The hero first zooms its existing mountain photograph, then reveals the cloud ascent. There is no cloud band attached to the hero. Astronaut/rocket entrances are staged outside the camera frame; departure pitches the rocket into depth without scaling its model down.
-
-## Rigged astronaut — evaluated, currently unused
+## Rigged astronaut (the Lab, `/journey`)
 - Creator: Quaternius.
 - Source and license: https://poly.pizza/m/3hC2i0CTuO — CC0 1.0.
 - Original GLB: https://static.poly.pizza/0076345b-bbea-42d5-931c-4a5ad2050b18.glb
 - This is the helmeted human astronaut, replacing the initially evaluated novelty character.
 - Changes: retained the 62-joint skeleton shared by four skinned suit parts and Idle, Idle_Neutral, Wave clips; removed unused clips; deduplicated, welded and pruned unused resources; Meshopt compression. No flattening or static joining of the skinned hierarchy.
-- Output: `astronaut-rigged.glb`, 423,864 bytes, 10,558 triangles, 13 primitives, no textures. Full statistics in model-stats.json. The rig is slightly over the preferred 60-bone target, with a small total geometry budget.
-- Evaluated with a custom skeletal float cycle and a source wave. This model is currently unused; the active story uses the original Poly astronaut.
+- Output: `astronaut-rigged.glb`, 423,864 bytes, 10,558 triangles, 13 primitives, no textures. The rig is slightly over the preferred 60-bone target, with a small total geometry budget.
+- Used by the Lab (`/journey`).
 
 ## NASA maps (journey prototype, `public/textures/`)
 NASA imagery is generally not subject to copyright in the United States; NASA asks for a "NASA" credit and no implied endorsement (per NASA's media usage guidelines). No claim of endorsement.
@@ -43,7 +16,7 @@ NASA imagery is generally not subject to copyright in the United States; NASA as
 - `earth-night-2k.jpg`: NASA Earth Observatory, Black Marble 2016, `BlackMarble_2016_01deg.jpg`, downloaded from https://eoimages.gsfc.nasa.gov/images/imagerecords/144000/144898/. Resized to 2048 × 1024, JPEG quality 80.
 Originals are kept in the ignored `work/nasa/` folder.
 
-## Floating island hero (`/homepage-test`, `public/models/island/`)
+## Floating island hero (the homepage `/`, `public/models/island/`)
 All by Quaternius, via Poly Pizza, license CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/). Originals are kept under ignored `work/island/src/`; build script `work/island/build.mjs`.
 - `stag.glb` — "Stag", https://poly.pizza/m/tQdzbZ1Cmw. Kept Idle, Eating, Walk, Gallop (dropped other clips and the duplicate `AnimalArmature|` copies); resampled, deduplicated, welded, pruned, Meshopt (high). 3,667 tris, 38 joints.
 - `deer.glb` — "Deer", https://poly.pizza/m/T6Cs7tmMHJ. Same processing. 2,096 tris, 46 joints.
@@ -59,9 +32,12 @@ All by Quaternius, via Poly Pizza, license CC0 1.0 (https://creativecommons.org/
 - `antelope.glb` — "Antelope" by Poly by Google, https://poly.pizza/m/dC2-G-IF8rz, CC BY 3.0. Texture baked to vertex colours; Meshopt; walks with the shared leg shader. 1,168 tris.
 - `wolf.glb` — "Wolf" by Quaternius, https://poly.pizza/m/P1gU3Qkr9r, CC0 1.0. Kept Idle, Walk, Gallop; resampled; Meshopt. 1,962 tris, 51 joints.
 - `moose.glb` — assembled from "Elk" by Poly by Google, https://poly.pizza/m/bO8XPdrAb5G, CC BY 3.0, and "Moose antlers" by Poly by Google, https://poly.pizza/m/cX6NECw97x7, CC BY 3.0. The elk's antlers removed and its coat darkened, the moose antler palms mounted on its head; texture baked to vertex colours; Meshopt (built by `work/island/moose.mjs`). 2,239 tris, 11 KB.
-- `hiker.glb` — the bearded guy from "Low Poly Characters (PACK)" by micaelsampaio, https://sketchfab.com/3d-models/low-poly-characters-pack-f1c8018af59643e0b009a6f018ed9fd9, CC BY 4.0. Only that character kept; turned y-up, centred and scaled to unit height; its 64px texture kept (the face is painted in it); unlit extension dropped; Meshopt (built by `work/island/hiker-chibi.mjs`). Walk, wave and drink are procedural (vertex shader). 717 tris.
 - `squirrel.glb` — "Squirrel" by Poly by Google, https://poly.pizza/m/caxos24uWC9, CC BY 3.0. Texture baked to vertex colours; Meshopt. 716 tris.
 - `rabbit.glb` — "Cottontail rabbit" by Poly by Google, https://poly.pizza/m/3vvONbRCuEF, CC BY 3.0. Texture baked to vertex colours; Meshopt. 954 tris.
 - `cougar.glb` — "Cougar" by Poly by Google, https://poly.pizza/m/8nuCN-gn2s-, CC BY 3.0. Texture baked to vertex colours; Meshopt; moves with the shared leg shader. 980 tris, 24 KB.
-- Attribution for the CC BY models above is required wherever the page is published (currently pending on `/homepage-test`). No endorsement implied.
-The island terrain, river, waterfall, pines, clouds, birds and the flying eagle, and the prairie's ground, Garden-of-the-Gods sandstone fins, junipers and sagebrush, and the road trip's valley, forest pines, snags, grass, flowers, fences, park signs, hot springs, geyser and fish, and the hike's mountain, trail, stream, poppies, sun shafts and summit cairn, birds and butterflies, are procedural (Three.js), with no external assets.
+- `orca.glb` — "Killer Whale" by Poly by Google, https://poly.pizza/m/7pqZEQ9b_E-, CC BY 3.0. Texture baked to vertex colours; Meshopt. 636 tris, 11 KB.
+- `sealion.glb` — "Sea lion" by Poly by Google, https://poly.pizza/m/45HRvXYpvUG, CC BY 3.0. Texture baked to vertex colours; Meshopt. 714 tris, 16 KB.
+- `kayak.glb` — "Kayak" by Poly by Google, https://poly.pizza/m/6wu_h830iRe, CC BY 3.0. Texture baked to vertex colours; recoloured at runtime; Meshopt. 278 tris, 8 KB.
+- `shark.glb` — "Shark" by Quaternius, https://poly.pizza/m/AyHTK3zUSG, CC0 1.0. Swim clip kept; resampled; Meshopt (built by `work/island/shark.mjs`). 644 tris, 24 KB.
+- Attribution for the CC BY models above is required wherever the page is published (shown in the Contact section of the homepage). No endorsement implied.
+The island terrain, river, waterfall, pines, clouds, birds and the flying eagle, and the prairie's ground, Garden-of-the-Gods sandstone fins, junipers and sagebrush, and the road trip's valley, forest pines, snags, grass, flowers, fences, park signs, hot springs, geyser and fish, and the hike's ranger bear (an original character), mountain, trail, stream, poppies, sun shafts and summit cairn, birds and leaves, and the coast's cliffs, ocean, sea stacks, arch bridge, lighthouse, beam, fog, paddlers and gulls, are procedural (Three.js), with no external assets.
