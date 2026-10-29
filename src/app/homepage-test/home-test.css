@@ -1,8 +1,8 @@
 /* Satoshi (Indian Type Foundry, ITF Free Font License) is served by Fontshare's API, so the font files are never
    redistributed from this repository. */
 @import url('https://api.fontshare.com/v2/css?f[]=satoshi@500,700,900&f[]=satoshi@500i&display=swap');
-/* Park-sign lettering for the road trip (Google Fonts, OFL): a router-bit style script and rounded caps. */
-@import url('https://fonts.googleapis.com/css2?family=Varela+Round&family=Yellowtail&display=swap');
+/* Park-sign lettering for the road trip (Google Fonts, OFL). */
+@import url('https://fonts.googleapis.com/css2?family=Bitter:wght@600;800&display=swap');
 /* Offset TM (Type Mania) is a paid typeface: add a licensed webfont at public/fonts/offset-tm/OffsetTM.woff2 and
    the display type switches to it; until then it falls back to Satoshi. */
 @font-face{font-family:'Offset TM';src:local('Offset TM'),local('OffsetTM'),url('/fonts/offset-tm/OffsetTM.woff2') format('woff2');font-display:swap}
@@ -63,7 +63,10 @@ body:has(.ht){background:#1b1335}
 /* Work and Skills: sky, a giant translucent title behind the scene, the scene, then the heading. */
 .ht-prairie-sky,.ht-valley-sky{position:absolute;inset:0;z-index:0}
 .ht-prairie-sky{background:linear-gradient(180deg,#f3b89c 0%,#f6c592 38%,#ffd9a2 62%,#f2b98f 100%)}
-.ht-valley-sky{background:linear-gradient(180deg,#8fb3d9 0%,#b9d0e2 42%,#e9dccb 70%,#f1d9bc 100%)}
+.ht-valley-sky{background:linear-gradient(180deg,#e9bfa0 0%,#f3cfaa 40%,#f9dfbd 68%,#f0cba6 100%)}
+/* The valley's grade: golden-hour haze, a soft warm wash over everything and slightly lifted, rosy shadows. */
+.ht-skills .ht-finish{background:radial-gradient(120% 90% at 50% 40%,transparent 50%,rgba(70,32,40,.45) 100%),linear-gradient(180deg,rgba(255,214,170,.16) 0%,rgba(255,180,140,0) 45%,rgba(110,50,70,.1) 100%)}
+.ht-skills .ht-finish:before{content:'';position:absolute;inset:0;mix-blend-mode:soft-light;opacity:.3;background:linear-gradient(180deg,#ffb47c,#c86f7c)}
 .ht-ghost{position:absolute;z-index:1;left:0;right:0;top:12svh;margin:0;text-align:center;pointer-events:none;font-family:var(--font-display),'Inter',sans-serif;font-weight:900;
   font-size:clamp(90px,22vw,420px);line-height:.8;letter-spacing:-.06em;color:rgba(255,255,255,.42)}
 .ht-prairie-canvas,.ht-road-canvas{position:absolute;inset:0}
