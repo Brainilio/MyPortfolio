@@ -37,10 +37,17 @@ const SECTIONS = [
   { id: "experience", label: "Experience", length: 1 + EXPERIENCE.length * .55, steps: EXPERIENCE.length, fadeIn: 2.5 },
 ];
 const CROSS = .8;
-const START = SECTIONS.reduce((list, section, i) => [...list, i ? list[i - 1] + SECTIONS[i - 1].length : 0], []);
-const TOTAL = START.at(-1) + SECTIONS.at(-1).length;
+// Dwell (in viewport heights) at each end of a section's own scroll: the first and last stops (card, sign, role) hold
+// still for a moment before the hand-off to the neighbouring section begins, so a small scroll back doesn't leave.
+const HOLD = .35;
+const lead = i => (i ? HOLD : 0), tail = i => (i === SECTIONS.length - 1 ? 0 : HOLD);
+// Length of a section's stepping stretch (where its progress runs 0 → 1).
+const span = i => SECTIONS[i].length - (i === SECTIONS.length - 1 ? 1 : CROSS);
+const sectionLength = i => SECTIONS[i].length + lead(i) + tail(i);
+const START = SECTIONS.reduce((list, section, i) => [...list, i ? list[i - 1] + sectionLength(i - 1) : 0], []);
+const TOTAL = START.at(-1) + sectionLength(SECTIONS.length - 1);
 // Scroll position (in viewport heights) where a section's internal progress reaches q.
-const scrollFor = (s, q) => START[s] + q * (SECTIONS[s].length - (s === SECTIONS.length - 1 ? 1 : CROSS));
+const scrollFor = (s, q) => START[s] + lead(s) + q * span(s);
 
 export default function HomeTest() {
   const [where, setWhere] = useState({ section: 0, stop: 0 }), [menu, setMenu] = useState(false);
@@ -66,12 +73,12 @@ export default function HomeTest() {
       const p = window.scrollY / window.innerHeight, live = [];
       let dominant = 0, best = -1;
       SECTIONS.forEach((x, i) => {
-        const begin = START[i], end = begin + x.length, isLast = i === SECTIONS.length - 1;
+        const begin = START[i], end = begin + sectionLength(i), isLast = i === SECTIONS.length - 1;
         // 0 → fully on screen; negative → still rising in from below; positive → drifting up and out.
         const enter = i === 0 ? 1 : Math.min(1, Math.max(0, (p - (begin - CROSS)) / CROSS));
         const leave = isLast ? 0 : Math.min(1, Math.max(0, (p - (end - CROSS)) / CROSS));
         const amount = Math.min(1, Math.min(enter * (x.fadeIn ?? 1), 1 - leave)), shift = leave > 0 ? leave : enter < 1 ? -(1 - enter) : 0;
-        const q = Math.min(1, Math.max(0, (p - begin) / (x.length - (isLast ? 1 : CROSS))));
+        const q = Math.min(1, Math.max(0, (p - begin - lead(i)) / span(i)));
         scene.current.progress[i] = q;
         if (amount > 0.001) live.push(i);
         if (amount > best) { best = amount; dominant = i; }
