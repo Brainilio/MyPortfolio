@@ -55,5 +55,8 @@ All by Quaternius, via Poly Pizza, license CC0 1.0 (https://creativecommons.org/
 - `prairiedog.glb` — "Gopher" by Poly by Google, https://poly.pizza/m/2IatILCJa3X, CC BY 3.0, used as a prairie dog. Texture baked to vertex colours. 616 tris.
 - `boulder.glb` — "Desert boulder" by Leigh Garland, https://poly.pizza/m/dJvxGOx16m0, CC BY 3.0. Meshopt; recoloured at runtime. 192 tris.
 - `hawk.glb` — "Hawk Lp Rigged" by Sherkiz, https://poly.pizza/m/RkN6MEbP6g, CC BY 3.0. Fly clip kept; 1024px texture baked to vertex colours; Meshopt. 9,956 tris, 58 joints.
+- `wagon.glb` — "Loaded Wagon" by Eric Wilson, https://poly.pizza/m/2fwnYnnxB9d, CC BY 3.0. Deduplicated, welded, Meshopt; wheels spun in a vertex shader. 3,164 tris, 10 primitives.
+- `antelope.glb` — "Antelope" by Poly by Google, https://poly.pizza/m/dC2-G-IF8rz, CC BY 3.0. Texture baked to vertex colours; Meshopt; walks with the shared leg shader. 1,168 tris.
+- `wolf.glb` — "Wolf" by Quaternius, https://poly.pizza/m/P1gU3Qkr9r, CC0 1.0. Kept Idle, Walk, Gallop; resampled; Meshopt. 1,962 tris, 51 joints.
 - Attribution for the CC BY models above is required wherever the page is published (currently pending on `/homepage-test`). No endorsement implied.
 The island terrain, river, waterfall, pines, clouds, birds and the flying eagle, and the prairie's ground, Garden-of-the-Gods sandstone fins, junipers and sagebrush, are procedural (Three.js), with no external assets.

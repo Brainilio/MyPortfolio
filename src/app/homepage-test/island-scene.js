@@ -13,8 +13,9 @@ const ANIMALS={stag:{height:1.55,walk:.75,run:3.6},deer:{height:1.2,walk:.65,run
 const BEAR_GAITS={Idle:[0,2,.004],Eating:[0,1.4,.006],Walk:[.45,5.5,.012],Gallop:[.72,10,.035]};
 const MOUNTAIN_SCALE=1.9,MOUNTAIN_CLEAR=3.6;
 
-export default function IslandScene({ onEvent } = {}) {
-  const host=useRef(null),event=useRef(onEvent);
+export default function IslandScene({ onEvent, active } = {}) {
+  const host=useRef(null),event=useRef(onEvent),live=useRef(active);
+  live.current=active;
   event.current=onEvent;
   useEffect(()=>{
     const mount=host.current;
@@ -396,7 +397,8 @@ export default function IslandScene({ onEvent } = {}) {
     function draw(){
       raf=requestAnimationFrame(draw);
       const dt=Math.min(clock.getDelta(),.05);
-      if(!visible||document.hidden)return;
+      // Paused while another section is on screen (section 0 is the hero).
+      if(!visible||document.hidden||(live.current&&!live.current.current.live.includes(0)))return;
       if(preference.matches&&!needsRender)return;
       tick(dt);
     }

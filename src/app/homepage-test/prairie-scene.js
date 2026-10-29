@@ -45,11 +45,13 @@ function createBasket() {
   return new THREE.Mesh(geometry,flatMaterial());
 }
 
-export default function PrairieScene({ sectionRef, projects }) {
+export default function PrairieScene({ state, projects }) {
   const host=useRef(null);
   useEffect(()=>{
-    const mount=host.current,section=sectionRef.current;
-    let renderer,disposed=false,raf=0,visible=false;
+    const mount=host.current;
+    let renderer,disposed=false,raf=0;
+    // On screen while the director has the Work section (1) live, including during the transitions in and out.
+    const onScreen=()=>state.current.live.includes(1);
     try { renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:"high-performance"}); } catch { return; }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5));
     renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
@@ -322,17 +324,15 @@ export default function PrairieScene({ sectionRef, projects }) {
     let tall=false;
     function frame(){const w=mount.clientWidth,h=mount.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;tall=camera.aspect<.85;camera.fov=tall?46:35;camera.updateProjectionMatrix();}
     const resize=new ResizeObserver(frame);resize.observe(mount);frame();
-    const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;},{rootMargin:"200px 0px"});observer.observe(section);
 
     const clock=new THREE.Clock();let time=0;
     function tick(dt){
       const reduced=preference.matches,step=reduced?0:dt;time+=step;
-      const rect=section.getBoundingClientRect(),runway=Math.max(1,rect.height-window.innerHeight),progress=THREE.MathUtils.clamp(-rect.top/runway,0,1);
       lean.lerp(reduced?pointer.set(0,0):pointer,1-Math.exp(-dt*2));
       camera.position.set(lean.x*.6,EYE+.2+lean.y*.25,tall?12.5:15);camera.lookAt(lean.x*.3,EYE+1,-20);
-      // Scroll turns the ring: card 0 at the front at the start, the last card at the end. The ring eases after the
-      // scroll rather than snapping to it, so it glides.
-      const n=cards.length,target=-progress*(n-1)/n*Math.PI*2,before=spin;
+      // The ring eases round to the chosen card rather than snapping, so it glides.
+      // Scrolling through Work turns the ring from the first card to the last.
+      const n=cards.length,card0=state.current.progress[1]*(n-1),target=-card0/n*Math.PI*2,before=spin;
       spin=reduced?target:spin+(target-spin)*(1-Math.exp(-dt*4));spinVelocity=(spin-before)/Math.max(dt,1/120);
       const rx=tall?3.6:RING.rx,rz=tall?5.5:RING.rz,cz=tall?-4.5:RING.center.z;
       cards.forEach((card,i)=>{
@@ -358,18 +358,18 @@ export default function PrairieScene({ sectionRef, projects }) {
       sky.forEach((c,i)=>{c.position.x+=step*(.4+i*.15);if(c.position.x>120)c.position.x=-120;});
       renderer.render(scene,camera);
     }
-    function draw(){raf=requestAnimationFrame(draw);const dt=Math.min(clock.getDelta(),.05);if(visible&&!document.hidden&&!window.__prairieHold)tick(dt);}
+    function draw(){raf=requestAnimationFrame(draw);const dt=Math.min(clock.getDelta(),.05);if(onScreen()&&!document.hidden&&!window.__prairieHold)tick(dt);}
     draw();
     if(new URLSearchParams(window.location.search).has("debug"))window.__prairie={step:(n=30)=>{for(let i=0;i<n;i++)tick(1/30);},pour,scene,camera,herd,dogs,cards,hawks,THREE,renderer};
 
     return()=>{
-      disposed=true;cancelAnimationFrame(raf);resize.disconnect();observer.disconnect();delete window.__prairie;
+      disposed=true;cancelAnimationFrame(raf);resize.disconnect();delete window.__prairie;
       cards.forEach(c=>{if(c.video){c.video.pause();c.video.removeAttribute("src");c.video.load();}});
       canvas.removeEventListener("pointermove",onMove);canvas.removeEventListener("click",onClick);
       hawks.forEach(h=>h.mixer.stopAllAction());
       scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat())if(m){m.map?.dispose();m.uniforms?.uMap?.value?.dispose();m.dispose();}});
       glowTexture.dispose();renderer.dispose();canvas.remove();
     };
-  },[sectionRef,projects]);
+  },[state,projects]);
   return <div className="ht-prairie-canvas" ref={host} aria-hidden="true" />;
 }
