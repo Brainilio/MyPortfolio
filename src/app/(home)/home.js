@@ -39,10 +39,11 @@ export const EXPERIENCE = [
 // drifts up and fades, the next rises in, the giant titles move slower (parallax) and the skies crossfade.
 // Inside Work the carousel turns with the scroll; inside Skills the wagon drives with it.
 const SECTIONS = [
-  { id: "home", label: "Home", length: 1.2, steps: 1 },
+  { id: "home", label: "Home", length: 1.2, steps: 1, tail: .1 },
   { id: "work", label: "Work", length: .8 + work.length * .6, steps: work.length },
-  // Skills holds longer after the last sign, so the geyser and the wagon's skid have time to play.
-  { id: "skills", label: "Skills", length: 1 + SKILLS.length * .6, steps: SKILLS.length, tail: 1.1, finale: true },
+  // Skills rests on its last sign while the wagon skids to a halt and the geyser plays (the finale hold below, on the
+  // clock), then only a short margin of scroll before the hand-off.
+  { id: "skills", label: "Skills", length: 1 + SKILLS.length * .6, steps: SKILLS.length, tail: .25, finale: true },
   { id: "experience", label: "Experience", length: 1 + EXPERIENCE.length * .55, steps: EXPERIENCE.length, fadeIn: 2.5 },
   { id: "contact", label: "Contact", length: 1.6, steps: 1 },
 ];
@@ -50,6 +51,8 @@ const CROSS = .8;
 // Dwell (in viewport heights) at each end of a section's own scroll: the first and last stops (card, sign, role) hold
 // still for a moment before the hand-off to the neighbouring section begins, so a small scroll back doesn't leave.
 const HOLD = .35;
+// How long the page rests on a finale (the wagon's skid and the geyser's eruption) before the next scroll moves on.
+const FINALE_MS = 2600;
 const lead = i => (i ? HOLD : 0), tail = i => (i === SECTIONS.length - 1 ? 0 : SECTIONS[i].tail ?? HOLD);
 // Length of a section's stepping stretch (where its progress runs 0 → 1).
 const span = i => SECTIONS[i].length - (i === SECTIONS.length - 1 ? 1 : CROSS);
@@ -131,10 +134,12 @@ export default function Home() {
         // A section with a finale (the geyser at the end of Skills) is never skipped past: scrolling down past its last
         // stop brings you back to rest on it for a moment; the next scroll moves on.
         const endStop = scrollFor(g.section, 1);
-        if (p < endStop - .3) g.heldEnd = false;
+        if (p < endStop - .3) { g.heldEnd = false; g.endAt = 0; }
+        // Time already spent at the last stop counts toward the finale, so someone who watched it isn't held again.
+        if (p > endStop - .05 && !g.endAt) g.endAt = performance.now();
         if (SECTIONS[g.section].finale && !g.heldEnd && p > endStop + .05) {
           g.busy = true;g.heldEnd = true;
-          lenis.scrollTo(endStop * window.innerHeight + 2, { duration: .9, lock: true, force: true, onComplete: () => { lenis.stop(); setTimeout(() => { lenis.start(); g.busy = false; }, 1400); } });
+          lenis.scrollTo(endStop * window.innerHeight + 2, { duration: .9, lock: true, force: true, onComplete: () => { lenis.stop(); setTimeout(() => { lenis.start(); g.busy = false; }, Math.max(500, FINALE_MS - (performance.now() - g.endAt))); } });
         } else if (region !== g.section) {
           const up = region < g.section, next = g.section + (up ? -1 : 1), top = scrollFor(next, up ? 1 : 0) * window.innerHeight + 2;
           g.busy = true;

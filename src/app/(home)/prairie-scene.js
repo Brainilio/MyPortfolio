@@ -13,8 +13,9 @@ import { drawCard, createCardMaterial, videoTexture, coverCrop } from "./prairie
 // Golden-hour prairie seen from eye level: Garden-of-the-Gods sandstone fins in front of a hazy range, a loose
 // bison herd with a calf, prairie dogs, gliding hawks, and a feed basket you can fill. The camera holds still;
 // the project cards ride a slow carousel ring among the rocks, and scrolling turns it.
+const MOUNDS=[[-4.2,5],[-2,8],[2.2,8.5],[8.6,2.5],[-10,2.5],[10.5,6.5],[-6.5,7.5]];
 const GROUND=-5.5,EYE=GROUND+1.8,CARD=new THREE.Vector2(4.6,2.3),BASKET=new THREE.Vector3(2.5,0,6.6);
-const FIN_COLORS=["#8f3b22","#b04b2a","#c65e34","#d9774a","#e8c9a2"].map(c=>new THREE.Color(c));
+const FIN_COLORS=["#8f3b22","#a8462a","#bd5631","#cc6a3e"].map(c=>new THREE.Color(c));
 // Bison gaits: leg swing (rad), stride rate, bob (fraction of height), knee fold, foot lift (fraction), nod.
 const GAITS={Graze:[0,1.1,.003,0,0,.04],Walk:[.36,3.4,.006,.6,.035,.09],Trot:[.5,5.6,.014,.8,.05,.12],Run:[.62,7.5,.02,.95,.06,.14]};
 const smooth=t=>{t=THREE.MathUtils.clamp(t,0,1);return t*t*(3-2*t);};
@@ -42,8 +43,57 @@ function createFin(rng,width,height,depth) {
   for(let k=1;k<rings.length;k++)for(let s=0;s<SEG;s++){const a=rings[k-1][s],b=rings[k-1][(s+1)%SEG],c=rings[k][s],d=rings[k][(s+1)%SEG];tris.push([a,b,c],[b,d,c]);}
   // Cap the crest: a ridge line joining the two sides of the top ring.
   const top=rings.at(-1);tris.push([top[0],top[1],top[SEG-1]]);for(let s=1;s<SEG/2;s++){const a=top[s],b=top[s+1],c=top[SEG-s],d=top[SEG-s-1];tris.push([a,b,c],[b,d,c]);}
-  const geometry=faceted(tris,(tri,c)=>{const y=(tri[0].y+tri[1].y+tri[2].y)/3/height,band=Math.min(3,Math.floor(y*5+rng()*.6));c.copy(FIN_COLORS[band===3&&rng()<.35?4:band]);});
+  const geometry=faceted(tris,(tri,c)=>{const y=(tri[0].y+tri[1].y+tri[2].y)/3/height,band=Math.min(3,Math.floor(y*4.4+rng()*.5));c.copy(FIN_COLORS[band]);});
   return new THREE.Mesh(geometry,flatMaterial());
+}
+
+// A Teton-style range: a faceted ridge strip whose crest rises into a few big peaks, built from rows that step down
+// toward the plain. Slate blue in shadow, snow caught in the gullies near the summits, hazed toward the sky at the base.
+function createRange(rng,{peaks,width,depth,base,rough,snow,low,high,haze}) {
+  const COLS=110,ROWS=6,grid=[];
+  const crest=x=>{let h=0;for(const [cx,ph,pw] of peaks)h=Math.max(h,ph*Math.pow(Math.max(0,1-Math.abs(x-cx)/pw),1.25));return h;};
+  for(let r=0;r<=ROWS;r++){
+    const t=r/ROWS,row=[];
+    for(let i=0;i<=COLS;i++){
+      const x=-width/2+i*width/COLS+(i&&i<COLS?(rng()-.5)*width/COLS*.6:0);
+      // Each row down the face keeps the crest's shape but sinks toward the base, with buttresses jutting out.
+      const h=(crest(x)+rough*(.6+.4*Math.sin(x*.13+r)))*Math.pow(1-t,1.35)*(.85+rng()*.3);
+      row.push(new THREE.Vector3(x,base+Math.max(0,h),t*depth+(rng()-.5)*depth*.12));
+    }
+    grid.push(row);
+  }
+  const tris=[];
+  for(let r=1;r<=ROWS;r++)for(let i=0;i<COLS;i++){const a=grid[r-1][i],b=grid[r-1][i+1],c=grid[r][i],d=grid[r][i+1];tris.push([a,c,b],[b,c,d]);}
+  const top=Math.max(...peaks.map(p=>p[1])),lowC=new THREE.Color(low),highC=new THREE.Color(high),snowC=new THREE.Color(snow),hazeC=new THREE.Color(haze),e1=new THREE.Vector3(),e2=new THREE.Vector3();
+  const geometry=faceted(tris,(tri,c)=>{
+    const y=(tri[0].y+tri[1].y+tri[2].y)/3-base,k=y/top;
+    e1.subVectors(tri[1],tri[0]);e2.subVectors(tri[2],tri[0]);const steep=1-Math.abs(e1.cross(e2).normalize().y);
+    c.copy(lowC).lerp(highC,THREE.MathUtils.clamp(k*1.3,0,1));
+    // Snow lies on the gentler facets high up, in streaks rather than a cap.
+    if(snow&&k>.42&&steep<.8&&rng()<(k-.42)*2.4)c.lerp(snowC,.75+rng()*.2);
+    c.lerp(hazeC,(1-THREE.MathUtils.clamp(k*2.2,0,1))*.45);
+  });
+  return new THREE.Mesh(geometry,new THREE.MeshLambertMaterial({vertexColors:true,flatShading:true,fog:false}));
+}
+
+// A long, thin sunset cloud: a few stretched puffs, lit pink underneath and pale on top.
+function createStreak(rng,under,over) {
+  const parts=[],n=4+Math.floor(rng()*4);
+  for(let i=0;i<n;i++)parts.push(new THREE.IcosahedronGeometry(1,0).scale(2.6+rng()*2.4,.38+rng()*.3,1.2).translate((i-n/2)*3.2+rng()*1.5,(rng()-.5)*.5,(rng()-.5)*1.2).toNonIndexed());
+  const g=mergeGeometries(parts),pos=g.attributes.position,colors=new Float32Array(pos.count*3),a=new THREE.Color(under),b=new THREE.Color(over),c=new THREE.Color();
+  for(let i=0;i<pos.count;i+=3){const y=(pos.getY(i)+pos.getY(i+1)+pos.getY(i+2))/3;c.copy(a).lerp(b,THREE.MathUtils.clamp(y*1.6+.5,0,1));for(let k=0;k<3;k++)colors.set([c.r,c.g,c.b],(i+k)*3);}
+  g.setAttribute("color",new THREE.BufferAttribute(colors,3));
+  return new THREE.Mesh(g,new THREE.MeshBasicMaterial({vertexColors:true,fog:false,transparent:true,opacity:.92,depthWrite:false}));
+}
+
+// A tuft of three grass blades, darker at the root.
+function createTuft() {
+  const tris=[];
+  for(let k=0;k<3;k++){const a=k*2.1,w=.07,h=.5+k*.12,lean=(k-1)*.12,cx=Math.cos(a)*.06,cz=Math.sin(a)*.06,dx=Math.cos(a+1.57)*w,dz=Math.sin(a+1.57)*w;
+    tris.push([new THREE.Vector3(cx-dx,0,cz-dz),new THREE.Vector3(cx+dx,0,cz+dz),new THREE.Vector3(cx+lean,h,cz+lean*.5)]);}
+  const g=faceted(tris,(tri,c)=>c.setRGB(1,1,1)),pos=g.attributes.position,col=g.attributes.color;
+  for(let i=0;i<pos.count;i++){const s=.72+.35*pos.getY(i)/.74;col.setXYZ(i,s,s,s);}
+  return g;
 }
 
 // A woven basket: a lathe-turned bowl with alternating bands.
@@ -71,7 +121,7 @@ export default function PrairieScene({ state, projects, onReady }) {
     mount.appendChild(renderer.domElement);
     const canvas=renderer.domElement;canvas.style.touchAction="pan-y";
     const preference=matchMedia("(prefers-reduced-motion: reduce)");
-    const scene=new THREE.Scene();scene.fog=new THREE.Fog("#f2c19a",45,170);
+    const scene=new THREE.Scene();scene.fog=new THREE.Fog("#eeae94",45,170);
     const camera=new THREE.PerspectiveCamera(35,1,.5,400);
     const rng=random(5);
 
@@ -88,23 +138,27 @@ export default function PrairieScene({ state, projects, onReady }) {
       g.setAttribute("color",new THREE.BufferAttribute(colors,3));g.computeVertexNormals();
       scene.add(new THREE.Mesh(g,new THREE.MeshStandardMaterial({vertexColors:true,roughness:1})));
     }
-    // A hazy violet range on the horizon, like the Front Range behind the rocks.
+    // The big range on the horizon, Teton-like: a jagged main massif with snow in its gullies, a paler far range
+    // peeking behind it, and a dark wooded ridge along its foot. [x, height, half-width]
     {
-      const points=[],base=GROUND-3;for(let i=0;i<=60;i++){const x=-230+i*460/60;points.push([x,base+9+7*Math.sin(i*.55+1)+5*Math.sin(i*1.7)+(rng()-.5)*4]);}
-      const positions=[];for(let i=0;i<60;i++){const [x0,y0]=points[i],[x1,y1]=points[i+1];positions.push(x0,base,0,x1,base,0,x0,y0,0,x1,base,0,x1,y1,0,x0,y0,0);}
-      const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.Float32BufferAttribute(positions,3));
-      const colors=new Float32Array(positions.length),low=new THREE.Color("#a993c4"),high=new THREE.Color("#cdbbd6"),c=new THREE.Color();
-      for(let i=0;i<positions.length;i+=3){c.copy(low).lerp(high,THREE.MathUtils.clamp((positions[i+1]-base)/18,0,1));colors.set([c.r,c.g,c.b],i);}
-      g.setAttribute("color",new THREE.BufferAttribute(colors,3));
-      const range=new THREE.Mesh(g,new THREE.MeshBasicMaterial({vertexColors:true,fog:false,side:THREE.DoubleSide}));range.position.z=-200;scene.add(range);
+      const far=createRange(random(21),{peaks:[[-170,30,60],[-90,24,50],[60,28,55],[150,34,60],[230,22,45]],width:560,depth:30,base:GROUND-4,rough:5,snow:"#d9d2e6",low:"#8e86ad",high:"#a9a0c4",haze:"#e7b3a6"});
+      far.position.z=-290;scene.add(far);
+      const main=createRange(random(22),{peaks:[[-120,52,70],[-55,62,58],[-18,44,30],[35,50,52],[110,40,60],[190,30,55],[-200,34,50]],width:520,depth:44,base:GROUND-4,rough:6,snow:"#eceaf4",low:"#4a5577",high:"#69739a",haze:"#c99aa6"});
+      main.position.z=-240;scene.add(main);
+      const woods=createRange(random(23),{peaks:[[-150,9,90],[-30,7,80],[90,10,90],[200,8,70]],width:520,depth:26,base:GROUND-3,rough:2.5,snow:null,low:"#2f3a40",high:"#3d4a48",haze:"#7c6f7c"});
+      woods.position.z=-185;scene.add(woods);
     }
-    // Low-poly clouds drifting across the sky.
-    const sky=[[-70,46,-180,5],[15,54,-200,6],[80,42,-170,4.5],[-25,38,-150,3.5]].map(([x,y,z,s],i)=>{const cloud=createCloud(80+i);cloud.material=new THREE.MeshBasicMaterial({color:"#fff3e6",fog:false,transparent:true,opacity:.85});cloud.position.set(x,y,z);cloud.scale.setScalar(s);scene.add(cloud);return cloud;});
+    // Streaks of sunset cloud in layers: high violet bands, pink ones lower down, drifting slowly.
+    const sky=[];
+    {
+      const cr=random(31),layers=[{n:7,y:[68,96],z:-340,s:[4,5.8],under:"#c96f8e",over:"#f0b3c0"},{n:8,y:[46,66],z:-320,s:[3.2,4.6],under:"#e3788a",over:"#ffc0b0"},{n:5,y:[36,46],z:-300,s:[2.6,3.4],under:"#ef8f86",over:"#ffd0b4"}];
+      layers.forEach(l=>{for(let i=0;i<l.n;i++){const cloud=createStreak(cr,l.under,l.over),s=l.s[0]+cr()*(l.s[1]-l.s[0]);cloud.scale.set(s,s*(.8+cr()*.4),s);cloud.position.set(-300+(i+cr()*.8)*600/l.n,l.y[0]+cr()*(l.y[1]-l.y[0]),l.z+cr()*20);cloud.renderOrder=-1;scene.add(cloud);sky.push(cloud);}});
+    }
 
     const glow=document.createElement("canvas");glow.width=glow.height=128;
     const gg=glow.getContext("2d"),gr=gg.createRadialGradient(64,64,0,64,64,64);gr.addColorStop(0,"rgba(255,240,210,1)");gr.addColorStop(.25,"rgba(255,200,140,.5)");gr.addColorStop(1,"rgba(255,170,150,0)");gg.fillStyle=gr;gg.fillRect(0,0,128,128);
     const glowTexture=new THREE.CanvasTexture(glow);glowTexture.colorSpace=THREE.SRGBColorSpace;
-    const glare=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTexture,blending:THREE.AdditiveBlending,depthWrite:false,fog:false,transparent:true}));glare.position.set(-50,14,-190);glare.scale.setScalar(80);scene.add(glare);
+    const glare=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTexture,blending:THREE.AdditiveBlending,depthWrite:false,fog:false,transparent:true}));glare.position.set(-40,12,-330);glare.scale.setScalar(150);scene.add(glare);
 
     // Sandstone fins with open sky between them, plus two tall spires standing among the card ring. [x, z, width, height, depth, lean]
     const HIDES=[[-18,-27,6,8.5,2,.06],[-6,-35,5,7.5,1.8,-.04],[6,-31,6.5,9,2.2,.05],[19,-37,5.5,8,1.8,-.07],[-7.2,1.5,2.4,8.5,1.4,.05],[6.6,-10.5,2.8,10,1.6,-.06]];
@@ -125,6 +179,18 @@ export default function PrairieScene({ state, projects, onReady }) {
       const count=240,bushes=new THREE.InstancedMesh(sageGeometry,new THREE.MeshStandardMaterial({flatShading:true,roughness:1}),count),tints=["#8a9a5c","#7a8b52","#94a066"].map(c=>new THREE.Color(c));
       for(let i=0;i<count;i++){let x=(rng()-.5)*90;const z=-2-rng()*75;if(Math.hypot(x-BASKET.x,z-BASKET.z)<2.5)x+=4;d.position.set(x,groundY(x,z),z);d.rotation.set(0,rng()*6,0);d.scale.setScalar(.45+rng()*.6);d.updateMatrix();bushes.setMatrixAt(i,d.matrix);bushes.setColorAt(i,tints[i%3]);}
       scene.add(bushes);
+      // A dark band of forest along the foot of the range, and tall grass tufts thick in the foreground.
+      const fr=random(41),belt=[];for(let k=0;k<260;k++)belt.push([(fr()-.5)*300,-118-fr()*55]);
+      const forest=new THREE.InstancedMesh(createPineGeometry(17),new THREE.MeshLambertMaterial({color:"#3c4a4c",flatShading:true,fog:false}),belt.length);
+      belt.forEach(([x,z],i)=>{d.position.set(x,groundY(x,z)-.2,z);d.rotation.set(0,fr()*6,0);const s=1.6+fr()*1.4;d.scale.set(s,s*(1+fr()*.5),s);d.updateMatrix();forest.setMatrixAt(i,d.matrix);});
+      scene.add(forest);
+      const TUFTS=3600,tufts=new THREE.InstancedMesh(createTuft(),new THREE.MeshBasicMaterial({vertexColors:true,side:THREE.DoubleSide}),TUFTS),golds=["#b88a42","#a87b38","#c59a4e","#9f8a50","#b08e48"].map(c=>new THREE.Color(c));
+      for(let i=0;i<TUFTS;i++){
+        const z=13-Math.pow(fr(),1.6)*60,x=(fr()-.5)*(26+Math.max(0,13-z)*1.5);
+        if(Math.hypot(x-BASKET.x,z-BASKET.z)<1.4||MOUNDS.some(([mx,mz])=>Math.hypot(x-mx,z-mz)<1.1)){i--;continue;}
+        d.position.set(x,groundY(x,z)-.02,z);d.rotation.set((fr()-.5)*.3,fr()*6,(fr()-.5)*.3);d.scale.set(1,.45+fr()*.45,1);d.updateMatrix();tufts.setMatrixAt(i,d.matrix);tufts.setColorAt(i,golds[i%5]);
+      }
+      scene.add(tufts);
     }
 
     // The feed basket, its hay, and the pellets that drop into it.
@@ -198,12 +264,12 @@ export default function PrairieScene({ state, projects, onReady }) {
 
     // The herd: each bison grazes, ambles and now and then trots on its own, staying loosely together.
     // The calf is a scaled bison with a red coat (real calves are orange-red) that dashes around its mother.
-    const herd=[],PEN={x:[-26,26],z:[-24,-11]};
+    const herd=[],PEN={x:[-30,30],z:[-26,-11]};
     loader.load("/models/island/bison.glb",gltf=>{
       if(disposed)return;
       const box=new THREE.Box3().setFromObject(gltf.scene),size=box.getSize(new THREE.Vector3());
-      for(let i=0;i<9;i++){
-        const calf=i===8,model=i?gltf.scene.clone():gltf.scene,root=new THREE.Group();let gait=null;
+      for(let i=0;i<13;i++){
+        const calf=i===12,model=i?gltf.scene.clone():gltf.scene,root=new THREE.Group();let gait=null;
         model.traverse(o=>{if(!o.isMesh)return;
           if(calf){
             // Recolour a copy of the geometry: dark browns become the calf's rusty orange.
@@ -277,7 +343,7 @@ export default function PrairieScene({ state, projects, onReady }) {
       if(disposed)return;
       const box=new THREE.Box3().setFromObject(gltf.scene),size=box.getSize(new THREE.Vector3());
       const moundMaterial=new THREE.MeshStandardMaterial({color:"#9a6a3e",flatShading:true,roughness:1}),hole=new THREE.MeshBasicMaterial({color:"#2b1a14"});
-      [[-4.2,5],[-2,8],[2.2,8.5],[8.6,2.5],[-10,2.5],[10.5,6.5],[-6.5,7.5]].forEach(([x,z],i)=>{
+      MOUNDS.forEach(([x,z],i)=>{
         const y=groundY(x,z),mound=new THREE.Mesh(new THREE.CylinderGeometry(.22,.62,.26,7),moundMaterial);mound.position.set(x,y+.08,z);scene.add(mound);
         const opening=new THREE.Mesh(new THREE.CircleGeometry(.2,7).rotateX(-Math.PI/2),hole);opening.position.set(x,y+.22,z);scene.add(opening);
         const model=i?gltf.scene.clone():gltf.scene;model.traverse(o=>{if(o.isMesh)o.material=new THREE.MeshStandardMaterial({vertexColors:true,flatShading:true,roughness:1});});
@@ -342,16 +408,18 @@ export default function PrairieScene({ state, projects, onReady }) {
     function frame(){const w=mount.clientWidth,h=mount.clientHeight;view.w=w;view.h=h;renderer.setSize(w,h,false);camera.aspect=w/h;tall=camera.aspect<.85;narrowSpire.visible=tall;camera.fov=tall?46:35;camera.updateProjectionMatrix();}
     const resize=new ResizeObserver(frame);resize.observe(mount);frame();
 
-    const clock=new THREE.Clock();let time=0;
+    const clock=new THREE.Clock();let time=0,travel=0;
     function tick(dt){
       const reduced=preference.matches,step=reduced?0:dt;time+=step;
       lean.lerp(reduced?pointer.set(0,0):pointer,1-Math.exp(-dt*2));
-      camera.position.set(lean.x*.6,EYE+.2+lean.y*.25,tall?12.5:15);camera.lookAt(lean.x*.3,EYE+1,-20);
+      // Scrolling through Work walks the camera slowly into the prairie: a step forward and a drift from left to right.
+      const want=smooth(state.current.progress[1]);travel=reduced?want:travel+(want-travel)*(1-Math.exp(-dt*3));
+      camera.position.set(lean.x*.6+(travel-.5)*2.4,EYE+.2+lean.y*.25+travel*.3,(tall?12.5:15)-travel*1.2);camera.lookAt(lean.x*.3+(travel-.5)*1.2,EYE+1,-20);
       // The ring eases round to the chosen card rather than snapping, so it glides.
       // Scrolling through Work turns the ring from the first card to the last.
       const n=cards.length,card0=state.current.progress[1]*(n-1),target=-card0/n*Math.PI*2,before=spin;
       // Back on screen after a while away: start at the right card instead of spinning all the way round to it.
-      if(snap){snap=false;spin=target;}
+      if(snap){snap=false;spin=target;travel=smooth(state.current.progress[1]);}
       spin=reduced?target:spin+(target-spin)*(1-Math.exp(-dt*4));spinVelocity=(spin-before)/Math.max(dt,1/120);
       const rx=tall?3.6:RING.rx,rz=tall?5.5:RING.rz,cz=tall?-4.5:RING.center.z;
       cards.forEach((card,i)=>{
@@ -374,7 +442,7 @@ export default function PrairieScene({ state, projects, onReady }) {
       updatePellets(step);updateBits(step);if(herd.some(b=>b.state==="eat"))food=Math.max(0,food-step*.18);
       basket.rotation.z=onBasket&&!reduced?Math.sin(time*9)*.03:0;
       herd.forEach(b=>updateBison(b,step,time));dogs.forEach(d=>updateDog(d,step));hawks.forEach(h=>updateHawk(h,step));
-      sky.forEach((c,i)=>{c.position.x+=step*(.4+i*.15);if(c.position.x>120)c.position.x=-120;});
+      sky.forEach((c,i)=>{c.position.x+=step*(.25+(i%5)*.06);if(c.position.x>320)c.position.x=-320;});
       applyView();renderer.render(scene,camera);
     }
     let snap=true,wasLive=false;

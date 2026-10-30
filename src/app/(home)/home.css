@@ -9,6 +9,8 @@
 /* Homepage test: one dusk palette, the brand violet, a giant name under a floating island. */
 .ht{overflow-x:clip;--font-display:'Offset TM','Satoshi';--sky-top:#1b1335;--violet:#a78bfa;--cream:#fbf7ff;--ink:#2a1636;background:var(--sky-top);color:var(--cream)}
 body:has(.ht){background:#1b1335}
+/* On very wide screens the header, copy and controls stay within the shared page width (the worlds still fill the screen). */
+@media(min-width:1300px){.ht{--gutter:max(clamp(24px,6.3vw,100px),calc((100vw - var(--page-max-width)) / 2 + 100px))}}
 /* No visible scrollbar on the homepage (scrolling still works; the section pill shows where you are). */
 html:has(.ht){scrollbar-width:none}
 html:has(.ht)::-webkit-scrollbar{display:none}
@@ -75,7 +77,7 @@ html:has(.ht)::-webkit-scrollbar{display:none}
 
 /* Work and Skills: sky, a giant translucent title behind the scene, the scene, then the heading. */
 .ht-prairie-sky,.ht-valley-sky{position:absolute;inset:0;z-index:0}
-.ht-prairie-sky{background:linear-gradient(180deg,#f3b89c 0%,#f6c592 38%,#ffd9a2 62%,#f2b98f 100%)}
+.ht-prairie-sky{background:linear-gradient(180deg,#5f5d8c 0%,#9a6f9c 22%,#d9808f 40%,#f4a089 54%,#ffc79a 64%,#f2b98f 100%)}
 .ht-valley-sky{background:linear-gradient(180deg,#e9bfa0 0%,#f3cfaa 40%,#f9dfbd 68%,#f0cba6 100%)}
 /* The valley's grade: golden-hour haze, a soft warm wash over everything and slightly lifted, rosy shadows. */
 .ht-skills .ht-finish{background:radial-gradient(120% 90% at 50% 40%,transparent 50%,rgba(70,32,40,.45) 100%),linear-gradient(180deg,rgba(255,214,170,.16) 0%,rgba(255,180,140,0) 45%,rgba(110,50,70,.1) 100%)}
@@ -93,7 +95,7 @@ html:has(.ht)::-webkit-scrollbar{display:none}
 .ht-mountain-sky{position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,#cfdde6 0%,#e4ebe6 42%,#f3efdf 72%,#eadfc6 100%)}
 .ht-experience .ht-finish{background:radial-gradient(120% 90% at 65% 45%,transparent 55%,rgba(30,40,30,.35) 100%),radial-gradient(50% 40% at 20% 0%,rgba(255,236,190,.35),transparent 70%)}
 /* A soft frosted backing behind the left column, so the text reads over the forest; it melts into the scene. */
-.ht-scrim{position:absolute;z-index:3;left:0;top:0;bottom:0;width:min(640px,54vw);pointer-events:none;
+.ht-scrim{position:absolute;z-index:3;left:0;top:0;bottom:0;width:min(calc(var(--gutter) + 540px),54vw);pointer-events:none;
   background:linear-gradient(90deg,rgba(243,240,228,.86) 0%,rgba(243,240,228,.6) 50%,rgba(243,240,228,0) 100%);
   backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);-webkit-mask-image:linear-gradient(90deg,#000 45%,transparent);mask-image:linear-gradient(90deg,#000 45%,transparent)}
 .ht-trail-log{position:absolute;z-index:4;left:var(--gutter);top:0;bottom:0;width:min(430px,38vw);overflow:hidden;
