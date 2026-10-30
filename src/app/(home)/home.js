@@ -67,7 +67,7 @@ export default function Home() {
   // Shared with the 3D scenes (read every frame): which sections are on screen and how far through each one we are.
   const scene = useRef({ section: 0, live: [0], progress: [0, 0, 0, 0, 0] });
   const [spotted, setSpotted] = useState([]);
-  const altitude = useRef(null);
+  const altitude = useRef(null), pill = useRef(null), bar = useRef(null);
   const layers = useRef([]);
   const { section, stop } = where;
   // Loading: every model is fetched up front (to warm the cache) while the worlds are built one after another behind
@@ -127,6 +127,10 @@ export default function Home() {
         if (el) { el.style.opacity = amount.toFixed(3); el.style.visibility = amount > 0.001 ? "visible" : "hidden"; el.style.setProperty("--shift", shift.toFixed(4)); el.style.setProperty("--enter", enter.toFixed(4)); el.style.setProperty("--q", q.toFixed(4)); }
       });
       scene.current.live = live;scene.current.section = dominant;
+      // The pill fills as you scroll through the section on screen.
+      pill.current?.style.setProperty("--progress", scene.current.progress[dominant].toFixed(4));
+      // The bar along the top shows how far through the whole page you are.
+      bar.current?.style.setProperty("--progress", Math.min(1, p / Math.max(.01, TOTAL - 1)).toFixed(4));
       // The gate: which section's stretch the scroll is in (boundaries at the middle of each hand-off).
       const lenis = lenisRef.current, g = gate.current;
       if (lenis && !g.busy) {
@@ -300,8 +304,9 @@ export default function Home() {
         <span className="ht-sr">Loading {Math.round(progress * 100)}%</span>
       </div>
 
+      <div className="ht-progress" ref={bar} aria-hidden="true" />
       {/* Where you are, and a way to jump anywhere. */}
-      <nav className="ht-pill" aria-label="Sections">
+      <nav className="ht-pill" aria-label="Sections" ref={pill}>
         <button type="button" aria-expanded={menu} onClick={() => setMenu(open => !open)}>
           <span className="ht-pill-dot" aria-hidden="true" />{SECTIONS[section].label}{counter && <em>{counter}</em>}<span aria-hidden="true" className="ht-pill-caret">▲</span>
         </button>
