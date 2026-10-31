@@ -15,11 +15,11 @@ const work = allProjects.filter(project => project.slug && project.previewImage)
 
 // Skill groups, drawn from the stacks in the project list. Each one is a roadside sign on the road trip.
 export const SKILLS = [
-  { title: "Frontend", items: ["React", "Redux", "Next.js", "GSAP"] },
+  { title: "Frontend", items: ["React", "Redux", "Next.js", "React Query", "GSAP"] },
   { title: "Backend", items: ["Node", "Express", "MongoDB", "Laravel"] },
   { title: "3D & motion", items: ["Three.js", "WebGL", "Shaders"] },
   { title: "Languages", items: ["TypeScript", "JavaScript", "PHP", "Java", "Python"] },
-  { title: "Product", items: ["UX/UI", "User research", "Pitching"] },
+  { title: "Product", items: ["UX/UI", "User research", "Pitching", "Stakeholder communication", "Agile"] },
 ];
 
 // Every model the homepage loads (fetched up front by the loading screen).

@@ -82,7 +82,32 @@ const bv2 = "/legacy/projects/bayvinemedia/bv2.webp"
 const bv3 = "/legacy/projects/bayvinemedia/bv3.webp"
 const bv4 = "/legacy/projects/bayvinemedia/bv4.webp"
 
+// MyCompassion: captured from a live account with children's photos blurred and every name, ID and contact detail replaced.
+const mc = n => `/projects/my-compassion/${n}.jpg`
+
 const projects = [
+	{
+		name: "MyCompassion",
+		// PLACEHOLDER copy: replace with your role, the team and what you built.
+		shortDescription:
+			"MyCompassion is Compassion International's sponsor portal, where supporters keep up with the children they sponsor, give gifts, manage payments and update their account.",
+		previewImage: mc("poster"),
+		previewVideo: "/projects/my-compassion/preview.mp4",
+		livePreview: "https://my.compassion.com/",
+		gitHub: null,
+		tags: ["Next.js", "Storybook", "GraphQL", "Zustand", "AWS Cognito", "AWS DynamoDB", "AWS ElastiCache", "AWS Lambda", "Agentic AI workflows", "Architecture"],
+		category: "Development",
+		description:
+			"MyCompassion is Compassion International's sponsor portal, where supporters keep up with the children they sponsor, give gifts, manage payments and update their account. Screens shown include the dashboard, sponsorships, giving, payments and billing (with its commitment and payment dialogs) and settings.",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
+		additionalLinks: [],
+		dateCreated: "2026",
+		fullImages: [1, 2, 3, 4, 5, 6, 7, 8, 9].map(mc),
+		slug: "my-compassion",
+	},
 	{
 		name: "Natours",
 		shortDescription:
