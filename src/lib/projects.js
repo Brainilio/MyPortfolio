@@ -84,6 +84,7 @@ const bv4 = "/legacy/projects/bayvinemedia/bv4.webp"
 
 // MyCompassion: captured from a live account with children's photos blurred and every name, ID and contact detail replaced.
 const mc = n => `/projects/my-compassion/${n}.jpg`
+const nc = n => `/projects/newcold/${n}.jpg`
 
 const projects = [
 	{
@@ -107,6 +108,28 @@ const projects = [
 		dateCreated: "2026",
 		fullImages: [1, 2, 3, 4, 5, 6, 7, 8, 9].map(mc),
 		slug: "my-compassion",
+	},
+	{
+		name: "NewCold",
+		// PLACEHOLDER copy: replace with your role, the team and what you built.
+		shortDescription:
+			"NewCold's website, built as a front-end developer, with an interactive map of the company's facilities and offices worldwide.",
+		previewImage: nc("poster"),
+		previewVideo: "/projects/newcold/preview.mp4",
+		livePreview: "https://newcold.com/",
+		gitHub: null,
+		tags: ["Next.js", "React", "Mapbox", "Tailwind CSS"],
+		category: "Development",
+		description:
+			"NewCold is a refrigerated food logistics provider. I worked on its website as a front-end developer, including the interactive facilities map: filter by facilities or offices, fly to a region, and click a pin to open a side panel with that site's photo and figures.",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
+		additionalLinks: [],
+		dateCreated: "",
+		fullImages: [1, 2, 3, 4, 5, 6, 7, 8, 9].map(nc),
+		slug: "newcold",
 	},
 	{
 		name: "Natours",
