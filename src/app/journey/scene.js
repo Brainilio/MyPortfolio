@@ -208,7 +208,7 @@ export default function JourneyScene({ controls, flashRef, hudRef, scoreRef, onP
         else if(enter==='same')shown=next;
         else{[cutMode,cutLength]=CUTS[enter]??CUTS.cut;cutAt=now;swapped=false;}
       }
-      const id=CHAPTERS[shown]?.id,closeUp=id==='summit'||id==='about'||id==='skills',aliensStage=id==='aliens',projectsStage=id==='projects';
+      const id=CHAPTERS[shown]?.id,closeUp=id==='about'||id==='skills',aliensStage=id==='aliens',projectsStage=id==='projects';
       const progress=reduced?.5:story.progress[shown]??0;
       // Skills: idle, then the rocket streaks past (flyby), then he goes after it (depart).
       const skills=id==='skills'?progress:0,flyby=clamp((skills-.35)/.33,0,1),depart=reduced?0:clamp((skills-.7)/.3,0,1);
@@ -309,7 +309,8 @@ export default function JourneyScene({ controls, flashRef, hudRef, scoreRef, onP
       if(snap||reduced)astronaut.quaternion.copy(qTarget);else astronaut.quaternion.slerp(qTarget,1-Math.exp(-dt*(closeUp?3:6)));
       const fly=pose.fly;
       const shrink=1-dive*.95;astronaut.scale.set(shrink*(1-pull*.15),shrink*(1+pull*.45),shrink*(1-pull*.15));
-      astronaut.visible=!galaxyMode&&!!mixer;
+      // Liftoff is the rocket's alone: he isn't aboard yet.
+      astronaut.visible=!galaxyMode&&!!mixer&&id!=='launch';
       // The jetpack only shows once he's going somewhere; it ignites with a quick ramp rather than popping on.
       jetpack.group.visible=!(closeUp&&depart===0);jetpack.flame.group.visible=fly>.02&&!galaxyMode;jetpack.flame.group.scale.setScalar(.42*fly*(1+pull*.9));jetpack.flame.update(time,reduced);
       // Aliens: the game moves with the section's scroll; he tracks the nearest saucer.
@@ -361,9 +362,8 @@ export default function JourneyScene({ controls, flashRef, hudRef, scoreRef, onP
       } else {
         if(closeUp)aboutShot(targetPos,targetLook);
         else if(projectsStage){
-          // Close behind him at first; after the first project the camera eases over to the rocket and keeps it
-          // on the right (centred on portrait screens), the cards flowing down the left.
-          const toRocket=smooth((progress-.16)/.22),offset=tall?0:9;
+          // Close behind him at first, then the camera eases over to ride behind the rocket, keeping it centred.
+          const toRocket=smooth((progress-.16)/.22),offset=0;
           v1.copy(ctx.astro).addScaledVector(fr.tangent,-4.2).addScaledVector(fr.up,1.1);
           v2.copy(ctx.astro).addScaledVector(fr.tangent,8).addScaledVector(fr.up,.4);
           targetPos.copy(ctx.rocketPath).addScaledVector(fr.tangent,-30).addScaledVector(fr.up,3).addScaledVector(fr.side,-offset*.35);
@@ -415,6 +415,8 @@ export default function JourneyScene({ controls, flashRef, hudRef, scoreRef, onP
       const home=deep*smooth((s-2.3)/.5)*(1-smooth((s-5.18)/.14));
       saturn.fade(home);saturn.update(time);mars.fade(home);
       moon.update(camera,deep);
+      // The Sun only shows in space; left un-updated its glow sits at the origin, washing out the summit.
+      sunGlow.update(camera,galaxyMode?0:deep,reduced);
       jumper.update(s,camera,1);
       // The black hole only emerges once the alien zone is behind us.
       holeFade(reveal(camera.position.distanceTo(HOLE),380,720)*smooth((s-5.8)/.3));blackHole.update(time,Math.max(pull,dive),camera,reduced);

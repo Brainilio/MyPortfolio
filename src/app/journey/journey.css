@@ -1,90 +1,57 @@
-.journey{color:#f0eff8;position:relative}
-body:has(.journey){background:#04050d}
+.journey{color:#f0eff8;position:relative;min-height:100svh;overflow:hidden}
+body:has(.journey){background:#04050d;overflow:hidden}
 .journey-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;background:#9cc4ea}
 .journey-canvas canvas{display:block;width:100%;height:100%}
 .journey-flash{position:fixed;inset:0;z-index:3;background:#fff;opacity:0;pointer-events:none}
-
-/* Chrome: wordmark, availability, altimeter. Quiet, so the type and the scene carry the page. */
-.journey-top{position:fixed;top:0;left:0;right:0;z-index:4;mix-blend-mode:difference;display:flex;justify-content:space-between;align-items:center;padding:24px var(--gutter);pointer-events:none}
-.journey-top>*{pointer-events:auto}
-.journey-wordmark{font-weight:750;font-size:20px;letter-spacing:-1px}.journey-wordmark span{color:var(--accent)}
-.journey-available{display:inline-flex;align-items:center;gap:9px;font-size:12px;letter-spacing:.02em}
-.journey-available i{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 10px #4ade80}
-.journey-altimeter{position:fixed;left:18px;top:50%;transform:translateY(-50%);z-index:4;display:flex;flex-direction:column;gap:14px;font-size:10px;letter-spacing:.06em}
-.journey-altimeter a{display:flex;flex-direction:column;opacity:.4;border-left:1px solid rgba(255,255,255,.25);padding-left:10px;transition:opacity .4s,border-color .4s}
-.journey-altimeter a[aria-current]{opacity:1;border-color:var(--accent)}
-.journey-altimeter b{font-weight:500;font-size:11px}
-.journey-altimeter a:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
 .journey-debug{position:fixed;left:50%;top:16px;transform:translateX(-50%);z-index:5;font:12px ui-monospace,monospace;background:rgba(0,0,0,.7);padding:6px 10px;border-radius:6px}
+.lab[data-stage="aliens"]{cursor:crosshair}
 
-.journey-chapters{position:relative;z-index:2;pointer-events:none}
-/* Hero: the homepage hero with no runway: it scrolls straight off, uncovering the About scene behind it.
-   Its own header stands in for the fixed chrome until the hero hands off. */
-.journey .launch-runway{height:auto}
-.journey-top,.journey-altimeter{transition:opacity .5s}
-.journey[data-stage="0"] .journey-top,.journey[data-stage="0"] .journey-altimeter{opacity:0;pointer-events:none}
-.journey[data-stage="0"] .journey-top>*{pointer-events:none}
-.journey-chapter{position:relative;padding:0 var(--content-gutter) 0 max(var(--content-gutter),150px)}
+/* Chrome: the wordmark home and a quiet name for the page. */
+.lab-top{position:fixed;top:0;left:0;right:0;z-index:4;display:flex;align-items:baseline;gap:14px;padding:24px var(--gutter);mix-blend-mode:difference;pointer-events:none}
+.lab-top>*{pointer-events:auto}
+.journey-wordmark{font-weight:750;font-size:20px;letter-spacing:-1px}.journey-wordmark span{color:var(--accent)}
+.lab-name{font-size:15px;color:rgba(255,255,255,.7);transition:color .3s}.lab-name:hover{color:#fff}
 
-/* Editorial type: large, unboxed, readable over the scene with a soft shadow. */
-.type{position:sticky;top:0;height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:10svh;max-width:min(1100px,82vw);pointer-events:none;text-shadow:0 2px 40px rgba(2,3,10,.55)}
-.type>*{pointer-events:auto}
-.type .eyebrow{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#bfb6e8;margin-bottom:18px}
-.type h2,.type h3{font-size:clamp(52px,8vw,136px);font-weight:500;letter-spacing:-.05em;line-height:.92;margin:0}
-.type em,.journey-final em{font-style:normal;color:var(--accent)}
-.type p{max-width:420px;margin:22px 0 0;font-size:17px;line-height:1.55;color:#cfcde0}
-.type .type-list{max-width:none;font-size:clamp(18px,1.8vw,26px);letter-spacing:-.02em;color:#e7e4f5}
-.type.intro{position:relative;height:auto;display:block;padding:58svh 0 0;color:#0b0b18;text-shadow:none;max-width:none}
-/* About: the copy keeps to the left so the astronaut owns the centre. */
-.about-panel{max-width:min(560px,36vw)}
-.about-panel h2{font-size:clamp(44px,5.2vw,88px)}
-.type.intro .eyebrow{color:#3c2d84}
-.type.intro h1{font-size:clamp(84px,15vw,250px);font-weight:700;letter-spacing:-.055em;line-height:.85;margin:0}
-.journey-scroll{display:inline-block;margin-top:28px;font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+/* The current experiment: title, one line, and its actions, low on the left over a soft shade. */
+.lab-panel{position:fixed;left:0;bottom:0;z-index:4;padding:0 var(--gutter) 112px;max-width:min(620px,100%);pointer-events:none;text-shadow:0 2px 30px rgba(2,3,10,.6)}
+.lab-panel>*{pointer-events:auto}
+.lab-panel::before{content:"";position:fixed;left:0;bottom:0;width:min(900px,100vw);height:min(460px,60svh);background:radial-gradient(ellipse at 0 100%,rgba(4,5,13,.72),rgba(4,5,13,0) 70%);z-index:-1;pointer-events:none}
+.lab-panel h1{margin:0;font-size:clamp(44px,6.4vw,96px);font-weight:600;letter-spacing:-.045em;line-height:.95}
+.lab-note{margin:14px 0 0;max-width:420px;font-size:17px;line-height:1.5;color:#d4d1e6}
+.lab-actions{display:flex;align-items:center;gap:14px;margin-top:22px;min-height:42px}
+.lab-actions button{font:inherit;font-size:15px;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.3);border-radius:100px;padding:10px 18px;cursor:pointer;backdrop-filter:blur(6px);transition:background .3s,border-color .3s}
+.lab-actions button:hover{background:rgba(139,92,246,.35);border-color:var(--accent)}
+.lab-actions button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.lab-score{font-size:15px;color:#9dffb0}
+/* Light tone: over bright sky the panel turns to dark type and drops its shade. */
+.lab-panel,.lab-note,.lab-actions button{transition:color .8s,text-shadow .8s,border-color .8s,background .8s}
+.lab-panel::before{transition:opacity .8s}
+.lab[data-tone="light"] .lab-panel{color:#0b0b18;text-shadow:none}
+.lab[data-tone="light"] .lab-panel::before{opacity:0}
+.lab[data-tone="light"] .lab-note{color:#3a3a4a}
+.lab[data-tone="light"] .lab-actions button{color:#0b0b18;background:rgba(255,255,255,.5);border-color:rgba(11,11,24,.3)}
 
-/* Projects: one giant title per beat, alternating sides. */
-.type.project{position:absolute;height:auto;display:block;padding:0;left:max(var(--content-gutter),150px);pointer-events:auto}
-.type.project h3{font-size:clamp(48px,7vw,120px);transition:color .4s}
-.type.project h3 span{font-size:.45em;vertical-align:.6em;color:var(--accent)}
-.type.project:hover h3{color:#d9ccff}
-.type-tags{display:block;margin-top:14px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#a9a5c4}
-.type.project:focus-visible{outline:2px solid var(--accent);outline-offset:10px}
+/* Scroll indicator, for experiments that play as you scroll: a track that fills with progress and a nudging
+   chevron, on the right edge. It fades once the experiment has played through. */
+.lab-scroll{position:fixed;right:var(--gutter);top:50%;transform:translateY(-50%);z-index:4;display:flex;flex-direction:column;align-items:center;gap:12px;pointer-events:none;transition:opacity .6s}
+.lab-scroll[data-done="true"]{opacity:0}
+.lab-scroll-track{position:relative;width:2px;height:120px;border-radius:2px;background:rgba(255,255,255,.22);overflow:hidden}
+.lab-scroll-track i{position:absolute;inset:0;background:var(--accent);transform-origin:50% 0;transform:scaleY(var(--progress,0))}
+.lab-scroll-label{font-size:14px;color:rgba(255,255,255,.8);text-shadow:0 1px 12px rgba(2,3,10,.6)}
+.lab-scroll-label::after{content:"";display:block;width:8px;height:8px;margin:8px auto 0;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg);animation:lab-nudge 1.6s ease-in-out infinite}
+@keyframes lab-nudge{0%,100%{transform:translateY(-2px) rotate(45deg);opacity:.5}50%{transform:translateY(3px) rotate(45deg);opacity:1}}
+.lab[data-tone="light"] .lab-scroll-track{background:rgba(11,11,24,.18)}
+.lab[data-tone="light"] .lab-scroll-label{color:#0b0b18;text-shadow:none}
+@media(prefers-reduced-motion:reduce){.lab-scroll-label::after{animation:none}}
 
-/* Contact: big heading, underline fields, a text-link send. */
-.type.contact form{display:flex;flex-direction:column;gap:18px;max-width:760px}
-.type.contact .fields{display:flex;gap:28px;margin-top:22px}
-.type.contact input{flex:1;font:inherit;font-size:20px;color:inherit;background:none;border:none;border-bottom:1px solid rgba(255,255,255,.3);padding:10px 0;border-radius:0;text-shadow:none}
-.type.contact input::placeholder{color:#8f8aa8}
-.type.contact input:focus{outline:none;border-color:var(--accent)}
-.type.contact button{align-self:flex-start;font:inherit;font-size:clamp(22px,2.4vw,34px);letter-spacing:-.03em;background:none;border:none;color:#f0eff8;padding:6px 0;cursor:pointer;border-bottom:1px solid var(--accent)}
-.type.contact button span{display:inline-block;transition:transform .4s}.type.contact button:hover span{transform:translateX(8px)}
-.type.contact button:focus-visible{outline:2px solid var(--accent);outline-offset:6px}
-
-.journey-final{position:fixed;inset:auto 0 12svh;z-index:4;text-align:center;opacity:0;transition:opacity 1.2s;pointer-events:none}
-.journey-final[data-visible=true]{opacity:1;pointer-events:auto}
-.journey-final h2{font-size:clamp(48px,7vw,110px);font-weight:500;letter-spacing:-.05em;line-height:.95;margin:0 0 22px}
-.journey-final a{font-size:13px;letter-spacing:.14em;text-transform:uppercase;border-bottom:1px solid currentColor;padding-bottom:4px}
-
-/* Liquid cards: the DOM image holds layout, alt text and hover; its WebGL twin draws it once ready. */
-img[data-liquid]{display:block;object-fit:cover;border-radius:10px;background:rgba(255,255,255,.04)}
-img[data-liquid][data-liquid-ready]{opacity:0;background:none}
-.about-cards{position:absolute;inset:0;pointer-events:none}
-.about-card{position:absolute;pointer-events:auto}
-.about-card-portrait{right:7vw;top:16svh;width:min(16vw,250px);aspect-ratio:4/5;height:auto}
-.about-card-place{right:19vw;bottom:13svh;width:min(13vw,210px);aspect-ratio:3/2;height:auto}
-.project-shot{width:min(30vw,360px);aspect-ratio:3/2;height:auto;margin-bottom:22px}
-
-/* Projects: cards flow down the left on a curve (set from scroll); the rocket owns the right. */
-.type.project{transform-origin:0 50%;will-change:transform}
-.type.project h3{font-size:clamp(44px,5.6vw,96px)}
-
-/* Aliens: the whole sticky frame takes clicks (a crosshair) for the game; copy stays readable. */
-.aliens-panel{pointer-events:auto;cursor:crosshair;max-width:none;padding-right:var(--content-gutter)}
-.aliens-panel>*{max-width:min(560px,40vw)}
-.aliens-score{display:inline-block;margin-top:18px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#9dffb0}
+/* Way out: back to the grid, or on to the next experiment. */
+.lab-nav{position:fixed;left:var(--gutter);right:calc(var(--gutter) + 140px);bottom:26px;z-index:5;display:flex;gap:28px;font-size:15px}
+.lab-nav a{color:rgba(255,255,255,.75);border-bottom:1px solid rgba(255,255,255,.3);padding-bottom:3px;transition:color .3s,border-color .3s;mix-blend-mode:difference}
+.lab-nav a:hover{color:#fff;border-color:var(--accent)}
+.lab-nav a:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
 
 /* Sound: one quiet toggle, always reachable. */
-.sound-toggle{position:fixed;right:var(--gutter);bottom:22px;z-index:6;display:inline-flex;align-items:center;gap:10px;padding:9px 14px;border:1px solid rgba(255,255,255,.35);border-radius:100px;background:none;color:#fff;mix-blend-mode:difference;font:inherit;font-size:11px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer}
+.sound-toggle{position:fixed;right:var(--gutter);bottom:22px;z-index:6;display:inline-flex;align-items:center;gap:10px;padding:8px 14px;border:1px solid rgba(255,255,255,.35);border-radius:100px;background:none;color:#fff;mix-blend-mode:difference;font:inherit;font-size:14px;cursor:pointer}
 .sound-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
 .sound-bars{display:inline-flex;align-items:flex-end;gap:2px;height:11px}
 .sound-bars i{width:2px;height:3px;background:currentColor;border-radius:1px;transition:height .4s}
@@ -93,19 +60,12 @@ img[data-liquid][data-liquid-ready]{opacity:0;background:none}
 @keyframes sound-bar{from{height:3px}to{height:11px}}
 @media(prefers-reduced-motion:reduce){.sound-bars[data-playing=true] i{animation:none;height:7px}}
 
-/* Moon pass: giant words drifting across the top of the frame as he glides beneath them. */
-.journey-rail{position:sticky;top:0;height:100svh;overflow:hidden;pointer-events:none}
-.journey-rail-track{position:absolute;top:10svh;white-space:nowrap;padding-left:100vw;font-size:clamp(90px,15vw,260px);font-weight:600;letter-spacing:-.05em;line-height:1;color:transparent;-webkit-text-stroke:1px rgba(240,239,248,.55);transform:translateX(calc(var(--rail,0) * -100%));will-change:transform}
-
 @media(max-width:700px){
-  .journey-altimeter{display:none}
-  .journey-chapter{padding:0 24px}
-  .type{max-width:none}
-  .about-panel{max-width:none}
-  .about-card-portrait{right:20px;top:13svh;width:28vw}
-  .about-cards .about-card-place{display:none}
-  .project-shot{width:62vw}
+  .lab-top{padding:20px 16px}
+  .lab-panel{padding:0 16px 124px}
+  .lab-note{font-size:16px}
+  .lab-scroll{right:16px;top:42%}
+  .lab-scroll-track{height:80px}
+  .lab-nav{left:16px;right:16px;bottom:70px;gap:20px;font-size:14px}
   .sound-toggle{right:16px;bottom:16px}
-  .type.project{left:24px;right:24px}
-  .type.contact .fields{flex-direction:column;gap:12px}
 }

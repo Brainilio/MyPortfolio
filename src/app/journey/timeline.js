@@ -1,19 +1,16 @@
 import * as THREE from 'three';
 
-// The page is a stack of sections, each with its own calm composition. A section rests at a story time `s`
-// (placing the world and the actors), or eases through an [from, to] range while its copy scrolls.
-// `enter` is how the 3D arrives from the section before: 'cut' (a glitch), 'liquid' (a melt), 'fade', or
-// 'same' (it's the same shot, so nothing happens). Going back up always cuts.
+// The space experiments' places in the shared 3D scene (titles and notes live in experiments.js). Each rests at a story time `s` (placing the world and the
+// actors), or plays through an [from, to] range as you scroll (`scroll`: its length in screen heights). `enter` is how the 3D arrives from the experiment
+// before: 'cut' (a glitch), 'liquid' (a melt), 'fade', or 'same' (it's the same shot). Going back always cuts.
 export const CHAPTERS=[
-  // The hero has no 3D of its own: it scrolls away over the About close-up at 100 km.
-  {id:'summit',label:'Hello',altitude:'0 m',s:2},
-  {id:'about',label:'About',altitude:'100 km',s:2,enter:'same'},
-  {id:'skills',label:'Skills',altitude:'100 km',s:2,vh:200,enter:'same'},
-  {id:'projects',label:'Projects',altitude:'36,000 km',s:[3.06,3.9],vh:340,enter:'liquid'},
+  {id:'launch',s:[.35,1.6],scroll:3},
+  {id:'about',s:2,enter:'cut'},
+  {id:'skills',s:2,scroll:2.5,enter:'same'},
+  {id:'projects',s:[3.06,3.9],scroll:4,enter:'liquid'},
   // Moon pass: parked for now (too busy); its set pieces stay in the world.
-  // {id:'moon',label:'Moon pass',altitude:'384,400 km',s:[4.1,4.84],vh:260},
-  {id:'aliens',label:'Defend',altitude:'??? km',s:[5.4,5.9],vh:260,enter:'cut'},
-  {id:'contact',label:'Contact',altitude:'∞',s:7,enter:'cut'},
+  {id:'aliens',s:[5.4,5.9],scroll:4,enter:'cut'},
+  {id:'contact',s:7,enter:'cut'},
 ];
 export const chapterIndex=id=>CHAPTERS.findIndex(c=>c.id===id);
 
