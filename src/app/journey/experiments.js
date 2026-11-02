@@ -1,5 +1,6 @@
 // Everything in the lab, in grid order. Each experiment gets its own page at /journey/<slug>/.
-// `kind` is shown on its card. Space experiments name the `chapter` they play in the shared 3D scene (timeline.js);
+// `kind` is shown on its card. Space experiments name the `chapter` they play in the shared 3D scene (timeline.js),
+// worlds name the homepage-born `world` they show (world.js);
 // other kinds (little UI pieces, tricks, animations) will add their own component when they arrive.
 export const EXPERIMENTS = [
   { slug: "liftoff", title: "Liftoff", kind: "3D", chapter: "launch", note: "From the summit pad to the edge of space." },
@@ -8,6 +9,10 @@ export const EXPERIMENTS = [
   { slug: "rocket-cam", title: "Rocket cam", kind: "3D", chapter: "projects", note: "Riding behind the rocket through two figure-eights." },
   { slug: "defend", title: "Defend", kind: "3D", chapter: "aliens", note: "Click the saucers. Whatever you miss, he zaps." },
   { slug: "black-hole", title: "Black hole", kind: "3D", chapter: "contact", note: "Dive in and fall through to the other side." },
+  // Worlds that started as homepage sections, at full size (see world.js).
+  { slug: "road-trip", title: "Road trip", kind: "3D", world: "road-trip", note: "Drive the wagon through the park, sign by sign, to the geyser." },
+  { slug: "the-hike", title: "The hike", kind: "3D", world: "hike", note: "The ranger bear climbs the switchbacks to the summit, in his own time." },
+  { slug: "lighthouse", title: "Lighthouse", kind: "3D", world: "lighthouse", note: "Big Sur in the fog. Steer the beam and see what turns up." },
 ].map(experiment => ({ ...experiment, thumb: `/lab/${experiment.slug}.jpg` }));
 
 export const findExperiment = slug => EXPERIMENTS.find(experiment => experiment.slug === slug);

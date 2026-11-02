@@ -47,9 +47,9 @@ html:has(.ht)::-webkit-scrollbar{display:none}
 
 .ht-header{position:fixed;z-index:20;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:28px var(--gutter);font-size:13px;transition:color .8s ease}
 /* On the light skies the chrome turns ink. */
-.ht[data-section=work] .ht-header,.ht[data-section=skills] .ht-header,.ht[data-section=experience] .ht-header{color:var(--ink)}
+.ht[data-section=work] .ht-header,.ht[data-section=skills] .ht-header{color:var(--ink)}
 .ht[data-section=contact] .ht-header{color:#f4f6f8}
-.ht[data-section=work] .ht-available,.ht[data-section=skills] .ht-available,.ht[data-section=experience] .ht-available{border-color:rgba(42,22,54,.25)}
+.ht[data-section=work] .ht-available,.ht[data-section=skills] .ht-available{border-color:rgba(42,22,54,.25)}
 .ht-wordmark{font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:22px;letter-spacing:-.04em}
 .ht-wordmark span,.ht-roles span{color:var(--violet)}
 .ht-header nav{display:flex;gap:44px}
@@ -61,7 +61,6 @@ html:has(.ht)::-webkit-scrollbar{display:none}
 
 /* The intro and its buttons sit bottom-left, under the island. */
 .ht-intro{position:absolute;z-index:4;left:var(--gutter);bottom:clamp(36px,7svh,72px);max-width:360px;pointer-events:none}
-.ht-eyebrow{display:block;margin-bottom:18px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(251,247,255,.6)}
 .ht-intro a{pointer-events:auto}
 .ht-roles{margin:0;font-family:var(--font-display),'Inter',sans-serif;font-weight:700;font-size:clamp(24px,2.2vw,34px);line-height:1.02;letter-spacing:-.045em}
 .ht-stack{margin:16px 0 0;font-size:12px;letter-spacing:.08em;color:rgba(251,247,255,.55)}
@@ -87,36 +86,33 @@ html:has(.ht)::-webkit-scrollbar{display:none}
 .ht-prairie-canvas,.ht-road-canvas,.ht-hike-canvas,.ht-coast-canvas{position:absolute;inset:0}
 .ht-prairie-canvas canvas,.ht-road-canvas canvas,.ht-hike-canvas canvas,.ht-coast-canvas canvas{display:block;width:100%;height:100%}
 .ht-head{position:absolute;z-index:4;left:var(--gutter);top:clamp(92px,13svh,128px);pointer-events:none;color:var(--ink)}
-.ht-head .ht-eyebrow{color:rgba(42,22,54,.6)}
 .ht-head h2{margin:0;font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:clamp(34px,4.2vw,68px);line-height:.95;letter-spacing:-.05em}
 .ht-head h2 span{color:#7c5cdb}
-.ht-drive{margin:14px 0 0;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:rgba(42,22,54,.55)}
-/* Experience: a misty morning on the mountain; the trail log (glass cards on a dashed trail) scrolls on the left. */
-.ht-mountain-sky{position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,#cfdde6 0%,#e4ebe6 42%,#f3efdf 72%,#eadfc6 100%)}
-.ht-experience .ht-finish{background:radial-gradient(120% 90% at 65% 45%,transparent 55%,rgba(30,40,30,.35) 100%),radial-gradient(50% 40% at 20% 0%,rgba(255,236,190,.35),transparent 70%)}
-/* A soft frosted backing behind the left column, so the text reads over the forest; it melts into the scene. */
-.ht-scrim{position:absolute;z-index:3;left:0;top:0;bottom:0;width:min(calc(var(--gutter) + 540px),54vw);pointer-events:none;
-  background:linear-gradient(90deg,rgba(243,240,228,.86) 0%,rgba(243,240,228,.6) 50%,rgba(243,240,228,0) 100%);
-  backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);-webkit-mask-image:linear-gradient(90deg,#000 45%,transparent);mask-image:linear-gradient(90deg,#000 45%,transparent)}
+.ht-drive{margin:14px 0 0;font-size:14px;color:rgba(42,22,54,.6)}
+/* About: blue hour by the river. The words sit top left; the trail log (dark glass cards on a dashed trail) scrolls
+   up under them, and the diorama floats on the right. */
+.ht-about-sky{position:absolute;inset:0;z-index:0;background:
+  radial-gradient(40% 30% at 70% 78%,rgba(255,150,110,.22),transparent 70%),
+  linear-gradient(180deg,#120e2c 0%,#1f1846 30%,#3d2c66 58%,#7a4f86 82%,#b27390 100%)}
+.ht-about .ht-finish{background:radial-gradient(120% 95% at 62% 50%,transparent 55%,rgba(8,6,20,.45) 100%)}
+.ht-about-copy{position:absolute;z-index:4;left:var(--gutter);top:clamp(92px,13svh,128px);max-width:430px;pointer-events:none}
+.ht-about-copy h2{margin:0;font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:clamp(34px,4.2vw,68px);line-height:.95;letter-spacing:-.05em}
+.ht-about-copy h2 span{color:var(--violet)}
+.ht-about-copy p{margin:16px 0 0;font-size:16px;line-height:1.55;color:rgba(251,247,255,.8)}
 .ht-trail-log{position:absolute;z-index:4;left:var(--gutter);top:0;bottom:0;width:min(430px,38vw);overflow:hidden;
-  -webkit-mask-image:linear-gradient(180deg,transparent 26svh,#000 34svh,#000 86svh,transparent 96svh);mask-image:linear-gradient(180deg,transparent 26svh,#000 34svh,#000 86svh,transparent 96svh)}
-.ht-log{position:absolute;left:0;right:0;top:36svh;margin:0;padding:0 0 0 30px;list-style:none;transform:translateY(calc(var(--q,0) * (44svh - 100%)))}
-.ht-log:before{content:'';position:absolute;left:8px;top:8px;bottom:8px;border-left:2px dashed rgba(42,22,54,.28)}
-.ht-log li{position:relative;margin:0 0 18px;padding:18px 20px;border-radius:18px;color:var(--ink);background:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.65);
-  backdrop-filter:blur(12px) saturate(1.2);-webkit-backdrop-filter:blur(12px) saturate(1.2);box-shadow:0 10px 30px rgba(42,40,30,.1);transition:background .5s,transform .5s,box-shadow .5s}
-.ht-log li:before{content:'';position:absolute;left:-29px;top:24px;width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid rgba(42,22,54,.35);transition:background .5s,border-color .5s,box-shadow .5s}
-.ht-log li.is-here{background:rgba(255,255,255,.66);transform:translateX(6px);box-shadow:0 14px 36px rgba(42,40,30,.16)}
-.ht-log li.is-here:before{background:var(--violet);border-color:#7c5cdb;box-shadow:0 0 0 6px rgba(167,139,250,.25)}
-.ht-log-years{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(42,22,54,.55)}
-.ht-log h3{margin:6px 0 6px;font-family:var(--font-display),'Inter',sans-serif;font-weight:700;font-size:20px;letter-spacing:-.03em;line-height:1.15}
-.ht-log h3 em{font-style:normal;font-weight:500;color:rgba(42,22,54,.6)}
-.ht-log p{margin:0;font-size:14px;line-height:1.5;color:rgba(42,22,54,.78)}
-.ht-log-tags{display:block;margin-top:10px;font-size:11px;letter-spacing:.08em;color:#7c5cdb}
-.ht-altitude{position:absolute;z-index:5;right:calc(var(--gutter) + 200px);bottom:34px;padding:9px 14px;border-radius:100px;font-size:12px;letter-spacing:.06em;color:var(--ink);
-  background:rgba(255,255,255,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-.ht-altitude b{font-weight:600}
-/* Arriving from the road trip: the valley goes dark for a beat, then the mountain fades up. */
-.ht-blackout{position:absolute;inset:0;z-index:7;pointer-events:none;background:#09080d;opacity:clamp(0,calc((.95 - var(--enter,1)) * 2),1)}
+  -webkit-mask-image:linear-gradient(180deg,transparent 38svh,#000 44svh,#000 86svh,transparent 96svh);mask-image:linear-gradient(180deg,transparent 38svh,#000 44svh,#000 86svh,transparent 96svh)}
+.ht-log{position:absolute;left:0;right:0;top:45svh;margin:0;padding:0 0 0 30px;list-style:none;transform:translateY(calc(var(--q,0) * (38svh - 100%)))}
+.ht-log:before{content:'';position:absolute;left:8px;top:8px;bottom:8px;border-left:2px dashed rgba(251,247,255,.25)}
+.ht-log li{position:relative;margin:0 0 16px;padding:16px 20px;border-radius:18px;color:var(--cream);background:rgba(20,14,44,.42);border:1px solid rgba(255,255,255,.12);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:background .5s,transform .5s,border-color .5s}
+.ht-log li:before{content:'';position:absolute;left:-29px;top:22px;width:12px;height:12px;border-radius:50%;background:#1b1335;border:2px solid rgba(251,247,255,.4);transition:background .5s,border-color .5s,box-shadow .5s}
+.ht-log li.is-here{background:rgba(44,30,86,.62);border-color:rgba(167,139,250,.45);transform:translateX(6px)}
+.ht-log li.is-here:before{background:var(--violet);border-color:#c4b5fd;box-shadow:0 0 0 6px rgba(167,139,250,.25)}
+.ht-log-years{font-size:13px;color:rgba(251,247,255,.6)}
+.ht-log h3{margin:4px 0 6px;font-family:var(--font-display),'Inter',sans-serif;font-weight:700;font-size:20px;letter-spacing:-.03em;line-height:1.15}
+.ht-log h3 em{font-style:normal;font-weight:500;color:rgba(251,247,255,.6)}
+.ht-log p{margin:0;font-size:14px;line-height:1.5;color:rgba(251,247,255,.78)}
+.ht-log-tags{display:block;margin-top:10px;font-size:12px;color:#c4b5fd}
 
 /* Contact: Big Sur on a clear late afternoon, a little haze on the horizon. */
 /* Sky: blue overhead, banks of cloud, a pale hazy horizon. */
@@ -128,7 +124,6 @@ html:has(.ht)::-webkit-scrollbar{display:none}
 .ht-contact .ht-finish{background:radial-gradient(130% 100% at 60% 42%,transparent 60%,rgba(18,30,44,.32) 100%),radial-gradient(45% 35% at 92% 22%,rgba(255,224,178,.22),transparent 70%)}
 .ht-contact-card{position:absolute;z-index:4;left:var(--gutter);top:clamp(110px,18svh,170px);max-width:430px;padding:28px 30px;border-radius:22px;color:#f4f6f8;
   background:rgba(28,36,46,.42);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(14px) saturate(1.1);-webkit-backdrop-filter:blur(14px) saturate(1.1);box-shadow:0 20px 50px rgba(10,16,24,.25)}
-.ht-contact-card .ht-eyebrow{color:rgba(244,246,248,.65)}
 .ht-contact-card h2{margin:0;font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:clamp(34px,4vw,60px);line-height:.95;letter-spacing:-.05em}
 .ht-contact-card h2 span{color:var(--violet)}
 .ht-contact-card p{margin:16px 0 0;font-size:15px;line-height:1.55;color:rgba(244,246,248,.8)}
@@ -154,7 +149,7 @@ html.ht-locked{overflow:hidden}
 @keyframes ht-rise{from{transform:translateY(10px)}to{transform:translateY(-14px)}}
 .ht-loader-name{font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:30px;letter-spacing:-.05em}
 .ht-loader-name span{color:var(--violet)}
-.ht-loader-line{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:rgba(251,247,255,.65)}
+.ht-loader-line{font-size:14px;color:rgba(251,247,255,.65)}
 .ht-loader-bar{width:160px;height:2px;border-radius:2px;background:rgba(251,247,255,.18);overflow:hidden}
 .ht-loader-bar i{display:block;height:100%;background:var(--violet);transform-origin:left;transition:transform .4s ease}
 @media(prefers-reduced-motion:reduce){.ht-loader-sun{animation:none}.ht-loader{transition:none}}
@@ -185,16 +180,15 @@ html.ht-locked{overflow:hidden}
   .ht-header nav{display:none}
   .ht-intro{left:20px;right:20px;bottom:84px;max-width:none}
   .ht-roles{font-size:24px}
-  .ht-eyebrow{margin-bottom:10px}
   .ht-stack{margin-top:10px}
     .ht-lede{font-size:14px;margin-top:12px;max-width:320px}
   .ht-links{margin-top:14px}
   .ht-button{padding:12px 18px;font-size:14px}
-  .ht-scrim{width:auto;right:0;bottom:auto;height:66svh;background:linear-gradient(180deg,rgba(243,240,228,.88) 0%,rgba(243,240,228,.6) 60%,rgba(243,240,228,0) 100%);-webkit-mask-image:linear-gradient(180deg,#000 55%,transparent);mask-image:linear-gradient(180deg,#000 55%,transparent)}
-  .ht-trail-log{left:16px;right:16px;width:auto;-webkit-mask-image:linear-gradient(180deg,transparent 18svh,#000 24svh,#000 52svh,transparent 60svh);mask-image:linear-gradient(180deg,transparent 18svh,#000 24svh,#000 52svh,transparent 60svh)}
-  .ht-log{top:25svh;transform:translateY(calc(var(--q,0) * (22svh - 100%)))}
+  .ht-about-copy{left:20px;right:20px;top:78px;max-width:none}
+  .ht-about-copy p{font-size:14px;margin-top:10px}
+  .ht-trail-log{left:16px;right:16px;width:auto;-webkit-mask-image:linear-gradient(180deg,transparent 31svh,#000 35svh,#000 54svh,transparent 60svh);mask-image:linear-gradient(180deg,transparent 31svh,#000 35svh,#000 54svh,transparent 60svh)}
+  .ht-log{top:36svh;transform:translateY(calc(var(--q,0) * (18svh - 100%)))}
   .ht-log li{padding:14px 16px}
-  .ht-altitude{right:auto;left:16px;bottom:20px}
   .ht-contact-card{left:16px;right:16px;top:84px;max-width:none;padding:22px}
   .ht-beam-hint{right:16px;bottom:120px}
   .ht-credits{left:16px;right:16px;bottom:78px;font-size:9px}

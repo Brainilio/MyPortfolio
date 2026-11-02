@@ -29,7 +29,8 @@ const swellAt=(x,z,t)=>.95*peak(x*.085+z*.018+t*1.15)+.55*peak(x*.05-z*.04+t*.75
 const CANYON=-72,LIGHTHOUSE=new THREE.Vector3(0,0,-112);
 export const SIGHTINGS=["orca","shark","sea lion","kayaker"];
 
-export default function CoastScene({ state, onSpot, onReady }) {
+// `lite` (the homepage) takes the lighter path phones always get: fewer plants and rocks, a coarser ocean.
+export default function CoastScene({ state, onSpot, onReady, slot = 4, lite: light = false }) {
   // Tells the page this world is built (the loading screen builds the worlds one after another).
   const ready=useRef(onReady);ready.current=onReady;
   const host=useRef(null),spotted=useRef(onSpot);
@@ -41,8 +42,8 @@ export default function CoastScene({ state, onSpot, onReady }) {
     const adapt=adaptivePixelRatio(renderer,{onChange:()=>frameSize()});
     renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
     mount.appendChild(renderer.domElement);
-    const preference=matchMedia("(prefers-reduced-motion: reduce)"),lite=matchMedia("(pointer: coarse)").matches;
-    const onScreen=()=>state.current.live.includes(4);
+    const preference=matchMedia("(prefers-reduced-motion: reduce)"),lite=light||matchMedia("(pointer: coarse)").matches;
+    const onScreen=()=>state.current.live.includes(slot);
     const scene=new THREE.Scene();// Haze only in the distance: the foreground stays crisp, the far coast and the horizon melt into it.
     scene.fog=new THREE.Fog("#d4e0e7",150,700);
     const camera=new THREE.PerspectiveCamera(40,1,1,1800);
@@ -102,7 +103,7 @@ export default function CoastScene({ state, onSpot, onReady }) {
     // The Pacific: turquoise in the shallows to deep blue offshore. The swell is in the vertex shader; the fragment
     // shader adds fine ripples to the surface normal, reflects the sky at grazing angles, sparkles where the sun glints,
     // and rolls foam in along the shore and round the stacks.
-    const ocean=new THREE.Mesh(new THREE.PlaneGeometry(2400,2400,420,420).rotateX(-Math.PI/2).translate(1000,0,300),new THREE.ShaderMaterial({fog:true,
+    const ocean=new THREE.Mesh(new THREE.PlaneGeometry(2400,2400,lite?240:420,lite?240:420).rotateX(-Math.PI/2).translate(1000,0,300),new THREE.ShaderMaterial({fog:true,
       uniforms:THREE.UniformsUtils.merge([THREE.UniformsLib.fog,{uTime:{value:0},uSun:{value:SUN},uStacks:{value:stacks.map(([dx,z,r])=>new THREE.Vector3(shoreX(z)+dx+r,z,r))}}]),
       vertexShader:`uniform float uTime;varying vec3 vWorld;
         #include <fog_pars_vertex>
@@ -327,7 +328,7 @@ export default function CoastScene({ state, onSpot, onReady }) {
 
     let tall=false;
     // The view window; its vertical offset follows the section hand-off, so the scene slides like the others.
-    const view={w:1,h:1,full:[1,1]},applyView=()=>{const shift=state.current.shift?.[4]??0;camera.setViewOffset(view.full[0],view.full[1],0,shift*view.h*.28,view.w,view.h);};
+    const view={w:1,h:1,full:[1,1]},applyView=()=>{const shift=state.current.shift?.[slot]??0;camera.setViewOffset(view.full[0],view.full[1],0,shift*view.h*.28,view.w,view.h);};
     function frameSize(){const w=mount.clientWidth,h=mount.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;tall=camera.aspect<.85;camera.fov=tall?56:36;
       // The lighthouse and the open sea sit right of centre, clear of the contact card (lower on a phone, under it).
       view.w=w;view.h=h;view.full=tall?[w,h*1.4]:[w*1.2,h];applyView();camera.updateProjectionMatrix();
@@ -388,6 +389,6 @@ export default function CoastScene({ state, onSpot, onReady }) {
       scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat())if(m){m.map?.dispose();m.dispose();}});
       renderer.dispose();renderer.domElement.remove();
     };
-  },[state]);
+  },[state,slot,light]);
   return <div className="ht-coast-canvas" ref={host} aria-hidden="true" />;
 }

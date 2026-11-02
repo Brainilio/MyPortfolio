@@ -87,7 +87,8 @@ function createSign(skill,index) {
   sign.traverse(o=>{if(o.isMesh)o.castShadow=o.receiveShadow=true;});sign.userData.texture=texture;return sign;
 }
 
-export default function RoadTripScene({ state, skills, onCar, onReady }) {
+// `lite` (the homepage) takes the lighter path phones always get: fewer plants, wider tree spacing, a smaller shadow map.
+export default function RoadTripScene({ state, skills, onCar, onReady, slot = 2, lite: light = false }) {
   // Tells the page this world is built (the loading screen builds the worlds one after another).
   const ready=useRef(onReady);ready.current=onReady;
   const host=useRef(null),carClick=useRef(onCar);
@@ -103,14 +104,14 @@ export default function RoadTripScene({ state, skills, onCar, onReady }) {
     const canvas=renderer.domElement;canvas.style.touchAction="pan-y";
     const preference=matchMedia("(prefers-reduced-motion: reduce)");
     // On screen while the director has the Skills section (2) live.
-    const onScreen=()=>state.current.live.includes(2);
+    const onScreen=()=>state.current.live.includes(slot);
     const scene=new THREE.Scene();scene.fog=new THREE.Fog("#ead2b8",40,210);
     const camera=new THREE.PerspectiveCamera(42,1,.5,900);
     const rng=random(9);
 
     // Golden hour: a low warm sun from the side of the valley, so the pines lay long soft shadows across the road
     // with sunlit gaps between them. The shadow map only covers the stretch around the car and moves with it (smaller on phones).
-    const lite=matchMedia("(pointer: coarse)").matches;
+    const lite=light||matchMedia("(pointer: coarse)").matches;
     scene.add(new THREE.HemisphereLight("#ffe6cf","#6b5d4c",1.6));
     const SUN=new THREE.Vector3(-1,.85,-.45).normalize(),sun=new THREE.DirectionalLight("#ffc890",3.2);
     sun.castShadow=true;sun.shadow.mapSize.setScalar(lite?1024:2048);sun.shadow.bias=-.0006;sun.shadow.normalBias=.04;sun.shadow.radius=4;
@@ -453,7 +454,7 @@ export default function RoadTripScene({ state, skills, onCar, onReady }) {
 
     let tall=false;
     // The section hand-off slides the view inside the camera (no canvas edge shows), by the same amount as the others.
-    const view={w:1,h:1},applyView=()=>{const shift=state.current.shift?.[2]??0;camera.setViewOffset(view.w,view.h,0,shift*view.h*.28,view.w,view.h);};
+    const view={w:1,h:1},applyView=()=>{const shift=state.current.shift?.[slot]??0;camera.setViewOffset(view.w,view.h,0,shift*view.h*.28,view.w,view.h);};
     function frameSize(){const w=mount.clientWidth,h=mount.clientHeight;view.w=w;view.h=h;renderer.setSize(w,h,false);camera.aspect=w/h;tall=camera.aspect<.85;camera.fov=tall?58:42;camera.updateProjectionMatrix();particleUniforms.uScale.value=h*renderer.getPixelRatio()/(2*Math.tan(camera.fov*Math.PI/360));}
     const resize=new ResizeObserver(frameSize);resize.observe(mount);frameSize();
 
@@ -461,7 +462,7 @@ export default function RoadTripScene({ state, skills, onCar, onReady }) {
     function tick(dt){
       const reduced=preference.matches,step=reduced?0:dt;time+=step;
       // Scrolling through Skills drives from the first sign to the last (piecewise between the stops).
-      const q=state.current.progress[2]*(STATIONS.length-1),k=Math.min(STATIONS.length-2,Math.floor(q)),target=STATIONS[k]+(STATIONS[k+1]-STATIONS[k])*(q-k);
+      const q=state.current.progress[slot]*(STATIONS.length-1),k=Math.min(STATIONS.length-2,Math.floor(q)),target=STATIONS[k]+(STATIONS[k+1]-STATIONS[k])*(q-k);
       // Critically damped glide toward the stop: pulls away gently, cruises, brakes into the stop.
       const before=u;
       // Coming back on screen (say, scrolling up from Experience): jump straight to where the scroll says, rather than
@@ -519,6 +520,6 @@ export default function RoadTripScene({ state, skills, onCar, onReady }) {
       scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat())if(m){m.map?.dispose();m.dispose();}});
       signs.forEach(s=>s.userData.texture.dispose());renderer.dispose();canvas.remove();
     };
-  },[state,skills]);
+  },[state,skills,slot,light]);
   return <div className="ht-road-canvas" ref={host} aria-hidden="true" />;
 }

@@ -106,7 +106,8 @@ function createBasket() {
   return new THREE.Mesh(geometry,flatMaterial());
 }
 
-export default function PrairieScene({ state, projects, onReady }) {
+// `lite` (the homepage) halves the grass.
+export default function PrairieScene({ state, projects, onReady, slot = 1, lite = false }) {
   // Tells the page this world is built (the loading screen builds the worlds one after another).
   const ready=useRef(onReady);ready.current=onReady;
   const host=useRef(null);
@@ -114,7 +115,7 @@ export default function PrairieScene({ state, projects, onReady }) {
     const mount=host.current;
     let renderer,disposed=false,raf=0;
     // On screen while the director has the Work section (1) live, including during the transitions in and out.
-    const onScreen=()=>state.current.live.includes(1);
+    const onScreen=()=>state.current.live.includes(slot);
     try { renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:"high-performance"}); } catch { ready.current?.(); return; }
     const adapt=adaptivePixelRatio(renderer,{onChange:()=>frame()});
     renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
@@ -184,7 +185,7 @@ export default function PrairieScene({ state, projects, onReady }) {
       const forest=new THREE.InstancedMesh(createPineGeometry(17),new THREE.MeshLambertMaterial({color:"#3c4a4c",flatShading:true,fog:false}),belt.length);
       belt.forEach(([x,z],i)=>{d.position.set(x,groundY(x,z)-.2,z);d.rotation.set(0,fr()*6,0);const s=1.6+fr()*1.4;d.scale.set(s,s*(1+fr()*.5),s);d.updateMatrix();forest.setMatrixAt(i,d.matrix);});
       scene.add(forest);
-      const TUFTS=3600,tufts=new THREE.InstancedMesh(createTuft(),new THREE.MeshBasicMaterial({vertexColors:true,side:THREE.DoubleSide}),TUFTS),golds=["#b88a42","#a87b38","#c59a4e","#9f8a50","#b08e48"].map(c=>new THREE.Color(c));
+      const TUFTS=lite?1800:3600,tufts=new THREE.InstancedMesh(createTuft(),new THREE.MeshBasicMaterial({vertexColors:true,side:THREE.DoubleSide}),TUFTS),golds=["#b88a42","#a87b38","#c59a4e","#9f8a50","#b08e48"].map(c=>new THREE.Color(c));
       for(let i=0;i<TUFTS;i++){
         const z=13-Math.pow(fr(),1.6)*60,x=(fr()-.5)*(26+Math.max(0,13-z)*1.5);
         if(Math.hypot(x-BASKET.x,z-BASKET.z)<1.4||MOUNDS.some(([mx,mz])=>Math.hypot(x-mx,z-mz)<1.1)){i--;continue;}
@@ -404,7 +405,7 @@ export default function PrairieScene({ state, projects, onReady }) {
 
     let tall=false;
     // The section hand-off slides the view inside the camera (no canvas edge shows), by the same amount as the others.
-    const view={w:1,h:1},applyView=()=>{const shift=state.current.shift?.[1]??0;camera.setViewOffset(view.w,view.h,0,shift*view.h*.28,view.w,view.h);};
+    const view={w:1,h:1},applyView=()=>{const shift=state.current.shift?.[slot]??0;camera.setViewOffset(view.w,view.h,0,shift*view.h*.28,view.w,view.h);};
     function frame(){const w=mount.clientWidth,h=mount.clientHeight;view.w=w;view.h=h;renderer.setSize(w,h,false);camera.aspect=w/h;tall=camera.aspect<.85;narrowSpire.visible=tall;camera.fov=tall?46:35;camera.updateProjectionMatrix();}
     const resize=new ResizeObserver(frame);resize.observe(mount);frame();
 
@@ -413,13 +414,13 @@ export default function PrairieScene({ state, projects, onReady }) {
       const reduced=preference.matches,step=reduced?0:dt;time+=step;
       lean.lerp(reduced?pointer.set(0,0):pointer,1-Math.exp(-dt*2));
       // Scrolling through Work walks the camera slowly into the prairie: a step forward and a drift from left to right.
-      const want=smooth(state.current.progress[1]);travel=reduced?want:travel+(want-travel)*(1-Math.exp(-dt*3));
+      const want=smooth(state.current.progress[slot]);travel=reduced?want:travel+(want-travel)*(1-Math.exp(-dt*3));
       camera.position.set(lean.x*.6+(travel-.5)*2.4,EYE+.2+lean.y*.25+travel*.3,(tall?12.5:15)-travel*1.2);camera.lookAt(lean.x*.3+(travel-.5)*1.2,EYE+1,-20);
       // The ring eases round to the chosen card rather than snapping, so it glides.
       // Scrolling through Work turns the ring from the first card to the last.
-      const n=cards.length,card0=state.current.progress[1]*(n-1),target=-card0/n*Math.PI*2,before=spin;
+      const n=cards.length,card0=state.current.progress[slot]*(n-1),target=-card0/n*Math.PI*2,before=spin;
       // Back on screen after a while away: start at the right card instead of spinning all the way round to it.
-      if(snap){snap=false;spin=target;travel=smooth(state.current.progress[1]);}
+      if(snap){snap=false;spin=target;travel=smooth(state.current.progress[slot]);}
       spin=reduced?target:spin+(target-spin)*(1-Math.exp(-dt*4));spinVelocity=(spin-before)/Math.max(dt,1/120);
       const rx=tall?3.6:RING.rx,rz=tall?5.5:RING.rz,cz=tall?-4.5:RING.center.z;
       cards.forEach((card,i)=>{
@@ -460,6 +461,6 @@ export default function PrairieScene({ state, projects, onReady }) {
       scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat())if(m){m.map?.dispose();m.uniforms?.uMap?.value?.dispose();m.dispose();}});
       glowTexture.dispose();renderer.dispose();canvas.remove();
     };
-  },[state,projects]);
+  },[state,projects,slot,lite]);
   return <div className="ht-prairie-canvas" ref={host} aria-hidden="true" />;
 }

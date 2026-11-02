@@ -50,15 +50,17 @@ export function faceted(triangles,colorOf) {
 }
 export const flatMaterial=()=>new THREE.MeshStandardMaterial({vertexColors:true,flatShading:true,roughness:.95,metalness:0});
 
-// The floating chunk: grassy top with a carved river bed, and a jagged, layered underside.
-export function createIsland(seed=7) {
+// The floating chunk: grassy top with a carved river bed, and a jagged, layered underside. Shaped by the island's
+// layout unless another one is passed (the About diorama has its own); `depth` scales how far the underside hangs and
+// `sand` is how far the sandy banks reach from the river.
+export function createIsland(seed=7,{outline:edgeAt=outline,heightAt:groundAt=heightAt,riverDistance:riverAt=riverDistance,depth=1,sand:bank=1.6}={}) {
   const r=random(seed),SEG=64,RINGS=14,top=[],grid=[];
   for(let ring=0;ring<=RINGS;ring++){
     const row=[];
     for(let s=0;s<SEG;s++){
       const a=s/SEG*Math.PI*2,k=ring/RINGS,jitter=ring>0&&ring<RINGS?(r()-.5)*.25:0;
-      const radius=outline(a)*k+jitter,x=Math.cos(a)*radius,z=Math.sin(a)*radius;
-      row.push(new THREE.Vector3(x,heightAt(x,z),z));
+      const radius=edgeAt(a)*k+jitter,x=Math.cos(a)*radius,z=Math.sin(a)*radius;
+      row.push(new THREE.Vector3(x,groundAt(x,z),z));
       if(ring===0)break;
     }
     grid.push(row);
@@ -71,26 +73,27 @@ export function createIsland(seed=7) {
   }
   const grassColors=PALETTE.grass.map(h=>new THREE.Color(h)),sand=new THREE.Color(PALETTE.sand),edgeGreen=new THREE.Color(PALETTE.edge);
   const topGeometry=faceted(top,(tri,c)=>{
-    const x=(tri[0].x+tri[1].x+tri[2].x)/3,z=(tri[0].z+tri[1].z+tri[2].z)/3,{d,t}=riverDistance(x,z),edge=Math.hypot(x,z)/outline(Math.atan2(z,x));
+    const x=(tri[0].x+tri[1].x+tri[2].x)/3,z=(tri[0].z+tri[1].z+tri[2].z)/3,{d,t}=riverAt(x,z),edge=Math.hypot(x,z)/edgeAt(Math.atan2(z,x));
     c.copy(grassColors[Math.floor(r()*grassColors.length)]);
     if(edge>.86)c.lerp(edgeGreen,.6);
-    if(t>0&&d<1.6)c.copy(sand);
+    if(t>0&&d<bank)c.copy(sand);
   });
   // Underside: shrinking, jittered rings down to a point, banded dirt then rock.
-  const rings=[grid[RINGS]],layers=[[.97,-.7],[.82,-2],[.62,-3.6],[.4,-5.3],[.18,-7]];
-  for(const [scale,y] of layers)rings.push(grid[RINGS].map(v=>new THREE.Vector3(v.x*scale*(.9+r()*.2),y+(r()-.5)*.7,v.z*scale*(.9+r()*.2))));
-  const tip=new THREE.Vector3(.3,-8.6,-.2),under=[];
+  const rings=[grid[RINGS]],layers=[[.97,-.7],[.82,-2],[.62,-3.6],[.4,-5.3],[.18,-7]].map(([k,y])=>[k,y*depth]);
+  for(const [scale,y] of layers)rings.push(grid[RINGS].map(v=>new THREE.Vector3(v.x*scale*(.9+r()*.2),y+(r()-.5)*.7*depth,v.z*scale*(.9+r()*.2))));
+  const tip=new THREE.Vector3(.3,-8.6*depth,-.2),under=[];
   for(let k=1;k<rings.length;k++)for(let s=0;s<SEG;s++){const a=rings[k-1][s],b=rings[k-1][(s+1)%SEG],c=rings[k][s],d=rings[k][(s+1)%SEG];under.push([a,b,c],[b,d,c]);}
   for(let s=0;s<SEG;s++)under.push([rings.at(-1)[s],rings.at(-1)[(s+1)%SEG],tip]);
   const dirt=new THREE.Color(PALETTE.dirt),rocks=PALETTE.rock.map(h=>new THREE.Color(h));
-  const underGeometry=faceted(under,(tri,c)=>{const y=(tri[0].y+tri[1].y+tri[2].y)/3;if(y>-1.1)c.copy(dirt);else c.copy(rocks[Math.min(3,Math.floor(-y/2.2)+(r()<.3?1:0))]);});
+  const underGeometry=faceted(under,(tri,c)=>{const y=(tri[0].y+tri[1].y+tri[2].y)/3;if(y>-1.1*depth)c.copy(dirt);else c.copy(rocks[Math.min(3,Math.floor(-y/(2.2*depth))+(r()<.3?1:0))]);});
   const material=flatMaterial(),group=new THREE.Group(),surface=new THREE.Mesh(topGeometry,material);
   group.add(surface,new THREE.Mesh(underGeometry,material));
   return {group,surface,material};
 }
 
-// River and waterfall: ribbons with a flowing, banded water shader.
-export function createWater() {
+// River and waterfall: ribbons with a flowing, banded water shader. The river follows `path` (the island's unless
+// another is passed) until it leaves the land at `edgeAt`, then pours off the edge and drops `fall` units.
+export function createWater(path=riverPoints,edgeAt=outline,{width=1,fall=8}={}) {
   const uniforms={uTime:{value:0},uFlow:{value:0},uSurge:{value:0},uLength:{value:1},uShallow:{value:new THREE.Color(PALETTE.water)},uDeep:{value:new THREE.Color(PALETTE.waterDeep)}};
   const material=new THREE.ShaderMaterial({uniforms,transparent:true,depthWrite:false,side:THREE.DoubleSide,
     vertexShader:`varying vec2 vUv;uniform float uSurge,uTime;void main(){vUv=uv;vec3 p=position;p.y+=uSurge*.07*(1.+sin(uv.y*9.-uTime*8.));gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}`,
@@ -122,13 +125,13 @@ export function createWater() {
   };
   // The river runs until it leaves the island, then pours off the edge.
   const flowing=[];
-  for(const p of riverPoints){const inside=Math.hypot(p.x,p.z)<outline(Math.atan2(p.z,p.x))-.05;flowing.push(new THREE.Vector3(p.x,-.2,p.z));if(!inside)break;}
+  for(const p of path){const inside=Math.hypot(p.x,p.z)<edgeAt(Math.atan2(p.z,p.x))-.05;flowing.push(new THREE.Vector3(p.x,-.2,p.z));if(!inside)break;}
   // One continuous sheet: the river curls over the lip and pours straight down.
   const lip=flowing.at(-1),out=new THREE.Vector3(lip.x,0,lip.z).normalize(),stream=[...flowing];
   [[.22,-.24],[.42,-.36],[.56,-.62],[.62,-1]].forEach(([o,y])=>stream.push(new THREE.Vector3(lip.x+out.x*o,y,lip.z+out.z*o)));
-  for(let i=1;i<=20;i++){const t=i/20;stream.push(new THREE.Vector3(lip.x+out.x*(.62+t*t*1.3),-1-t*8,lip.z+out.z*(.62+t*t*1.3)));}
+  for(let i=1;i<=20;i++){const t=i/20;stream.push(new THREE.Vector3(lip.x+out.x*(.62+t*t*1.3),-1-t*fall,lip.z+out.z*(.62+t*t*1.3)));}
   const span=list=>list.reduce((sum,p,i)=>i?sum+p.distanceTo(list[i-1]):0,0),riverShare=span(flowing)/span(stream);
-  const geometry=ribbon(stream,k=>k<riverShare?.62+.3*(k/riverShare)+.08*Math.sin(k*20):.92-(k-riverShare)*.45);
+  const geometry=ribbon(stream,k=>width*(k<riverShare?.62+.3*(k/riverShare)+.08*Math.sin(k*20):.92-(k-riverShare)*.45));
   uniforms.uLength.value=geometry.attributes.uv.array.at(-1);
   const group=new THREE.Group();group.add(new THREE.Mesh(geometry,material));
   return {group,uniforms,lip,path:flowing};

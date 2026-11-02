@@ -23,6 +23,15 @@ body:has(.journey){background:#04050d;overflow:hidden}
 .lab-actions button:hover{background:rgba(139,92,246,.35);border-color:var(--accent)}
 .lab-actions button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .lab-score{font-size:15px;color:#9dffb0}
+.lab-altitude b{font-weight:600}
+/* A world from the homepage: its sky and scene fill the screen under the lab chrome. */
+.lab-world{height:100svh}
+/* The hike's misty morning sky (the other worlds' skies come from the homepage styles). */
+.ht-mountain-sky{position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,#cfdde6 0%,#e4ebe6 42%,#f3efdf 72%,#eadfc6 100%)}
+/* Over a bright, busy world the dark type needs its own pale shade (the dark one is off in the light tone). */
+.lab-world[data-tone="light"] .lab-panel::before{opacity:1;background:radial-gradient(ellipse at 0 100%,rgba(255,248,236,.85),rgba(255,248,236,0) 70%)}
+/* ?bare: just the world, for stills (the grid's thumbnails). */
+.lab-world[data-bare="true"] :is(.lab-top,.lab-panel,.lab-scroll,.lab-nav){display:none}
 /* Light tone: over bright sky the panel turns to dark type and drops its shade. */
 .lab-panel,.lab-note,.lab-actions button{transition:color .8s,text-shadow .8s,border-color .8s,background .8s}
 .lab-panel::before{transition:opacity .8s}
@@ -30,6 +39,7 @@ body:has(.journey){background:#04050d;overflow:hidden}
 .lab[data-tone="light"] .lab-panel::before{opacity:0}
 .lab[data-tone="light"] .lab-note{color:#3a3a4a}
 .lab[data-tone="light"] .lab-actions button{color:#0b0b18;background:rgba(255,255,255,.5);border-color:rgba(11,11,24,.3)}
+.lab[data-tone="light"] .lab-score{color:#0b0b18}
 
 /* Scroll indicator, for experiments that play as you scroll: a track that fills with progress and a nudging
    chevron, on the right edge. It fades once the experiment has played through. */

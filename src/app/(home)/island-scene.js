@@ -432,7 +432,7 @@ export default function IslandScene({ onEvent, active, onReady } = {}) {
       clearTimeout(readyTimer);delete window.__islandStep;delete window.__island;
       disposed=true;cancelAnimationFrame(raf);resize.disconnect();observer.disconnect();
       canvas.removeEventListener("pointermove",onMove);canvas.removeEventListener("pointerdown",onDown);window.removeEventListener("pointerup",onUp);
-      animals.forEach(a=>a.mixer.stopAllAction());
+      animals.forEach(a=>a.mixer?.stopAllAction());
       scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat())if(m){m.map?.dispose();m.dispose();}});
       shadowTexture.dispose();glareTexture.dispose();puffTexture.dispose();renderer.dispose();canvas.remove();
     };

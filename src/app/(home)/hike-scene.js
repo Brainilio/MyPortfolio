@@ -28,7 +28,7 @@ const TRAIL=new THREE.CatmullRomCurve3([...LEAD,...Array.from({length:LEGS*36+1}
 const STREAM=new THREE.CatmullRomCurve3(Array.from({length:24},(_,i)=>{const t=i/23,r=20+t*82,a=FACE+.12+.1*Math.sin(t*9);return new THREE.Vector3(Math.cos(a)*r,0,Math.sin(a)*r);}));
 const WALK=1.2,START=26,BRIDGE=2.4,DECK=.32;
 
-export default function HikeScene({ state, altitude, onReady }) {
+export default function HikeScene({ state, altitude, onReady, slot = 3 }) {
   // Tells the page this world is built (the loading screen builds the worlds one after another).
   const ready=useRef(onReady);ready.current=onReady;
   const host=useRef(null);
@@ -41,7 +41,7 @@ export default function HikeScene({ state, altitude, onReady }) {
     renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
     mount.appendChild(renderer.domElement);
     const preference=matchMedia("(prefers-reduced-motion: reduce)"),lite=matchMedia("(pointer: coarse)").matches;
-    const onScreen=()=>state.current.live.includes(3);
+    const onScreen=()=>state.current.live.includes(slot);
     const scene=new THREE.Scene();scene.fog=new THREE.Fog("#dfe5d3",24,135);
     const camera=new THREE.PerspectiveCamera(36,1,.3,600);scene.add(camera);
     const rng=random(31),swayTime={value:0};
@@ -399,7 +399,7 @@ export default function HikeScene({ state, altitude, onReady }) {
     const onPointer=event=>{if(event.pointerType==="mouse")pointer.set(event.clientX/window.innerWidth*2-1,-(event.clientY/window.innerHeight)*2+1);};
     window.addEventListener("pointermove",onPointer,{passive:true});
     // The view window; its vertical offset follows the section hand-off, so the scene slides like the others.
-    const view={w:1,h:1,full:[1,1]},applyView=()=>{const shift=state.current.shift?.[3]??0;camera.setViewOffset(view.full[0],view.full[1],0,shift*view.h*.28,view.w,view.h);};
+    const view={w:1,h:1,full:[1,1]},applyView=()=>{const shift=state.current.shift?.[slot]??0;camera.setViewOffset(view.full[0],view.full[1],0,shift*view.h*.28,view.w,view.h);};
     function frameSize(){const w=mount.clientWidth,h=mount.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;tall=camera.aspect<.85;camera.fov=tall?50:36;
       view.w=w;view.h=h;view.full=tall?[w,h*1.5]:[w*1.32,h*1.1];applyView();camera.updateProjectionMatrix();
 }
@@ -443,6 +443,6 @@ export default function HikeScene({ state, altitude, onReady }) {
       scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat())if(m){m.map?.dispose();m.dispose();}});
       renderer.dispose();renderer.domElement.remove();
     };
-  },[state,altitude]);
+  },[state,altitude,slot]);
   return <div className="ht-hike-canvas" ref={host} aria-hidden="true" />;
 }

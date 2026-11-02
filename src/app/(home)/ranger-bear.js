@@ -52,21 +52,22 @@ export function createRangerBearGeometry() {
   return geometry;
 }
 
-// Poses the limbs: legs swing from the hips, arms swing from the shoulders and can be lifted (x: forward, to drink;
-// y: out to the side, to wave), and the whole bear bobs. The shadow pass uses a matching depth material.
+// Poses the limbs: legs swing from the hips (and fold forward together to sit), arms swing from the shoulders and
+// can be lifted (x: forward, to drink or hold a rod; y: out to the side, to wave), and the whole bear bobs.
+// The shadow pass uses a matching depth material.
 export function createRangerBearMaterial() {
   const material=new THREE.MeshStandardMaterial({vertexColors:true,flatShading:true,roughness:.9});
   const depth=new THREE.MeshDepthMaterial({depthPacking:THREE.RGBADepthPacking});
-  const uniforms={uPhase:{value:0},uSwing:{value:0},uBob:{value:0},uArmA:{value:new THREE.Vector2()},uArmB:{value:new THREE.Vector2()}};
+  const uniforms={uPhase:{value:0},uSwing:{value:0},uSit:{value:0},uBob:{value:0},uArmA:{value:new THREE.Vector2()},uArmB:{value:new THREE.Vector2()}};
   material.onBeforeCompile=depth.onBeforeCompile=shader=>{
     Object.assign(shader.uniforms,uniforms);
     shader.vertexShader=shader.vertexShader.replace("#include <common>",`#include <common>
-      attribute float aPart;uniform float uPhase,uSwing,uBob;uniform vec2 uArmA,uArmB;
+      attribute float aPart;uniform float uPhase,uSwing,uSit,uBob;uniform vec2 uArmA,uArmB;
       vec3 rotX(vec3 p,vec3 c,float a){p-=c;float s=sin(a),k=cos(a);return c+vec3(p.x,p.y*k-p.z*s,p.y*s+p.z*k);}
       vec3 rotZ(vec3 p,vec3 c,float a){p-=c;float s=sin(a),k=cos(a);return c+vec3(p.x*k-p.y*s,p.x*s+p.y*k,p.z);}`)
       .replace("#include <begin_vertex>",`#include <begin_vertex>
         float side=(aPart==1.||aPart==4.)?1.:-1.,step=sin(uPhase+(side>0.?0.:3.14159));
-        if(aPart>.5&&aPart<2.5)transformed=rotX(transformed,vec3(side*.09,${BEAR_HIP},0.),step*uSwing);
+        if(aPart>.5&&aPart<2.5)transformed=rotX(transformed,vec3(side*.09,${BEAR_HIP},0.),step*uSwing-uSit);
         else if(aPart>2.5){vec3 shoulder=vec3(side*${BEAR_SHOULDER.x},${BEAR_SHOULDER.y},0.);vec2 lift=side>0.?uArmA:uArmB;
           transformed=rotZ(transformed,shoulder,side*lift.y);transformed=rotX(transformed,shoulder,-step*uSwing*.9-lift.x);}
         // A little waddle: the body rolls side to side with each step.

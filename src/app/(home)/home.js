@@ -6,48 +6,34 @@ import "lenis/dist/lenis.css";
 import allProjects from "../../lib/projects";
 import "./home.css";
 const IslandScene = dynamic(() => import("./island-scene"), { ssr: false });
+const AboutScene = dynamic(() => import("./about-scene"), { ssr: false });
 const PrairieScene = dynamic(() => import("./prairie-scene"), { ssr: false });
 const RoadTripScene = dynamic(() => import("./roadtrip-scene"), { ssr: false });
-const HikeScene = dynamic(() => import("./hike-scene"), { ssr: false });
 const CoastScene = dynamic(() => import("./coast-scene"), { ssr: false });
 import { MODEL_CREDITS } from "./model-credits";
+import { EXPERIENCE, SKILLS } from "./content";
 const work = allProjects.filter(project => project.slug && project.previewImage).slice(0, 5);
 
-// Skill groups, drawn from the stacks in the project list. Each one is a roadside sign on the road trip.
-export const SKILLS = [
-  { title: "Frontend", items: ["React", "Redux", "Next.js", "React Query", "GSAP"] },
-  { title: "Backend", items: ["Node", "Express", "MongoDB", "Laravel"] },
-  { title: "3D & motion", items: ["Three.js", "WebGL", "Shaders"] },
-  { title: "Languages", items: ["TypeScript", "JavaScript", "PHP", "Java", "Python"] },
-  { title: "Product", items: ["UX/UI", "User research", "Pitching", "Stakeholder communication", "Agile"] },
-];
-
 // Every model the homepage loads (fetched up front by the loading screen).
-const MODELS = ["kit", "stag", "deer", "fox", "bear", "eagle", "bison", "boulder", "prairiedog", "hawk", "wagon", "antelope", "wolf", "moose", "cougar", "rabbit", "squirrel", "orca", "shark", "sealion", "kayak"].map(name => `/models/island/${name}.glb`);
-const LOADING_LINES = ["Raising the island", "Rounding up the bison", "Packing the wagon", "Lacing up the boots", "Lighting the lighthouse"];
-
-// Career, newest first. PLACEHOLDER entries: replace each with the real role, company, dates and a line on the work.
-export const EXPERIENCE = [
-  { years: "20XX — Now", role: "Current role", org: "Company", summary: "Placeholder: one line on what you build there and the difference it makes.", tags: ["React", "Node"] },
-  { years: "20XX — 20XX", role: "Previous role", org: "Company", summary: "Placeholder: the product, your part in it, one result worth naming.", tags: ["TypeScript", "Three.js"] },
-  { years: "20XX — 20XX", role: "Earlier role", org: "Company", summary: "Placeholder: what you shipped and what you learned.", tags: ["Laravel", "MongoDB"] },
-  { years: "20XX — 20XX", role: "First role", org: "Company or school", summary: "Placeholder: where it started.", tags: ["JavaScript"] },
-];
+const MODELS = ["kit", "stag", "deer", "fox", "bear", "eagle", "bison", "boulder", "prairiedog", "hawk", "wagon", "antelope", "wolf", "moose", "orca", "shark", "sealion", "kayak"].map(name => `/models/island/${name}.glb`);
+const LOADING_LINES = ["Raising the island", "Stoking the campfire", "Rounding up the bison", "Packing the wagon", "Lighting the lighthouse"];
 
 // Sections are full-screen worlds stacked on top of each other, driven by ordinary page scrolling. Each one owns a
 // stretch of scroll (in viewport heights); where two meet, a crossover zone scrubs the hand-off: the outgoing scene
 // drifts up and fades, the next rises in, the giant titles move slower (parallax) and the skies crossfade.
-// Inside Work the carousel turns with the scroll; inside Skills the wagon drives with it.
+// Inside About the trail log moves with the scroll; inside Work the carousel turns; inside Skills the wagon drives.
 const SECTIONS = [
   { id: "home", label: "Home", length: 1.2, steps: 1, tail: .1 },
+  { id: "about", label: "About", length: 1 + EXPERIENCE.length * .55, steps: EXPERIENCE.length },
   { id: "work", label: "Work", length: .8 + work.length * .6, steps: work.length },
   // Skills rests on its last sign while the wagon skids to a halt and the geyser plays (the finale hold below, on the
   // clock), then only a short margin of scroll before the hand-off.
   { id: "skills", label: "Skills", length: 1 + SKILLS.length * .6, steps: SKILLS.length, tail: .25, finale: true },
-  { id: "experience", label: "Experience", length: 1 + EXPERIENCE.length * .55, steps: EXPERIENCE.length, fadeIn: 2.5 },
   { id: "contact", label: "Contact", length: 1.6, steps: 1 },
 ];
 const CROSS = .8;
+// Which slot each scene reads in the shared scroll state.
+const ABOUT = 1, WORK = 2, SKILLS_AT = 3, CONTACT = 4;
 // Dwell (in viewport heights) at each end of a section's own scroll: the first and last stops (card, sign, role) hold
 // still for a moment before the hand-off to the neighbouring section begins, so a small scroll back doesn't leave.
 const HOLD = .35;
@@ -67,7 +53,7 @@ export default function Home() {
   // Shared with the 3D scenes (read every frame): which sections are on screen and how far through each one we are.
   const scene = useRef({ section: 0, live: [0], progress: [0, 0, 0, 0, 0] });
   const [spotted, setSpotted] = useState([]);
-  const altitude = useRef(null), pill = useRef(null), bar = useRef(null);
+  const pill = useRef(null), bar = useRef(null);
   const layers = useRef([]);
   const { section, stop } = where;
   // Loading: every model is fetched up front (to warm the cache) while the worlds are built one after another behind
@@ -174,8 +160,8 @@ export default function Home() {
 
   // Clicking the wagon glides the page on to the next sign (or back to the first from the last).
   const onCar = useCallback(() => {
-    const n = SKILLS.length, at = Math.round(scene.current.progress[2] * (n - 1)), next = at >= n - 1 ? 0 : at + 1;
-    scrollToSection(2, next / (n - 1));
+    const n = SKILLS.length, at = Math.round(scene.current.progress[SKILLS_AT] * (n - 1)), next = at >= n - 1 ? 0 : at + 1;
+    scrollToSection(SKILLS_AT, next / (n - 1));
   }, [scrollToSection]);
   const counter = SECTIONS[section].steps > 1 ? `${stop + 1}/${SECTIONS[section].steps}` : null;
 
@@ -186,11 +172,11 @@ export default function Home() {
       <header className="ht-header">
         <a href="#" className="ht-wordmark" onClick={event => { event.preventDefault(); jump(0); }}>Brainilio<span>.</span></a>
         <nav aria-label="Main">
-          <a href="#work" onClick={event => { event.preventDefault(); jump(1); }}>Work</a>
-          <a href="#skills" onClick={event => { event.preventDefault(); jump(2); }}>Skills</a>
-          <a href="#experience" onClick={event => { event.preventDefault(); jump(3); }}>Experience</a>
+          <a href="#about" onClick={event => { event.preventDefault(); jump(ABOUT); }}>About</a>
+          <a href="#work" onClick={event => { event.preventDefault(); jump(WORK); }}>Work</a>
+          <a href="#skills" onClick={event => { event.preventDefault(); jump(SKILLS_AT); }}>Skills</a>
           <a href="/journey/">Lab</a>
-          <a href="#contact" onClick={event => { event.preventDefault(); jump(4); }}>Contact</a>
+          <a href="#contact" onClick={event => { event.preventDefault(); jump(CONTACT); }}>Contact</a>
         </nav>
         {/* <span className="ht-available"><i aria-hidden="true" /> Available for work</span> */}
       </header>
@@ -201,12 +187,11 @@ export default function Home() {
         <h1 className="ht-name ht-title">Brainilio</h1>
         <div className="ht-move ht-intro-wrap">
           <div className="ht-intro">
-            <span className="ht-eyebrow">Software developer</span>
             <p className="ht-roles">I build digital products<span>,</span> and the odd little world<span>.</span></p>
             <p className="ht-lede">Full-stack, from REST APIs to 3D on the web. I explore new ideas and try to leave the world a little better than I found it.</p>
             <p className="ht-stack">React · Node · TypeScript · Three.js</p>
             <div className="ht-links">
-              <a className="ht-button" href="#work" onClick={event => { event.preventDefault(); jump(1); }}>See my work <span aria-hidden="true">↓</span></a>
+              <a className="ht-button" href="#work" onClick={event => { event.preventDefault(); jump(WORK); }}>See my work <span aria-hidden="true">↓</span></a>
               <a className="ht-button ht-button-ghost" href="mailto:brainilioir@gmail.com">Say hello <span aria-hidden="true">↗</span></a>
             </div>
           </div>
@@ -214,45 +199,20 @@ export default function Home() {
         <div className="ht-finish" aria-hidden="true" />
       </section>
 
-      <section className="ht-layer ht-work" ref={el => (layers.current[1] = el)} aria-labelledby="ht-work-title">
-        <div className="ht-prairie-sky" aria-hidden="true" />
-        <p className="ht-ghost ht-title" aria-hidden="true">Work</p>
-        <div className="ht-move ht-move-3d">{built[1] && <PrairieScene state={scene} projects={work} onReady={onReady(1)} />}</div>
-        <div className="ht-head ht-move-soft">
-          <span className="ht-eyebrow">Selected work</span>
-          <h2 id="ht-work-title">Things I&apos;ve built<span>.</span></h2>
-        </div>
-        <div className="ht-finish" aria-hidden="true" />
-        <ul className="ht-sr">{work.map(project => <li key={project.slug}><a href={`/project/${project.slug}/`}>{project.name}</a></li>)}</ul>
-      </section>
-
-      <section className="ht-layer ht-skills" ref={el => (layers.current[2] = el)} aria-labelledby="ht-skills-title">
-        <div className="ht-valley-sky" aria-hidden="true" />
-        <p className="ht-ghost ht-title" aria-hidden="true">Skills</p>
-        <div className="ht-move ht-move-3d">{built[2] && <RoadTripScene state={scene} skills={SKILLS} onCar={onCar} onReady={onReady(2)} />}</div>
-        <div className="ht-head ht-move-soft">
-          <span className="ht-eyebrow">On the road</span>
-          <h2 id="ht-skills-title">What I bring along<span>.</span></h2>
-          <p className="ht-drive">Scroll or click the car to drive on</p>
-        </div>
-        <div className="ht-finish" aria-hidden="true" />
-        <ul className="ht-sr">{SKILLS.map(skill => <li key={skill.title}>{skill.title}: {skill.items.join(", ")}</li>)}</ul>
-      </section>
-
-      {/* Experience: the hike. The scene runs on its own; scrolling moves the trail log on the left. Arriving, the
-          valley goes dark for a beat before the mountain fades up. */}
-      <section className="ht-layer ht-experience" ref={el => (layers.current[3] = el)} aria-labelledby="ht-experience-title">
-        <div className="ht-mountain-sky" aria-hidden="true" />
-        <div className="ht-move ht-move-3d">{built[3] && <HikeScene state={scene} altitude={altitude} onReady={onReady(3)} />}</div>
-        <div className="ht-scrim" aria-hidden="true" />
-        <div className="ht-head ht-move-soft">
-          <span className="ht-eyebrow">The trail so far</span>
-          <h2 id="ht-experience-title">My experience<span>.</span></h2>
+      {/* About: an evening by the river. The bear fishes and the fire crackles on their own; scrolling moves the
+          trail log (the career, newest first) beside them. */}
+      <section className="ht-layer ht-about" ref={el => (layers.current[ABOUT] = el)} aria-labelledby="ht-about-title">
+        <div className="ht-about-sky" aria-hidden="true" />
+        <div className="ht-move">{built[ABOUT] && <AboutScene state={scene} slot={ABOUT} onReady={onReady(ABOUT)} />}</div>
+        <div className="ht-about-copy ht-move-soft">
+          <h2 id="ht-about-title">Around the fire<span>.</span></h2>
+          {/* PLACEHOLDER copy: replace with your own words. */}
+          <p>I&apos;m a software developer who likes building things people enjoy using, from the API to the last bit of motion. Away from the keyboard you&apos;ll find me on a trail, on a road trip through a national park, or by a river with a line in the water.</p>
         </div>
         <div className="ht-trail-log">
           <ol className="ht-log">
             {EXPERIENCE.map((job, i) => (
-              <li key={i} className={section === 3 && stop === i ? "is-here" : undefined}>
+              <li key={i} className={section === ABOUT && stop === i ? "is-here" : undefined}>
                 <span className="ht-log-years">{job.years}</span>
                 <h3>{job.role} <em>· {job.org}</em></h3>
                 <p>{job.summary}</p>
@@ -261,17 +221,37 @@ export default function Home() {
             ))}
           </ol>
         </div>
-        <span className="ht-altitude" aria-hidden="true">▲ <b ref={altitude}>4,200 ft</b></span>
         <div className="ht-finish" aria-hidden="true" />
-        <div className="ht-blackout" aria-hidden="true" />
+      </section>
+
+      <section className="ht-layer ht-work" ref={el => (layers.current[WORK] = el)} aria-labelledby="ht-work-title">
+        <div className="ht-prairie-sky" aria-hidden="true" />
+        <p className="ht-ghost ht-title" aria-hidden="true">Work</p>
+        <div className="ht-move ht-move-3d">{built[WORK] && <PrairieScene state={scene} projects={work} slot={WORK} lite onReady={onReady(WORK)} />}</div>
+        <div className="ht-head ht-move-soft">
+          <h2 id="ht-work-title">Things I&apos;ve built<span>.</span></h2>
+        </div>
+        <div className="ht-finish" aria-hidden="true" />
+        <ul className="ht-sr">{work.map(project => <li key={project.slug}><a href={`/project/${project.slug}/`}>{project.name}</a></li>)}</ul>
+      </section>
+
+      <section className="ht-layer ht-skills" ref={el => (layers.current[SKILLS_AT] = el)} aria-labelledby="ht-skills-title">
+        <div className="ht-valley-sky" aria-hidden="true" />
+        <p className="ht-ghost ht-title" aria-hidden="true">Skills</p>
+        <div className="ht-move ht-move-3d">{built[SKILLS_AT] && <RoadTripScene state={scene} skills={SKILLS} onCar={onCar} slot={SKILLS_AT} lite onReady={onReady(SKILLS_AT)} />}</div>
+        <div className="ht-head ht-move-soft">
+          <h2 id="ht-skills-title">What I bring along<span>.</span></h2>
+          <p className="ht-drive">Scroll or click the car to drive on</p>
+        </div>
+        <div className="ht-finish" aria-hidden="true" />
+        <ul className="ht-sr">{SKILLS.map(skill => <li key={skill.title}>{skill.title}: {skill.items.join(", ")}</li>)}</ul>
       </section>
 
       {/* Contact: the end of the road, on the Big Sur coast. The pointer steers the lighthouse beam through the fog. */}
-      <section className="ht-layer ht-contact" ref={el => (layers.current[4] = el)} aria-labelledby="ht-contact-title">
+      <section className="ht-layer ht-contact" ref={el => (layers.current[CONTACT] = el)} aria-labelledby="ht-contact-title">
         <div className="ht-coast-sky" aria-hidden="true" />
-        <div className="ht-move ht-move-3d">{built[4] && <CoastScene state={scene} onSpot={setSpotted} onReady={onReady(4)} />}</div>
+        <div className="ht-move ht-move-3d">{built[CONTACT] && <CoastScene state={scene} onSpot={setSpotted} slot={CONTACT} lite onReady={onReady(CONTACT)} />}</div>
         <div className="ht-contact-card ht-move-soft">
-          <span className="ht-eyebrow">End of the road</span>
           <h2 id="ht-contact-title">Let&apos;s build something<span>.</span></h2>
           <p>Have a project, a role or an idea worth exploring? I&apos;d love to hear about it.</p>
           <a className="ht-contact-email" href="mailto:brainilioir@gmail.com">brainilioir@gmail.com <span aria-hidden="true">↗</span></a>
