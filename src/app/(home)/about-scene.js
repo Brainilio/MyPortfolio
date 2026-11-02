@@ -31,7 +31,7 @@ function heightAt(x,z) {
 // Where things sit (x, z): the bear on his log on the near bank, facing the water; the fire to his left; the tent behind.
 const SEAT=new THREE.Vector2(-.75,1.35),FIRE=new THREE.Vector2(-2,.35),TENT=new THREE.Vector2(-2.3,-1.7);
 
-export default function AboutScene({ state, slot = 1, onReady }) {
+export default function AboutScene({ state, slot = 1, side = "right", onReady }) {
   const ready=useRef(onReady);ready.current=onReady;
   const host=useRef(null);
   useEffect(()=>{
@@ -137,12 +137,12 @@ export default function AboutScene({ state, slot = 1, onReady }) {
     const flyMaterial=new THREE.PointsMaterial({color:"#e7ff9a",size:.07,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false});
     world.add(new THREE.Points(flyGeometry,flyMaterial));
 
-    // Framing: the diorama right of centre on wide screens (the words sit on the left), centred and further off when tall.
+    // Framing: the diorama to one side on wide screens (the words scroll past on the other), centred and further off when tall.
     let tall=false,lean=new THREE.Vector2(),leanTarget=new THREE.Vector2();
     const view={w:1,h:1};
     function frame(){
       const w=mount.clientWidth,h=mount.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;tall=camera.aspect<.85;view.w=w;view.h=h;
-      if(tall)camera.setViewOffset(w,h,0,-h*.2,w,h);else camera.setViewOffset(w,h,-w*.2,0,w,h);
+      if(tall)camera.setViewOffset(w,h,0,h*.14,w,h);else camera.setViewOffset(w,h,(side==="left"?.22:-.22)*w,0,w,h);
       camera.updateProjectionMatrix();place();needsRender=true;
     }
     function place(){

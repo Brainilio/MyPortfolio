@@ -9,43 +9,18 @@ import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { clone as cloneSkinned } from "three/addons/utils/SkeletonUtils.js";
 import { random, createBearMaterial, createPineGeometry, createCloud, flatMaterial, faceted } from "./island-parts";
 import { drawCard, createCardMaterial, videoTexture, coverCrop } from "./prairie-cards";
+import { createFin } from "./park-parts";
 
 // Golden-hour prairie seen from eye level: Garden-of-the-Gods sandstone fins in front of a hazy range, a loose
 // bison herd with a calf, prairie dogs, gliding hawks, and a feed basket you can fill. The camera holds still;
 // the project cards ride a slow carousel ring among the rocks, and scrolling turns it.
 const MOUNDS=[[-4.2,5],[-2,8],[2.2,8.5],[8.6,2.5],[-10,2.5],[10.5,6.5],[-6.5,7.5]];
 const GROUND=-5.5,EYE=GROUND+1.8,CARD=new THREE.Vector2(4.6,2.3),BASKET=new THREE.Vector3(2.5,0,6.6);
-const FIN_COLORS=["#8f3b22","#a8462a","#bd5631","#cc6a3e"].map(c=>new THREE.Color(c));
 // Bison gaits: leg swing (rad), stride rate, bob (fraction of height), knee fold, foot lift (fraction), nod.
 const GAITS={Graze:[0,1.1,.003,0,0,.04],Walk:[.36,3.4,.006,.6,.035,.09],Trot:[.5,5.6,.014,.8,.05,.12],Run:[.62,7.5,.02,.95,.06,.14]};
 const smooth=t=>{t=THREE.MathUtils.clamp(t,0,1);return t*t*(3-2*t);};
 // Near the camera the ground stays gentle (so the herd stays in view); further off it rolls into real hills.
 const groundY=(x,z)=>{const far=smooth((-z-8)/45);return GROUND+(.2+far*1.7)*Math.sin(x*.06+1)*Math.cos(z*.05)+(.1+far*.6)*Math.sin(x*.17+z*.12)+far*1.4*Math.sin(z*.035+x*.02);};
-
-// A sandstone fin, built the way the island's underside is: rings of shared points stacked up a slim oval
-// cross-section, each point jittered once (so the facets stay closed and smooth), tapering into a jagged crest that
-// peaks off-centre. Banded rust to cream by height, like Garden of the Gods.
-function createFin(rng,width,height,depth) {
-  const SEG=16,RINGS=7,crest=.25+rng()*.5,rings=[];
-  const crestAt=u=>Math.pow(Math.max(0,1-Math.abs(u-crest)/Math.max(crest,1-crest)),.75);
-  for(let k=0;k<=RINGS;k++){
-    const t=k/RINGS,ring=[];
-    for(let s=0;s<SEG;s++){
-      const a=s/SEG*Math.PI*2,u=.5+.5*Math.cos(a);
-      // The top ring follows the crest line; lower rings taper and thin toward it.
-      const rise=k===RINGS?height*(.42+.58*crestAt(u))*(.9+rng()*.18):height*t*(.55+.45*crestAt(u));
-      const rx=width/2*(1-t*.18)*(.94+rng()*.1),rz=depth/2*(1-t*.55)*(.9+rng()*.16);
-      ring.push(new THREE.Vector3(Math.cos(a)*rx,Math.max(0,rise+(k&&k<RINGS?(rng()-.5)*height*.04:0)),Math.sin(a)*rz));
-    }
-    rings.push(ring);
-  }
-  const tris=[];
-  for(let k=1;k<rings.length;k++)for(let s=0;s<SEG;s++){const a=rings[k-1][s],b=rings[k-1][(s+1)%SEG],c=rings[k][s],d=rings[k][(s+1)%SEG];tris.push([a,b,c],[b,d,c]);}
-  // Cap the crest: a ridge line joining the two sides of the top ring.
-  const top=rings.at(-1);tris.push([top[0],top[1],top[SEG-1]]);for(let s=1;s<SEG/2;s++){const a=top[s],b=top[s+1],c=top[SEG-s],d=top[SEG-s-1];tris.push([a,b,c],[b,d,c]);}
-  const geometry=faceted(tris,(tri,c)=>{const y=(tri[0].y+tri[1].y+tri[2].y)/3/height,band=Math.min(3,Math.floor(y*4.4+rng()*.5));c.copy(FIN_COLORS[band]);});
-  return new THREE.Mesh(geometry,flatMaterial());
-}
 
 // A Teton-style range: a faceted ridge strip whose crest rises into a few big peaks, built from rows that step down
 // toward the plain. Slate blue in shadow, snow caught in the gullies near the summits, hazed toward the sky at the base.
@@ -106,8 +81,7 @@ function createBasket() {
   return new THREE.Mesh(geometry,flatMaterial());
 }
 
-// `lite` (the homepage) halves the grass.
-export default function PrairieScene({ state, projects, onReady, slot = 1, lite = false }) {
+export default function PrairieScene({ state, projects, onReady, slot = 1 }) {
   // Tells the page this world is built (the loading screen builds the worlds one after another).
   const ready=useRef(onReady);ready.current=onReady;
   const host=useRef(null);
@@ -185,7 +159,7 @@ export default function PrairieScene({ state, projects, onReady, slot = 1, lite 
       const forest=new THREE.InstancedMesh(createPineGeometry(17),new THREE.MeshLambertMaterial({color:"#3c4a4c",flatShading:true,fog:false}),belt.length);
       belt.forEach(([x,z],i)=>{d.position.set(x,groundY(x,z)-.2,z);d.rotation.set(0,fr()*6,0);const s=1.6+fr()*1.4;d.scale.set(s,s*(1+fr()*.5),s);d.updateMatrix();forest.setMatrixAt(i,d.matrix);});
       scene.add(forest);
-      const TUFTS=lite?1800:3600,tufts=new THREE.InstancedMesh(createTuft(),new THREE.MeshBasicMaterial({vertexColors:true,side:THREE.DoubleSide}),TUFTS),golds=["#b88a42","#a87b38","#c59a4e","#9f8a50","#b08e48"].map(c=>new THREE.Color(c));
+      const TUFTS=3600,tufts=new THREE.InstancedMesh(createTuft(),new THREE.MeshBasicMaterial({vertexColors:true,side:THREE.DoubleSide}),TUFTS),golds=["#b88a42","#a87b38","#c59a4e","#9f8a50","#b08e48"].map(c=>new THREE.Color(c));
       for(let i=0;i<TUFTS;i++){
         const z=13-Math.pow(fr(),1.6)*60,x=(fr()-.5)*(26+Math.max(0,13-z)*1.5);
         if(Math.hypot(x-BASKET.x,z-BASKET.z)<1.4||MOUNDS.some(([mx,mz])=>Math.hypot(x-mx,z-mz)<1.1)){i--;continue;}
@@ -461,6 +435,6 @@ export default function PrairieScene({ state, projects, onReady, slot = 1, lite 
       scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat())if(m){m.map?.dispose();m.uniforms?.uMap?.value?.dispose();m.dispose();}});
       glowTexture.dispose();renderer.dispose();canvas.remove();
     };
-  },[state,projects,slot,lite]);
+  },[state,projects,slot]);
   return <div className="ht-prairie-canvas" ref={host} aria-hidden="true" />;
 }

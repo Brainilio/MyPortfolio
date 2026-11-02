@@ -6,8 +6,9 @@ import { adaptivePixelRatio, snapToTexels } from "./perf";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { clone as cloneSkinned } from "three/addons/utils/SkeletonUtils.js";
-import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { random, createBearMaterial, createFish, bakeProp } from "./island-parts";
+import { loadWagon } from "./wagon";
+import { createSign, createHalfDome } from "./park-parts";
 import { chunkSpots, paintGeometry, createForestPine, createSnag, createTuft, createLupine, createDaisy, createSwayMaterial } from "./forest-parts";
 
 // Skills as a road trip through a national park: a loaded wagon idles on a winding road through deep forest under
@@ -20,75 +21,7 @@ const STATIONS=[.08,.27,.46,.64,.82];
 // distance to the left of the road, radius]) and a geyser just past the end of the road.
 const SPRINGS=[[.42,14,4.2],[.38,9,1.5],[.462,8.6,1.1]],GEYSER={r:1.6,at:(()=>{const p=ROAD.getPointAt(1),t=ROAD.getTangentAt(.999);return new THREE.Vector2(p.x+t.x*12,p.z+t.z*12);})()};
 const leftOf=([u,d])=>{const p=ROAD.getPointAt(u),t=ROAD.getTangentAt(u);return new THREE.Vector2(p.x+t.z*d,p.z-t.x*d);};
-const GRANITE=["#b4aea3","#a39d92","#958f85","#c4bdb1"].map(c=>new THREE.Color(c));
-
-// Half Dome: a dome with one side sheared off into a sheer face.
-function createHalfDome(rng) {
-  const g=new THREE.SphereGeometry(1,28,18,0,Math.PI,0,Math.PI/2).scale(1,1.15,.95),pos=g.attributes.position,colors=new Float32Array(pos.count*3);
-  for(let i=0;i<pos.count;i++)pos.setXYZ(i,pos.getX(i)*(1+(rng()-.5)*.04),pos.getY(i),pos.getZ(i)*(1+(rng()-.5)*.04));
-  for(let i=0;i<pos.count;i++){const c=GRANITE[Math.floor(pos.getY(i)*3.99)%4];colors.set([c.r,c.g,c.b],i*3);}
-  g.setAttribute("color",new THREE.BufferAttribute(colors,3));g.deleteAttribute("uv");g.computeVertexNormals();
-  const dome=new THREE.Mesh(g,new THREE.MeshStandardMaterial({vertexColors:true,roughness:1}));
-  // The sheer face: a flat cap closing the cut side.
-  const face=new THREE.Mesh(new THREE.CircleGeometry(1,28,0,Math.PI).scale(1,1.15,1),new THREE.MeshStandardMaterial({color:"#9a948a",roughness:1,side:THREE.DoubleSide}));
-  const group=new THREE.Group();group.add(dome,face);return group;
-}
-// A national-park entrance sign: a dark-stained plank board with a routed cream border and lettering, held up by two
-// log posts set in a stone footing. Lettering is Bitter (Google Fonts, OFL), a sturdy slab close to park signage.
-// Every line is measured and shrunk to fit inside the border, and a long tool list wraps onto two lines.
-const BOARD={w:4.4,h:2.2,r:.14};
-function roundedRect(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
-function createSign(skill,index) {
-  const W=1024,H=512,canvas=document.createElement("canvas");canvas.width=W;canvas.height=H;
-  const g=canvas.getContext("2d"),CREAM="#efe2bf",SHADOW="#24130a",family="Bitter, Georgia, serif";
-  // Largest size (up to max) at which the text fits the width.
-  const fit=(text,weight,max,width,spacing=0)=>{let size=max;for(;size>18;size-=2){g.font=`${weight} ${size}px ${family}`;g.letterSpacing=`${spacing*size}px`;if(g.measureText(text).width<=width)break;}return size;};
-  const carve=(text,y,weight,size,spacing=0)=>{g.font=`${weight} ${size}px ${family}`;g.letterSpacing=`${spacing*size}px`;g.fillStyle=SHADOW;g.fillText(text,W/2+3,y+4);g.fillStyle=CREAM;g.fillText(text,W/2,y);};
-  const paint=()=>{
-    g.clearRect(0,0,W,H);
-    roundedRect(g,0,0,W,H,32);g.fillStyle="#4e2f1d";g.fill();
-    // Three planks: seams and a little grain.
-    g.save();g.clip();
-    for(let i=0;i<90;i++){g.globalAlpha=.05+(i%4)*.015;g.fillStyle=i%3?"#1d0f07":"#8a5a3a";g.fillRect(0,(i*53.7)%H,W,1+(i%3));}
-    g.globalAlpha=.5;g.fillStyle="#24130a";for(const y of [H/3,H*2/3])g.fillRect(0,y-2,W,4);
-    g.restore();g.globalAlpha=1;
-    roundedRect(g,26,26,W-52,H-52,20);g.lineWidth=7;g.strokeStyle=SHADOW;g.save();g.translate(2,3);g.stroke();g.restore();g.strokeStyle=CREAM;g.stroke();
-    g.textAlign="center";g.textBaseline="alphabetic";
-    const inner=W-150;
-    carve(`SKILLS  ·  STOP ${String(index+1).padStart(2,"0")}`,112,600,fit(`SKILLS  ·  STOP 00`,600,30,inner,.2),.2);
-    carve(skill.title,262,800,fit(skill.title,800,140,inner,-.01),-.01);
-    g.fillStyle=CREAM;g.fillRect(W/2-60,292,120,5);
-    // The tools: one line if it fits at a readable size, otherwise split into two balanced lines.
-    const one=skill.items.join("  ·  ").toUpperCase(),size=fit(one,600,40,inner,.08);
-    if(size>=32)carve(one,380,600,size,.08);
-    else{const half=Math.ceil(skill.items.length/2),lines=[skill.items.slice(0,half),skill.items.slice(half)].map(x=>x.join("  ·  ").toUpperCase());
-      const s=Math.min(...lines.map(l=>fit(l,600,38,inner,.08)));carve(lines[0],360,600,s,.08);carve(lines[1],360+s*1.25,600,s,.08);}
-  };
-  paint();
-  const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=8;
-  // Re-letter once the sign font has loaded.
-  Promise.all([document.fonts?.load(`800 140px Bitter`),document.fonts?.load(`600 40px Bitter`)]).then(()=>{paint();texture.needsUpdate=true;}).catch(()=>{});
-  const sign=new THREE.Group(),wood=new THREE.MeshStandardMaterial({color:"#3d2416",flatShading:true,roughness:1});
-  const {w,h,r}=BOARD,shape=new THREE.Shape();
-  shape.moveTo(-w/2+r,-h/2);shape.lineTo(w/2-r,-h/2);shape.quadraticCurveTo(w/2,-h/2,w/2,-h/2+r);shape.lineTo(w/2,h/2-r);shape.quadraticCurveTo(w/2,h/2,w/2-r,h/2);
-  shape.lineTo(-w/2+r,h/2);shape.quadraticCurveTo(-w/2,h/2,-w/2,h/2-r);shape.lineTo(-w/2,-h/2+r);shape.quadraticCurveTo(-w/2,-h/2,-w/2+r,-h/2);
-  const board=new THREE.Mesh(new THREE.ExtrudeGeometry(shape,{depth:.14,bevelEnabled:true,bevelSize:.035,bevelThickness:.03,bevelSegments:1}),wood);
-  board.position.set(0,2.35,-.08);sign.add(board);
-  const face=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshStandardMaterial({map:texture,transparent:true,roughness:.85}));
-  face.position.set(0,2.35,.1);sign.add(face);
-  // Log posts with rounded tops, in a footing of piled stones.
-  const log=new THREE.MeshStandardMaterial({color:"#6b4630",flatShading:true,roughness:1}),stones=[];
-  for(const x of [-1.75,1.75]){
-    const post=new THREE.Mesh(new THREE.CylinderGeometry(.17,.2,3.6,7),log);post.position.set(x,1.8,-.22);sign.add(post);
-    const cap=new THREE.Mesh(new THREE.SphereGeometry(.17,7,4,0,Math.PI*2,0,Math.PI/2),log);cap.position.set(x,3.6,-.22);sign.add(cap);
-    for(let k=0;k<6;k++){const a=k/6*Math.PI*2+index,s=.22+((k*7+index*3)%5)*.04;stones.push(new THREE.DodecahedronGeometry(s,0).scale(1,.7,1).translate(x+Math.cos(a)*.34,s*.45,-.22+Math.sin(a)*.3));}
-  }
-  const footing=new THREE.Mesh(mergeGeometries(stones),new THREE.MeshStandardMaterial({color:"#8d8b8f",flatShading:true,roughness:1}));sign.add(footing);
-  sign.traverse(o=>{if(o.isMesh)o.castShadow=o.receiveShadow=true;});sign.userData.texture=texture;return sign;
-}
-
-// `lite` (the homepage) takes the lighter path phones always get: fewer plants, wider tree spacing, a smaller shadow map.
-export default function RoadTripScene({ state, skills, onCar, onReady, slot = 2, lite: light = false }) {
+export default function RoadTripScene({ state, skills, onCar, onReady, slot = 2 }) {
   // Tells the page this world is built (the loading screen builds the worlds one after another).
   const ready=useRef(onReady);ready.current=onReady;
   const host=useRef(null),carClick=useRef(onCar);
@@ -111,7 +44,7 @@ export default function RoadTripScene({ state, skills, onCar, onReady, slot = 2,
 
     // Golden hour: a low warm sun from the side of the valley, so the pines lay long soft shadows across the road
     // with sunlit gaps between them. The shadow map only covers the stretch around the car and moves with it (smaller on phones).
-    const lite=light||matchMedia("(pointer: coarse)").matches;
+    const lite=matchMedia("(pointer: coarse)").matches;
     scene.add(new THREE.HemisphereLight("#ffe6cf","#6b5d4c",1.6));
     const SUN=new THREE.Vector3(-1,.85,-.45).normalize(),sun=new THREE.DirectionalLight("#ffc890",3.2);
     sun.castShadow=true;sun.shadow.mapSize.setScalar(lite?1024:2048);sun.shadow.bias=-.0006;sun.shadow.normalBias=.04;sun.shadow.radius=4;
@@ -324,34 +257,8 @@ export default function RoadTripScene({ state, skills, onCar, onReady, slot = 2,
 
     // The car: the loaded wagon, wheels spun in the vertex shader around each wheel's own centre.
     const car=new THREE.Group(),body=new THREE.Group();car.add(body);scene.add(car);
-    const wheelSpin={value:0};let carReady=false;
-    new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).load("/models/island/wagon.glb",gltf=>{
-      if(disposed)return;
-      const model=gltf.scene,box=new THREE.Box3().setFromObject(model),size=box.getSize(new THREE.Vector3());
-      // The wagon's length runs along x with its nose at -x; turn it so it faces +z (the way the car travels).
-      const holder=new THREE.Group();holder.add(model);holder.rotation.y=Math.PI/2;
-      model.position.set(-(box.min.x+box.max.x)/2,-box.min.y,-(box.min.z+box.max.z)/2);
-      holder.scale.setScalar(2.6/size.x);body.add(holder);
-      model.traverse(o=>{
-        if(!o.isMesh)return;o.castShadow=true;o.material=o.material.clone();o.material.flatShading=true;o.material.roughness=.8;o.material.metalness=0;
-        // Tyres are the near-black material.
-        const c=o.material.color,wheel=c.r<.03&&c.g<.03&&c.b<.03;
-        if(!wheel)return;
-        // Find the four wheel centres for this mesh (by quadrant), then spin vertices around them.
-        const pos=o.geometry.attributes.position,b=new THREE.Box3().setFromBufferAttribute(pos),mid=b.getCenter(new THREE.Vector3()),sums=[0,1,2,3].map(()=>new THREE.Vector3()),counts=[0,0,0,0];
-        for(let i=0;i<pos.count;i++){const x=pos.getX(i),z=pos.getZ(i),q=(x>mid.x?1:0)+(z>mid.z?2:0);sums[q].add(new THREE.Vector3(x,pos.getY(i),z));counts[q]++;}
-        const centers=sums.map((v,q)=>counts[q]?v.divideScalar(counts[q]):mid.clone());
-        o.material.onBeforeCompile=shader=>{
-          shader.uniforms.uSpin=wheelSpin;shader.uniforms.uMid={value:mid};shader.uniforms.uCenters={value:centers};
-          shader.vertexShader=shader.vertexShader.replace("#include <common>","#include <common>\nuniform float uSpin;uniform vec3 uMid;uniform vec3 uCenters[4];")
-            .replace("#include <begin_vertex>",`#include <begin_vertex>
-              int q=(transformed.x>uMid.x?1:0)+(transformed.z>uMid.z?2:0);vec3 c=uCenters[0];
-              if(q==1)c=uCenters[1];else if(q==2)c=uCenters[2];else if(q==3)c=uCenters[3];
-              vec2 d=transformed.xy-c.xy;float s=sin(uSpin),k=cos(uSpin);transformed.xy=c.xy+vec2(d.x*k-d.y*s,d.x*s+d.y*k);`);
-        };
-      });
-      carReady=true;
-    },undefined,()=>{});
+    let carReady=false;
+    const wheelSpin=loadWagon(new GLTFLoader().setMeshoptDecoder(MeshoptDecoder),{length:2.6,shadows:true},holder=>{if(disposed)return;body.add(holder);carReady=true;});
     // Wildlife (Poly Pizza, see public/models/CREDITS.md). Antelope graze on the meadow across from the river and bound
     // away from the passing car; a wolf pack trots a loop through the valley and gallops off when the car comes close.
     const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder),antelope=[],wolves=[];
@@ -520,6 +427,6 @@ export default function RoadTripScene({ state, skills, onCar, onReady, slot = 2,
       scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat())if(m){m.map?.dispose();m.dispose();}});
       signs.forEach(s=>s.userData.texture.dispose());renderer.dispose();canvas.remove();
     };
-  },[state,skills,slot,light]);
+  },[state,skills,slot]);
   return <div className="ht-road-canvas" ref={host} aria-hidden="true" />;
 }

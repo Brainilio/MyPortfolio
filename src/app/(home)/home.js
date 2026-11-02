@@ -7,58 +7,43 @@ import allProjects from "../../lib/projects";
 import "./home.css";
 const IslandScene = dynamic(() => import("./island-scene"), { ssr: false });
 const AboutScene = dynamic(() => import("./about-scene"), { ssr: false });
-const PrairieScene = dynamic(() => import("./prairie-scene"), { ssr: false });
-const RoadTripScene = dynamic(() => import("./roadtrip-scene"), { ssr: false });
+const WorkScene = dynamic(() => import("./work-scene"), { ssr: false });
+const SkillsScene = dynamic(() => import("./skills-scene"), { ssr: false });
 const CoastScene = dynamic(() => import("./coast-scene"), { ssr: false });
 import { MODEL_CREDITS } from "./model-credits";
 import { EXPERIENCE, SKILLS } from "./content";
 const work = allProjects.filter(project => project.slug && project.previewImage).slice(0, 5);
 
 // Every model the homepage loads (fetched up front by the loading screen).
-const MODELS = ["kit", "stag", "deer", "fox", "bear", "eagle", "bison", "boulder", "prairiedog", "hawk", "wagon", "antelope", "wolf", "moose", "orca", "shark", "sealion", "kayak"].map(name => `/models/island/${name}.glb`);
+const MODELS = ["kit", "stag", "deer", "fox", "bear", "eagle", "bison", "prairiedog", "wagon", "moose", "orca", "shark", "sealion", "kayak"].map(name => `/models/island/${name}.glb`);
 const LOADING_LINES = ["Raising the island", "Stoking the campfire", "Rounding up the bison", "Packing the wagon", "Lighting the lighthouse"];
 
-// Sections are full-screen worlds stacked on top of each other, driven by ordinary page scrolling. Each one owns a
-// stretch of scroll (in viewport heights); where two meet, a crossover zone scrubs the hand-off: the outgoing scene
-// drifts up and fades, the next rises in, the giant titles move slower (parallax) and the skies crossfade.
-// Inside About the trail log moves with the scroll; inside Work the carousel turns; inside Skills the wagon drives.
+// One long page. Each section is a floating diorama that holds still (sticky) while its words scroll past on the other
+// side, alternating right, left, right; the coast closes the page full width. Behind everything a fixed stack of skies
+// crossfades as you move from one section into the next. Inside a section its own progress (0 → 1 while it's pinned)
+// turns the Work ring, drives the Skills wagon and lights the trail log.
 const SECTIONS = [
-  { id: "home", label: "Home", length: 1.2, steps: 1, tail: .1 },
-  { id: "about", label: "About", length: 1 + EXPERIENCE.length * .55, steps: EXPERIENCE.length },
-  { id: "work", label: "Work", length: .8 + work.length * .6, steps: work.length },
-  // Skills rests on its last sign while the wagon skids to a halt and the geyser plays (the finale hold below, on the
-  // clock), then only a short margin of scroll before the hand-off.
-  { id: "skills", label: "Skills", length: 1 + SKILLS.length * .6, steps: SKILLS.length, tail: .25, finale: true },
-  { id: "contact", label: "Contact", length: 1.6, steps: 1 },
+  { id: "home", label: "Home", steps: 1 },
+  { id: "about", label: "About", steps: EXPERIENCE.length },
+  { id: "work", label: "Work", steps: work.length },
+  { id: "skills", label: "Skills", steps: SKILLS.length },
+  { id: "contact", label: "Contact", steps: 1 },
 ];
-const CROSS = .8;
+const SKIES = ["ht-sky", "ht-about-sky", "ht-prairie-sky", "ht-valley-sky", "ht-coast-sky"];
 // Which slot each scene reads in the shared scroll state.
 const ABOUT = 1, WORK = 2, SKILLS_AT = 3, CONTACT = 4;
-// Dwell (in viewport heights) at each end of a section's own scroll: the first and last stops (card, sign, role) hold
-// still for a moment before the hand-off to the neighbouring section begins, so a small scroll back doesn't leave.
-const HOLD = .35;
-// How long the page rests on a finale (the wagon's skid and the geyser's eruption) before the next scroll moves on.
-const FINALE_MS = 2600;
-const lead = i => (i ? HOLD : 0), tail = i => (i === SECTIONS.length - 1 ? 0 : SECTIONS[i].tail ?? HOLD);
-// Length of a section's stepping stretch (where its progress runs 0 → 1).
-const span = i => SECTIONS[i].length - (i === SECTIONS.length - 1 ? 1 : CROSS);
-const sectionLength = i => SECTIONS[i].length + lead(i) + tail(i);
-const START = SECTIONS.reduce((list, section, i) => [...list, i ? list[i - 1] + sectionLength(i - 1) : 0], []);
-const TOTAL = START.at(-1) + sectionLength(SECTIONS.length - 1);
-// Scroll position (in viewport heights) where a section's internal progress reaches q.
-const scrollFor = (s, q) => START[s] + lead(s) + q * span(s);
+const clamp = v => Math.min(1, Math.max(0, v));
 
 export default function Home() {
   const [where, setWhere] = useState({ section: 0, stop: 0 }), [menu, setMenu] = useState(false);
   // Shared with the 3D scenes (read every frame): which sections are on screen and how far through each one we are.
-  const scene = useRef({ section: 0, live: [0], progress: [0, 0, 0, 0, 0] });
+  const scene = useRef({ section: 0, live: [0], progress: [0, 0, 0, 0, 0], shift: [0, 0, 0, 0, 0] });
   const [spotted, setSpotted] = useState([]);
   const pill = useRef(null), bar = useRef(null);
-  const layers = useRef([]);
+  const zones = useRef([]), skies = useRef([]);
   const { section, stop } = where;
-  // Loading: every model is fetched up front (to warm the cache) while the worlds are built one after another behind
-  // the loading screen, each as soon as the previous one reports it's ready. Building a world is the expensive part
-  // (terrain, thousands of trees), so doing it here means scrolling never pays for it. The screen lifts when all are
+  // Loading: every model is fetched up front (to warm the cache) while the dioramas are built one after another
+  // behind the loading screen, each as soon as the previous one reports it's ready. The screen lifts when all are
   // built, or after a few seconds regardless (the rest then finish in the background).
   const [built, setBuilt] = useState(() => SECTIONS.map((_, i) => i === 0));
   const [loading, setLoading] = useState({ fetched: 0, ready: 0, done: false });
@@ -76,17 +61,15 @@ export default function Home() {
   const loaded = loading.done || progress >= 1;
   useEffect(() => { document.documentElement.classList.toggle("ht-locked", !loaded); }, [loaded]);
 
-  // Smooth scrolling (Lenis) and the section gate: inside a section you scroll freely, but a scroll that carries you
-  // over a boundary glides you to the next section's first stop (or the previous one's last) and holds for a beat,
-  // swallowing the leftover momentum, so even a hard flick moves one section at a time. Menu and header jumps go
-  // straight to their section. With reduced motion there's no smoothing and no gate.
-  const lenisRef = useRef(null), gate = useRef({ section: 0, busy: false, heldEnd: false });
+  // Smooth scrolling (Lenis), off with reduced motion. Menu and header links glide to a section's top, or to a point
+  // inside it (q: how far through its pinned stretch).
+  const lenisRef = useRef(null);
   const scrollToSection = useCallback((s, q = 0) => {
-    const top = scrollFor(s, q) * window.innerHeight + 2, lenis = lenisRef.current;
+    const el = zones.current[s];
+    if (!el) return;
+    const top = el.offsetTop + q * Math.max(0, el.offsetHeight - window.innerHeight), lenis = lenisRef.current;
     setMenu(false);
-    if (!lenis) { window.scrollTo({ top, behavior: "auto" }); return; }
-    gate.current.busy = true;
-    lenis.scrollTo(top, { duration: Math.min(2.2, .9 + Math.abs(s - gate.current.section) * .3), lock: true, force: true, onComplete: () => { gate.current.section = s; gate.current.busy = false; } });
+    if (lenis) lenis.scrollTo(top, { duration: 1.4 }); else window.scrollTo({ top, behavior: "auto" });
   }, []);
   useEffect(() => { lenisRef.current?.[loaded ? "start" : "stop"](); }, [loaded]);
   const jump = useCallback(s => scrollToSection(s, 0), [scrollToSection]);
@@ -95,48 +78,21 @@ export default function Home() {
     let frame = 0, last = "";
     const update = () => {
       frame = 0;
-      const p = window.scrollY / window.innerHeight, live = [];
-      let dominant = 0, best = -1;
-      SECTIONS.forEach((x, i) => {
-        const begin = START[i], end = begin + sectionLength(i), isLast = i === SECTIONS.length - 1;
-        // 0 → fully on screen; negative → still rising in from below; positive → drifting up and out.
-        const enter = i === 0 ? 1 : Math.min(1, Math.max(0, (p - (begin - CROSS)) / CROSS));
-        const leave = isLast ? 0 : Math.min(1, Math.max(0, (p - (end - CROSS)) / CROSS));
-        const amount = Math.min(1, Math.min(enter * (x.fadeIn ?? 1), 1 - leave)), shift = leave > 0 ? leave : enter < 1 ? -(1 - enter) : 0;
-        const q = Math.min(1, Math.max(0, (p - begin - lead(i)) / span(i)));
-        scene.current.progress[i] = q;
-        // Scenes that fill the frame do the slide with their own camera (see .ht-move-3d), so no canvas edge shows.
-        (scene.current.shift ??= [])[i] = shift;
-        if (amount > 0.001) live.push(i);
-        if (amount > best) { best = amount; dominant = i; }
-        const el = layers.current[i];
-        if (el) { el.style.opacity = amount.toFixed(3); el.style.visibility = amount > 0.001 ? "visible" : "hidden"; el.style.setProperty("--shift", shift.toFixed(4)); el.style.setProperty("--enter", enter.toFixed(4)); el.style.setProperty("--q", q.toFixed(4)); }
+      const y = window.scrollY, vh = window.innerHeight, middle = y + vh / 2, live = [];
+      let dominant = 0;
+      zones.current.forEach((el, i) => {
+        if (!el) return;
+        const top = el.offsetTop, height = el.offsetHeight;
+        scene.current.progress[i] = clamp((y - top) / Math.max(1, height - vh));
+        if (top < y + vh && top + height > y) live.push(i);
+        if (middle >= top) dominant = i;
+        // Each sky fades in over the screen-height either side of where its section begins; later skies sit on top.
+        const sky = skies.current[i];
+        if (sky && i) sky.style.opacity = clamp((middle - (top - vh / 2)) / vh).toFixed(3);
       });
       scene.current.live = live;scene.current.section = dominant;
-      // The pill fills as you scroll through the section on screen.
       pill.current?.style.setProperty("--progress", scene.current.progress[dominant].toFixed(4));
-      // The bar along the top shows how far through the whole page you are.
-      bar.current?.style.setProperty("--progress", Math.min(1, p / Math.max(.01, TOTAL - 1)).toFixed(4));
-      // The gate: which section's stretch the scroll is in (boundaries at the middle of each hand-off).
-      const lenis = lenisRef.current, g = gate.current;
-      if (lenis && !g.busy) {
-        let region = 0;for (let i = 1; i < SECTIONS.length; i++) if (p >= START[i] - CROSS * .5) region = i;
-        // A section with a finale (the geyser at the end of Skills) is never skipped past: scrolling down past its last
-        // stop brings you back to rest on it for a moment; the next scroll moves on.
-        const endStop = scrollFor(g.section, 1);
-        if (p < endStop - .3) { g.heldEnd = false; g.endAt = 0; }
-        // Time already spent at the last stop counts toward the finale, so someone who watched it isn't held again.
-        if (p > endStop - .05 && !g.endAt) g.endAt = performance.now();
-        if (SECTIONS[g.section].finale && !g.heldEnd && p > endStop + .05) {
-          g.busy = true;g.heldEnd = true;
-          lenis.scrollTo(endStop * window.innerHeight + 2, { duration: .9, lock: true, force: true, onComplete: () => { lenis.stop(); setTimeout(() => { lenis.start(); g.busy = false; }, Math.max(500, FINALE_MS - (performance.now() - g.endAt))); } });
-        } else if (region !== g.section) {
-          const up = region < g.section, next = g.section + (up ? -1 : 1), top = scrollFor(next, up ? 1 : 0) * window.innerHeight + 2;
-          g.busy = true;
-          // Arriving on a section's last stop from below counts as having rested there.
-          lenis.scrollTo(top, { duration: 1.1, lock: true, force: true, onComplete: () => { g.section = next; g.heldEnd = up; lenis.stop(); setTimeout(() => { lenis.start(); g.busy = false; }, 450); } });
-        }
-      }
+      bar.current?.style.setProperty("--progress", clamp(y / Math.max(1, document.documentElement.scrollHeight - vh)).toFixed(4));
       // If someone gets ahead of the background builds, build the neighbours now.
       setBuilt(was => was.some((b, i) => !b && Math.abs(i - dominant) <= 1) ? was.map((b, i) => b || Math.abs(i - dominant) <= 1) : was);
       const q = scene.current.progress[dominant], steps = SECTIONS[dominant].steps, at = Math.min(steps - 1, Math.round(q * (steps - 1)));
@@ -150,12 +106,14 @@ export default function Home() {
     // Start on the section in the URL, if any (and don't let the browser restore an old scroll position over it).
     history.scrollRestoration = "manual";
     const fromHash = SECTIONS.findIndex(x => `#${x.id}` === location.hash);
-    if (fromHash > 0) { window.scrollTo(0, scrollFor(fromHash, 0) * window.innerHeight + 2); gate.current.section = fromHash; }
-    const lenis = matchMedia("(prefers-reduced-motion: reduce)").matches ? null : new Lenis({ autoRaf: true, lerp: .085, smoothWheel: true, wheelMultiplier: .9 });
+    if (fromHash > 0) window.scrollTo(0, zones.current[fromHash]?.offsetTop ?? 0);
+    const lenis = matchMedia("(prefers-reduced-motion: reduce)").matches ? null : new Lenis({ autoRaf: true, lerp: .09, smoothWheel: true });
     lenisRef.current = lenis;lenis?.stop();
     update();
+    // Sections change height as fonts load and the layout settles; keep the measurements fresh.
+    const resize = new ResizeObserver(onScroll);resize.observe(document.body);
     window.addEventListener("scroll", onScroll, { passive: true }); window.addEventListener("resize", onScroll);
-    return () => { cancelAnimationFrame(frame); window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); lenis?.destroy(); lenisRef.current = null; };
+    return () => { cancelAnimationFrame(frame); resize.disconnect(); window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); lenis?.destroy(); lenisRef.current = null; };
   }, []);
 
   // Clicking the wagon glides the page on to the next sign (or back to the first from the last).
@@ -167,8 +125,8 @@ export default function Home() {
 
   return (
     <main className="ht" data-section={SECTIONS[section].id}>
-      {/* The page's scroll length; the sections themselves are fixed layers. */}
-      <div className="ht-runway" style={{ height: `${TOTAL * 100}svh` }} aria-hidden="true" />
+      <div className="ht-skies" aria-hidden="true">{SKIES.map((sky, i) => <div key={sky} className={sky} ref={el => (skies.current[i] = el)} style={i ? { opacity: 0 } : undefined} />)}</div>
+      <div className="ht-finish" aria-hidden="true" />
       <header className="ht-header">
         <a href="#" className="ht-wordmark" onClick={event => { event.preventDefault(); jump(0); }}>Brainilio<span>.</span></a>
         <nav aria-label="Main">
@@ -178,38 +136,30 @@ export default function Home() {
           <a href="/journey/">Lab</a>
           <a href="#contact" onClick={event => { event.preventDefault(); jump(CONTACT); }}>Contact</a>
         </nav>
-        {/* <span className="ht-available"><i aria-hidden="true" /> Available for work</span> */}
       </header>
 
-      <section className="ht-layer ht-home" ref={el => (layers.current[0] = el)} aria-label="Introduction">
-        <div className="ht-sky" aria-hidden="true" />
-        <div className="ht-move"><IslandScene active={scene} onReady={onReady(0)} /></div>
-        <h1 className="ht-name ht-title">Brainilio</h1>
-        <div className="ht-move ht-intro-wrap">
-          <div className="ht-intro">
-            <p className="ht-roles">I build digital products<span>,</span> and the odd little world<span>.</span></p>
-            <p className="ht-lede">Full-stack, from REST APIs to 3D on the web. I explore new ideas and try to leave the world a little better than I found it.</p>
-            <p className="ht-stack">React · Node · TypeScript · Three.js</p>
-            <div className="ht-links">
-              <a className="ht-button" href="#work" onClick={event => { event.preventDefault(); jump(WORK); }}>See my work <span aria-hidden="true">↓</span></a>
-              <a className="ht-button ht-button-ghost" href="mailto:brainilioir@gmail.com">Say hello <span aria-hidden="true">↗</span></a>
-            </div>
+      <section className="ht-zone ht-home" id="home" ref={el => (zones.current[0] = el)} aria-label="Introduction">
+        <div className="ht-stage"><IslandScene active={scene} onReady={onReady(0)} /></div>
+        <h1 className="ht-name">Brainilio</h1>
+        <div className="ht-intro">
+          <p className="ht-roles">I build digital products<span>,</span> and the odd little world<span>.</span></p>
+          <p className="ht-lede">Full-stack, from REST APIs to 3D on the web. I explore new ideas and try to leave the world a little better than I found it.</p>
+          <p className="ht-stack">React · Node · TypeScript · Three.js</p>
+          <div className="ht-links">
+            <a className="ht-button" href="#work" onClick={event => { event.preventDefault(); jump(WORK); }}>See my work <span aria-hidden="true">↓</span></a>
+            <a className="ht-button ht-button-ghost" href="mailto:brainilioir@gmail.com">Say hello <span aria-hidden="true">↗</span></a>
           </div>
         </div>
-        <div className="ht-finish" aria-hidden="true" />
       </section>
 
-      {/* About: an evening by the river. The bear fishes and the fire crackles on their own; scrolling moves the
-          trail log (the career, newest first) beside them. */}
-      <section className="ht-layer ht-about" ref={el => (layers.current[ABOUT] = el)} aria-labelledby="ht-about-title">
-        <div className="ht-about-sky" aria-hidden="true" />
-        <div className="ht-move">{built[ABOUT] && <AboutScene state={scene} slot={ABOUT} onReady={onReady(ABOUT)} />}</div>
-        <div className="ht-about-copy ht-move-soft">
+      {/* About: an evening by the river, the diorama on the right. The bear fishes and the fire crackles on their own;
+          the words and the trail log (the career, newest first) scroll past on the left. */}
+      <section className="ht-zone ht-about" id="about" data-side="right" ref={el => (zones.current[ABOUT] = el)} aria-labelledby="ht-about-title">
+        <div className="ht-stage">{built[ABOUT] && <AboutScene state={scene} slot={ABOUT} side="right" onReady={onReady(ABOUT)} />}</div>
+        <div className="ht-copy">
           <h2 id="ht-about-title">Around the fire<span>.</span></h2>
           {/* PLACEHOLDER copy: replace with your own words. */}
           <p>I&apos;m a software developer who likes building things people enjoy using, from the API to the last bit of motion. Away from the keyboard you&apos;ll find me on a trail, on a road trip through a national park, or by a river with a line in the water.</p>
-        </div>
-        <div className="ht-trail-log">
           <ol className="ht-log">
             {EXPERIENCE.map((job, i) => (
               <li key={i} className={section === ABOUT && stop === i ? "is-here" : undefined}>
@@ -221,37 +171,43 @@ export default function Home() {
             ))}
           </ol>
         </div>
-        <div className="ht-finish" aria-hidden="true" />
       </section>
 
-      <section className="ht-layer ht-work" ref={el => (layers.current[WORK] = el)} aria-labelledby="ht-work-title">
-        <div className="ht-prairie-sky" aria-hidden="true" />
-        <p className="ht-ghost ht-title" aria-hidden="true">Work</p>
-        <div className="ht-move ht-move-3d">{built[WORK] && <PrairieScene state={scene} projects={work} slot={WORK} lite onReady={onReady(WORK)} />}</div>
-        <div className="ht-head ht-move-soft">
+      {/* Work: the bison mesa on the left, ringed by the project cards; the ring turns as the list scrolls past. */}
+      <section className="ht-zone ht-work ht-pinned" id="work" data-side="left" style={{ "--steps": work.length }} ref={el => (zones.current[WORK] = el)} aria-labelledby="ht-work-title">
+        <div className="ht-stage">{built[WORK] && <WorkScene state={scene} projects={work} slot={WORK} side="left" onReady={onReady(WORK)} />}</div>
+        <div className="ht-copy">
           <h2 id="ht-work-title">Things I&apos;ve built<span>.</span></h2>
+          <ol className="ht-list">
+            {work.map((project, i) => (
+              <li key={project.slug} className={section === WORK && stop === i ? "is-here" : undefined}>
+                <a href={`/project/${project.slug}/`}><span>{project.category}</span><b>{project.name} <i aria-hidden="true">→</i></b></a>
+              </li>
+            ))}
+          </ol>
         </div>
-        <div className="ht-finish" aria-hidden="true" />
-        <ul className="ht-sr">{work.map(project => <li key={project.slug}><a href={`/project/${project.slug}/`}>{project.name}</a></li>)}</ul>
       </section>
 
-      <section className="ht-layer ht-skills" ref={el => (layers.current[SKILLS_AT] = el)} aria-labelledby="ht-skills-title">
-        <div className="ht-valley-sky" aria-hidden="true" />
-        <p className="ht-ghost ht-title" aria-hidden="true">Skills</p>
-        <div className="ht-move ht-move-3d">{built[SKILLS_AT] && <RoadTripScene state={scene} skills={SKILLS} onCar={onCar} slot={SKILLS_AT} lite onReady={onReady(SKILLS_AT)} />}</div>
-        <div className="ht-head ht-move-soft">
+      {/* Skills: the park road on the right; the wagon drives sign to sign as the list scrolls past. */}
+      <section className="ht-zone ht-skills ht-pinned" id="skills" data-side="right" style={{ "--steps": SKILLS.length }} ref={el => (zones.current[SKILLS_AT] = el)} aria-labelledby="ht-skills-title">
+        <div className="ht-stage">{built[SKILLS_AT] && <SkillsScene state={scene} skills={SKILLS} onCar={onCar} slot={SKILLS_AT} side="right" onReady={onReady(SKILLS_AT)} />}</div>
+        <div className="ht-copy">
           <h2 id="ht-skills-title">What I bring along<span>.</span></h2>
-          <p className="ht-drive">Scroll or click the car to drive on</p>
+          <p className="ht-drive">Scroll or click the wagon to drive on</p>
+          <ol className="ht-list">
+            {SKILLS.map((skill, i) => (
+              <li key={skill.title} className={section === SKILLS_AT && stop === i ? "is-here" : undefined}>
+                <b>{skill.title}</b><span>{skill.items.join(" · ")}</span>
+              </li>
+            ))}
+          </ol>
         </div>
-        <div className="ht-finish" aria-hidden="true" />
-        <ul className="ht-sr">{SKILLS.map(skill => <li key={skill.title}>{skill.title}: {skill.items.join(", ")}</li>)}</ul>
       </section>
 
-      {/* Contact: the end of the road, on the Big Sur coast. The pointer steers the lighthouse beam through the fog. */}
-      <section className="ht-layer ht-contact" ref={el => (layers.current[CONTACT] = el)} aria-labelledby="ht-contact-title">
-        <div className="ht-coast-sky" aria-hidden="true" />
-        <div className="ht-move ht-move-3d">{built[CONTACT] && <CoastScene state={scene} onSpot={setSpotted} slot={CONTACT} lite onReady={onReady(CONTACT)} />}</div>
-        <div className="ht-contact-card ht-move-soft">
+      {/* Contact: the end of the road, on the Big Sur coast, full width. The pointer steers the lighthouse beam. */}
+      <section className="ht-zone ht-contact" id="contact" ref={el => (zones.current[CONTACT] = el)} aria-labelledby="ht-contact-title">
+        <div className="ht-stage">{built[CONTACT] && <CoastScene state={scene} onSpot={setSpotted} slot={CONTACT} lite onReady={onReady(CONTACT)} />}</div>
+        <div className="ht-contact-card">
           <h2 id="ht-contact-title">Let&apos;s build something<span>.</span></h2>
           <p>Have a project, a role or an idea worth exploring? I&apos;d love to hear about it.</p>
           <a className="ht-contact-email" href="mailto:brainilioir@gmail.com">brainilioir@gmail.com <span aria-hidden="true">↗</span></a>
@@ -272,7 +228,6 @@ export default function Home() {
             ))} by {group.author}{g < MODEL_CREDITS.length - 1 ? "; " : ""}</span>
           ))}. All <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">CC BY 3.0</a>, via Poly Pizza; other models CC0 (Quaternius) or made in code. No endorsement implied.
         </footer>
-        <div className="ht-finish" aria-hidden="true" />
       </section>
 
       {/* The loading screen: a little sun rising over the ridges while the worlds are built. */}

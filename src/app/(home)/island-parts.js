@@ -52,8 +52,8 @@ export const flatMaterial=()=>new THREE.MeshStandardMaterial({vertexColors:true,
 
 // The floating chunk: grassy top with a carved river bed, and a jagged, layered underside. Shaped by the island's
 // layout unless another one is passed (the About diorama has its own); `depth` scales how far the underside hangs and
-// `sand` is how far the sandy banks reach from the river.
-export function createIsland(seed=7,{outline:edgeAt=outline,heightAt:groundAt=heightAt,riverDistance:riverAt=riverDistance,depth=1,sand:bank=1.6}={}) {
+// `sand` is how far the sandy banks reach from the river; `grass` and `edge` recolour the top.
+export function createIsland(seed=7,{outline:edgeAt=outline,heightAt:groundAt=heightAt,riverDistance:riverAt=riverDistance,depth=1,sand:bank=1.6,grass=PALETTE.grass,edge:rim=PALETTE.edge}={}) {
   const r=random(seed),SEG=64,RINGS=14,top=[],grid=[];
   for(let ring=0;ring<=RINGS;ring++){
     const row=[];
@@ -71,7 +71,7 @@ export function createIsland(seed=7,{outline:edgeAt=outline,heightAt:groundAt=he
     const c=grid[ring-1][s],d=grid[ring-1][(s+1)%SEG];
     top.push([c,d,a],[d,b,a]);
   }
-  const grassColors=PALETTE.grass.map(h=>new THREE.Color(h)),sand=new THREE.Color(PALETTE.sand),edgeGreen=new THREE.Color(PALETTE.edge);
+  const grassColors=grass.map(h=>new THREE.Color(h)),sand=new THREE.Color(PALETTE.sand),edgeGreen=new THREE.Color(rim);
   const topGeometry=faceted(top,(tri,c)=>{
     const x=(tri[0].x+tri[1].x+tri[2].x)/3,z=(tri[0].z+tri[1].z+tri[2].z)/3,{d,t}=riverAt(x,z),edge=Math.hypot(x,z)/edgeAt(Math.atan2(z,x));
     c.copy(grassColors[Math.floor(r()*grassColors.length)]);

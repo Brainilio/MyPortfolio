@@ -3,18 +3,22 @@ import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { SKILLS } from "../(home)/content";
+import allProjects from "../../lib/projects";
 import { EXPERIMENTS } from "./experiments";
 import { ScrollIndicator, useScrollPlay } from "./scroll-play";
 import "../(home)/home.css";
 import "./journey.css";
+const PrairieScene = dynamic(() => import("../(home)/prairie-scene"), { ssr: false });
 const RoadTripScene = dynamic(() => import("../(home)/roadtrip-scene"), { ssr: false });
 const HikeScene = dynamic(() => import("../(home)/hike-scene"), { ssr: false });
 const CoastScene = dynamic(() => import("../(home)/coast-scene"), { ssr: false });
 
 // The full-size worlds that used to be homepage sections, each on its own. The scenes read the same shared state
 // the homepage gives them, here with a single slot: always on screen, never sliding, and (for the road trip)
-// with progress driven by scroll input.
+// with progress driven by scroll input (the road trip's drive, the prairie's ring of project cards).
+const work = allProjects.filter(project => project.slug && project.previewImage).slice(0, 5);
 const WORLDS = {
+  prairie: { sky: "ht-prairie-sky", scroll: 3, tone: "light" },
   "road-trip": { sky: "ht-valley-sky", scroll: 3, tone: "light" },
   hike: { sky: "ht-mountain-sky", tone: "light" },
   lighthouse: { sky: "ht-coast-sky", tone: "dark" },
@@ -39,6 +43,7 @@ export default function WorldExperiment({ slug }) {
   return (
     <div className="journey lab lab-world" data-tone={world.tone} data-bare={bare}>
       <div className={world.sky} aria-hidden="true" />
+      {experiment.world === "prairie" && <PrairieScene state={state} projects={work} slot={0} />}
       {experiment.world === "road-trip" && <RoadTripScene state={state} skills={SKILLS} onCar={onCar} slot={0} />}
       {experiment.world === "hike" && <HikeScene state={state} altitude={altitude} slot={0} />}
       {experiment.world === "lighthouse" && <CoastScene state={state} onSpot={setSpotted} slot={0} />}
