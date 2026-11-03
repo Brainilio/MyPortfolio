@@ -46,7 +46,7 @@ export default function IslandScene({ onEvent, active, onReady } = {}) {
     // The island and everything on it ride in one group, so it can float and be turned as a whole.
     const world=new THREE.Group();scene.add(world);
     const island=createIsland();world.add(island.group);
-    const water=createWater();world.add(water.group);
+    const water=createWater(undefined,undefined,{fall:2.6,fade:.75});world.add(water.group);
     const shared={uTime:{value:0},uBreeze:{value:.035},uGust:{value:.07}};
     const foliage=createFoliageMaterial(shared);
     const rng=random(21);

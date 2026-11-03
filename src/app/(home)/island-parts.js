@@ -92,18 +92,19 @@ export function createIsland(seed=7,{outline:edgeAt=outline,heightAt:groundAt=he
 }
 
 // River and waterfall: ribbons with a flowing, banded water shader. The river follows `path` (the island's unless
-// another is passed) until it leaves the land at `edgeAt`, then pours off the edge and drops `fall` units.
-export function createWater(path=riverPoints,edgeAt=outline,{width=1,fall=8}={}) {
-  const uniforms={uTime:{value:0},uFlow:{value:0},uSurge:{value:0},uLength:{value:1},uShallow:{value:new THREE.Color(PALETTE.water)},uDeep:{value:new THREE.Color(PALETTE.waterDeep)}};
+// another is passed) until it leaves the land at `edgeAt`, then pours off the edge and drops `fall` units, fading
+// out over the lower part of the drop.
+export function createWater(path=riverPoints,edgeAt=outline,{width=1,fall=8,fade=Math.max(.6,fall*.19)}={}) {
+  const uniforms={uTime:{value:0},uFlow:{value:0},uSurge:{value:0},uLength:{value:1},uFade:{value:fade},uShallow:{value:new THREE.Color(PALETTE.water)},uDeep:{value:new THREE.Color(PALETTE.waterDeep)}};
   const material=new THREE.ShaderMaterial({uniforms,transparent:true,depthWrite:false,side:THREE.DoubleSide,
     vertexShader:`varying vec2 vUv;uniform float uSurge,uTime;void main(){vUv=uv;vec3 p=position;p.y+=uSurge*.07*(1.+sin(uv.y*9.-uTime*8.));gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}`,
-    fragmentShader:`varying vec2 vUv;uniform float uTime,uFlow,uSurge,uLength;uniform vec3 uShallow,uDeep;
+    fragmentShader:`varying vec2 vUv;uniform float uTime,uFlow,uSurge,uLength,uFade;uniform vec3 uShallow,uDeep;
       void main(){
         float across=abs(vUv.x-.5)*2.,flow=fract(vUv.y*1.6-uFlow*.5+sin(vUv.x*9.+vUv.y*5.)*.06);
         float band=smoothstep(.0,.08,flow)*smoothstep(.22,.1,flow)*(1.-across*.7);
         float foam=smoothstep(.72,.95,across+sin(vUv.y*16.-uTime*3.)*.04);
         vec3 color=mix(uDeep,uShallow,across*.7+.15)+band*(.3+uSurge*.5)+foam*(.55+uSurge*.4)+uSurge*.12;
-        float fade=smoothstep(0.,.25,vUv.y)*(1.-smoothstep(uLength-.6,uLength,vUv.y));
+        float fade=smoothstep(0.,.25,vUv.y)*(1.-smoothstep(uLength-uFade,uLength,vUv.y));
         gl_FragColor=vec4(color,.92*fade);
         #include <colorspace_fragment>
       }`});
