@@ -33,11 +33,11 @@ const noRiver=()=>({d:99,t:0});
 const GAITS={Graze:[0,1.1,.003,0,0,.04],Walk:[.36,3.4,.006,.6,.035,.09],Run:[.62,7.5,.02,.95,.06,.14]};
 // Monument Valley, from real low-poly models (public/models/island/buttes.glb): Kenney's "Large Rock Formation" (CC0) as
 // the West Mitten, Danni Bittman's "Desert Pillar" (CC BY 3.0) as the East Mitten, and Poly by Google's layered "Cliff"
-// (CC BY 3.0) as the mesa. (x, z, node, height, turn, widen, foot radius): the West Mitten 55% of the island's ~10.8
-// diameter tall at the back left; the East Mitten 38% at the back right, sky between them; the mesa 18%, stretched
-// wider than tall, mid-left in front. The right and the front stay open for the herd. Swells (x, z, radius, height);
+// (CC BY 3.0) as the mesa. (x, z, node, height, turn, widen, foot radius): kept cartoon-small, like the hero island's peaks: the West
+// Mitten ~38% of the island's ~10.8 diameter tall at the back left; the East Mitten ~27% at the back right, sky between
+// them; the mesa ~13%, stretched wider than tall, mid-left in front. The right and the front stay open for the herd. Swells (x, z, radius, height);
 // the prairie dogs' mounds and the feed basket near the front.
-const BUTTES=[[-1.9,-2.3,"WestMitten",5.94,.3,1,1.5],[2.3,-2.1,"EastMitten",4.1,-.6,1,1.3],[-3,.9,"Mesa",1.95,.9,1.7,1.6]];
+const BUTTES=[[-2,-2.6,"WestMitten",4.1,.3,1,1.1],[2.2,-2.6,"EastMitten",2.9,-.6,1,.95],[-3.2,.6,"Mesa",1.4,.9,1.7,1.2]];
 const footOf=b=>b[6];
 const SWELLS=[[-1.4,.5,1.7,.13],[1.9,.6,1.6,.11],[.1,2.9,1.4,.08]];
 const MOUNDS=[[2.4,1.3],[0,2.5],[-.6,3.15]],BASKET=new THREE.Vector3(1.1,0,2);
@@ -108,7 +108,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     },undefined,()=>{});
     // Loose boulders tumbled off the talus, in the buttes' colours.
     {const base=new THREE.Color("#9e5226"),spots=[];
-      [[0,.7],[0,2.3],[1,1],[1,2.6],[2,.4],[2,2],[0,-.6]].forEach(([k,a])=>{const b=BUTTES[k],r=footOf(b)*(.92+rng()*.15);spots.push([b[0]+Math.cos(a)*r,b[1]+Math.sin(a)*r,(.3+rng()*.33)*(k===2?.7:1)]);});
+      [[0,.7],[0,2.3],[1,1],[1,2.6],[2,.4],[2,2],[0,-.6]].forEach(([k,a])=>{const b=BUTTES[k],r=footOf(b)*(.92+rng()*.15);spots.push([b[0]+Math.cos(a)*r,b[1]+Math.sin(a)*r,(.22+rng()*.24)*(k===2?.7:1)]);});
       const rocks=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1,1),new THREE.MeshLambertMaterial({flatShading:true}),spots.length),d=new THREE.Object3D();
       spots.forEach(([x,z,s],i)=>{d.position.copy(on(x,z,s*.25));d.rotation.set(rng()*.4,rng()*6,rng()*.4);d.scale.set(s*(1.05+rng()*.3),s*.7,s*(.85+rng()*.25));d.updateMatrix();rocks.setMatrixAt(i,d.matrix);rocks.setColorAt(i,base.clone().multiplyScalar(.9+rng()*.2));});
       world.add(rocks);}
