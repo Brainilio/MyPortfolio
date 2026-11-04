@@ -46,10 +46,14 @@ function createStage() {
   const entries = new Set(), last = new Map();
   let width = 0, height = 0, dirty = true, frame = 0, previous = performance.now(), host = null;
   const resize = () => {
-    width = window.innerWidth; height = window.innerHeight;
+    // The page's own width (window.innerWidth would include a scrollbar, stretching the drawing and shifting it off the
+    // islands' stages by that much at the right edge).
+    width = document.documentElement.clientWidth; height = window.innerHeight;
     renderer.setSize(width, height, false); dirty = true;
   };
   window.addEventListener("resize", resize); resize();
+  // (A scrollbar coming or going changes the page width without a window resize.)
+  new ResizeObserver(() => { if (document.documentElement.clientWidth !== width) resize(); }).observe(document.documentElement);
 
   function loop(now) {
     frame = requestAnimationFrame(loop);

@@ -111,29 +111,25 @@ body:has(.ht){background:#1b1335}
    as you scroll, alternating right and left: each drifts in from its side with a little spring and lands at its own
    slight tilt (--r), and stays. */
 .ht-cards{margin:0;padding:0;list-style:none}
-.ht-card{position:absolute;width:280px;opacity:0;pointer-events:none;transform:translate(120px,20px) rotate(4deg);transition:transform .7s cubic-bezier(.34,1.56,.64,1),opacity .5s ease}
+.ht-card{position:absolute;width:360px;opacity:0;pointer-events:none;transform:translate(120px,20px) rotate(4deg);transition:transform .7s cubic-bezier(.34,1.56,.64,1),opacity .5s ease}
 .ht-card.is-left{transform:translate(-120px,20px) rotate(-4deg)}
 .ht-card.is-placed{opacity:1;pointer-events:auto;transform:rotate(var(--r))}
 .ht-card.is-placed:hover{transform:translateY(-6px) rotate(var(--r));transition:transform .25s ease,opacity .5s ease}
-/* The card is just the picture, as liquid: no frame or caption, a softly breathing rounded outline, and a ripple
-   (an SVG displacement, see liquid-card.js) when the pointer passes over it. The project's name is its link's label. */
-.ht-liquid{display:block;border-radius:28px;box-shadow:0 18px 40px rgba(42,22,54,.22),0 4px 12px rgba(42,22,54,.12);transition:box-shadow .3s ease}
+/* The card is just the picture: no frame or caption, gently rounded corners, and a shader ripple (liquid-card.js) that
+   runs through it when the pointer passes over. The project's name is its link's label. */
+.ht-liquid{display:block;border-radius:10px;box-shadow:0 18px 40px rgba(42,22,54,.22),0 4px 12px rgba(42,22,54,.12);transition:box-shadow .3s ease}
 .ht-liquid:hover{box-shadow:0 26px 54px rgba(42,22,54,.28),0 6px 16px rgba(42,22,54,.14)}
 .ht-liquid:focus-visible{outline:2px solid var(--violet);outline-offset:6px}
-.ht-liquid-filter{position:absolute;width:0;height:0;overflow:hidden}
-.ht-liquid-media{display:block;aspect-ratio:16/10;overflow:hidden;border-radius:28px 34px 30px 26px / 30px 26px 34px 28px;background:linear-gradient(135deg,var(--violet),#f4a089);animation:ht-blob 9s ease-in-out infinite alternate;will-change:border-radius}
-.ht-liquid-media img,.ht-liquid-media video{display:block;width:100%;height:100%;object-fit:cover;transform:scale(1.04)}
-@keyframes ht-blob{
-  0%{border-radius:28px 34px 30px 26px / 30px 26px 34px 28px}
-  50%{border-radius:40px 24px 36px 30px / 26px 38px 24px 36px}
-  100%{border-radius:24px 38px 26px 40px / 36px 28px 40px 24px}}
+.ht-liquid-media{position:relative;display:block;aspect-ratio:16/10;overflow:hidden;border-radius:10px;background:linear-gradient(135deg,var(--violet),#f4a089)}
+.ht-liquid-media img,.ht-liquid-media video{display:block;width:100%;height:100%;object-fit:cover}
+.ht-liquid-shader{position:absolute;inset:0;width:100%;height:100%;opacity:0;pointer-events:none}
 @media(min-width:761px){
   .ht-zone.ht-work .ht-copy{width:auto;margin:-100svh 0 0;padding:0;display:block;pointer-events:none}
   .ht-work-head{position:absolute;z-index:2;top:clamp(92px,12svh,128px);left:50%;width:min(480px,90vw);transform:translateX(-50%);text-align:center}
   .ht-work-head p.ht-drive{margin-top:10px}
   /* Right-hand cards just off the island's right edge, left-hand ones off its left, at staggered heights. */
-  .ht-card.is-right{left:calc(78% - 40px)}
-  .ht-card.is-left{left:calc(22% - 240px)}
+  .ht-card.is-right{left:calc(78% - 90px)}
+  .ht-card.is-left{right:calc(78% - 90px)}
   .ht-card:nth-child(1){top:22%}.ht-card:nth-child(2){top:36%}.ht-card:nth-child(3){top:52%}.ht-card:nth-child(4){top:62%}
   .ht-work .ht-copy>p.ht-more{position:absolute;z-index:2;left:50%;bottom:clamp(28px,6svh,64px);transform:translate(-50%,16px);margin:0;justify-content:center}
   .ht-work .ht-copy>p.ht-more.is-shown{transform:translate(-50%,0)}
@@ -141,7 +137,7 @@ body:has(.ht){background:#1b1335}
 /* Below the pile: the rest of the work, and the Lab. */
 .ht-copy>p.ht-more{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 0;opacity:0;pointer-events:none;transform:translateY(16px);transition:opacity .4s ease-out,transform .4s ease-out}
 .ht-copy>p.ht-more.is-shown{opacity:1;pointer-events:auto;transform:none}
-@media(max-width:1199px){.ht-card{width:240px}}
+@media(max-width:1199px){.ht-card{width:290px}}
 .ht-more a{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:999px;font-size:.92rem;font-weight:600;transition:transform .25s ease,box-shadow .25s ease,background .25s ease}
 /* Primary: the rest of the work; secondary: the Lab. Both solid, so they read as buttons against the sky. */
 .ht-more a:first-child{background:#7c3aed;color:#fff;box-shadow:0 10px 24px rgba(124,58,237,.35)}
@@ -270,7 +266,7 @@ html.ht-locked{overflow:hidden}
   .ht-list b{font-size:16px}
   .ht-work.ht-pinned .ht-copy{justify-content:flex-end;padding:0 0 84px}
   /* Phones: one centred spot under the island; each new card rises into it from below, on top of the last. */
-  .ht-cards{position:relative;width:min(280px,100%);height:200px;margin:14px auto 0}
+  .ht-cards{position:relative;width:min(340px,100%);height:220px;margin:14px auto 0}
   .ht-card,.ht-card.is-left{left:0;top:0;width:100%;transform:translateY(40px) rotate(var(--r))}
   .ht-card.is-placed{transform:rotate(var(--r))}
   .ht-liquid-media{aspect-ratio:16/9}
@@ -312,7 +308,6 @@ html.ht-locked{overflow:hidden}
 @media(prefers-reduced-motion:reduce){.ht-finish:after{animation:none}
   .ht-reveal .ht-word,.ht-reveal .ht-dot{clip-path:none;transform:none;transition:none}
   .ht-card,.ht-liquid,.ht-copy>p.ht-more{transition:none}
-  .ht-liquid-media{animation:none}
   .ht.is-entered .ht-home .ht-canvas,.ht.is-entered .ht-intro>*{animation:ht-show .4s ease both;animation-delay:0s!important}
   .ht.is-entered .ht-name-window,.ht.is-entered .ht-name{animation:none}
   .ht.is-entered .ht-name-window>span{animation:ht-show .4s ease both!important}}
