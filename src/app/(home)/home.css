@@ -19,7 +19,7 @@ body:has(.ht){background:#1b1335}
 /* The skies: fixed behind the page, each fading in as its section arrives (opacity set on scroll). */
 .ht-skies{position:fixed;inset:0;z-index:0;pointer-events:none}
 .ht-motes{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.ht-sky-live{position:absolute;inset:0;background:linear-gradient(180deg,#0d0820 0%,#2d1060 50%,#7a3d8f 100%)}
+.ht-sky-live{position:absolute;inset:0;background:linear-gradient(180deg,#1b1335 0%,#33225a 30%,#6e4a8f 55%,#c9849c 80%,#f3b89c 100%)}
 /* A section: the diorama's stage stays pinned while the words scroll past on the other side. */
 .ht-zone{position:relative;min-height:100svh}
 .ht-stage{position:sticky;top:0;z-index:2;height:100svh}
@@ -96,6 +96,12 @@ body:has(.ht){background:#1b1335}
 .ht-skills .ht-stage{-webkit-mask-image:linear-gradient(270deg,#000 75%,transparent);mask-image:linear-gradient(270deg,#000 75%,transparent)}
 .ht-list li{color:var(--ink)}
 .ht-list b i{color:#7c5cdb}
+/* On the light skies the words and chrome turn ink. */
+.ht[data-section=work] .ht-header,.ht[data-section=skills] .ht-header{color:var(--ink)}
+.ht[data-section=work] .ht-available,.ht[data-section=skills] .ht-available{border-color:rgba(42,22,54,.25)}
+.ht-work .ht-copy,.ht-skills .ht-copy{color:var(--ink)}
+.ht-work .ht-copy h2 .ht-dot,.ht-skills .ht-copy h2 .ht-dot{color:#7c5cdb}
+.ht-work .ht-copy p.ht-drive,.ht-skills .ht-copy p.ht-drive{color:rgba(42,22,54,.6)}
 .ht-copy p.ht-drive{margin:14px 0 0;font-size:14px;color:rgba(251,247,255,.62)}
 /* Work: the island in the middle with its heading above, and the cards floating off its right edge in 3D: a
    perspective box, each card turned to show its left edge (a little spine) and casting a shadow down and to the left.
@@ -131,8 +137,8 @@ body:has(.ht){background:#1b1335}
 }
 /* Below the pile: the rest of the work, and the Lab. */
 .ht-copy>p.ht-more{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 0}
-.ht-more a{padding:6px 16px;border-radius:999px;border:1px solid var(--violet);color:var(--violet);font-size:.8rem;font-weight:600;transition:background .3s,color .3s}
-.ht-more a:hover{background:var(--violet);color:#fff}
+.ht-more a{padding:6px 16px;border-radius:999px;border:1px solid #7c5cdb;color:#7c5cdb;font-size:.8rem;font-weight:600;transition:background .3s,color .3s}
+.ht-more a:hover{background:#7c5cdb;color:#fff}
 /* Skills: a plain list beside the diorama; the entry for the wagon's stop lights up. */
 .ht-list{margin:30px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
 .ht-list li{padding:16px 20px;border-radius:16px;background:rgba(255,255,255,.38);border:1px solid rgba(255,255,255,.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:background .5s,transform .5s,box-shadow .5s}

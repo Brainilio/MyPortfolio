@@ -29,16 +29,16 @@ const SECTIONS = [
   { id: "skills", label: "Skills", steps: SKILLS.length },
   { id: "contact", label: "Contact", steps: 1 },
 ];
-// One sky for the whole page: a three-colour gradient (top, middle, bottom) that shifts continuously with how far down
+// One sky for the whole page: a five-colour gradient (top to bottom) that shifts continuously with how far down
 // the page you are. Each stop belongs to a section and sits where that section is settled on screen; the last two
 // are the coast as you arrive and at the very end.
 const SKY = [
-  ["#0d0820", "#2d1060", "#7a3d8f"], // Home
-  ["#0a0618", "#1a0d45", "#4a2070"], // About
-  ["#3d1f0a", "#8b4a1a", "#d4875a"], // Work
-  ["#6b3d0a", "#c47820", "#e8c878"], // Skills
-  ["#0a1a2d", "#0d3050", "#2d6080"], // Contact, arriving
-  ["#061520", "#0a2540", "#1a4860"], // Contact, the end
+  ["#1b1335", "#33225a", "#6e4a8f", "#c9849c", "#f3b89c"], // Home: dusk
+  ["#120e2c", "#1f1846", "#3d2c66", "#7a4f86", "#b27390"], // About: blue hour by the fire
+  ["#5f5d8c", "#b57796", "#f5a389", "#f9c195", "#f2b98f"], // Work: prairie sunset
+  ["#e9bfa0", "#f1cba8", "#f6d8b5", "#f6d6b4", "#f0cba6"], // Skills: warm valley morning
+  ["#4f8cc6", "#86b1d8", "#c4d7e5", "#d4e0e7", "#d4e0e7"], // Contact: Big Sur, arriving
+  ["#4f8cc6", "#86b1d8", "#c4d7e5", "#d4e0e7", "#d4e0e7"], // Contact, the end
 ].map(stops => stops.map(hex => [1, 3, 5].map(k => parseInt(hex.slice(k, k + 2), 16))));
 const mix = (a, b, t) => a.map((c, k) => Math.round(c + (b[k] - c) * t));
 // Between About, Work, Skills and Contact the page holds a beat of open sky: each of those sections runs on for TAIL
@@ -209,7 +209,7 @@ export default function Home() {
       const end = Math.max(1, document.documentElement.scrollHeight - vh), marks = [...stops.slice(0, 5).map(v => v / end), 1], p = clamp(y / end);
       let k = 0; while (k < marks.length - 2 && p > marks[k + 1]) k++;
       const blend = clamp((p - marks[k]) / Math.max(1e-6, marks[k + 1] - marks[k])), colors = SKY[k].map((c, n) => mix(c, SKY[k + 1][n], blend));
-      if (sky.current) sky.current.style.background = `linear-gradient(180deg,rgb(${colors[0]}) 0%,rgb(${colors[1]}) 50%,rgb(${colors[2]}) 100%)`;
+      if (sky.current) sky.current.style.background = `linear-gradient(180deg,${colors.map((c, n) => `rgb(${c}) ${[0, 30, 55, 80, 100][n]}%`).join(",")})`;
       motes.strength.current = clamp(1 - shown * 1.4);if (motes.strength.current > .01) motes.start();
       scene.current.live = live;scene.current.section = dominant;
       pill.current?.style.setProperty("--progress", scene.current.progress[dominant].toFixed(4));
