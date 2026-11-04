@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
-import { adaptivePixelRatio } from "./perf";
+import { getStage } from "./stage";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { clone as cloneSkinned } from "three/addons/utils/SkeletonUtils.js";
@@ -37,11 +37,9 @@ export default function CoastScene({ state, onSpot, onReady, slot = 4, lite: lig
   spotted.current=onSpot;
   useEffect(()=>{
     const mount=host.current;
-    let renderer,disposed=false,raf=0;
-    try { renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:"high-performance"}); } catch { ready.current?.(); return; }
-    const adapt=adaptivePixelRatio(renderer,{onChange:()=>frameSize()});
-    renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
-    mount.appendChild(renderer.domElement);
+    let disposed=false;
+    // Drawn on the page's one shared canvas (stage.js), into this stage's rectangle.
+    const shared_=getStage();if(!shared_){ready.current?.();return;}const renderer=shared_.renderer;
     const preference=matchMedia("(prefers-reduced-motion: reduce)"),lite=light||matchMedia("(pointer: coarse)").matches;
     const onScreen=()=>state.current.live.includes(slot);
     const scene=new THREE.Scene();// Haze only in the distance: the foreground stays crisp, the far coast and the horizon melt into it.
@@ -329,7 +327,7 @@ export default function CoastScene({ state, onSpot, onReady, slot = 4, lite: lig
     let tall=false;
     // The view window; its vertical offset follows the section hand-off, so the scene slides like the others.
     const view={w:1,h:1,full:[1,1]},applyView=()=>{const shift=state.current.shift?.[slot]??0;camera.setViewOffset(view.full[0],view.full[1],0,shift*view.h*.28,view.w,view.h);};
-    function frameSize(){const w=mount.clientWidth,h=mount.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;tall=camera.aspect<.85;camera.fov=tall?56:36;
+    function frameSize(){const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;tall=camera.aspect<.85;camera.fov=tall?56:36;
       // The lighthouse and the open sea sit right of centre, clear of the contact card (lower on a phone, under it).
       view.w=w;view.h=h;view.full=tall?[w,h*1.4]:[w*1.2,h];applyView();camera.updateProjectionMatrix();
       const s=h*renderer.getPixelRatio()/(2*Math.tan(camera.fov*Math.PI/360));fogUniforms.uScale.value=s;splashUniforms.uScale.value=s;sprayUniforms.uScale.value=s;}
@@ -376,18 +374,19 @@ export default function CoastScene({ state, onSpot, onReady, slot = 4, lite: lig
       for(const b of gulls){const u=b.userData;u.a+=step*u.speed;b.position.set(shoreX(u.z)+Math.cos(u.a)*u.r,u.h+Math.sin(u.a*2),u.z+Math.sin(u.a)*u.r*1.4);b.rotation.set(0,-u.a,Math.sin(u.a)*.3);
         const glide=Math.sin(t*.8+u.flap)>.2,f=glide?.1:Math.sin(t*9+u.flap)*.55;u.wings[0].rotation.z=f;u.wings[1].rotation.z=-f;}
       ocean.material.uniforms.uTime.value=t;fogUniforms.uTime.value=t;sprayUniforms.uTime.value=t;
-      applyView();renderer.render(scene,camera);
+      applyView();
     }
-    function draw(){raf=requestAnimationFrame(draw);const dt=Math.min(clock.getDelta(),.05);if(onScreen()&&!document.hidden&&!window.__coastHold){tick(dt);adapt(dt,state.current.live.length===1);}}
-    draw();
+    // Called by the shared frame loop: full rate while on screen. The top of the view fades into the sky, as it arrives
+    // under the section above.
+    function draw(dt){if(!onScreen()||document.hidden||window.__coastHold)return false;tick(Math.min(dt,.05));return true;}
+    const unregister=shared_.register({mount,scene,camera,draw,exposure:1.05,fade:{side:"top",from:.78}});
     const readyTimer=setTimeout(()=>ready.current?.(),0);
     if(new URLSearchParams(window.location.search).has("debug"))window.__coast={step:(n=30)=>{for(let i=0;i<n;i++)tick(1/30);},scene,camera,creatures,renderer,aimTarget,THREE};
 
     return()=>{
       clearTimeout(readyTimer);
-      disposed=true;cancelAnimationFrame(raf);resize.disconnect();delete window.__coast;window.removeEventListener("pointermove",onPointer);window.removeEventListener("pointermove",onLean);
+      disposed=true;unregister();resize.disconnect();delete window.__coast;window.removeEventListener("pointermove",onPointer);window.removeEventListener("pointermove",onLean);
       scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat())if(m){m.map?.dispose();m.dispose();}});
-      renderer.dispose();renderer.domElement.remove();
     };
   },[state,slot,light]);
   return <div className="ht-coast-canvas" ref={host} aria-hidden="true" />;
