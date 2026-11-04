@@ -5,9 +5,9 @@ import * as THREE from "three";
 import { getStage } from "./stage";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
-import { random, createIsland, createPineGeometry, createSwayingInstances, createFoliageMaterial, flatMaterial, createSpin, tilted } from "./island-parts";
+import { random, createIsland, createPineGeometry, createSwayingInstances, createFoliageMaterial, flatMaterial, createSpin, tilted, bakeProp } from "./island-parts";
 import { paintGeometry } from "./forest-parts";
-import { createSign, createTetons } from "./park-parts";
+import { createSign } from "./park-parts";
 import { loadWagon } from "./wagon";
 
 // Skills as the road trip in miniature, the island's daytime cousin: a floating patch of national park with a road
@@ -76,7 +76,6 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, side = "ri
       world.add(new THREE.Mesh(geometry,asphalt));}
 
     // The Tetons at the back, a hot spring in rings of colour, and the geyser's sinter cone where the road ends.
-    const tetons=createTetons(rng);tetons.position.copy(on(RANGE.x,RANGE.y,-.2));tetons.rotation.y=.42;tetons.scale.setScalar(.95);world.add(tetons);
     {const c=document.createElement("canvas");c.width=c.height=128;const g=c.getContext("2d"),grad=g.createRadialGradient(64,64,0,64,64,64);
       [[0,"#1f6f9a"],[.35,"#3fa7c4"],[.55,"#8fd1b0"],[.7,"#f2d36a"],[.84,"#e9883e"],[.96,"#c4572e"],[1,"rgba(196,87,46,0)"]].forEach(([k,col])=>grad.addColorStop(k,col));g.fillStyle=grad;g.fillRect(0,0,128,128);
       const texture=new THREE.CanvasTexture(c);texture.colorSpace=THREE.SRGBColorSpace;
@@ -144,6 +143,16 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, side = "ri
 
     // A moose grazing by the hot spring (Poly Pizza, see public/models/CREDITS.md).
     const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+    // The mountains at the back: the hero island's low-poly peak (Quaternius "Mountains", in kit.glb, already loaded
+    // for the hero), recoloured onto the palette, a big one and a smaller one beside it as a little range.
+    loader.load("/models/island/kit.glb",gltf=>{
+      if(disposed)return;let node=null;gltf.scene.traverse(o=>{if(!node&&o.name.startsWith("Mountain"))node=o;});if(!node)return;
+      node.position.set(0,0,0);const geometry=bakeProp(node);geometry.translate(0,-geometry.boundingBox.min.y,0);
+      const material=new THREE.MeshStandardMaterial({vertexColors:true,flatShading:true,roughness:.95});
+      [[RANGE.x+.3,RANGE.y+.45,1.4,.4],[RANGE.x-.85,RANGE.y+1.15,.95,2.3]].forEach(([x,z,k,turn])=>{
+        const peak=new THREE.Mesh(geometry,material);peak.scale.setScalar(k);peak.position.set(x,heightAt(x,z)-.22,z);peak.rotation.y=turn;world.add(peak);});
+      needsRender=true;
+    },undefined,()=>{});
     loader.load("/models/island/moose.glb",gltf=>{if(disposed)return;const model=gltf.scene,box=new THREE.Box3().setFromObject(model),size=box.getSize(new THREE.Vector3());
       const k=.75/size.y;model.scale.setScalar(k);model.traverse(o=>{if(o.isMesh){o.material=o.material.clone();o.material.flatShading=true;o.material.metalness=0;}});
       model.position.copy(on(POOL.x+1.5,POOL.y-.7));model.position.y-=box.min.y*k;model.rotation.y=-2.2;world.add(model);needsRender=true;},undefined,()=>{});
@@ -173,7 +182,7 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, side = "ri
     // Driving: the wagon glides (critically damped) to where the scroll says; at the last stop it swings round to
     // face the geyser, which goes off as it pulls up.
     let facing=0,u=STATIONS[0],uVel=0,hop=-1,turn=0,time=0,since=0,needsRender=true,snap=true,wasLive=false,arrived=false;
-    const point=new THREE.Vector3(),tangent=new THREE.Vector3();
+    const point=new THREE.Vector3(),tangent=new THREE.Vector3(),carAim=new THREE.Matrix4(),ORIGIN=new THREE.Vector3(),UP=new THREE.Vector3(0,1,0);
     function tick(dt){
       const reduced=preference.matches,step=reduced?0:dt;time+=step;
       const q=state.current.progress[slot]*(STATIONS.length-1),k=Math.min(STATIONS.length-2,Math.floor(q)),goal=STATIONS[k]+(STATIONS[k+1]-STATIONS[k])*(q-k);
@@ -181,7 +190,9 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, side = "ri
       if(snap||reduced){snap=false;u=goal;uVel=0;}
       else{const w=2/.8,x=w*dt,decay=1/(1+x+.48*x*x+.235*x*x*x),change=u-goal,temp=(uVel+w*change)*dt;uVel=(uVel-w*temp)*decay;u=goal+(change+temp)*decay;}
       ROAD.getPointAt(THREE.MathUtils.clamp(u,0,1),point);ROAD.getTangentAt(THREE.MathUtils.clamp(u,0,.999),tangent);
-      car.position.copy(on(point.x,point.z,.03));car.lookAt(car.position.clone().add(tangent));
+      // (Facing along the road in the island's own space: lookAt would aim at a world-space point and point the wagon
+      // off the road once the island is spun.)
+      car.position.copy(on(point.x,point.z,.03));carAim.lookAt(tangent,ORIGIN,UP);car.quaternion.setFromRotationMatrix(carAim);
       const end=goal>=STATIONS.at(-1)-1e-4&&Math.abs(u-STATIONS.at(-1))<.03;
       turn+=((end&&!reduced?1:0)-turn)*(1-Math.exp(-step*3));
       {let face=Math.atan2(GEYSER.x-point.x,GEYSER.y-point.z)-Math.atan2(tangent.x,tangent.z);face=Math.atan2(Math.sin(face),Math.cos(face));body.rotation.y=turn*face;facing=face;}
