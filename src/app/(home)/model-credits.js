@@ -5,11 +5,9 @@ export const MODEL_CREDITS = [
     ["Black bear", "56ym_pyVnel"], ["Eagle", "d7CSLvsHULY"], ["Bison", "9sTrha-TxdS"], ["Gopher", "2IatILCJa3X"],
     ["Antelope", "dC2-G-IF8rz"], ["Elk", "bO8XPdrAb5G"], ["Moose antlers", "cX6NECw97x7"], ["Squirrel", "caxos24uWC9"],
     ["Cottontail rabbit", "3vvONbRCuEF"], ["Cougar", "8nuCN-gn2s-"], ["Killer Whale", "7pqZEQ9b_E-"], ["Sea lion", "45HRvXYpvUG"], ["Kayak", "6wu_h830iRe"],
-    ["Cliff", "bN-rWrWm3mC"], ["Mallard duck", "frSLi6b6Vid"],
+    ["Mallard duck", "frSLi6b6Vid"],
   ] },
   { author: "Leigh Garland", works: [["Desert boulder", "dJvxGOx16m0"]] },
   { author: "Sherkiz", works: [["Hawk Lp Rigged", "RkN6MEbP6g"]] },
-  { author: "Danni Bittman", works: [["Desert Pillar", "708JmtEKqEU"]] },
   { author: "Eric Wilson", works: [["Loaded Wagon", "2fwnYnnxB9d"]] },
-  { author: "J-Toastie", works: [["Cowboy Hat", "jcXfae4GiZ"]] },
 ];

@@ -17,7 +17,7 @@ import { SKILLS } from "./content";
 const work = allProjects.filter(project => project.slug && project.previewImage).slice(0, 4);
 
 // Every model the homepage loads (fetched up front by the loading screen).
-const MODELS = ["kit", "stag", "deer", "fox", "bear", "eagle", "bison", "prairiedog", "wagon", "buttes", "moose", "orca", "shark", "sealion", "kayak"].map(name => `/models/island/${name}.glb`);
+const MODELS = ["kit", "stag", "deer", "fox", "bear", "eagle", "bison", "prairiedog", "wagon", "duck", "moose", "orca", "shark", "sealion", "kayak"].map(name => `/models/island/${name}.glb`);
 const LOADING_LINES = ["Raising the island", "Stoking the campfire", "Rounding up the bison", "Packing the wagon", "Lighting the lighthouse"];
 
 // One long page. Each section is a floating diorama that holds still (sticky) while its words scroll past on the other
@@ -50,8 +50,6 @@ const ARRIVE = 14, DEPART = 10;
 // Which slot each scene reads in the shared scroll state.
 const ABOUT = 1, WORK = 2, SKILLS_AT = 3, CONTACT = 4;
 const clamp = v => Math.min(1, Math.max(0, v));
-// The Work section's scene tester: which 3D scene its island shows (work-scene.js builds all four up front).
-const WORK_SCENES = { A: "Current fixed", B: "Yellowstone", C: "Cowboy", D: "Sky only", E: "Cowboy hat" };
 // The Work section's card-layout tester (work-cards.js).
 const CARD_LAYOUTS = { A: "Orbital ring", B: "Ticker", C: "Staggered stack", D: "Focused" };
 
@@ -111,8 +109,7 @@ export default function Home() {
   // Shared with the 3D scenes (read every frame): which sections are on screen and how far through each one we are.
   const scene = useRef({ section: 0, live: [0], progress: [0, 0, 0, 0, 0], tilt: [0, 0, 0, 0, 0] });
   const [spotted, setSpotted] = useState([]), [still, setStill] = useState(false);
-  const [workScene, setWorkScene] = useState("A"), [cardLayout, setCardLayout] = useState("A");
-  useEffect(() => { scene.current.workVariant = workScene; }, [workScene]);
+  const [cardLayout, setCardLayout] = useState("A");
   // Reduced motion, and phones: the Work postcard shows its still image instead of playing its preview.
   useEffect(() => {
     const queries = [matchMedia("(prefers-reduced-motion: reduce)"), matchMedia("(max-width: 760px)")], sync = () => setStill(queries.some(q => q.matches));
@@ -333,15 +330,6 @@ export default function Home() {
       </div>
 
       <div className="ht-progress" ref={bar} aria-hidden="true" />
-      {/* The Work scene tester: shown only while Work is the section on screen. */}
-      {section === WORK && (
-        <div className="ht-tester">
-          <div className="ht-tester-pill" role="group" aria-label="Work scene">
-            {Object.keys(WORK_SCENES).map(key => <button key={key} type="button" aria-pressed={workScene === key} title={WORK_SCENES[key]} onClick={() => setWorkScene(key)}>{key}</button>)}
-          </div>
-          <span className="ht-tester-label">{WORK_SCENES[workScene]}</span>
-        </div>
-      )}
       {/* The Work card-layout tester, on the other side: shown only while Work is the section on screen. */}
       {section === WORK && (
         <div className="ht-tester ht-tester-cards">
