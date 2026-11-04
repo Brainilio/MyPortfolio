@@ -55,7 +55,8 @@ export const flatMaterial=()=>new THREE.MeshStandardMaterial({vertexColors:true,
 // `sand` is how far the sandy banks reach from the river; `grass` and `edge` recolour the top.
 // Options: hub moves the point every ring closes in on (somewhere it's hidden, say under a rock), and scatter nudges the
 // inner points sideways (a fraction of a segment) so the facets don't line up into spokes on open ground.
-export function createIsland(seed=7,{outline:edgeAt=outline,heightAt:groundAt=heightAt,riverDistance:riverAt=riverDistance,depth=1,sand:bank=1.6,grass=PALETTE.grass,edge:rim=PALETTE.edge,hub=null,scatter=0}={}) {
+// paint(x, z, colour), if given, gets the last word on each top face's colour (at the face's centre).
+export function createIsland(seed=7,{outline:edgeAt=outline,heightAt:groundAt=heightAt,riverDistance:riverAt=riverDistance,depth=1,sand:bank=1.6,grass=PALETTE.grass,edge:rim=PALETTE.edge,hub=null,scatter=0,paint=null}={}) {
   const r=random(seed),SEG=64,RINGS=14,top=[],grid=[];
   for(let ring=0;ring<=RINGS;ring++){
     const row=[];
@@ -80,6 +81,7 @@ export function createIsland(seed=7,{outline:edgeAt=outline,heightAt:groundAt=he
     c.copy(grassColors[Math.floor(r()*grassColors.length)]);
     if(edge>.86)c.lerp(edgeGreen,.6);
     if(t>0&&d<bank)c.copy(sand);
+    paint?.(x,z,c);
   });
   // Underside: shrinking, jittered rings down to a point, banded dirt then rock.
   const rings=[grid[RINGS]],layers=[[.97,-.7],[.82,-2],[.62,-3.6],[.4,-5.3],[.18,-7]].map(([k,y])=>[k,y*depth]);
@@ -98,7 +100,8 @@ export function createIsland(seed=7,{outline:edgeAt=outline,heightAt:groundAt=he
 // another is passed) at height `level` until it leaves the land at `edgeAt`, then pours off the edge and drops `fall`
 // units, fading out over the lower part of the drop (and in over `head` at the start). `volume` rounds the ribbon's cross-section (a fraction of its
 // width): the river swells up in the middle and the waterfall bows outward, so it reads as a body of water.
-export function createWater(path=riverPoints,edgeAt=outline,{width=1,fall=8,fade=Math.max(.6,fall*.19),level=-.2,volume=0,head=.25}={}) {
+// pour: false ends it on the land (into a lake, say) with no waterfall; shape(k) then scales its width along it (0 → 1).
+export function createWater(path=riverPoints,edgeAt=outline,{width=1,fall=8,fade=Math.max(.6,fall*.19),level=-.2,volume=0,head=.25,pour=true,shape=null}={}) {
   const uniforms={uTime:{value:0},uFlow:{value:0},uSurge:{value:0},uLength:{value:1},uFade:{value:fade},uHead:{value:head},uShallow:{value:new THREE.Color(PALETTE.water)},uDeep:{value:new THREE.Color(PALETTE.waterDeep)}};
   const material=new THREE.ShaderMaterial({uniforms,transparent:true,depthWrite:false,side:THREE.DoubleSide,
     vertexShader:`varying vec2 vUv;uniform float uSurge,uTime;void main(){vUv=uv;vec3 p=position;p.y+=uSurge*.07*(1.+sin(uv.y*9.-uTime*8.));gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}`,
@@ -140,10 +143,12 @@ export function createWater(path=riverPoints,edgeAt=outline,{width=1,fall=8,fade
   // One continuous sheet: the river curls over the lip and pours straight down.
   const lip=flowing.at(-1),out=new THREE.Vector3(lip.x,0,lip.z).normalize(),stream=[...flowing];
   const drop=level+.2;
-  [[.22,-.24],[.42,-.36],[.56,-.62],[.62,-1]].forEach(([o,y])=>stream.push(new THREE.Vector3(lip.x+out.x*o,y+drop,lip.z+out.z*o)));
-  for(let i=1;i<=20;i++){const t=i/20;stream.push(new THREE.Vector3(lip.x+out.x*(.62+t*t*1.3),-1+drop-t*fall,lip.z+out.z*(.62+t*t*1.3)));}
+  if(pour){
+    [[.22,-.24],[.42,-.36],[.56,-.62],[.62,-1]].forEach(([o,y])=>stream.push(new THREE.Vector3(lip.x+out.x*o,y+drop,lip.z+out.z*o)));
+    for(let i=1;i<=20;i++){const t=i/20;stream.push(new THREE.Vector3(lip.x+out.x*(.62+t*t*1.3),-1+drop-t*fall,lip.z+out.z*(.62+t*t*1.3)));}
+  }
   const span=list=>list.reduce((sum,p,i)=>i?sum+p.distanceTo(list[i-1]):0,0),riverShare=span(flowing)/span(stream);
-  const geometry=ribbon(stream,k=>width*(k<riverShare?.62+.3*(k/riverShare)+.08*Math.sin(k*20):.92-(k-riverShare)*.45));
+  const geometry=ribbon(stream,shape?k=>width*shape(k):k=>width*(k<riverShare?.62+.3*(k/riverShare)+.08*Math.sin(k*20):.92-(k-riverShare)*.45));
   uniforms.uLength.value=geometry.attributes.uv.array.at(-1);
   const group=new THREE.Group();group.add(new THREE.Mesh(geometry,material));
   return {group,uniforms,lip,path:flowing};

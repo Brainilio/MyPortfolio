@@ -503,7 +503,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       clearTimeout(readyTimer);delete window.__work;disposed=true;unregister();wide.removeEventListener("change",syncFade);resize.disconnect();observer.disconnect();
       spin.dispose();canvas.removeEventListener("pointermove",onHover);
       scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat())m?.dispose();});
-      sunTexture.dispose();cowboy.dispose();hatScene.dispose();
+      sunTexture.dispose();cowboy.dispose();hatScene.dispose();meadow.dispose();
       
     };
   },[state,slot]);
