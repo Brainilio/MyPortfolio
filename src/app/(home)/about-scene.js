@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { getStage } from "./stage";
 import { random, faceted, createIsland, createWater, createPineGeometry, createSwayingInstances, createFoliageMaterial, flatMaterial, createSpin, tilted } from "./island-parts";
 import { paintGeometry, mergeFlat, createAspen } from "./forest-parts";
 import { createRangerBearGeometry, createRangerBearMaterial, bearHandAt } from "./ranger-bear";
@@ -40,11 +41,9 @@ export default function AboutScene({ state, slot = 1, side = "right", onReady })
   const host=useRef(null);
   useEffect(()=>{
     const mount=host.current;
-    let renderer,raf=0,visible=true;
-    try { renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:"high-performance"}); } catch { ready.current?.(); return; }
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5));
-    renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;
-    mount.appendChild(renderer.domElement);
+    let visible=true;
+    // Drawn on the page's one shared canvas (stage.js), into this stage's rectangle; the stage is the hit area.
+    const shared_=getStage();if(!shared_){ready.current?.();return;}const renderer=shared_.renderer;
     const preference=matchMedia("(prefers-reduced-motion: reduce)");
     const scene=new THREE.Scene();scene.fog=new THREE.Fog("#2b2150",30,60);
     const camera=new THREE.PerspectiveCamera(30,1,.3,150);
@@ -185,7 +184,7 @@ export default function AboutScene({ state, slot = 1, side = "right", onReady })
     let flare=0,tentWobble=0;
     function stoke(){flare=1;sparks.forEach(spark=>{spark.t=rng()*.15;spark.life=.7+rng()*.8;spark.dx=(rng()-.5)*.7;spark.dz=(rng()-.5)*.7;});needsRender=true;}
     // Pointer: drag to spin; tap the bear or his marshmallow, the fire, or the tent.
-    const raycaster=new THREE.Raycaster(),ndc=new THREE.Vector2(),canvas=renderer.domElement;
+    const raycaster=new THREE.Raycaster(),ndc=new THREE.Vector2(),canvas=mount;
     const pick=(event,objects)=>{const rect=canvas.getBoundingClientRect();ndc.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(ndc,camera);return raycaster.intersectObjects(objects,false).length>0;};
     const bearParts=[ranger,stick,mallow,mallowFlame,log],fireParts=[camp,...flames];
     const onMoon=event=>{const rect=canvas.getBoundingClientRect(),p=moonDisc.position.clone().project(camera),x=(p.x+1)/2*rect.width+rect.left,y=(1-p.y)/2*rect.height+rect.top;return Math.hypot(event.clientX-x,event.clientY-y)<40;};
@@ -255,7 +254,7 @@ export default function AboutScene({ state, slot = 1, side = "right", onReady })
     let tall=false,lean=new THREE.Vector2(),leanTarget=new THREE.Vector2(),attitude=0;const viewDir=new THREE.Vector3();
     const view={w:1,h:1};
     function frame(){
-      const w=mount.clientWidth,h=mount.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;tall=camera.aspect<.85;view.w=w;view.h=h;
+      const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;tall=camera.aspect<.85;view.w=w;view.h=h;
       if(tall)camera.setViewOffset(w,h,0,h*.14,w,h);else camera.setViewOffset(w,h,(side==="left"?.22:-.22)*w,0,w,h);
       camera.updateProjectionMatrix();place();starUniforms.uPixel.value=renderer.getPixelRatio();needsRender=true;
     }
@@ -326,26 +325,27 @@ export default function AboutScene({ state, slot = 1, side = "right", onReady })
       mallowMaterial.emissiveIntensity=(1-pull)*(.12+flare*.2);
       flies.forEach((fly,i)=>{flyPositions.set([fly.x+Math.sin(time*.4+fly.phase)*.4,fly.y+Math.sin(time*.9+fly.phase)*.15,fly.z+Math.cos(time*.35+fly.phase)*.4],i*3);});
       flyGeometry.attributes.position.needsUpdate=true;starUniforms.uTime.value=time;if(!reduced||shooting.t>=0)updateShooting(dt);flyMaterial.opacity=.55+.45*Math.sin(time*1.7);
-      renderer.render(scene,camera);needsRender=false;
+      needsRender=false;
     }
     // 30 fps is plenty while it's calm, full rate while dragged or while he's eating; paused while another section is on screen.
-    function draw(){
-      raf=requestAnimationFrame(draw);
-      const dt=Math.min(clock.getDelta(),.05);since+=dt;
-      if(!visible||document.hidden||!state.current.live.includes(slot))return;
+    // Called by the shared frame loop; returns whether anything changed (so the canvas needs redrawing).
+    function draw(dt){
+      dt=Math.min(dt,.05);since+=dt;
+      if(!visible||document.hidden||!state.current.live.includes(slot))return false;
       const busy=spin.busy||shooting.t>=0||roast.treat>=0||roast.shake>=0||flare>.05||tentWobble>.02||waving>=0||leaves.some(l=>l.life>=0)||[...pines.sway,...aspens.sway].some(v=>v>.003);
-      if(preference.matches&&!needsRender&&!busy)return;
-      if(!busy&&since<1/30-.002)return;
-      tick(Math.min(since,.1));since=0;
+      if(preference.matches&&!needsRender&&!busy)return false;
+      if(!busy&&since<1/30-.002)return false;
+      tick(Math.min(since,.1));since=0;return true;
     }
-    frame();tick(0);mount.dataset.ready="true";draw();
+    frame();tick(0);mount.dataset.ready="true";
+    const unregister=shared_.register({mount,scene,camera,draw,exposure:1.1});
     const readyTimer=setTimeout(()=>ready.current?.(),0);
     if(new URLSearchParams(window.location.search).has("debug"))window.__about={camera,renderer,ranger,stick,mallow,roast,eat,stoke,view,wave:()=>{waving=0;},dropLeaf,aspens};
 
     return()=>{
-      clearTimeout(readyTimer);delete window.__about;cancelAnimationFrame(raf);resize.disconnect();observer.disconnect();window.removeEventListener("pointermove",onPointer);canvas.removeEventListener("pointermove",onHover);spin.dispose();
+      clearTimeout(readyTimer);delete window.__about;unregister();resize.disconnect();observer.disconnect();window.removeEventListener("pointermove",onPointer);canvas.removeEventListener("pointermove",onHover);spin.dispose();
       scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat())if(m){m.map?.dispose();m.dispose();}});
-      glowTexture.dispose();puffTexture.dispose();shadowTexture.dispose();renderer.dispose();renderer.domElement.remove();
+      glowTexture.dispose();puffTexture.dispose();shadowTexture.dispose();
     };
   },[state,slot]);
   return <div className="ht-canvas" ref={host} aria-hidden="true" />;
