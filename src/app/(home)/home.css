@@ -111,11 +111,13 @@ body:has(.ht){background:#1b1335}
    column of cards scrolling past over it, alternating left and right with the island showing through the gaps. Each
    card slides in from its own side the first time a fifth of it is on screen. */
 .ht-zone.ht-work[data-side] .ht-copy{width:auto;margin:-100svh 0 0;padding:clamp(92px,12svh,128px) 0 24svh;display:block;pointer-events:none}
-.ht-work-head{width:min(480px,90vw);margin:0 auto;text-align:center}
+/* The heading stays put above the island while the cards scroll past (over it). */
+.ht-work-head{position:sticky;top:clamp(92px,12svh,128px);z-index:0;width:min(480px,90vw);margin:0 auto;text-align:center}
+.ht-cards{position:relative;z-index:1}
 .ht-work-head p.ht-drive{margin-top:10px}
 .ht-cards{margin:62svh 0 0;padding:0 5vw;list-style:none;display:flex;flex-direction:column;gap:12vh}
 .ht-cards li{display:flex}
-.ht-shine{position:relative;display:block;width:min(28vw,460px);aspect-ratio:16/10;overflow:hidden;border-radius:16px;pointer-events:auto;
+.ht-shine{position:relative;display:block;width:min(32vw,520px);aspect-ratio:16/10;overflow:hidden;border-radius:6px;pointer-events:auto;
   background:linear-gradient(135deg,var(--violet),#f4a089);box-shadow:0 16px 48px rgba(0,0,0,.18);
   opacity:0;transform:translate(-60px,20px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1),box-shadow .35s ease}
 .ht-shine.is-left{margin-right:auto}
@@ -124,8 +126,13 @@ body:has(.ht){background:#1b1335}
 /* Hover: lifted and a touch bigger, like a card being picked up (with the foil in the shader). */
 .ht-shine.is-in:hover{transform:translateY(-6px) scale(1.015);box-shadow:0 28px 64px rgba(0,0,0,.24);transition:opacity .8s ease,transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .35s ease}
 .ht-shine:focus-visible{outline:2px solid var(--violet);outline-offset:6px}
-.ht-shine img,.ht-shine video{display:block;width:100%;height:100%;object-fit:cover}
-.ht-shine-overlay{position:absolute;inset:0;z-index:1;width:100%;height:100%;border-radius:16px;pointer-events:none;mix-blend-mode:screen}
+.ht-shine-media,.ht-shine img,.ht-shine video{display:block;width:100%;height:100%;object-fit:cover}
+/* The shader canvas reaches past the card above and below (room for the bend, see shine-card.js); once it has drawn
+   the picture, it is the card: the plain picture, the box's clip, fill and shadow step aside. */
+.ht-shine-overlay{position:absolute;left:0;right:0;top:-28.125%;z-index:1;width:100%;height:156.25%;pointer-events:none}
+.ht-shine.is-drawn{overflow:visible;background:none;box-shadow:none}
+.ht-shine.is-drawn .ht-shine-media{opacity:0}
+.ht-shine.is-drawn.is-in:hover{box-shadow:none}
 .ht-shine-pill{position:absolute;z-index:2;left:14px;bottom:14px;padding:7px 14px;border-radius:999px;background:rgba(0,0,0,.5);
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:.8rem;font-weight:500;line-height:1.2}
 .ht-work .ht-copy>p.ht-more{justify-content:center;margin:10vh 0 0}
@@ -260,6 +267,7 @@ html.ht-locked{overflow:hidden}
   .ht-list b{font-size:16px}
   /* Phones: full-width cards, one under another, each rising in from below. */
   .ht-zone.ht-work[data-side] .ht-copy{padding:88px 0 20svh}
+  .ht-work-head{top:72px}
   .ht-cards{margin-top:58svh;padding:0}
   .ht-shine,.ht-shine.is-right{width:100%;transform:translateY(40px)}
   .ht-shine.is-in{transform:none}
