@@ -41,6 +41,32 @@ const tailOf = i => (i > 0 && i < 4 ? TAIL : 0);
 const ABOUT = 1, WORK = 2, SKILLS_AT = 3, CONTACT = 4;
 const clamp = v => Math.min(1, Math.max(0, v));
 
+// The contact form posts to Formspree with fetch, so the card stays put and thanks you in place.
+// Replace REPLACE_WITH_ID with your Formspree form ID from formspree.io; until then the form says to email instead.
+const FORMSPREE = "https://formspree.io/f/REPLACE_WITH_ID";
+function ContactForm() {
+  const [status, setStatus] = useState("idle");
+  const submit = async event => {
+    event.preventDefault();
+    if (FORMSPREE.endsWith("REPLACE_WITH_ID")) { setStatus("error"); return; }
+    setStatus("sending");
+    try {
+      const response = await fetch(FORMSPREE, { method: "POST", body: new FormData(event.currentTarget), headers: { Accept: "application/json" } });
+      setStatus(response.ok ? "sent" : "error");
+    } catch { setStatus("error"); }
+  };
+  if (status === "sent") return <p className="ht-form-sent" role="status">Got it. I&apos;ll be in touch.</p>;
+  return (
+    <form className="ht-form" onSubmit={submit}>
+      <input type="text" name="name" placeholder="Your name" aria-label="Your name" autoComplete="name" required />
+      <input type="email" name="email" placeholder="Your email" aria-label="Your email" autoComplete="email" required />
+      <textarea name="message" placeholder="What are you building?" aria-label="What are you building?" rows={4} required />
+      <button type="submit" disabled={status === "sending"}>{status === "sending" ? "Sending…" : <>Send it <span aria-hidden="true">→</span></>}</button>
+      {status === "error" && <p className="ht-form-error" role="alert">That didn&apos;t go through. Email me instead, below.</p>}
+    </form>
+  );
+}
+
 export default function Home() {
   const [where, setWhere] = useState({ section: 0, stop: 0 }), [menu, setMenu] = useState(false);
   // Shared with the 3D scenes (read every frame): which sections are on screen and how far through each one we are.
@@ -106,6 +132,7 @@ export default function Home() {
           const enter = i ? clamp((y - (top - vh * ENTER)) / (vh * RISE)) : 1;
           const leave = i === 0 ? clamp((top + height - y - vh * .5) / (vh * .55)) : tailOf(i) ? clamp((top + run + vh * FADE - y) / (vh * FADE)) : 1, o = Math.min(enter, leave);
           stage.style.opacity = o.toFixed(3);stage.style.transform = o < 1 ? `scale(${(.94 + o * .06).toFixed(4)})` : "";
+          if (tailOf(i)) copies.current[i]?.style.setProperty("opacity", leave.toFixed(3));
         }
         // Each sky fades in across the beat before its section (About's over the screen-height before it); later skies sit
         // on top. Between About's night and Work's golden hour a dusk layer rises and sets again in the middle of the beat.
@@ -139,7 +166,6 @@ export default function Home() {
     if (fromHash > 0) window.scrollTo(0, zones.current[fromHash]?.offsetTop ?? 0);
     // (Also off with ?debug, so tests can jump straight to a scroll position.)
     const lenis = matchMedia("(prefers-reduced-motion: reduce)").matches || new URLSearchParams(location.search).has("debug") ? null : new Lenis({ autoRaf: true, lerp: .09, smoothWheel: true });
-          if (tailOf(i)) copies.current[i]?.style.setProperty("opacity", leave.toFixed(3));
     lenisRef.current = lenis;lenis?.stop();
     update();
     // Sections change height as fonts load and the layout settles; keep the measurements fresh.
@@ -188,7 +214,7 @@ export default function Home() {
           their own; on the left, just the person behind it. The words hold in the middle while the island does. */}
       <section className="ht-zone ht-about ht-pinned" id="about" data-side="right" style={{ "--steps": 1.25 }} ref={el => (zones.current[ABOUT] = el)} aria-labelledby="ht-about-title">
         <div className="ht-stage">{built[ABOUT] && <AboutScene state={scene} slot={ABOUT} side="right" onReady={onReady(ABOUT)} />}</div>
-        <div className="ht-copy" ref={el => (copies.current[SKILLS_AT] = el)}>
+        <div className="ht-copy" ref={el => (copies.current[ABOUT] = el)}>
           {/* Replace with: <Image src="/me.jpg" alt="Brainilio" width={120} height={120} /> (drop me.jpg into /public) */}
           <div className="ht-portrait" aria-hidden="true" />
           <h2 id="ht-about-title">Around the fire<span>.</span></h2>
@@ -204,7 +230,7 @@ export default function Home() {
           one off toward the mesa and the next one, now on top, plays its preview. */}
       <section className="ht-zone ht-work ht-pinned" id="work" data-side="left" style={{ "--steps": work.length }} ref={el => (zones.current[WORK] = el)} aria-labelledby="ht-work-title">
         <div className="ht-stage">{built[WORK] && <WorkScene state={scene} slot={WORK} side="left" onReady={onReady(WORK)} />}</div>
-        <div className="ht-copy" ref={el => (copies.current[ABOUT] = el)}>
+        <div className="ht-copy" ref={el => (copies.current[WORK] = el)}>
           <h2 id="ht-work-title">Things I&apos;ve built<span>.</span></h2>
           <p className="ht-drive">Click the basket to feed the herd</p>
           <ol className="ht-deck" ref={deck} style={{ "--n": work.length }}>
@@ -235,7 +261,7 @@ export default function Home() {
       {/* Skills: the park road on the right; the wagon drives sign to sign as the list scrolls past. */}
       <section className="ht-zone ht-skills ht-pinned" id="skills" data-side="right" style={{ "--steps": SKILLS.length }} ref={el => (zones.current[SKILLS_AT] = el)} aria-labelledby="ht-skills-title">
         <div className="ht-stage">{built[SKILLS_AT] && <SkillsScene state={scene} skills={SKILLS} onCar={onCar} slot={SKILLS_AT} side="right" onReady={onReady(SKILLS_AT)} />}</div>
-        <div className="ht-copy" ref={el => (copies.current[WORK] = el)}>
+        <div className="ht-copy" ref={el => (copies.current[SKILLS_AT] = el)}>
           <h2 id="ht-skills-title">What I bring along<span>.</span></h2>
           <p className="ht-drive">Scroll or click the wagon to drive on</p>
           <ol className="ht-list">
@@ -254,6 +280,8 @@ export default function Home() {
         <div className="ht-contact-card">
           <h2 id="ht-contact-title">Let&apos;s build something<span>.</span></h2>
           <p>Have a project, a role or an idea worth exploring? I&apos;d love to hear about it.</p>
+          <ContactForm />
+          <p className="ht-contact-or">or email directly</p>
           <a className="ht-contact-email" href="mailto:brainilioir@gmail.com">brainilioir@gmail.com <span aria-hidden="true">↗</span></a>
           <ul className="ht-contact-links">
             <li><a href="https://github.com/Brainilio" target="_blank" rel="noopener noreferrer">GitHub</a></li>
