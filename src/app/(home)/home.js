@@ -51,7 +51,7 @@ const ARRIVE = 14, DEPART = 10;
 const ABOUT = 1, WORK = 2, SKILLS_AT = 3, CONTACT = 4;
 const clamp = v => Math.min(1, Math.max(0, v));
 // The Work section's scene tester: which 3D scene its island shows (work-scene.js builds all four up front).
-const WORK_SCENES = { A: "Current fixed", B: "Yellowstone", C: "Cowboy", D: "Sky only" };
+const WORK_SCENES = { A: "Current fixed", B: "Yellowstone", C: "Cowboy", D: "Sky only", E: "Cowboy hat" };
 
 // The contact form posts to Formspree with fetch, so the card stays put and thanks you in place.
 // Replace REPLACE_WITH_ID with your Formspree form ID from formspree.io; until then the form says to email instead.

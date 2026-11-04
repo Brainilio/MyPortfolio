@@ -11,4 +11,5 @@ export const MODEL_CREDITS = [
   { author: "Sherkiz", works: [["Hawk Lp Rigged", "RkN6MEbP6g"]] },
   { author: "Danni Bittman", works: [["Desert Pillar", "708JmtEKqEU"]] },
   { author: "Eric Wilson", works: [["Loaded Wagon", "2fwnYnnxB9d"]] },
+  { author: "J-Toastie", works: [["Cowboy Hat", "jcXfae4GiZ"]] },
 ];

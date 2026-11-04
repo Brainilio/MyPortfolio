@@ -11,7 +11,7 @@ import { paintGeometry } from "./forest-parts";
 import { createBasket } from "./park-parts";
 import { createBisonRig, createBisonAnimator } from "./bison-rig";
 import { createMeadow } from "./work-meadow";
-import { createCowboy } from "./work-cowboy";
+import { createCowboy, createHat } from "./work-cowboy";
 
 // Work as the prairie in miniature, the island's golden-hour cousin: rolling prairie climbing to a mesa shelf at the
 // back, where flat-topped sandstone buttes stand (Monument Valley), rounded boulders at their feet, a small bison herd
@@ -71,7 +71,8 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
 
     // The scene tester (A·B·C·D, home.js): each scene is built up front and switching only flips visibility. A is this
     // island (world); B, the Yellowstone meadow (work-meadow.js); C, the cowboy on the open prairie, a scene and camera
-    // of its own (work-cowboy.js); D, only the sky's sun, clouds and birds. The birds fly in A, B and D.
+    // of its own (work-cowboy.js); D, only the sky's sun, clouds and birds; E, a cowboy hat turning with the scroll
+    // (work-cowboy.js). The birds fly in A, B and D.
     const world=new THREE.Group();world.userData.scene="A";scene.add(world);
     const flock=new THREE.Group();flock.userData.scene="ABD";scene.add(flock);
     const island=createIsland(13,{outline,heightAt,riverDistance:noRiver,depth:.85,hub:new THREE.Vector2(-1.1,-3.3),scatter:.8,grass:["#b89a52","#c4a65a","#a98d4c"],edge:"#9a7c46"});world.add(island.group);
@@ -195,10 +196,11 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       const reeds=[];for(let k=0;k<9;k++){const a=-.6+k*.32+rng()*.2,r=POND.r*(.95+rng()*.2);
         reeds.push({position:on(POND.x+Math.cos(a)*r*1.05,POND.z+Math.sin(a)*r*.85),rotation:rng()*6,scale:(.05+rng()*.035)});}
       const set=createSwayingInstances(paintGeometry(new THREE.ConeGeometry(.22,3,4).translate(0,1.5,0),"#7f8f4a"),reeds,foliage);bushes.push(set);world.add(set.mesh);}
-    // Scene B, the meadow, spinning with the island; scene C, the cowboy, in a scene of its own.
+    // Scene B, the meadow, spinning with the island; C, the cowboy, and E, the hat, each in a scene of its own.
     const meadow=createMeadow({outline,foliage,loader:new GLTFLoader().setMeshoptDecoder(MeshoptDecoder),onLoad:()=>{needsRender=true;}});
     meadow.group.userData.scene="B";meadow.group.visible=false;scene.add(meadow.group);bushes.push(meadow.swaying);
-    const cowboy=createCowboy();
+    const modelLoader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder),cowboy=createCowboy({loader:modelLoader,onLoad:()=>{needsRender=true;}}),hatScene=createHat({loader:modelLoader,onLoad:()=>{needsRender=true;}});
+    const ALONE={C:cowboy,E:hatScene};
     // A few birds wheeling high over the Mittens.
     const birdMaterial=new THREE.MeshStandardMaterial({color:"#3b2b33",flatShading:true,roughness:1,side:THREE.DoubleSide});
     const birds=Array.from({length:5},(_,i)=>{const bird=createBird(birdMaterial);bird.scale.setScalar(.9);Object.assign(bird.userData,{a:i/5*Math.PI*2,r:2.2+(i%3)*.7,h:6.4+(i%2)*.8,speed:.28+(i%4)*.05,flap:i*1.7});flock.add(bird);return bird;});
@@ -375,10 +377,10 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
         Object.assign(b,{state:i===2?"rest":"graze",timer:1+Math.random()*3,feeding:false,drink:false,face:null,wallowing:false,resting:i===2,restUntil:i===2?time+40:0,alarmUntil:0,startAt:0});});
     }
     function setVariant(v){
-      variant=v;world.visible=v==="A";meadow.group.visible=v==="B";flock.visible=v!=="C";
+      variant=v;world.visible=v==="A";meadow.group.visible=v==="B";flock.visible=!ALONE[v];
       // B's sun is low on the left, lighting the scene from that side.
       if(v==="B")sun.position.set(-12,6,2);else sun.position.set(-10,7,-8);
-      if(stageEntry){stageEntry.scene=v==="C"?cowboy.scene:scene;stageEntry.camera=v==="C"?cowboy.camera:camera;}
+      if(stageEntry){stageEntry.scene=ALONE[v]?.scene??scene;stageEntry.camera=ALONE[v]?.camera??camera;}
       settleHerd();frame();shared_.invalidate();
     }
     // Prairie dogs pop up from their mounds, look about, and duck back down.
@@ -437,14 +439,12 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     canvas.addEventListener("pointermove",onHover);
 
     // Framing: the mesa to one side (the words scroll past on the other), further off when tall.
-    // Every scene in the tester is seen from 38° above the horizontal.
-    const ELEVATION=38;
-    let tall=false,attitude=0;const VIEW=new THREE.Vector3(0,Math.tan(ELEVATION*Math.PI/180),1).normalize(),focus=new THREE.Vector3(0,.9,0),viewDir=new THREE.Vector3();
+    let tall=false,attitude=0;const VIEW=new THREE.Vector3(0,.34,1).normalize(),focus=new THREE.Vector3(0,.9,0),viewDir=new THREE.Vector3();
     // The camera sits on an orbit round the mesa; only its attitude (steeper arriving, lower leaving) changes.
     let closeUp=null;// (?debug only: { from, at } to inspect something up close)
     function placeCamera(){if(closeUp){camera.position.copy(closeUp.from);camera.lookAt(closeUp.at);return;}camera.position.copy(tilted(VIEW,attitude,viewDir)).multiplyScalar(tall?60:27).add(focus);camera.lookAt(focus);}
     function frame(){
-      const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;tall=camera.aspect<.85;cowboy.frame(w,h);
+      const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;tall=camera.aspect<.85;cowboy.frame(w,h);hatScene.frame(w,h);
       if(tall)camera.setViewOffset(w,h,0,h*.2,w,h);else camera.setViewOffset(w,h,side==="center"?0:(side==="left"?.17:-.17)*w,side==="center"?-h*.13:h*.07,w,h);
       camera.updateProjectionMatrix();placeCamera();needsRender=true;
     }
@@ -455,8 +455,9 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     function tick(dt){
       const reduced=preference.matches,step=reduced?0:dt;time+=step;
       const wanted=state.current.workVariant??"A";if(wanted!==variant)setVariant(wanted);
-      // C: only the cowboy (always moving, so drawn at full rate).
+      // C: only the cowboy (always moving, so drawn at full rate). E: only the hat, turned by the scroll.
       if(variant==="C"){cowboy.update(step);needsRender=false;return !reduced;}
+      if(variant==="E"){hatScene.update(reduced?0:state.current.progress[slot]);needsRender=false;return false;}
       const falling=updatePellets(dt);
       // Food drains while the herd eats.
       if(herd.some(b=>b.state==="eat"))food=Math.max(0,food-dt*.12);
@@ -496,13 +497,13 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     const wide=matchMedia("(min-width: 761px)"),syncFade=()=>{entry.fade=wide.matches?{side:"right",from:.75}:null;shared_.invalidate();};
     syncFade();wide.addEventListener("change",syncFade);
     const readyTimer=setTimeout(()=>ready.current?.(),0);
-    if(new URLSearchParams(window.location.search).has("debug"))window.__work={camera,herd,world,scene,renderer,pour,THREE,tumble,tumbleweed,kickTumble,gust:()=>{gustIn=0;},closeUp:v=>{closeUp=v;},cowboy,meadow,variant:v=>{state.current.workVariant=v;}};
+    if(new URLSearchParams(window.location.search).has("debug"))window.__work={camera,herd,world,scene,renderer,pour,THREE,tumble,tumbleweed,kickTumble,gust:()=>{gustIn=0;},closeUp:v=>{closeUp=v;},cowboy,hat:hatScene,meadow,variant:v=>{state.current.workVariant=v;}};
 
     return()=>{
       clearTimeout(readyTimer);delete window.__work;disposed=true;unregister();wide.removeEventListener("change",syncFade);resize.disconnect();observer.disconnect();
       spin.dispose();canvas.removeEventListener("pointermove",onHover);
       scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat())m?.dispose();});
-      sunTexture.dispose();cowboy.dispose();
+      sunTexture.dispose();cowboy.dispose();hatScene.dispose();
       
     };
   },[state,slot]);
