@@ -27,7 +27,7 @@ body:has(.ht){background:#1b1335}
 /* A section: the diorama's stage stays pinned while the words scroll past on the other side. */
 .ht-zone{position:relative;min-height:100svh}
 /* A little open sky between one section and the next, so each island has room to leave before the next arrives. */
-.ht-zone+.ht-zone{margin-top:25svh}
+.ht-zone+.ht-zone{margin-top:10svh}
 /* Each section's stage is sticky: its island holds while the section is pinned and travels up and away with the page
    as the next one arrives. The islands are drawn on the one shared canvas into the stage's rectangle; the stage
    itself is the island's hit area. */
