@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { getStage } from "./stage";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { random, createIsland, createPineGeometry, createSwayingInstances, createFoliageMaterial, flatMaterial, createSpin, tilted } from "./island-parts";
@@ -43,12 +44,10 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, side = "ri
   const host=useRef(null),carClick=useRef(onCar);carClick.current=onCar;
   useEffect(()=>{
     const mount=host.current;
-    let renderer,disposed=false,raf=0,visible=true;
-    try { renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:"high-performance"}); } catch { ready.current?.(); return; }
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5));
-    renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
-    mount.appendChild(renderer.domElement);
-    const canvas=renderer.domElement,preference=matchMedia("(prefers-reduced-motion: reduce)");
+    let disposed=false,visible=true;
+    // Drawn on the page's one shared canvas (stage.js), into this stage's rectangle; the stage is the hit area.
+    const shared_=getStage();if(!shared_){ready.current?.();return;}const renderer=shared_.renderer;
+    const canvas=mount,preference=matchMedia("(prefers-reduced-motion: reduce)");
     const scene=new THREE.Scene();scene.fog=new THREE.Fog("#f2d3b2",40,80);
     const camera=new THREE.PerspectiveCamera(30,1,.3,200);
     const rng=random(31);
@@ -164,7 +163,7 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, side = "ri
     // Framing: the whole diorama to one side (the words scroll past on the other), further off when tall.
     let tall=false,orbit=0,attitude=0;const viewDir=new THREE.Vector3();const target=new THREE.Vector3(0,.2,0),aim=new THREE.Vector3(),Y=new THREE.Vector3(0,1,0),BASE=Math.atan2(VIEW.x,VIEW.z),SWING=THREE.MathUtils.degToRad(9);
     function frame(){
-      const w=mount.clientWidth,h=mount.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;tall=camera.aspect<.85;
+      const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;tall=camera.aspect<.85;
       if(tall)camera.setViewOffset(w,h,0,h*.14,w,h);else camera.setViewOffset(w,h,(side==="left"?.17:-.17)*w,h*.03,w,h);
       camera.updateProjectionMatrix();particles.uScale.value=h*renderer.getPixelRatio()/(2*Math.tan(camera.fov*Math.PI/360));needsRender=true;
     }
@@ -202,29 +201,33 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, side = "ri
       const goalYaw=reduced?0:THREE.MathUtils.clamp(lean*.3,-SWING,SWING);orbit+=(goalYaw-orbit)*(jump?1:1-Math.exp(-dt*5));
       attitude+=((reduced?0:state.current.tilt[slot])-attitude)*(jump?1:1-Math.exp(-dt*6));
       tilted(viewDir.copy(VIEW).applyAxisAngle(Y,orbit),attitude,camera.position).multiplyScalar(tall?33:27.5).add(target);camera.lookAt(target);
-      renderer.render(scene,camera);needsRender=false;
+      needsRender=false;
       return spin.busy||Math.abs(attitude-state.current.tilt[slot])>.05||Math.abs(uVel)>1e-4||hop>=0||geyser.t>=0||Math.abs(turn-(end?1:0))>.01;
     }
     // Full rate while something is moving, 30 fps when it's just the breeze.
     let busy=true;const clock=new THREE.Clock();
-    function draw(){
-      raf=requestAnimationFrame(draw);
-      const dt=Math.min(clock.getDelta(),.05);since+=dt;
+    // Called by the shared frame loop; returns whether anything changed (so the canvas needs redrawing).
+    function draw(dt){
+      dt=Math.min(dt,.05);since+=dt;
       const live=visible&&!document.hidden&&state.current.live.includes(slot);if(live&&!wasLive)snap=true;wasLive=live;
-      if(!live)return;
-      if(preference.matches&&!needsRender&&!snap&&!spin.busy)return;
-      if(!busy&&since<1/30-.002)return;
-      busy=tick(Math.min(since,.1));since=0;
+      if(!live)return false;
+      if(preference.matches&&!needsRender&&!snap&&!spin.busy)return false;
+      if(!busy&&since<1/30-.002)return false;
+      busy=tick(Math.min(since,.1));since=0;return true;
     }
-    frame();tick(0);mount.dataset.ready="true";draw();
+    frame();tick(0);mount.dataset.ready="true";
+    // On wide screens it fades out toward the words beside it.
+    const entry={mount,scene,camera,draw,exposure:1.05,fade:null},unregister=shared_.register(entry);
+    const wide=matchMedia("(min-width: 761px)"),syncFade=()=>{entry.fade=wide.matches?{side:"left",from:.75}:null;shared_.invalidate();};
+    syncFade();wide.addEventListener("change",syncFade);
     const readyTimer=setTimeout(()=>ready.current?.(),0);
     if(new URLSearchParams(window.location.search).has("debug"))window.__skills={camera,car,world,scene,renderer,THREE};
 
     return()=>{
-      clearTimeout(readyTimer);delete window.__skills;disposed=true;cancelAnimationFrame(raf);resize.disconnect();observer.disconnect();
+      clearTimeout(readyTimer);delete window.__skills;disposed=true;unregister();wide.removeEventListener("change",syncFade);resize.disconnect();observer.disconnect();
       spin.dispose();
       scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat())if(m){m.map?.dispose();m.dispose();}});
-      signs.forEach(sign=>sign.userData.texture.dispose());shadowTexture.dispose();renderer.dispose();canvas.remove();
+      signs.forEach(sign=>sign.userData.texture.dispose());shadowTexture.dispose();
     };
   },[state,skills,slot]);
   return <div className="ht-canvas" ref={host} aria-hidden="true" />;
