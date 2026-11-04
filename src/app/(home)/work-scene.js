@@ -31,12 +31,13 @@ function heightAt(x,z) {
 const noRiver=()=>({d:99,t:0});
 // Bison gaits: leg swing (rad), stride rate, bob (fraction of height), knee fold, foot lift (fraction), nod.
 const GAITS={Graze:[0,1.1,.003,0,0,.04],Walk:[.36,3.4,.006,.6,.035,.09],Run:[.62,7.5,.02,.95,.06,.14]};
-// Monument Valley, from real models (Kenney's "Rock Formation" and "Rock Flat", CC0; public/models/island/buttes.glb):
-// (x, z, model, size, turn, mirrored, foot radius). The West Mitten, 55% of the island's ~10.8 diameter tall, at the
-// back left; the East Mitten, 38%, at the back right and turned, sky between them; and the flat rock as a wide mesa
-// stub (size is its width) mid-left in front. The right and the front stay open for the herd. Swells (x, z, radius,
-// height); the prairie dogs' mounds and the feed basket near the front.
-const BUTTES=[[-1.6,-2.2,"formation_rock",5.94,.3,false,2.5],[2.2,-2,"formation_rock",4.1,-1.9,true,1.75],[-3,.9,"rockFlat",3.8,.9,false,1.9]];
+// Monument Valley, from real low-poly models (public/models/island/buttes.glb): Kenney's "Large Rock Formation" (CC0) as
+// the West Mitten, Danni Bittman's "Desert Pillar" (CC BY 3.0) as the East Mitten, and Poly by Google's layered "Cliff"
+// (CC BY 3.0) as the mesa. (x, z, node, height, turn, widen, foot radius): the West Mitten 55% of the island's ~10.8
+// diameter tall at the back left; the East Mitten 38% at the back right, sky between them; the mesa 18%, stretched
+// wider than tall, mid-left in front. The right and the front stay open for the herd. Swells (x, z, radius, height);
+// the prairie dogs' mounds and the feed basket near the front.
+const BUTTES=[[-1.9,-2.3,"WestMitten",5.94,.3,1,1.5],[2.3,-2.1,"EastMitten",4.1,-.6,1,1.3],[-3,.9,"Mesa",1.95,.9,1.7,1.6]];
 const footOf=b=>b[6];
 const SWELLS=[[-1.4,.5,1.7,.13],[1.9,.6,1.6,.11],[.1,2.9,1.4,.08]];
 const MOUNDS=[[2.4,1.3],[0,2.5],[-.6,3.15]],BASKET=new THREE.Vector3(1.1,0,2);
@@ -72,7 +73,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       if(disposed)return;
       gltf.scene.updateMatrixWorld(true);
       const shapes={};
-      for(const name of ["formation_rock","rockFlat"]){
+      for(const name of ["WestMitten","EastMitten","Mesa"]){
         const node=gltf.scene.getObjectByName(name),parts=[];if(!node)continue;
         node.traverse(o=>{if(!o.isMesh)return;
           // The positions are quantized (small integers, Meshopt); read them as floats, unindexed, in world space.
@@ -87,20 +88,18 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
           a.fromBufferAttribute(pos,f);b.fromBufferAttribute(pos,f+1);c.fromBufferAttribute(pos,f+2);
           n.subVectors(b,a).cross(c.clone().sub(a)).normalize();
           const low=Math.min(a.y,b.y,c.y)/size.y;
-          tone.copy(n.y>.62?TOP:low<.16&&n.y>.15?TALUS:low<.1?TALUS:CLIFF).multiplyScalar(.93+rng()*.14);
+          tone.copy(n.y>.7?TOP:low<.16&&n.y>.15?TALUS:low<.1?TALUS:CLIFF).multiplyScalar(.93+rng()*.14);
           for(let k=0;k<3;k++)colors.set([tone.r,tone.g,tone.b],(f+k)*3);
         }
         geometry.setAttribute("color",new THREE.BufferAttribute(colors,3));geometry.computeVertexNormals();
         shapes[name]={geometry,size};
       }
-      const material=new THREE.MeshLambertMaterial({vertexColors:true,flatShading:true,side:THREE.DoubleSide});
-      BUTTES.forEach(([x,z,name,size,turn,mirrored,foot])=>{
+      const material=new THREE.MeshLambertMaterial({vertexColors:true,flatShading:true});
+      BUTTES.forEach(([x,z,name,height,turn,widen,foot])=>{
         const shape=shapes[name];if(!shape)return;
-        const butte=new THREE.Mesh(shape.geometry,material);
-        // A formation is scaled to its height; the flat rock to its width, and stood up taller, as a mesa.
-        if(name==="rockFlat"){const k=size/Math.max(shape.size.x,shape.size.z);butte.scale.set(k,k*1.9,k);}
-        else butte.scale.setScalar(size/shape.size.y);
-        if(mirrored)butte.scale.x*=-1;
+        const butte=new THREE.Mesh(shape.geometry,material),k=height/shape.size.y;
+        // Scaled to its height; the mesa also stretched sideways so it reads wider than tall.
+        butte.scale.set(k*widen,k,k*widen);butte.castShadow=butte.receiveShadow=false;
         let low=heightAt(x,z);
         for(let k=0;k<12;k++){const a=k/12*Math.PI*2;low=Math.min(low,heightAt(x+Math.cos(a)*foot*.8,z+Math.sin(a)*foot*.8));}
         butte.position.set(x,low-.05,z);butte.rotation.y=turn;world.add(butte);
@@ -108,10 +107,10 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       needsRender=true;
     },undefined,()=>{});
     // Loose boulders tumbled off the talus, in the buttes' colours.
-    {const tints=["#b5602e","#8b3a1a","#a5532a","#c46f3c"].map(c=>new THREE.Color(c)),spots=[];
+    {const base=new THREE.Color("#9e5226"),spots=[];
       [[0,.7],[0,2.3],[1,1],[1,2.6],[2,.4],[2,2],[0,-.6]].forEach(([k,a])=>{const b=BUTTES[k],r=footOf(b)*(.92+rng()*.15);spots.push([b[0]+Math.cos(a)*r,b[1]+Math.sin(a)*r,(.3+rng()*.33)*(k===2?.7:1)]);});
       const rocks=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1,1),new THREE.MeshLambertMaterial({flatShading:true}),spots.length),d=new THREE.Object3D();
-      spots.forEach(([x,z,s],i)=>{d.position.copy(on(x,z,s*.25));d.rotation.set(rng()*.4,rng()*6,rng()*.4);d.scale.set(s*(1.05+rng()*.3),s*.7,s*(.85+rng()*.25));d.updateMatrix();rocks.setMatrixAt(i,d.matrix);rocks.setColorAt(i,tints[i%4]);});
+      spots.forEach(([x,z,s],i)=>{d.position.copy(on(x,z,s*.25));d.rotation.set(rng()*.4,rng()*6,rng()*.4);d.scale.set(s*(1.05+rng()*.3),s*.7,s*(.85+rng()*.25));d.updateMatrix();rocks.setMatrixAt(i,d.matrix);rocks.setColorAt(i,base.clone().multiplyScalar(.9+rng()*.2));});
       world.add(rocks);}
     // Sage bushes dotted over the grass; they sway in the breeze and stir when the cursor brushes past, like the trees.
     const shared={uTime:{value:0},uBreeze:{value:.03},uGust:{value:.05}},foliage=createFoliageMaterial(shared),bushes=[];
