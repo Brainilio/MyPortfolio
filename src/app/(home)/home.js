@@ -32,6 +32,11 @@ const SECTIONS = [
   { id: "contact", label: "Contact", steps: 1 },
 ];
 const SKIES = ["ht-sky", "ht-about-sky", "ht-prairie-sky", "ht-valley-sky", "ht-coast-sky"];
+// Between About, Work, Skills and Contact the page holds a beat of open sky: each of those sections runs on for TAIL
+// screen-heights after its own scroll is done. Its island fades out over FADE of that, the sky alone holds for the
+// rest, and the next island starts in once 30% of its section is on screen. The skies blend across the beat.
+const TAIL = .6, FADE = .45, ENTER = .7, RISE = .55;
+const tailOf = i => (i > 0 && i < 4 ? TAIL : 0);
 // Which slot each scene reads in the shared scroll state.
 const ABOUT = 1, WORK = 2, SKILLS_AT = 3, CONTACT = 4;
 const clamp = v => Math.min(1, Math.max(0, v));
@@ -48,7 +53,7 @@ export default function Home() {
     return () => queries.forEach(q => q.removeEventListener("change", sync));
   }, []);
   const pill = useRef(null), bar = useRef(null), deck = useRef(null);
-  const zones = useRef([]), skies = useRef([]);
+  const zones = useRef([]), skies = useRef([]), copies = useRef([]), dusk = useRef(null);
   const { section, stop } = where;
   // Loading: every model is fetched up front (to warm the cache) while the dioramas are built one after another
   // behind the loading screen, each as soon as the previous one reports it's ready. The screen lifts when all are
@@ -75,7 +80,7 @@ export default function Home() {
   const scrollToSection = useCallback((s, q = 0) => {
     const el = zones.current[s];
     if (!el) return;
-    const top = el.offsetTop + q * Math.max(0, el.offsetHeight - window.innerHeight), lenis = lenisRef.current;
+    const top = el.offsetTop + q * Math.max(0, el.offsetHeight - window.innerHeight * (1 + tailOf(s))), lenis = lenisRef.current;
     setMenu(false);
     if (lenis) lenis.scrollTo(top, { duration: 1.4 }); else window.scrollTo({ top, behavior: "auto" });
   }, []);
@@ -90,20 +95,27 @@ export default function Home() {
       let dominant = 0;
       zones.current.forEach((el, i) => {
         if (!el) return;
-        const top = el.offsetTop, height = el.offsetHeight;
-        scene.current.progress[i] = clamp((y - top) / Math.max(1, height - vh));
+        const top = el.offsetTop, height = el.offsetHeight, run = Math.max(1, height - vh * (1 + tailOf(i)));
+        scene.current.progress[i] = clamp((y - top) / run);
         if (top < y + vh && top + height > y) live.push(i);
         if (middle >= top) dominant = i;
-        // Each diorama fades in as its section scrolls up into view and fades out again as the next one arrives, so
-        // only one is ever on screen at full strength (the first has nothing to fade in from, the last nothing to leave for).
+        // Each diorama fades in as its section comes up into view and fades out again before the next one arrives, with
+        // only sky between (the first has nothing to fade in from, the last nothing to leave for). The words go with it.
         const stage = el.firstElementChild;
         if (stage) {
-          const enter = i ? clamp((y + vh * .85 - top) / (vh * .55)) : 1, leave = i < SECTIONS.length - 1 ? clamp((top + height - y - vh * .5) / (vh * .55)) : 1, o = Math.min(enter, leave);
+          const enter = i ? clamp((y - (top - vh * ENTER)) / (vh * RISE)) : 1;
+          const leave = i === 0 ? clamp((top + height - y - vh * .5) / (vh * .55)) : tailOf(i) ? clamp((top + run + vh * FADE - y) / (vh * FADE)) : 1, o = Math.min(enter, leave);
           stage.style.opacity = o.toFixed(3);stage.style.transform = o < 1 ? `scale(${(.94 + o * .06).toFixed(4)})` : "";
         }
-        // Each sky fades in over the screen-height either side of where its section begins; later skies sit on top.
+        // Each sky fades in across the beat before its section (About's over the screen-height before it); later skies sit
+        // on top. Between About's night and Work's golden hour a dusk layer rises and sets again in the middle of the beat.
         const sky = skies.current[i];
-        if (sky && i) sky.style.opacity = clamp((middle - (top - vh / 2)) / vh).toFixed(3);
+        if (sky && i) {
+          // The middle of the open-sky beat: halfway between the last island gone and this one starting in.
+          const beat = top - vh * (1 + TAIL - FADE + ENTER) / 2;
+          sky.style.opacity = (tailOf(i - 1) ? clamp((y - (beat - vh * .48)) / (vh * .96)) : clamp((middle - (top - vh / 2)) / vh)).toFixed(3);
+          if (i === WORK && dusk.current) dusk.current.style.opacity = clamp(1 - Math.abs(y - beat) / (vh * .5)).toFixed(3);
+        }
       });
       scene.current.live = live;scene.current.section = dominant;
       pill.current?.style.setProperty("--progress", scene.current.progress[dominant].toFixed(4));
@@ -125,7 +137,9 @@ export default function Home() {
     history.scrollRestoration = "manual";
     const fromHash = SECTIONS.findIndex(x => `#${x.id}` === location.hash);
     if (fromHash > 0) window.scrollTo(0, zones.current[fromHash]?.offsetTop ?? 0);
-    const lenis = matchMedia("(prefers-reduced-motion: reduce)").matches ? null : new Lenis({ autoRaf: true, lerp: .09, smoothWheel: true });
+    // (Also off with ?debug, so tests can jump straight to a scroll position.)
+    const lenis = matchMedia("(prefers-reduced-motion: reduce)").matches || new URLSearchParams(location.search).has("debug") ? null : new Lenis({ autoRaf: true, lerp: .09, smoothWheel: true });
+          if (tailOf(i)) copies.current[i]?.style.setProperty("opacity", leave.toFixed(3));
     lenisRef.current = lenis;lenis?.stop();
     update();
     // Sections change height as fonts load and the layout settles; keep the measurements fresh.
@@ -143,7 +157,7 @@ export default function Home() {
 
   return (
     <main className="ht" data-section={SECTIONS[section].id}>
-      <div className="ht-skies" aria-hidden="true">{SKIES.map((sky, i) => <div key={sky} className={sky} ref={el => (skies.current[i] = el)} style={i ? { opacity: 0 } : undefined} />)}</div>
+      <div className="ht-skies" aria-hidden="true">{SKIES.map((sky, i) => <div key={sky} className={sky} ref={el => (skies.current[i] = el)} style={i ? { opacity: 0 } : undefined} />)}<div className="ht-dusk-sky" ref={dusk} style={{ opacity: 0 }} /></div>
       <div className="ht-finish" aria-hidden="true" />
       <header className="ht-header">
         <a href="#" className="ht-wordmark" onClick={event => { event.preventDefault(); jump(0); }}>Brainilio<span>.</span></a>
@@ -174,7 +188,7 @@ export default function Home() {
           their own; on the left, just the person behind it. The words hold in the middle while the island does. */}
       <section className="ht-zone ht-about ht-pinned" id="about" data-side="right" style={{ "--steps": 1.25 }} ref={el => (zones.current[ABOUT] = el)} aria-labelledby="ht-about-title">
         <div className="ht-stage">{built[ABOUT] && <AboutScene state={scene} slot={ABOUT} side="right" onReady={onReady(ABOUT)} />}</div>
-        <div className="ht-copy">
+        <div className="ht-copy" ref={el => (copies.current[SKILLS_AT] = el)}>
           {/* Replace with: <Image src="/me.jpg" alt="Brainilio" width={120} height={120} /> (drop me.jpg into /public) */}
           <div className="ht-portrait" aria-hidden="true" />
           <h2 id="ht-about-title">Around the fire<span>.</span></h2>
@@ -190,7 +204,7 @@ export default function Home() {
           one off toward the mesa and the next one, now on top, plays its preview. */}
       <section className="ht-zone ht-work ht-pinned" id="work" data-side="left" style={{ "--steps": work.length }} ref={el => (zones.current[WORK] = el)} aria-labelledby="ht-work-title">
         <div className="ht-stage">{built[WORK] && <WorkScene state={scene} slot={WORK} side="left" onReady={onReady(WORK)} />}</div>
-        <div className="ht-copy">
+        <div className="ht-copy" ref={el => (copies.current[ABOUT] = el)}>
           <h2 id="ht-work-title">Things I&apos;ve built<span>.</span></h2>
           <p className="ht-drive">Click the basket to feed the herd</p>
           <ol className="ht-deck" ref={deck} style={{ "--n": work.length }}>
@@ -221,7 +235,7 @@ export default function Home() {
       {/* Skills: the park road on the right; the wagon drives sign to sign as the list scrolls past. */}
       <section className="ht-zone ht-skills ht-pinned" id="skills" data-side="right" style={{ "--steps": SKILLS.length }} ref={el => (zones.current[SKILLS_AT] = el)} aria-labelledby="ht-skills-title">
         <div className="ht-stage">{built[SKILLS_AT] && <SkillsScene state={scene} skills={SKILLS} onCar={onCar} slot={SKILLS_AT} side="right" onReady={onReady(SKILLS_AT)} />}</div>
-        <div className="ht-copy">
+        <div className="ht-copy" ref={el => (copies.current[WORK] = el)}>
           <h2 id="ht-skills-title">What I bring along<span>.</span></h2>
           <p className="ht-drive">Scroll or click the wagon to drive on</p>
           <ol className="ht-list">

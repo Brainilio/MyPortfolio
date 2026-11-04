@@ -47,7 +47,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     mount.appendChild(renderer.domElement);
     const canvas=renderer.domElement;canvas.style.touchAction="pan-y";
     const preference=matchMedia("(prefers-reduced-motion: reduce)");
-    const scene=new THREE.Scene();scene.fog=new THREE.Fog("#eeae94",40,80);
+    const scene=new THREE.Scene();scene.fog=new THREE.Fog("#eec08e",40,80);
     const camera=new THREE.PerspectiveCamera(30,1,.3,200);
     const rng=random(5);
 
