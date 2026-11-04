@@ -18,6 +18,7 @@ body:has(.ht){background:#1b1335}
 .ht{position:relative}
 /* The skies: fixed behind the page, each fading in as its section arrives (opacity set on scroll). */
 .ht-skies{position:fixed;inset:0;z-index:0;pointer-events:none}
+.ht-sky-live{position:absolute;inset:0;background:linear-gradient(180deg,#0d0820 0%,#2d1060 50%,#7a3d8f 100%)}
 /* A section: the diorama's stage stays pinned while the words scroll past on the other side. */
 .ht-zone{position:relative;min-height:100svh}
 .ht-stage{position:sticky;top:0;z-index:2;height:100svh}
@@ -52,10 +53,7 @@ body:has(.ht){background:#1b1335}
 @keyframes ht-grain{0%{transform:translate(0,0)}20%{transform:translate(-4%,3%)}40%{transform:translate(3%,-5%)}60%{transform:translate(-6%,-2%)}80%{transform:translate(5%,4%)}100%{transform:translate(0,0)}}
 
 .ht-header{position:fixed;z-index:20;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:28px var(--gutter);font-size:13px;transition:color .8s ease}
-/* On the light skies the chrome turns ink. */
-.ht[data-section=work] .ht-header,.ht[data-section=skills] .ht-header{color:var(--ink)}
 .ht[data-section=contact] .ht-header{color:#f4f6f8}
-.ht[data-section=work] .ht-available,.ht[data-section=skills] .ht-available{border-color:rgba(42,22,54,.25)}
 .ht-wordmark{font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:22px;letter-spacing:-.04em}
 .ht-wordmark span,.ht-roles span{color:var(--violet)}
 .ht-header nav{display:flex;gap:44px}
@@ -90,10 +88,9 @@ body:has(.ht){background:#1b1335}
 /* On wide screens each island fades out toward its words, so it never crowds them. */
 .ht-work .ht-stage{-webkit-mask-image:linear-gradient(90deg,#000 75%,transparent);mask-image:linear-gradient(90deg,#000 75%,transparent)}
 .ht-skills .ht-stage{-webkit-mask-image:linear-gradient(270deg,#000 75%,transparent);mask-image:linear-gradient(270deg,#000 75%,transparent)}
-.ht-work .ht-copy,.ht-skills .ht-copy{color:var(--ink)}
-.ht-work .ht-copy h2 span,.ht-skills .ht-copy h2 span{color:#7c5cdb}
-.ht-copy>p.ht-drive{margin:14px 0 0;font-size:14px;color:rgba(42,22,54,.6)}
-.ht-about .ht-copy>p.ht-drive{color:rgba(251,247,255,.6)}
+.ht-list li{color:var(--ink)}
+.ht-list b i{color:#7c5cdb}
+.ht-copy>p.ht-drive{margin:14px 0 0;font-size:14px;color:rgba(251,247,255,.62)}
 /* Work: a pile of postcards. --f (set from the scroll) is how far the deal has got; card i is --d = f - i: below zero
    it waits in the pile, --k places deep (the top card -1.5°, then +1.2°, -0.8°, +2°; each 10px lower, smaller, a
    little darker and with a weaker shadow), from 0 to 1 it's tossed off in an arc down and to the left toward the mesa,
@@ -120,8 +117,8 @@ body:has(.ht){background:#1b1335}
 .ht-deck a:hover .ht-deck-text i{transform:translateX(4px)}
 /* Below the pile: the rest of the work, and the Lab. */
 .ht-copy>p.ht-more{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 0}
-.ht-more a{padding:6px 16px;border-radius:999px;border:1px solid #7c5cdb;color:#7c5cdb;font-size:.8rem;font-weight:600;transition:background .3s,color .3s}
-.ht-more a:hover{background:#7c5cdb;color:#fff}
+.ht-more a{padding:6px 16px;border-radius:999px;border:1px solid var(--violet);color:var(--violet);font-size:.8rem;font-weight:600;transition:background .3s,color .3s}
+.ht-more a:hover{background:var(--violet);color:#fff}
 /* Skills: a plain list beside the diorama; the entry for the wagon's stop lights up. */
 .ht-list{margin:30px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
 .ht-list li{padding:16px 20px;border-radius:16px;background:rgba(255,255,255,.38);border:1px solid rgba(255,255,255,.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:background .5s,transform .5s,box-shadow .5s}

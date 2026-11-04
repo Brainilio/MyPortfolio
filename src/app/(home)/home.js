@@ -19,9 +19,9 @@ const MODELS = ["kit", "stag", "deer", "fox", "bear", "eagle", "bison", "prairie
 const LOADING_LINES = ["Raising the island", "Stoking the campfire", "Rounding up the bison", "Packing the wagon", "Lighting the lighthouse"];
 
 // One long page. Each section is a floating diorama that holds still (sticky) while its words scroll past on the other
-// side, alternating right, left, right; the coast closes the page full width. Behind everything a fixed stack of skies
-// crossfades as you move from one section into the next. Inside a section its own progress (0 → 1 while it's pinned)
-// turns the Work ring, drives the Skills wagon and lights the trail log.
+// side, alternating right, left, right; the coast closes the page full width. Behind everything one fixed sky
+// shifts colour continuously with the scroll. Inside a section its own progress (0 → 1 while it's pinned) deals the
+// Work cards and drives the Skills wagon.
 const SECTIONS = [
   { id: "home", label: "Home", steps: 1 },
   { id: "about", label: "About", steps: 1 },
@@ -29,7 +29,18 @@ const SECTIONS = [
   { id: "skills", label: "Skills", steps: SKILLS.length },
   { id: "contact", label: "Contact", steps: 1 },
 ];
-const SKIES = ["ht-sky", "ht-about-sky", "ht-prairie-sky", "ht-valley-sky", "ht-coast-sky"];
+// One sky for the whole page: a three-colour gradient (top, middle, bottom) that shifts continuously with how far down
+// the page you are. Each stop belongs to a section and sits where that section is settled on screen; the last two
+// are the coast as you arrive and at the very end.
+const SKY = [
+  ["#0d0820", "#2d1060", "#7a3d8f"], // Home
+  ["#0a0618", "#1a0d45", "#4a2070"], // About
+  ["#3d1f0a", "#8b4a1a", "#d4875a"], // Work
+  ["#6b3d0a", "#c47820", "#e8c878"], // Skills
+  ["#0a1a2d", "#0d3050", "#2d6080"], // Contact, arriving
+  ["#061520", "#0a2540", "#1a4860"], // Contact, the end
+].map(stops => stops.map(hex => [1, 3, 5].map(k => parseInt(hex.slice(k, k + 2), 16))));
+const mix = (a, b, t) => a.map((c, k) => Math.round(c + (b[k] - c) * t));
 // Between About, Work, Skills and Contact the page holds a beat of open sky: each of those sections runs on for TAIL
 // screen-heights after its own scroll is done. Its island fades out over FADE of that, the sky alone holds for the
 // rest, and the next island starts in once 30% of its section is on screen. The skies blend across the beat.
@@ -77,7 +88,7 @@ export default function Home() {
     return () => queries.forEach(q => q.removeEventListener("change", sync));
   }, []);
   const pill = useRef(null), bar = useRef(null), deck = useRef(null);
-  const zones = useRef([]), skies = useRef([]), copies = useRef([]), dusk = useRef(null);
+  const zones = useRef([]), sky = useRef(null), copies = useRef([]);
   const { section, stop } = where;
   // Loading: every model is fetched up front (to warm the cache) while the dioramas are built one after another
   // behind the loading screen, each as soon as the previous one reports it's ready. The screen lifts when all are
@@ -117,6 +128,7 @@ export default function Home() {
       frame = 0;
       const y = window.scrollY, vh = window.innerHeight, middle = y + vh / 2, live = [];
       let dominant = 0;
+      const stops = [];
       zones.current.forEach((el, i) => {
         if (!el) return;
         const top = el.offsetTop, height = el.offsetHeight, run = Math.max(1, height - vh * (1 + tailOf(i)));
@@ -132,16 +144,13 @@ export default function Home() {
           stage.style.opacity = o.toFixed(3);stage.style.transform = o < 1 ? `scale(${(.94 + o * .06).toFixed(4)})` : "";
           if (tailOf(i)) copies.current[i]?.style.setProperty("opacity", leave.toFixed(3));
         }
-        // Each sky fades in across the beat before its section (About's over the screen-height before it); later skies sit
-        // on top. Between About's night and Work's golden hour a dusk layer rises and sets again in the middle of the beat.
-        const sky = skies.current[i];
-        if (sky && i) {
-          // The middle of the open-sky beat: halfway between the last island gone and this one starting in.
-          const beat = top - vh * (1 + TAIL - FADE + ENTER) / 2;
-          sky.style.opacity = (tailOf(i - 1) ? clamp((y - (beat - vh * .48)) / (vh * .96)) : clamp((middle - (top - vh / 2)) / vh)).toFixed(3);
-          if (i === WORK && dusk.current) dusk.current.style.opacity = clamp(1 - Math.abs(y - beat) / (vh * .5)).toFixed(3);
-        }
+        stops[i] = i === CONTACT ? top - vh * .6 : i ? top + run * .5 : 0;
       });
+      // The sky: find the two section stops either side of this scroll position and blend between them.
+      const end = Math.max(1, document.documentElement.scrollHeight - vh), marks = [...stops.slice(0, 5).map(v => v / end), 1], p = clamp(y / end);
+      let k = 0; while (k < marks.length - 2 && p > marks[k + 1]) k++;
+      const blend = clamp((p - marks[k]) / Math.max(1e-6, marks[k + 1] - marks[k])), colors = SKY[k].map((c, n) => mix(c, SKY[k + 1][n], blend));
+      if (sky.current) sky.current.style.background = `linear-gradient(180deg,rgb(${colors[0]}) 0%,rgb(${colors[1]}) 50%,rgb(${colors[2]}) 100%)`;
       scene.current.live = live;scene.current.section = dominant;
       pill.current?.style.setProperty("--progress", scene.current.progress[dominant].toFixed(4));
       // The Work deck deals with the scroll, resting a moment on each card.
@@ -181,7 +190,7 @@ export default function Home() {
 
   return (
     <main className="ht" data-section={SECTIONS[section].id}>
-      <div className="ht-skies" aria-hidden="true">{SKIES.map((sky, i) => <div key={sky} className={sky} ref={el => (skies.current[i] = el)} style={i ? { opacity: 0 } : undefined} />)}<div className="ht-dusk-sky" ref={dusk} style={{ opacity: 0 }} /></div>
+      <div className="ht-skies" aria-hidden="true"><div className="ht-sky-live" ref={sky} /></div>
       <div className="ht-finish" aria-hidden="true" />
       <header className="ht-header">
         <a href="#" className="ht-wordmark" onClick={event => { event.preventDefault(); jump(0); }}>Brainilio<span>.</span></a>
