@@ -198,7 +198,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       const set=createSwayingInstances(paintGeometry(new THREE.ConeGeometry(.22,3,4).translate(0,1.5,0),"#7f8f4a"),reeds,foliage);bushes.push(set);world.add(set.mesh);}
     // Scene B, the meadow, spinning with the island; C, the cowboy, and E, the hat, each in a scene of its own.
     const meadow=createMeadow({outline,foliage,loader:new GLTFLoader().setMeshoptDecoder(MeshoptDecoder),onLoad:()=>{needsRender=true;}});
-    meadow.group.userData.scene="B";meadow.group.visible=false;scene.add(meadow.group);bushes.push(meadow.swaying);
+    meadow.group.userData.scene="B";meadow.group.visible=false;scene.add(meadow.group);bushes.push(...meadow.swaying);
     const modelLoader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder),cowboy=createCowboy({loader:modelLoader,onLoad:()=>{needsRender=true;}}),hatScene=createHat({loader:modelLoader,onLoad:()=>{needsRender=true;}});
     const ALONE={C:cowboy,E:hatScene};
     // A few birds wheeling high over the Mittens.
@@ -470,7 +470,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       if(variant!=="D")herd.forEach(b=>updateBison(b,step,time));dogs.forEach(d=>updateDog(d,step));
       const dusty=variant==="D"?false:updateDust(step);
       const rolling=updateTumble(step),windy=reduced?false:updateWind(step);
-      world.position.y=Math.sin(time*.45)*.1;meadow.group.rotation.y=flock.rotation.y=world.rotation.y;meadow.group.position.y=flock.position.y=world.position.y;meadow.update(time);
+      world.position.y=Math.sin(time*.45)*.1;meadow.group.rotation.y=flock.rotation.y=world.rotation.y;meadow.group.position.y=flock.position.y=world.position.y;meadow.update(time,step);
       // The sun's climb follows the scroll through the section (reduced motion: already up).
       const rise=reduced?1:smooth(state.current.progress[slot]/.75);
       if(Math.abs(rise-risen)>1e-3){risen=rise;sunDisc.position.set(-15+rise*2,-6+rise*9,-40);sunDisc.material.color.copy(LOW).lerp(HIGH,rise);
