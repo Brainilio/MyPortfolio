@@ -4,10 +4,11 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { getStage } from "./stage";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { random, createIsland, createBearMaterial, createSpin, tilted, createSwayingInstances, createFoliageMaterial, createBird, createCloud } from "./island-parts";
 import { paintGeometry } from "./forest-parts";
-import { createButte, createBasket } from "./park-parts";
+import { createBasket } from "./park-parts";
 
 // Work as the prairie in miniature, the island's golden-hour cousin: rolling prairie climbing to a mesa shelf at the
 // back, where flat-topped sandstone buttes stand (Monument Valley), rounded boulders at their feet, a small bison herd
@@ -30,12 +31,13 @@ function heightAt(x,z) {
 const noRiver=()=>({d:99,t:0});
 // Bison gaits: leg swing (rad), stride rate, bob (fraction of height), knee fold, foot lift (fraction), nod.
 const GAITS={Graze:[0,1.1,.003,0,0,.04],Walk:[.36,3.4,.006,.6,.035,.09],Run:[.62,7.5,.02,.95,.06,.14]};
-// Monument Valley against the island's ~10.8 diameter (x, z, height, cap width, turn, thumb): the West Mitten, tallest
-// (55%), at the back left with its thumb; the East Mitten (38%) at the back right, sky between them; and a low wide
-// mesa stub (18%, cap 1.6 times as wide as it's tall) mid-left in front. The right and the front stay open for the
-// herd. Swells (x, z, radius, height); the prairie dogs' mounds and the feed basket near the front.
-const BUTTES=[[-1.6,-2.2,5.94,null,.3,true],[2.2,-2,4.1,null,-.5,false],[-3,.9,1.6,3.1,.9,false]];
-const footOf=([,,h,w])=>w?w/2+.55*h:.45*h;
+// Monument Valley, from real models (Kenney's "Rock Formation" and "Rock Flat", CC0; public/models/island/buttes.glb):
+// (x, z, model, size, turn, mirrored, foot radius). The West Mitten, 55% of the island's ~10.8 diameter tall, at the
+// back left; the East Mitten, 38%, at the back right and turned, sky between them; and the flat rock as a wide mesa
+// stub (size is its width) mid-left in front. The right and the front stay open for the herd. Swells (x, z, radius,
+// height); the prairie dogs' mounds and the feed basket near the front.
+const BUTTES=[[-1.6,-2.2,"formation_rock",5.94,.3,false,2.5],[2.2,-2,"formation_rock",4.1,-1.9,true,1.75],[-3,.9,"rockFlat",3.8,.9,false,1.9]];
+const footOf=b=>b[6];
 const SWELLS=[[-1.4,.5,1.7,.13],[1.9,.6,1.6,.11],[.1,2.9,1.4,.08]];
 const MOUNDS=[[2.4,1.3],[0,2.5],[-.6,3.15]],BASKET=new THREE.Vector3(1.1,0,2);
 const blocked=(x,z,pad)=>BUTTES.some(b=>Math.hypot(x-b[0],z-b[1])<footOf(b)+pad)||Math.hypot(x-BASKET.x,z-BASKET.z)<pad+.3;
@@ -62,10 +64,49 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     const world=new THREE.Group();scene.add(world);
     const island=createIsland(13,{outline,heightAt,riverDistance:noRiver,depth:.85,hub:new THREE.Vector2(-1.1,-3.3),scatter:.8,grass:["#b89a52","#c4a65a","#a98d4c"],edge:"#9a7c46"});world.add(island.group);
     const on=(x,z,lift=0)=>new THREE.Vector3(x,heightAt(x,z)+lift,z);
-    // Each butte sits on the lowest ground under its talus, so no edge floats on the slope.
-    BUTTES.forEach(b=>{const [x,z,h,width,turn,thumb]=b,foot=footOf(b),butte=createButte(rng,h,{width,thumb});let low=heightAt(x,z);
-      for(let k=0;k<12;k++){const a=k/12*Math.PI*2;low=Math.min(low,heightAt(x+Math.cos(a)*foot*.9,z+Math.sin(a)*foot*.9));}
-      butte.position.set(x,low-.06,z);butte.rotation.y=turn;world.add(butte);});
+    // The buttes: each model's faces recoloured by which way they face, in three sandstone tones: sun-bleached tops,
+    // deep shadowed cliffs, and the mid-tone talus round the foot. Each sits on the lowest ground under its foot, so no
+    // edge floats on the slope.
+    const TOP=new THREE.Color("#d4854a"),CLIFF=new THREE.Color("#8b3a1a"),TALUS=new THREE.Color("#b5602e");
+    new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).load("/models/island/buttes.glb",gltf=>{
+      if(disposed)return;
+      gltf.scene.updateMatrixWorld(true);
+      const shapes={};
+      for(const name of ["formation_rock","rockFlat"]){
+        const node=gltf.scene.getObjectByName(name),parts=[];if(!node)continue;
+        node.traverse(o=>{if(!o.isMesh)return;
+          // The positions are quantized (small integers, Meshopt); read them as floats, unindexed, in world space.
+          const src=o.geometry.attributes.position,index=o.geometry.index,count=index?index.count:src.count,out=new Float32Array(count*3),v=new THREE.Vector3();
+          for(let i=0;i<count;i++){v.fromBufferAttribute(src,index?index.getX(i):i).applyMatrix4(o.matrixWorld);out.set([v.x,v.y,v.z],i*3);}
+          const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.BufferAttribute(out,3));parts.push(g);});
+        const geometry=parts.length>1?mergeGeometries(parts):parts[0];geometry.computeBoundingBox();
+        const box=geometry.boundingBox,size=box.getSize(new THREE.Vector3()),centre=box.getCenter(new THREE.Vector3());
+        geometry.translate(-centre.x,-box.min.y,-centre.z);
+        const pos=geometry.attributes.position,colors=new Float32Array(pos.count*3),a=new THREE.Vector3(),b=new THREE.Vector3(),c=new THREE.Vector3(),n=new THREE.Vector3(),tone=new THREE.Color();
+        for(let f=0;f<pos.count;f+=3){
+          a.fromBufferAttribute(pos,f);b.fromBufferAttribute(pos,f+1);c.fromBufferAttribute(pos,f+2);
+          n.subVectors(b,a).cross(c.clone().sub(a)).normalize();
+          const low=Math.min(a.y,b.y,c.y)/size.y;
+          tone.copy(n.y>.62?TOP:low<.16&&n.y>.15?TALUS:low<.1?TALUS:CLIFF).multiplyScalar(.93+rng()*.14);
+          for(let k=0;k<3;k++)colors.set([tone.r,tone.g,tone.b],(f+k)*3);
+        }
+        geometry.setAttribute("color",new THREE.BufferAttribute(colors,3));geometry.computeVertexNormals();
+        shapes[name]={geometry,size};
+      }
+      const material=new THREE.MeshLambertMaterial({vertexColors:true,flatShading:true,side:THREE.DoubleSide});
+      BUTTES.forEach(([x,z,name,size,turn,mirrored,foot])=>{
+        const shape=shapes[name];if(!shape)return;
+        const butte=new THREE.Mesh(shape.geometry,material);
+        // A formation is scaled to its height; the flat rock to its width, and stood up taller, as a mesa.
+        if(name==="rockFlat"){const k=size/Math.max(shape.size.x,shape.size.z);butte.scale.set(k,k*1.9,k);}
+        else butte.scale.setScalar(size/shape.size.y);
+        if(mirrored)butte.scale.x*=-1;
+        let low=heightAt(x,z);
+        for(let k=0;k<12;k++){const a=k/12*Math.PI*2;low=Math.min(low,heightAt(x+Math.cos(a)*foot*.8,z+Math.sin(a)*foot*.8));}
+        butte.position.set(x,low-.05,z);butte.rotation.y=turn;world.add(butte);
+      });
+      needsRender=true;
+    },undefined,()=>{});
     // Loose boulders tumbled off the talus, in the buttes' colours.
     {const tints=["#b5602e","#8b3a1a","#a5532a","#c46f3c"].map(c=>new THREE.Color(c)),spots=[];
       [[0,.7],[0,2.3],[1,1],[1,2.6],[2,.4],[2,2],[0,-.6]].forEach(([k,a])=>{const b=BUTTES[k],r=footOf(b)*(.92+rng()*.15);spots.push([b[0]+Math.cos(a)*r,b[1]+Math.sin(a)*r,(.3+rng()*.33)*(k===2?.7:1)]);});

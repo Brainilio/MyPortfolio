@@ -19,7 +19,7 @@ const work = allProjects.filter(project => project.slug && project.previewImage)
 const PLACE_AT = [.15, .35, .55, .75, .85], TILTS = [1.5, -2, .8, -1.2];
 
 // Every model the homepage loads (fetched up front by the loading screen).
-const MODELS = ["kit", "stag", "deer", "fox", "bear", "eagle", "bison", "prairiedog", "wagon", "moose", "orca", "shark", "sealion", "kayak"].map(name => `/models/island/${name}.glb`);
+const MODELS = ["kit", "stag", "deer", "fox", "bear", "eagle", "bison", "prairiedog", "wagon", "buttes", "moose", "orca", "shark", "sealion", "kayak"].map(name => `/models/island/${name}.glb`);
 const LOADING_LINES = ["Raising the island", "Stoking the campfire", "Rounding up the bison", "Packing the wagon", "Lighting the lighthouse"];
 
 // One long page. Each section is a floating diorama that holds still (sticky) while its words scroll past on the other
