@@ -12,7 +12,9 @@ const SkillsScene = dynamic(() => import("./skills-scene"), { ssr: false });
 const CoastScene = dynamic(() => import("./coast-scene"), { ssr: false });
 import { MODEL_CREDITS } from "./model-credits";
 import { SKILLS } from "./content";
-const work = allProjects.filter(project => project.slug && project.previewImage).slice(0, 5);
+const work = allProjects.filter(project => project.slug && project.previewImage).slice(0, 4);
+// Each postcard sits a little askew in the pile.
+const TILTS = [-1.5, 2, -.8, 1.2];
 
 // Every model the homepage loads (fetched up front by the loading screen).
 const MODELS = ["kit", "stag", "deer", "fox", "bear", "eagle", "bison", "prairiedog", "wagon", "moose", "orca", "shark", "sealion", "kayak"].map(name => `/models/island/${name}.glb`);
@@ -39,11 +41,11 @@ export default function Home() {
   // Shared with the 3D scenes (read every frame): which sections are on screen and how far through each one we are.
   const scene = useRef({ section: 0, live: [0], progress: [0, 0, 0, 0, 0], shift: [0, 0, 0, 0, 0] });
   const [spotted, setSpotted] = useState([]), [still, setStill] = useState(false);
-  // Reduced motion: the Work card shows its still image instead of playing its preview.
+  // Reduced motion, and phones: the Work postcard shows its still image instead of playing its preview.
   useEffect(() => {
-    const preference = matchMedia("(prefers-reduced-motion: reduce)"), sync = () => setStill(preference.matches);
-    sync(); preference.addEventListener("change", sync);
-    return () => preference.removeEventListener("change", sync);
+    const queries = [matchMedia("(prefers-reduced-motion: reduce)"), matchMedia("(max-width: 760px)")], sync = () => setStill(queries.some(q => q.matches));
+    sync(); queries.forEach(q => q.addEventListener("change", sync));
+    return () => queries.forEach(q => q.removeEventListener("change", sync));
   }, []);
   const pill = useRef(null), bar = useRef(null), deck = useRef(null);
   const zones = useRef([]), skies = useRef([]);
@@ -184,8 +186,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Work: the bison mesa on the left; on the right a deck of project cards. Scrolling deals the top card off toward
-          the mesa and the next one rises into its place, playing its preview. */}
+      {/* Work: the bison mesa on the left; on the right a pile of postcards, one per project. Scrolling tosses the top
+          one off toward the mesa and the next one, now on top, plays its preview. */}
       <section className="ht-zone ht-work ht-pinned" id="work" data-side="left" style={{ "--steps": work.length }} ref={el => (zones.current[WORK] = el)} aria-labelledby="ht-work-title">
         <div className="ht-stage">{built[WORK] && <WorkScene state={scene} slot={WORK} side="left" onReady={onReady(WORK)} />}</div>
         <div className="ht-copy">
@@ -193,21 +195,26 @@ export default function Home() {
           <p className="ht-drive">Click the basket to feed the herd</p>
           <ol className="ht-deck" ref={deck} style={{ "--n": work.length }}>
             {work.map((project, i) => {
-              const here = (section === WORK ? stop : 0) === i;
+              const at = section === WORK ? stop : 0, here = at === i;
               return (
-                <li key={project.slug} style={{ "--i": i, zIndex: work.length - i }} className={here ? "is-here" : i < (section === WORK ? stop : 0) - 1 || i > (section === WORK ? stop : 0) + 3 ? "is-far" : undefined} aria-current={here ? "true" : undefined}>
-                  <a href={`/project/${project.slug}/`} onFocus={() => scrollToSection(WORK, i / (work.length - 1))}>
+                <li key={project.slug} style={{ "--i": i, "--r": `${TILTS[i % TILTS.length]}deg`, zIndex: work.length - i }} className={here ? "is-here" : i < at - 1 ? "is-far" : undefined} aria-current={here ? "true" : undefined}>
+                  <a href={`/project/${project.slug}/`} onFocus={() => scrollToSection(WORK, i / Math.max(1, work.length - 1))}>
                     <span className="ht-deck-media" aria-hidden="true">
                       {here && section === WORK && !still && project.previewVideo
                         ? <video src={project.previewVideo} poster={project.previewImage} autoPlay muted loop playsInline />
                         : <img src={project.previewImage} alt="" loading="lazy" decoding="async" />}
+                      <span className="ht-stamp">{project.category}</span>
                     </span>
-                    <span className="ht-deck-text"><span>{String(i + 1).padStart(2, "0")} · {project.category}</span><b>{project.name} <i aria-hidden="true">→</i></b></span>
+                    <span className="ht-deck-text">{String(i + 1).padStart(2, "0")} · {project.name}<i aria-hidden="true">→</i></span>
                   </a>
                 </li>
               );
             })}
           </ol>
+          <p className="ht-more">
+            <a href="/projects/">All projects <span aria-hidden="true">→</span></a>
+            <a href="/journey/">Lab experiments <span aria-hidden="true">→</span></a>
+          </p>
         </div>
       </section>
 

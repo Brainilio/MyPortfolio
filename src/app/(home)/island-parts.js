@@ -249,7 +249,9 @@ export function createEagle() {
 // Rig-free four-legged walk (bear, bison). Below the hip line the mesh splits into four legs by quarter; each
 // swings from its hip on its own beat (a four-beat walk), lifts and folds at the knee while it swings forward,
 // and the head nods with the stride. `hip` is where the legs meet the body, as a fraction of height.
-export function createBearMaterial(geometry,{hip:hipFraction=.36}={}) {
+// diagonal: legs move in diagonal pairs (front left with hind right, then front right with hind left), as the bison
+// trot; otherwise a four-beat walk.
+export function createBearMaterial(geometry,{hip:hipFraction=.36,diagonal=false}={}) {
   geometry.computeBoundingBox();
   const box=geometry.boundingBox,height=box.max.y-box.min.y,length=box.max.z-box.min.z,hip=box.min.y+height*hipFraction,mid=(box.min.z+box.max.z)/2,pos=geometry.attributes.position;
   let front=0,back=0,nf=0,nb=0;
@@ -264,8 +266,8 @@ export function createBearMaterial(geometry,{hip:hipFraction=.36}={}) {
       .replace('#include <begin_vertex>',`#include <begin_vertex>
         if(transformed.y<uHip){
           bool front=transformed.z>uMid,left=transformed.x>uCenterX;
-          // Four-beat walk: left hind, left front, right hind, right front.
-          float offset=front?(left?1.5708:4.7124):(left?0.:3.14159);
+          // Four-beat walk (left hind, left front, right hind, right front), or diagonal pairs.
+          float offset=${diagonal?"front?(left?3.14159:0.):(left?0.:3.14159)":"front?(left?1.5708:4.7124):(left?0.:3.14159)"};
           float s=uPhase+offset,lift=max(0.,cos(s));
           float pivot=front?uFront:uBack;
           // Knee: the lower leg folds back while the leg swings forward.

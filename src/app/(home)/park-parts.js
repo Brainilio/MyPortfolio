@@ -96,6 +96,27 @@ export function createFin(rng,width,height,depth) {
 }
 
 // A woven basket: a lathe-turned bowl with alternating bands.
+// A sandstone butte (Monument Valley): a wide, flat-topped block with sheer banded cliffs standing on a talus apron,
+// a slightly overhanging caprock and a sun-bleached top. width and depth are the footprint, height the cliff top.
+const BUTTE={talus:"#c27a4c",bands:["#c1693a","#a8522a","#b65e33"],cap:"#97462a",top:"#e0a87c"};
+export function createButte(rng,width,height,depth) {
+  const SEG=10,noise=Array.from({length:SEG},()=>.78+rng()*.34);
+  // Rings from the foot up: the talus apron, the cliff's foot, two strata breaks, the caprock and its lip.
+  const levels=[[0,1.18],[.24,.86],[.5,.84],[.76,.83],[.9,.82],[1,.86]],rings=levels.map(([t,r])=>Array.from({length:SEG},(_,s)=>{
+    const a=s/SEG*Math.PI*2,k=noise[s]*r*(t?1:1+(rng()-.5)*.08);return new THREE.Vector3(Math.cos(a)*width/2*k,t*height,Math.sin(a)*depth/2*k);}));
+  const tris=[],paint=new Map(),top=new THREE.Vector3(0,height*1.004,0);
+  for(let k=0;k<rings.length-1;k++)for(let s=0;s<SEG;s++){
+    const a=rings[k][s],b=rings[k][(s+1)%SEG],c=rings[k+1][(s+1)%SEG],d=rings[k+1][s],color=k===0?BUTTE.talus:k===rings.length-2?BUTTE.cap:BUTTE.bands[(k+s%2)%3];
+    for(const tri of [[a,c,b],[a,d,c]]){tris.push(tri);paint.set(tri,color);}
+  }
+  for(let s=0;s<SEG;s++){const tri=[rings.at(-1)[s],top,rings.at(-1)[(s+1)%SEG]];tris.push(tri);paint.set(tri,BUTTE.top);}
+  // Underneath, so it can sink a little into a slope without showing a hole.
+  for(let s=0;s<SEG;s++){const tri=[rings[0][s],rings[0][(s+1)%SEG],new THREE.Vector3(0,0,0)];tris.push(tri);paint.set(tri,BUTTE.talus);}
+  const geometry=faceted(tris,(tri,color)=>color.set(paint.get(tri)));
+  const material=flatMaterial();material.side=THREE.DoubleSide;
+  return new THREE.Mesh(geometry,material);
+}
+
 export function createBasket() {
   const profile=[[0,.02],[.5,.02],[.62,.12],[.7,.3],[.74,.46],[.8,.5],[.76,.54],[.66,.5],[.6,.32],[.5,.14],[0,.12]].map(([x,y])=>new THREE.Vector2(x,y));
   const geometry=new THREE.LatheGeometry(profile,14).toNonIndexed(),pos=geometry.attributes.position,colors=new Float32Array(pos.count*3);
