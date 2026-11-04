@@ -11,6 +11,7 @@ import * as THREE from "three";
 // animation (it decides how often) and returns true when anything changed, exposure its tone-mapping exposure, and
 // fade ({ side: left, right or top, from }) fades it out toward that edge.
 let stage = null;
+const OVERSCAN = .5, saved = new THREE.Matrix4(), squeeze = new THREE.Matrix4();
 
 export function getStage() {
   if (!stage) stage = createStage();
@@ -79,8 +80,21 @@ function createStage() {
       renderer.toneMappingExposure = entry.exposure ?? 1.05;
       renderer.clearDepth();
       // Three's viewport is in CSS pixels from the bottom left; it may run off the canvas, which simply clips it.
-      renderer.setViewport(r.left, height - r.bottom, r.width, r.height);
-      renderer.render(entry.scene, entry.camera);
+      if (entry.pad != null) {
+        // A painted layer: drawn into its rectangle grown by pad pixels each side (room for a glow).
+        renderer.setViewport(r.left - entry.pad, height - r.bottom - entry.pad, r.width + entry.pad * 2, r.height + entry.pad * 2);
+        renderer.render(entry.scene, entry.camera);
+      } else {
+        // An island: drawn into its rectangle grown by half its height above and below, with the projection squeezed to
+        // match, so it lands exactly where it would but anything reaching past the stage's edge (the underside of an
+        // island as it travels) isn't cut off.
+        const grow = 1 + OVERSCAN * 2, projection = entry.camera.projectionMatrix;
+        renderer.setViewport(r.left, height - r.bottom - r.height * OVERSCAN, r.width, r.height * grow);
+        saved.copy(projection); projection.premultiply(squeeze.makeScale(1, 1 / grow, 1));
+        renderer.render(entry.scene, entry.camera);
+        projection.copy(saved);
+        renderer.setViewport(r.left, height - r.bottom, r.width, r.height);
+      }
       if (entry.fade) {
         veilUniforms.uScreen.value.set(width * renderer.getPixelRatio(), height * renderer.getPixelRatio());
         veilUniforms.uFrom.value = entry.fade.from; veilUniforms.uDir.value = entry.fade.side === "left" ? -1 : 1; veilUniforms.uAxis.value = entry.fade.side === "top" ? 1 : 0;
@@ -106,25 +120,26 @@ function createStage() {
     // front of it; the element stays in the page for screen readers and layout, its own text made invisible.
     text(element) {
       const paint = document.createElement("canvas"), texture = new THREE.CanvasTexture(paint);
-      texture.colorSpace = THREE.SRGBColorSpace;
-      const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, depthTest: false, depthWrite: false, toneMapped: false });
+      texture.colorSpace = THREE.SRGBColorSpace; texture.premultiplyAlpha = true;
+      const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, premultipliedAlpha: true, depthTest: false, depthWrite: false, toneMapped: false });
+      const PAD = 120;
       const layer = new THREE.Scene(), plane = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
       plane.frustumCulled = false; layer.add(plane);
       let opacity = -1;
       const draw = () => {
         const r = element.getBoundingClientRect(), style = getComputedStyle(element), ratio = renderer.getPixelRatio(), g = paint.getContext("2d");
-        paint.width = Math.max(1, Math.round(r.width * ratio)); paint.height = Math.max(1, Math.round(r.height * ratio));
+        paint.width = Math.max(1, Math.round((r.width + PAD * 2) * ratio)); paint.height = Math.max(1, Math.round((r.height + PAD * 2) * ratio));
         g.scale(ratio, ratio);
         g.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`; g.letterSpacing = style.letterSpacing;
         g.textAlign = "center"; g.textBaseline = "middle"; g.fillStyle = element.dataset.color || "#fbf7ff";
         g.shadowColor = "rgba(255,190,170,.25)"; g.shadowBlur = 80;
-        g.fillText(element.textContent, r.width / 2, r.height / 2);
+        g.fillText(element.textContent, PAD + r.width / 2, PAD + r.height / 2);
         texture.needsUpdate = true; dirty = true;
       };
       element.classList.add("is-painted");
       draw(); document.fonts?.ready.then(draw);
       const onResize = () => draw(); window.addEventListener("resize", onResize);
-      const entry = { mount: element, scene: layer, camera: skyCamera, order: 0, exposure: 1,
+      const entry = { mount: element, scene: layer, camera: skyCamera, order: 0, exposure: 1, pad: PAD,
         // Follows the element's own fade (its entrance animation).
         draw() { const o = +getComputedStyle(element).opacity; if (o === opacity) return false; opacity = o; material.opacity = o; return true; } };
       const unregister = this.register(entry);

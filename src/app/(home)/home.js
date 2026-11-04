@@ -6,6 +6,7 @@ import "lenis/dist/lenis.css";
 import allProjects from "../../lib/projects";
 import "./home.css";
 import { getStage } from "./stage";
+import LiquidCard from "./liquid-card";
 const IslandScene = dynamic(() => import("./island-scene"), { ssr: false });
 const AboutScene = dynamic(() => import("./about-scene"), { ssr: false });
 const WorkScene = dynamic(() => import("./work-scene"), { ssr: false });
@@ -275,14 +276,11 @@ export default function Home() {
               const shown = i < placed;
               return (
                 <li key={project.slug} className={`ht-card ${i % 2 ? "is-left" : "is-right"}${shown ? " is-placed" : ""}`} style={{ "--r": `${TILTS[i % TILTS.length]}deg`, zIndex: i + 1 }}>
-                  <a href={`/project/${project.slug}/`} tabIndex={shown ? undefined : -1}>
-                    <span className="ht-card-media" aria-hidden="true">
-                      {shown && section === WORK && !still && project.previewVideo
-                        ? <video src={project.previewVideo} poster={project.previewImage} autoPlay muted loop playsInline />
-                        : <img src={project.previewImage} alt="" loading="lazy" decoding="async" />}
-                    </span>
-                    <span className="ht-card-text">{String(i + 1).padStart(2, "0")} · {project.name}<i aria-hidden="true">→</i></span>
-                  </a>
+                  <LiquidCard id={`ht-liquid-${i}`} href={`/project/${project.slug}/`} label={`${project.name}: view the project`} placed={shown}>
+                    {shown && section === WORK && !still && project.previewVideo
+                      ? <video src={project.previewVideo} poster={project.previewImage} autoPlay muted loop playsInline />
+                      : <img src={project.previewImage} alt="" loading="lazy" decoding="async" />}
+                  </LiquidCard>
                 </li>
               );
             })}

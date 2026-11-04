@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { getStage } from "./stage";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
-import { random, createIsland, createBearMaterial, createSpin, tilted, createSwayingInstances, createFoliageMaterial, createBird } from "./island-parts";
+import { random, createIsland, createBearMaterial, createSpin, tilted, createSwayingInstances, createFoliageMaterial, createBird, createCloud } from "./island-parts";
 import { paintGeometry } from "./forest-parts";
 import { createButte, createBasket } from "./park-parts";
 
@@ -34,8 +34,8 @@ const GAITS={Graze:[0,1.1,.003,0,0,.04],Walk:[.36,3.4,.006,.6,.035,.09],Run:[.62
 // (55%), at the back left with its thumb; the East Mitten (38%) at the back right, sky between them; and a low wide
 // mesa stub (18%, cap 1.6 times as wide as it's tall) mid-left in front. The right and the front stay open for the
 // herd. Swells (x, z, radius, height); the prairie dogs' mounds and the feed basket near the front.
-const BUTTES=[[-1.6,-2.2,5.94,null,.3,true],[2.2,-2,4.1,null,-.5,false],[-3,.9,1.94,3.1,.9,false]];
-const footOf=([,,h,w])=>(w?w/2:.18*h)+.27*h;
+const BUTTES=[[-1.6,-2.2,5.94,null,.3,true],[2.2,-2,4.1,null,-.5,false],[-3,.9,1.6,3.1,.9,false]];
+const footOf=([,,h,w])=>w?w/2+.55*h:.45*h;
 const SWELLS=[[-1.4,.5,1.7,.13],[1.9,.6,1.6,.11],[.1,2.9,1.4,.08]];
 const MOUNDS=[[2.4,1.3],[0,2.5],[-.6,3.15]],BASKET=new THREE.Vector3(1.1,0,2);
 const blocked=(x,z,pad)=>BUTTES.some(b=>Math.hypot(x-b[0],z-b[1])<footOf(b)+pad)||Math.hypot(x-BASKET.x,z-BASKET.z)<pad+.3;
@@ -84,6 +84,21 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     const birdMaterial=new THREE.MeshStandardMaterial({color:"#3b2b33",flatShading:true,roughness:1,side:THREE.DoubleSide});
     const birds=Array.from({length:5},(_,i)=>{const bird=createBird(birdMaterial);bird.scale.setScalar(.9);Object.assign(bird.userData,{a:i/5*Math.PI*2,r:2.2+(i%3)*.7,h:6.4+(i%2)*.8,speed:.28+(i%4)*.05,flap:i*1.7});world.add(bird);return bird;});
     const ahead=new THREE.Vector3();
+    // Sunrise: you've come from a night by the campfire, so as the section scrolls on, the sun climbs out from behind
+    // the mesa (deep orange low down, paler gold as it rises), its light warming the scene with it. It sits in the
+    // scene, not on the island, so it stays put when the island is spun.
+    const sunCanvas=document.createElement("canvas");sunCanvas.width=sunCanvas.height=256;
+    {const g=sunCanvas.getContext("2d"),grad=g.createRadialGradient(128,128,0,128,128,128);
+      [[0,"rgba(255,248,226,1)"],[.16,"rgba(255,236,190,1)"],[.2,"rgba(255,206,150,.65)"],[.45,"rgba(255,170,120,.22)"],[1,"rgba(255,150,110,0)"]].forEach(([k,c])=>grad.addColorStop(k,c));
+      g.fillStyle=grad;g.fillRect(0,0,256,256);}
+    const sunTexture=new THREE.CanvasTexture(sunCanvas);sunTexture.colorSpace=THREE.SRGBColorSpace;
+    const sunDisc=new THREE.Sprite(new THREE.SpriteMaterial({map:sunTexture,color:"#ffffff",transparent:true,depthWrite:false,fog:false,toneMapped:false}));
+    sunDisc.scale.setScalar(16);sunDisc.renderOrder=-1;scene.add(sunDisc);
+    const LOW=new THREE.Color("#ff8a4c"),HIGH=new THREE.Color("#fff2d6");let risen=-1;
+    // A few warm clouds drifting round the mesa, lit pink and gold from below.
+    const clouds=[[7.5,2.6,.8,0],[8.5,3.6,.65,1.7],[9,1.6,.7,3.4],[8,4.4,.55,4.8]].map(([r,y,k,a],i)=>{
+      const cloud=createCloud(70+i);cloud.material.color.set("#fff1e6");cloud.material.emissive.set("#b4604a");cloud.material.emissiveIntensity=.22;
+      cloud.scale.setScalar(k);cloud.userData={r,y,a,speed:.012+(i%2)*.006};scene.add(cloud);return cloud;});
 
     // The feed basket, its hay, and the pellets that pour into it.
     const basket=createBasket();basket.position.copy(on(BASKET.x,BASKET.z));basket.scale.setScalar(.34);basket.rotation.y=.4;world.add(basket);
@@ -246,6 +261,11 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       const goal=reduced?0:state.current.tilt[slot];attitude+=(goal-attitude)*(1-Math.exp(-dt*6));placeCamera();
       herd.forEach(b=>updateBison(b,step,time));dogs.forEach(d=>updateDog(d,step));
       world.position.y=Math.sin(time*.45)*.1;
+      // The sun's climb follows the scroll through the section (reduced motion: already up).
+      const rise=reduced?1:smooth(state.current.progress[slot]/.75);
+      if(Math.abs(rise-risen)>1e-3){risen=rise;sunDisc.position.set(-15+rise*2,-4+rise*9,-32);sunDisc.material.color.copy(LOW).lerp(HIGH,rise);
+        sun.intensity=1.8+rise*1.4;sun.color.copy(LOW).lerp(HIGH,rise*.8);}
+      clouds.forEach(cloud=>{const u=cloud.userData;u.a+=step*u.speed;cloud.position.set(Math.cos(u.a)*u.r,u.y+Math.sin(time*.2+u.r)*.2,-Math.abs(Math.sin(u.a))*u.r-1.5);});
       shared.uTime.value=time;shared.uBreeze.value=reduced?0:.03;shared.uGust.value=reduced?0:.05;
       for(const set of bushes){for(let i=0;i<set.sway.length;i++)set.sway[i]*=Math.exp(-dt*2.2);set.update();}
       birds.forEach(bird=>{const u=bird.userData;u.a+=step*u.speed;const x=-.2+Math.cos(u.a)*u.r,z=-2+Math.sin(u.a)*u.r,y=u.h+Math.sin(time*.8+u.flap)*.25;
@@ -276,6 +296,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       clearTimeout(readyTimer);delete window.__work;disposed=true;unregister();wide.removeEventListener("change",syncFade);resize.disconnect();observer.disconnect();
       spin.dispose();canvas.removeEventListener("pointermove",onHover);
       scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat())m?.dispose();});
+      sunTexture.dispose();
       
     };
   },[state,slot]);

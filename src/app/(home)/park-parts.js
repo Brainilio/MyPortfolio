@@ -116,29 +116,36 @@ function ringSolid(rng,rings,sides,wobble,colorOf,{bottom=false,top=false,topJit
   if(bottom)for(let s=0;s<sides;s++)add([pts[0][(s+1)%sides],new THREE.Vector3(0,pts[0][0].y,0),pts[0][s]],colorOf(0));
   return faceted(tris,(tri,color)=>color.set(paint.get(tri)));
 }
+// A mesa (width given) is drawn differently from a mitten: a long, low, irregular table, its footprint stretched and
+// lobed, with no strata ledges (a stack of rings read as plates), a broad talus and a sloping, uneven top.
 export function createButte(rng,height,{width=null,thumb=false}={}) {
-  const H=height,shaft=width?width/2:.18*H,talusH=.2*H,shaftH=.75*H,capH=.05*H,skirt=shaft+.27*H;
+  const mesa=!!width;
+  // A mesa stands on a much taller, broader slope of talus, with a shorter cliff band on top.
+  const H=height,shaft=width?width/2:.18*H,talusH=(width?.42:.2)*H,shaftH=(width?.53:.75)*H,capH=.05*H,skirt=shaft+(width?.55:.27)*H;
   const parts=[];
   // The talus skirt: wide at the ground, curving in (convex) to meet the cliff, its outer edge ragged.
-  const skirtWobble=Array.from({length:11},()=>.92+rng()*.16);
-  parts.push(ringSolid(rng,[[0,skirt,.08],[talusH*.35,shaft+(skirt-shaft)*.55],[talusH*.75,shaft+(skirt-shaft)*.18],[talusH,shaft*1.02]],11,skirtWobble,()=>MITTEN.talus,{bottom:true}));
+  const skirtWobble=Array.from({length:11},()=>mesa?.85+rng()*.3:.92+rng()*.16);
+  parts.push(ringSolid(rng,[[0,skirt*(mesa?1.12:1),.08],[talusH*.35,shaft+(skirt-shaft)*.55],[talusH*.75,shaft+(skirt-shaft)*.18],[talusH,shaft*1.02]],11,skirtWobble,()=>MITTEN.talus,{bottom:true}));
   // The cliff shaft: an uneven 8-sided column, barely leaning in, with strata ledges at irregular heights.
-  const sides=8,wobble=Array.from({length:sides},()=>.86+rng()*.26),rings=[[talusH*.9,shaft]],top=shaft*(width?.97:.9);
+  const sides=mesa?11:8,wobble=Array.from({length:sides},(_,i)=>mesa?.78+rng()*.4+.12*Math.sin(i*2.1):.86+rng()*.26),rings=[[talusH*.9,shaft]],top=shaft*(width?.97:.9);
   const radiusAt=t=>shaft+(top-shaft)*t;
-  const ledges=Array.from({length:2+(rng()<.5?1:0)},(_,i,_a)=>.22+i*.26+rng()*.12);
+  const ledges=mesa?[]:Array.from({length:2+(rng()<.5?1:0)},(_,i,_a)=>.22+i*.26+rng()*.12);
   for(const t of ledges){const y=talusH+t*shaftH,r=radiusAt(t),bump=r*(.03+rng()*.02),tall=shaftH*(.04+rng()*.02);
     rings.push([y-tall/2,r],[y-tall/2+.001,r+bump],[y+tall/2,r+bump],[y+tall/2+.001,r]);}
   rings.push([talusH+shaftH,top]);
   parts.push(ringSolid(rng,rings,sides,wobble,()=>MITTEN.cliff));
   // The cap: a thin slab of the lighter rock, its top edge broken (some corners up, some down).
   parts.push(ringSolid(rng,[[talusH+shaftH,top*1.03],[talusH+shaftH+capH,top*1.03]],sides,wobble,()=>MITTEN.cap,
-    {top:true,topJitter:r=>r()<.6?r()*.08*H:-r()*.05*H}));
+    {top:true,topJitter:mesa?r=>(r()-.5)*.12*H:r=>r()<.6?r()*.08*H:-r()*.05*H}));
   // The West Mitten's thumb: a slim spire standing against the right side of the shaft.
   if(thumb){const h=.25*H,r=shaft*.3,tw=Array.from({length:6},()=>.85+rng()*.3);
     const spire=ringSolid(rng,[[talusH*.8,r],[talusH*.8+h*.9,r*.85],[talusH*.8+h,r*.85]],6,tw,k=>k===1||k<0?MITTEN.cap:MITTEN.cliff,{top:true,topJitter:q=>q()*.03*H});
     spire.translate(shaft*1.05,0,shaft*.15);parts.push(spire);}
   const material=new THREE.MeshLambertMaterial({vertexColors:true,flatShading:true,side:THREE.DoubleSide});
-  const mesh=new THREE.Mesh(mergeGeometries(parts),material);mesh.userData.foot=skirt;
+  const geometry=mergeGeometries(parts);
+  // The mesa's footprint: long and narrow rather than round.
+  if(mesa)geometry.scale(1.35,1,.72);
+  const mesh=new THREE.Mesh(geometry,material);mesh.userData.foot=skirt;
   return mesh;
 }
 
