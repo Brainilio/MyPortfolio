@@ -120,6 +120,47 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
         spots[n%3].push({position:on(x,z),rotation:rng()*6,scale:(.1+rng()*.14)/3});n++;}
       // Built three times taller than it's placed, so the sway (which grows with height) shows on something this low.
       tints.forEach((tint,k)=>{const geometry=paintGeometry(new THREE.IcosahedronGeometry(3,0).scale(1,.6,1).translate(0,1.2,0),tint),set=createSwayingInstances(geometry,spots[k],foliage);bushes.push(set);world.add(set.mesh);});}
+    // A tumbleweed: a loose ball of dry, bent stems (a dozen thin rings at random angles, two straw tones). Brush the
+    // cursor through it and it gets kicked the way you swiped, rolling and hopping across the grass; it bounces off the
+    // buttes and the basket and off an invisible fence short of the island's edge, so it never falls off. Now and then
+    // a gust nudges it along by itself.
+    const TUMBLE=.19,tumble={pos:new THREE.Vector3(-1.2,0,2.3),vel:new THREE.Vector2(),hop:0,lift:0,gust:4};
+    const tumbleweed=(()=>{const parts=[],straw=[new THREE.Color("#c9a467"),new THREE.Color("#a98349"),new THREE.Color("#dcbd84")],q=new THREE.Quaternion(),e=new THREE.Euler();
+      for(let i=0;i<13;i++){
+        const r=TUMBLE*(.72+rng()*.32),g=new THREE.TorusGeometry(r,.011+rng()*.006,3,9,Math.PI*(1.3+rng()*.7));
+        g.scale(1,.8+rng()*.4,1).applyQuaternion(q.setFromEuler(e.set(rng()*6.3,rng()*6.3,rng()*6.3)));
+        const c=straw[i%3],colors=new Float32Array(g.attributes.position.count*3);for(let k=0;k<colors.length;k+=3)colors.set([c.r,c.g,c.b],k);
+        g.setAttribute("color",new THREE.BufferAttribute(colors,3));g.deleteAttribute("uv");parts.push(g);}
+      const mesh=new THREE.Mesh(mergeGeometries(parts),new THREE.MeshLambertMaterial({vertexColors:true,flatShading:true}));
+      parts.forEach(g=>g.dispose());return mesh;})();
+    tumbleweed.position.copy(on(tumble.pos.x,tumble.pos.z,TUMBLE));world.add(tumbleweed);
+    const rollAxis=new THREE.Vector3(),rollTurn=new THREE.Quaternion();
+    function updateTumble(dt){
+      const t=tumble,p=t.pos,v=t.vel;
+      // A gust every so often, from the back left like the light.
+      if((t.gust-=dt)<=0){t.gust=7+rng()*8;if(v.length()<.2){v.x+=.35+rng()*.35;v.y+=.15+rng()*.3;t.hop=Math.max(t.hop,.6);}}
+      p.x+=v.x*dt;p.z+=v.y*dt;v.multiplyScalar(Math.exp(-dt*1.1));
+      // The fence near the edge: bounce back in.
+      const a=Math.atan2(p.z,p.x),edge=outline(a)*.8,r=Math.hypot(p.x,p.z);
+      if(r>edge){const nx=p.x/r,nz=p.z/r,out=v.x*nx+v.y*nz;p.x=nx*edge;p.z=nz*edge;if(out>0){v.x-=1.6*out*nx;v.y-=1.6*out*nz;t.hop=Math.max(t.hop,out*.6);}}
+      // The buttes and the basket: bounce off them.
+      for(const [bx,bz,stop] of [...BUTTES.map(b=>[b[0],b[1],footOf(b)+TUMBLE*.6]),[BASKET.x,BASKET.z,.3+TUMBLE]]){
+        const dx=p.x-bx,dz=p.z-bz,d=Math.hypot(dx,dz);if(d>=stop||d<1e-4)continue;
+        const nx=dx/d,nz=dz/d,into=v.x*nx+v.y*nz;p.x=bx+nx*stop;p.z=bz+nz*stop;if(into<0){v.x-=1.6*into*nx;v.y-=1.6*into*nz;}}
+      // Hops: a little upward kick that gravity brings back down.
+      t.lift+=t.hop*dt;t.hop-=9*dt;if(t.lift<=0){t.lift=0;t.hop=Math.abs(t.hop)>.5?Math.abs(t.hop)*.35:0;}
+      tumbleweed.position.set(p.x,heightAt(p.x,p.z)+TUMBLE*.85+t.lift,p.z);
+      // Roll: turn about the axis across its path by the distance travelled.
+      const speed=v.length();
+      if(speed>1e-3){rollAxis.set(v.y,0,-v.x).normalize();rollTurn.setFromAxisAngle(rollAxis,speed*dt/TUMBLE);tumbleweed.quaternion.premultiply(rollTurn);}
+      // The sage it rolls through stirs.
+      if(speed>.15)for(const set of bushes)set.mesh.userData.placements.forEach((q,i)=>{if(Math.hypot(q.position.x-p.x,q.position.z-p.z)<.35)set.sway[i]=Math.min(.22,set.sway[i]+speed*dt*.6);});
+      return speed>.02||t.lift>0;
+    }
+    function kickTumble(dx,dz,strength){
+      const d=Math.hypot(dx,dz)||1,v=tumble.vel,push=Math.min(2.6,strength*2.2);
+      v.x+=dx/d*push;v.y+=dz/d*push;if(v.length()>3)v.setLength(3);tumble.hop=Math.max(tumble.hop,.9+push*.5);tumble.gust=7+rng()*8;
+    }
     // A few birds wheeling high over the Mittens.
     const birdMaterial=new THREE.MeshStandardMaterial({color:"#3b2b33",flatShading:true,roughness:1,side:THREE.DoubleSide});
     const birds=Array.from({length:5},(_,i)=>{const bird=createBird(birdMaterial);bird.scale.setScalar(.9);Object.assign(bird.userData,{a:i/5*Math.PI*2,r:2.2+(i%3)*.7,h:6.4+(i%2)*.8,speed:.28+(i%4)*.05,flap:i*1.7});world.add(bird);return bird;});
@@ -265,14 +306,18 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
         const dog=dogs.find(d=>{let o=hit.object;while(o&&o!==d.root)o=o.parent;return o===d.root;});
         if(dog){dog.state="down";dog.timer=3+rng()*3;needsRender=true;}
       }});
-    canvas.addEventListener("pointerleave",()=>{onBasket=false;});
+    canvas.addEventListener("pointerleave",()=>{onBasket=false;hadHover=false;});
     // Hover (a mouse only): the sage near the cursor stirs, the faster the cursor the more. Passive under the drag.
-    const hover=new THREE.Vector3();let hoverX=0,hoverY=0,hoverAt=0;
+    // Brushing through the tumbleweed kicks it the way the cursor was going.
+    const hover=new THREE.Vector3(),lastHover=new THREE.Vector3();let hoverX=0,hoverY=0,hoverAt=0,hadHover=false;
     function onHover(event){
       if(event.pointerType!=="mouse"||event.buttons||preference.matches)return;
       const now=performance.now(),speed=Math.hypot(event.clientX-hoverX,event.clientY-hoverY)/Math.max(16,now-hoverAt);hoverX=event.clientX;hoverY=event.clientY;hoverAt=now;
-      const hit=pick(event,[island.surface]),kick=Math.min(1,speed*.9);if(!hit||kick<.03)return;
-      world.worldToLocal(hover.copy(hit.point));
+      const hit=pick(event,[island.surface,tumbleweed]),kick=Math.min(1,speed*.9);if(!hit){hadHover=false;return;}
+      lastHover.copy(hover);world.worldToLocal(hover.copy(hit.point));
+      const fresh=hadHover;hadHover=true;
+      if(fresh&&kick>.05&&(hit.object===tumbleweed||Math.hypot(hover.x-tumble.pos.x,hover.z-tumble.pos.z)<TUMBLE+.3)){kickTumble(hover.x-lastHover.x,hover.z-lastHover.z,kick);needsRender=true;}
+      if(kick<.03)return;
       for(const set of bushes)set.mesh.userData.placements.forEach((p,i)=>{const d=Math.hypot(p.position.x-hover.x,p.position.z-hover.z);if(d<1.4)set.sway[i]=Math.min(.22,set.sway[i]+(1-d/1.4)*kick*.09);});
       needsRender=true;
     }
@@ -300,6 +345,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       world.rotation.y=spin.update(dt);
       const goal=reduced?0:state.current.tilt[slot];attitude+=(goal-attitude)*(1-Math.exp(-dt*6));placeCamera();
       herd.forEach(b=>updateBison(b,step,time));dogs.forEach(d=>updateDog(d,step));
+      const rolling=updateTumble(step);
       world.position.y=Math.sin(time*.45)*.1;
       // The sun's climb follows the scroll through the section (reduced motion: already up).
       const rise=reduced?1:smooth(state.current.progress[slot]/.75);
@@ -312,7 +358,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
         bird.position.set(x,y,z);bird.lookAt(world.localToWorld(ahead.set(-.2+Math.cos(u.a+.2)*u.r,y,-2+Math.sin(u.a+.2)*u.r)));
         const flap=Math.sin(time*8+u.flap)*.7;u.wings[0].rotation.z=flap;u.wings[1].rotation.z=-flap;});
       needsRender=false;
-      return falling||onBasket||spin.busy||herd.some(b=>b.feeding&&b.state==="move")||Math.abs(goal-attitude)>.05||bushes.some(set=>set.sway.some(v=>v>.003));
+      return falling||rolling||onBasket||spin.busy||herd.some(b=>b.feeding&&b.state==="move")||Math.abs(goal-attitude)>.05||bushes.some(set=>set.sway.some(v=>v>.003));
     }
     // Full rate while feed falls, the herd runs to it or the basket is hovered, 30 fps for the grazing in between.
     let busy=true;
@@ -330,7 +376,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     const wide=matchMedia("(min-width: 761px)"),syncFade=()=>{entry.fade=wide.matches?{side:"right",from:.75}:null;shared_.invalidate();};
     syncFade();wide.addEventListener("change",syncFade);
     const readyTimer=setTimeout(()=>ready.current?.(),0);
-    if(new URLSearchParams(window.location.search).has("debug"))window.__work={camera,herd,world,scene,renderer,pour,THREE};
+    if(new URLSearchParams(window.location.search).has("debug"))window.__work={camera,herd,world,scene,renderer,pour,THREE,tumble,tumbleweed,kickTumble};
 
     return()=>{
       clearTimeout(readyTimer);delete window.__work;disposed=true;unregister();wide.removeEventListener("change",syncFade);resize.disconnect();observer.disconnect();
