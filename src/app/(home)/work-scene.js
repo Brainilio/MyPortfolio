@@ -307,9 +307,9 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
           const a=Math.atan2(p.z-POND.z,p.x-POND.x),d=POND.r+b.length*.42;b.target.set(POND.x+Math.cos(a)*d,POND.z+Math.sin(a)*d);
           b.drink=true;b.state="move";b.gait="walk";
         }
-        // The calf's play: a gallop off round its mother and back.
-        else if(b.calf&&r<.45){if(wander(b,mother.root.position,leash*.55,leash*.95)){b.state="move";b.gait="gallop";}else b.timer=1;}
-        else if(wander(b,b.calf?mother.root.position:p,b.calf?leash*.3:.8,b.calf?leash*.7:2.2)){b.state="move";b.gait="walk";}
+        // The calf's play: a burst of two to four gallops darting here and there round its mother.
+        else if(b.calf&&r<.7){b.dashes=1+Math.floor(Math.random()*3);if(wander(b,mother.root.position,leash*.35,leash*.95)){b.state="move";b.gait="gallop";}else b.timer=.6;}
+        else if(wander(b,b.calf?mother.root.position:p,b.calf?leash*.3:.8,b.calf?leash*.7:2.2)){b.state="move";b.gait=b.calf?"trot":"walk";}
         else b.timer=1;
       } else if(b.state==="move"&&now>=b.startAt){
         const dx=b.target.x-p.x,dz=b.target.y-p.z,dist=Math.hypot(dx,dz);
@@ -318,7 +318,9 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
         if(dist<.08||taken){
           if(b.feeding){b.state="eat";b.eatUntil=now+6;b.face=Math.atan2(BASKET.x-p.x,BASKET.z-p.z);}
           else if(b.drink){b.state="eat";b.eatUntil=now+5+Math.random()*3;b.face=Math.atan2(POND.x-p.x,POND.z-p.z);}
-          else{b.state="graze";b.timer=b.calf?1.5+Math.random()*2:4+Math.random()*7;}
+          // (Mid-burst, the calf darts straight off again.)
+          else if(b.calf&&b.gait==="gallop"&&b.dashes>0&&wander(b,mother.root.position,leash*.35,leash*.95)){b.dashes--;}
+          else{b.state="graze";b.timer=b.calf?1+Math.random()*2:4+Math.random()*7;}
         } else {
           // Steering: head for the target, bending the path round any bison in the way ahead (passing on whichever
           // side it's already on), then walk where it's facing, slowing into turns, at the pace its stride sets.
@@ -339,7 +341,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
         if(away>leash&&(b.state!=="move"||Math.hypot(b.target.x-m.x,b.target.y-m.z)>leash*.8)){
           const a=Math.atan2(p.z-m.z,p.x-m.x);b.target.set(m.x+Math.cos(a)*leash*.5,m.z+Math.sin(a)*leash*.5);
           const off=Math.hypot(b.target.x-POND.x,b.target.y-POND.z);if(off<POND.r+b.radius){const k=(POND.r+b.radius+.05)/Math.max(off,1e-3);b.target.set(POND.x+(b.target.x-POND.x)*k,POND.z+(b.target.y-POND.z)*k);}
-          if(b.state!=="move")b.startAt=now+.3;b.state="move";b.gait=away>leash*1.6?"gallop":away>leash*1.25?"trot":"walk";}}
+          if(b.state!=="move")b.startAt=now+.3;b.state="move";b.gait=away>leash*1.3?"gallop":"trot";}}
       if(b.face!==null){let turn=b.face-b.yaw;turn=Math.atan2(Math.sin(turn),Math.cos(turn));b.yaw+=turn*(1-Math.exp(-dt*3));}
       // Big bodies never overlap: pushed apart from any neighbour that's too close (all the way if the other is lying
       // down and won't budge, halfway otherwise; the other takes the other half on its turn).

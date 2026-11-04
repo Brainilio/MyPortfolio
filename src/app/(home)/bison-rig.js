@@ -31,7 +31,7 @@ const DEG = Math.PI / 180;
 const WALK = { offset: { HL: 0, FL: .25, HR: .5, FR: .75 }, duty: .76, upper: 18 * DEG, lower: 35 * DEG, cycle: 1.8 };
 const TROT = { offset: { FL: 0, HR: 0, FR: .5, HL: .5 }, duty: .5, upper: 35 * DEG, lower: 55 * DEG, cycle: .7 };
 // Gallop (the calf's play): the hinds land close together, then the fronts; a hoof down about a third of the time.
-const GALLOP = { offset: { HL: 0, HR: .1, FR: .45, FL: .55 }, duty: .35, upper: 42 * DEG, lower: 75 * DEG, cycle: .5 };
+const GALLOP = { offset: { HL: 0, HR: .1, FR: .45, FL: .55 }, duty: .38, upper: 30 * DEG, lower: 65 * DEG, cycle: .46 };
 // Lying (as bison do, on the belly), legs folded compactly under the body, nothing sticking out: fore legs under the
 // chest, the knee just forward and the cannon tucked back flat beneath; hind legs folded tight under the haunch, the
 // thigh barely forward and the hock folded right up so the cannon lies under the thigh. (upper, lower, hoof) per front
@@ -48,10 +48,12 @@ function legPose(p, g, front, out) {
     out[0] = g.upper * Math.cos(Math.PI * s); out[1] = 0;
     out[2] = Math.max(-8 * DEG, Math.min(8 * DEG, -out[0]));
   } else {
-    const s = (p - g.duty) / (1 - g.duty), fold = Math.sin(Math.PI * s);
+    // (The fold peaks early in the swing, as the hoof leaves the ground, and is straightening as the leg reaches.)
+    const s = (p - g.duty) / (1 - g.duty), fold = Math.sin(Math.PI * Math.pow(s, .7));
     out[0] = -g.upper * Math.cos(Math.PI * s);
-    // Folding under: the front hoof tucks back toward the chest, the rear hoof forward under the belly.
-    out[1] = (front ? -1 : 1) * g.lower * fold; out[2] = (front ? -1 : 1) * 8 * DEG * fold;
+    // Folding under: the front knee folds the cannon back toward the chest. The hock folds much less, only swinging
+    // the hind cannon up toward upright (never out in front), and the hind hoof curls back, trailing.
+    out[1] = front ? -g.lower * fold : g.lower * .45 * fold; out[2] = (front ? -8 : -14) * DEG * fold;
   }
   return out;
 }
@@ -272,19 +274,19 @@ export function createBisonAnimator(rig, { calf = false, seed = Math.random, res
     const c = s.phase * Math.PI * 2;
     // Body: bob twice a stride (±2.5% walking, ±5% trotting), sway ±1.5° once a stride a quarter-cycle off the bob,
     // the hump bouncing at a trot; breathing ±1.2% every 3.5 s.
-    u.uBob.value = s.walk * .025 * Math.sin(2 * c) + s.trot * .05 * Math.sin(2 * c) + s.gallop * .06 * Math.max(0, Math.sin(c - .6));
+    u.uBob.value = s.walk * .025 * Math.sin(2 * c) + s.trot * .05 * Math.sin(2 * c) + s.gallop * .045 * Math.sin(2 * Math.PI * ((s.phase + .25) % 1));
     u.uSway.value = s.walk * 1.5 * DEG * Math.cos(c);
     u.uHump.value = s.trot * 3 * DEG * Math.sin(2 * c - .6) + s.brace * 6 * DEG;
     u.uBreath.value = .012 * Math.sin(t * Math.PI * 2 / 3.5);
     u.uRoll.value = s.shift + lying * 5 * DEG * (s.side ?? 1);
     // (Galloping, the body rocks nose-up, nose-down.)
-    u.uPelvis.value = s.brace * 8 * DEG + s.gallop * 7 * DEG * Math.sin(c - 1.2);
+    u.uPelvis.value = s.brace * 8 * DEG + s.gallop * 4 * DEG * Math.sin(c - 1.2);
     // Rest pose: the rump dips (the back slopes down from the hump) and the neck angles forward and down.
     u.uRump.value = 4 * DEG;
     // Neck and head: carried low; a ±4° nod walking (±8° trotting); down to graze; down at the basket or water; up and
     // forward when alarmed; low and level lying down.
-    const nod = s.walk * 4 * DEG * Math.sin(c) + s.trot * 8 * DEG * Math.sin(2 * c) + s.gallop * 9 * DEG * Math.sin(c);
-    u.uNeckBase.value = 10 * DEG * calm - 4 * DEG * s.alert + eF * 4 * DEG;
+    const nod = s.walk * 4 * DEG * Math.sin(c) + s.trot * 8 * DEG * Math.sin(2 * c) + s.gallop * 3 * DEG * Math.sin(c);
+    u.uNeckBase.value = 10 * DEG * calm - 4 * DEG * s.alert + eF * 4 * DEG - 12 * DEG * s.gallop;
     u.uNeckMid.value = (dipDepth * .6 * s.dip + 18 * DEG * eat) * calm - 10 * DEG * s.alert + eF * 8 * DEG;
     u.uHead.value = (dipDepth * .4 * s.dip + 12 * DEG * eat + nod) * calm - 20 * DEG * s.alert + eat * Math.sin(t * 5.2) * 3 * DEG * calm + shake * 6 * DEG;
     u.uNeckYaw.value = s.look + shake * 16 * DEG;

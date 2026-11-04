@@ -75,7 +75,7 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, side = "ri
       const asphalt=new THREE.MeshStandardMaterial({map:texture,roughness:.95,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2});
       world.add(new THREE.Mesh(geometry,asphalt));}
 
-    // The Tetons at the back, a hot spring in rings of colour, and the geyser's sinter cone where the road ends.
+    // A hot spring in rings of colour, and the geyser's sinter cone where the road ends.
     {const c=document.createElement("canvas");c.width=c.height=128;const g=c.getContext("2d"),grad=g.createRadialGradient(64,64,0,64,64,64);
       [[0,"#1f6f9a"],[.35,"#3fa7c4"],[.55,"#8fd1b0"],[.7,"#f2d36a"],[.84,"#e9883e"],[.96,"#c4572e"],[1,"rgba(196,87,46,0)"]].forEach(([k,col])=>grad.addColorStop(k,col));g.fillStyle=grad;g.fillRect(0,0,128,128);
       const texture=new THREE.CanvasTexture(c);texture.colorSpace=THREE.SRGBColorSpace;
