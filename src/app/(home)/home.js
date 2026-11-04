@@ -5,6 +5,7 @@ import Lenis from "lenis";
 import "lenis/dist/lenis.css";
 import allProjects from "../../lib/projects";
 import "./home.css";
+import { getStage } from "./stage";
 const IslandScene = dynamic(() => import("./island-scene"), { ssr: false });
 const AboutScene = dynamic(() => import("./about-scene"), { ssr: false });
 const WorkScene = dynamic(() => import("./work-scene"), { ssr: false });
@@ -116,7 +117,7 @@ export default function Home() {
     return () => queries.forEach(q => q.removeEventListener("change", sync));
   }, []);
   const pill = useRef(null), bar = useRef(null);
-  const zones = useRef([]), sky = useRef(null), copies = useRef([]);
+  const zones = useRef([]), sky = useRef(null), copies = useRef([]), skiesRef = useRef(null);
   const { section, stop } = where;
   // Loading: every model is fetched up front (to warm the cache) while the dioramas are built one after another
   // behind the loading screen, each as soon as the previous one reports it's ready. The screen lifts when all are
@@ -186,7 +187,10 @@ export default function Home() {
       const end = Math.max(1, document.documentElement.scrollHeight - vh), marks = [...stops.slice(0, 5).map(v => v / end), 1], p = clamp(y / end);
       let k = 0; while (k < marks.length - 2 && p > marks[k + 1]) k++;
       const blend = clamp((p - marks[k]) / Math.max(1e-6, marks[k + 1] - marks[k])), colors = SKY[k].map((c, n) => mix(c, SKY[k + 1][n], blend));
-      if (sky.current) sky.current.style.background = `linear-gradient(180deg,${colors.map((c, n) => `rgb(${c}) ${[0, 30, 55, 80, 100][n]}%`).join(",")})`;
+      // Painted on the GPU behind the islands (or, without WebGL, as a CSS gradient).
+      const world = getStage();
+      if (world) world.setSky(colors);
+      else if (sky.current) sky.current.style.background = `linear-gradient(180deg,${colors.map((c, n) => `rgb(${c}) ${[0, 30, 55, 80, 100][n]}%`).join(",")})`;
       { const q = scene.current.progress[WORK], n = PLACE_AT.filter(t => q >= t).length; if (n) setPlaced(was => Math.max(was, n)); }
       scene.current.live = live;scene.current.section = dominant;
       pill.current?.style.setProperty("--progress", scene.current.progress[dominant].toFixed(4));
@@ -200,6 +204,8 @@ export default function Home() {
         history.replaceState(null, "", dominant ? `#${SECTIONS[dominant].id}` : location.pathname + location.search);
       }
     };
+    // The one WebGL canvas, behind the page.
+    const world = getStage(); if (world && skiesRef.current) world.attach(skiesRef.current);
     const onScroll = () => { if (!frame) frame = requestAnimationFrame(update); };
     // Start on the section in the URL, if any (and don't let the browser restore an old scroll position over it).
     history.scrollRestoration = "manual";
@@ -212,7 +218,7 @@ export default function Home() {
     // Sections change height as fonts load and the layout settles; keep the measurements fresh.
     const resize = new ResizeObserver(onScroll);resize.observe(document.body);
     window.addEventListener("scroll", onScroll, { passive: true }); window.addEventListener("resize", onScroll);
-    return () => { cancelAnimationFrame(frame); resize.disconnect(); window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); lenis?.destroy(); lenisRef.current = null; };
+    return () => { world?.detach(); cancelAnimationFrame(frame); resize.disconnect(); window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); lenis?.destroy(); lenisRef.current = null; };
   }, []);
 
   // Clicking the wagon glides the page on to the next sign (or back to the first from the last).
@@ -224,7 +230,7 @@ export default function Home() {
 
   return (
     <main className={`ht${loaded ? " is-entered" : ""}`} data-section={SECTIONS[section].id}>
-      <div className="ht-skies" aria-hidden="true"><div className="ht-sky-live" ref={sky} /></div>
+      <div className="ht-skies" aria-hidden="true" ref={skiesRef}><div className="ht-sky-live" ref={sky} /></div>
       <div className="ht-finish" aria-hidden="true" />
       <header className="ht-header">
         <a href="#" className="ht-wordmark" onClick={event => { event.preventDefault(); jump(0); }}>Brainilio<span>.</span></a>
