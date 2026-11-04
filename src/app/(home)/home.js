@@ -106,7 +106,7 @@ function RevealHeading({ id, text, arrive = 20 }) {
 export default function Home() {
   const [where, setWhere] = useState({ section: 0, stop: 0 }), [menu, setMenu] = useState(false);
   // Shared with the 3D scenes (read every frame): which sections are on screen and how far through each one we are.
-  const scene = useRef({ section: 0, live: [0], progress: [0, 0, 0, 0, 0], shift: [0, 0, 0, 0, 0], tilt: [0, 0, 0, 0, 0] });
+  const scene = useRef({ section: 0, live: [0], progress: [0, 0, 0, 0, 0], tilt: [0, 0, 0, 0, 0] });
   const [spotted, setSpotted] = useState([]), [still, setStill] = useState(false), [placed, setPlaced] = useState(0);
   // Reduced motion, and phones: the Work postcard shows its still image instead of playing its preview.
   useEffect(() => {
@@ -115,7 +115,7 @@ export default function Home() {
     return () => queries.forEach(q => q.removeEventListener("change", sync));
   }, []);
   const pill = useRef(null), bar = useRef(null);
-  const zones = useRef([]), sky = useRef(null), copies = useRef([]), skiesRef = useRef(null), nameRef = useRef(null);
+  const zones = useRef([]), sky = useRef(null), skiesRef = useRef(null), nameRef = useRef(null);
   const { section, stop } = where;
   // Loading: every model is fetched up front (to warm the cache) while the dioramas are built one after another
   // behind the loading screen, each as soon as the previous one reports it's ready. The screen lifts when all are
@@ -249,7 +249,7 @@ export default function Home() {
           their own; on the left, just the person behind it. The words hold in the middle while the island does. */}
       <section className="ht-zone ht-about" id="about" data-side="right" ref={el => (zones.current[ABOUT] = el)} aria-labelledby="ht-about-title">
         <div className="ht-stage">{built[ABOUT] && <AboutScene state={scene} slot={ABOUT} side="right" onReady={onReady(ABOUT)} />}</div>
-        <div className="ht-copy" ref={el => (copies.current[ABOUT] = el)}>
+        <div className="ht-copy">
           {/* Replace with: <Image src="/me.jpg" alt="Brainilio" width={120} height={120} /> (drop me.jpg into /public) */}
           <div className="ht-portrait" aria-hidden="true" />
           <RevealHeading id="ht-about-title" text="Around the fire" />
@@ -265,7 +265,7 @@ export default function Home() {
           per step of the scroll, alternating right and left, building up a little constellation that stays. */}
       <section className="ht-zone ht-work ht-pinned" id="work" data-side="left" style={{ "--steps": work.length, "--step": "50svh" }} ref={el => (zones.current[WORK] = el)} aria-labelledby="ht-work-title">
         <div className="ht-stage">{built[WORK] && <WorkScene state={scene} slot={WORK} side="center" onReady={onReady(WORK)} />}</div>
-        <div className="ht-copy" ref={el => (copies.current[WORK] = el)}>
+        <div className="ht-copy">
           <div className="ht-work-head">
             <RevealHeading id="ht-work-title" text="Things I’ve built" arrive={50} />
             <p className="ht-drive">Click the basket to feed the herd</p>
@@ -297,7 +297,7 @@ export default function Home() {
       {/* Skills: the park road on the right; the wagon drives sign to sign as the list scrolls past. */}
       <section className="ht-zone ht-skills ht-pinned" id="skills" data-side="right" style={{ "--steps": SKILLS.length }} ref={el => (zones.current[SKILLS_AT] = el)} aria-labelledby="ht-skills-title">
         <div className="ht-stage">{built[SKILLS_AT] && <SkillsScene state={scene} skills={SKILLS} onCar={onCar} slot={SKILLS_AT} side="right" onReady={onReady(SKILLS_AT)} />}</div>
-        <div className="ht-copy" ref={el => (copies.current[SKILLS_AT] = el)}>
+        <div className="ht-copy">
           <RevealHeading id="ht-skills-title" text="What I bring along" />
           <p className="ht-drive">Scroll or click the wagon to drive on</p>
           <ol className="ht-list">

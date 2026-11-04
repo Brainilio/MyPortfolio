@@ -267,7 +267,6 @@ export default function AboutScene({ state, slot = 1, side = "right", onReady })
     window.addEventListener("pointermove",onPointer,{passive:true});
 
     let time=0,needsRender=true,since=0,flow=0;
-    const clock=new THREE.Clock();
     function tick(dt){
       const reduced=preference.matches,step=reduced?0:dt;time+=step;flow+=step;
       shared.uTime.value=time;shared.uBreeze.value=reduced?0:.025;shared.uGust.value=reduced?0:.04;

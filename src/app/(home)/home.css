@@ -50,9 +50,8 @@ body:has(.ht){background:#1b1335}
 .ht-sky{position:absolute;inset:0;z-index:0;background:
   radial-gradient(60% 45% at 78% 74%,rgba(255,196,160,.55),transparent 70%),
   linear-gradient(180deg,#1b1335 0%,#33225a 34%,#6e4a8f 60%,#c9849c 82%,#f3b89c 100%)}
-.ht-canvas{position:absolute;inset:0;opacity:0;transition:opacity 1.8s ease}
-.ht-canvas[data-ready=true]{opacity:1}
-.ht-canvas canvas{display:block;width:100%;height:100%}
+/* An island's hit area inside its stage (the island itself is drawn on the shared canvas). */
+.ht-canvas{position:absolute;inset:0}
 
 /* The name: big, across the top and behind the island (under the canvas), so the peaks rise in front of it. */
 .ht .ht-name{position:absolute;z-index:1;left:0;right:0;top:clamp(96px,15svh,150px);display:block;margin:0;text-align:center;pointer-events:none;
@@ -100,9 +99,6 @@ body:has(.ht){background:#1b1335}
 /* The valley's grade: golden-hour haze, a soft warm wash over everything and slightly lifted, rosy shadows. */
 .ht-prairie-canvas,.ht-road-canvas,.ht-hike-canvas,.ht-coast-canvas{position:absolute;inset:0}
 .ht-prairie-canvas canvas,.ht-road-canvas canvas,.ht-hike-canvas canvas,.ht-coast-canvas canvas{display:block;width:100%;height:100%}
-/* On wide screens each island fades out toward its words, so it never crowds them. */
-.ht-work .ht-stage{-webkit-mask-image:linear-gradient(90deg,#000 75%,transparent);mask-image:linear-gradient(90deg,#000 75%,transparent)}
-.ht-skills .ht-stage{-webkit-mask-image:linear-gradient(270deg,#000 75%,transparent);mask-image:linear-gradient(270deg,#000 75%,transparent)}
 .ht-list li{color:var(--ink)}
 .ht-list b i{color:#7c5cdb}
 /* On the light skies the words and chrome turn ink. */
@@ -177,7 +173,6 @@ body:has(.ht){background:#1b1335}
   linear-gradient(180deg,#4f8cc6 0%,#7eacd6 26%,#b4cee2 44%,#d4e0e7 56%,#d4e0e7 100%)}
 /* Grade: a light vignette and a warm glow where the sun sits; the haze lives in the scene's distance. */
 .ht-contact{height:100svh}
-.ht-contact .ht-stage{-webkit-mask-image:linear-gradient(180deg,transparent,#000 22%);mask-image:linear-gradient(180deg,transparent,#000 22%)}
 .ht-contact-card{position:absolute;z-index:4;left:var(--gutter);top:clamp(110px,18svh,170px);max-width:430px;padding:28px 30px;border-radius:22px;color:#f4f6f8;
   background:rgba(28,36,46,.42);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(14px) saturate(1.1);-webkit-backdrop-filter:blur(14px) saturate(1.1);box-shadow:0 20px 50px rgba(10,16,24,.25)}
 .ht-contact-card h2{margin:0;font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:clamp(34px,4vw,60px);line-height:.95;letter-spacing:-.05em}
@@ -275,7 +270,6 @@ html.ht-locked{overflow:hidden}
   .ht-about .ht-copy>p:not(.ht-drive){padding:14px 16px;border-radius:16px;background:rgba(20,14,44,.42);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
   .ht-portrait{width:88px;height:88px;margin:0 auto 14px}
   .ht-about h2{text-align:center}
-  .ht-work .ht-stage,.ht-skills .ht-stage{-webkit-mask-image:none;mask-image:none}
   /* Phones: the card sits at the foot of the screen above the pill; the hint and credits move up over the sky. */
   .ht-contact-card{left:16px;right:16px;top:auto;bottom:76px;max-width:none;max-height:calc(100svh - 170px);padding:20px}
   .ht-contact-card h2{font-size:32px}
@@ -297,7 +291,7 @@ html.ht-locked{overflow:hidden}
 .ht.is-entered .ht-intro>:nth-child(2){animation-delay:1.55s}
 .ht.is-entered .ht-intro>:nth-child(3){animation-delay:1.7s}
 .ht.is-entered .ht-intro>:nth-child(4){animation-delay:1.85s}
-@media(prefers-reduced-motion:reduce){.ht-finish:after{animation:none}.ht-canvas{transition:none}
+@media(prefers-reduced-motion:reduce){.ht-finish:after{animation:none}
   .ht-reveal .ht-word,.ht-reveal .ht-dot{clip-path:none;transform:none;transition:none}
   .ht-card,.ht-card a,.ht-copy>p.ht-more{transition:none}
   .ht.is-entered .ht-home .ht-canvas,.ht.is-entered .ht-name,.ht.is-entered .ht-intro>*{animation:ht-show .4s ease both;animation-delay:0s!important}}

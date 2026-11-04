@@ -255,7 +255,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       return falling||onBasket||spin.busy||herd.some(b=>b.feeding&&b.state==="move")||Math.abs(goal-attitude)>.05||bushes.some(set=>set.sway.some(v=>v>.003));
     }
     // Full rate while feed falls, the herd runs to it or the basket is hovered, 30 fps for the grazing in between.
-    let busy=true;const clock=new THREE.Clock();
+    let busy=true;
     // Called by the shared frame loop; returns whether anything changed (so the canvas needs redrawing).
     function draw(dt){
       dt=Math.min(dt,.05);since+=dt;

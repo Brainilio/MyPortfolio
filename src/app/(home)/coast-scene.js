@@ -325,8 +325,8 @@ export default function CoastScene({ state, onSpot, onReady, slot = 4, lite: lig
     window.addEventListener("pointermove",onPointer,{passive:true});
 
     let tall=false;
-    // The view window; its vertical offset follows the section hand-off, so the scene slides like the others.
-    const view={w:1,h:1,full:[1,1]},applyView=()=>{const shift=state.current.shift?.[slot]??0;camera.setViewOffset(view.full[0],view.full[1],0,shift*view.h*.28,view.w,view.h);};
+    // The view window: the lighthouse and the open sea framed right of centre.
+    const view={w:1,h:1,full:[1,1]},applyView=()=>{camera.setViewOffset(view.full[0],view.full[1],0,0,view.w,view.h);};
     function frameSize(){const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;tall=camera.aspect<.85;camera.fov=tall?56:36;
       // The lighthouse and the open sea sit right of centre, clear of the contact card (lower on a phone, under it).
       view.w=w;view.h=h;view.full=tall?[w,h*1.4]:[w*1.2,h];applyView();camera.updateProjectionMatrix();
@@ -338,7 +338,7 @@ export default function CoastScene({ state, onSpot, onReady, slot = 4, lite: lig
     const camBase=new THREE.Vector3(52,31,-196),lookBase=new THREE.Vector3(4,6,-100),lean=new THREE.Vector2(),pointerN=new THREE.Vector2();
     const onLean=event=>{if(event.pointerType==="mouse")pointerN.set(event.clientX/window.innerWidth*2-1,-(event.clientY/window.innerHeight)*2+1);};
     window.addEventListener("pointermove",onLean,{passive:true});
-    const clock=new THREE.Clock();let t=0;
+    let t=0;
     const toLamp=new THREE.Vector3(),toThing=new THREE.Vector3();
     function tick(dt){
       const reduced=preference.matches,step=reduced?0:dt;t+=step;time.value=t;

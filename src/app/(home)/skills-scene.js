@@ -205,7 +205,7 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, side = "ri
       return spin.busy||Math.abs(attitude-state.current.tilt[slot])>.05||Math.abs(uVel)>1e-4||hop>=0||geyser.t>=0||Math.abs(turn-(end?1:0))>.01;
     }
     // Full rate while something is moving, 30 fps when it's just the breeze.
-    let busy=true;const clock=new THREE.Clock();
+    let busy=true;
     // Called by the shared frame loop; returns whether anything changed (so the canvas needs redrawing).
     function draw(dt){
       dt=Math.min(dt,.05);since+=dt;
