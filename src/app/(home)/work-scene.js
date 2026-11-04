@@ -9,7 +9,7 @@ import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { random, createIsland, createSpin, tilted, createSwayingInstances, createFoliageMaterial, createBird, createCloud } from "./island-parts";
 import { paintGeometry } from "./forest-parts";
 import { createBasket } from "./park-parts";
-import { createBisonRig } from "./bison-rig";
+import { createBisonRig, createBisonAnimator } from "./bison-rig";
 
 // Work as the prairie in miniature, the island's golden-hour cousin: rolling prairie climbing to a mesa shelf at the
 // back, where flat-topped sandstone buttes stand (Monument Valley), rounded boulders at their feet, a small bison herd
@@ -233,109 +233,85 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       return falling;
     }
 
-    // The herd: a few bison grazing and ambling about the mesa, the calf (red coat) never far from its mother.
-    const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder),herd=[],LIMIT=.72;let leash=.4;
-    const inside=(x,z)=>Math.hypot(x,z)<outline(Math.atan2(z,x))*LIMIT&&!blocked(x,z,.35);
+    // The herd: big, cartoon-scale bison (like the hero island's animals, sized for the diorama, not for the buttes),
+    // each a little different in size, grazing and ambling about; one or two lying down; the red calf (55% of its
+    // mother) never more than a body length and a half from her. The rig and the animation are in bison-rig.js; this
+    // decides where each one goes and what it's doing.
+    const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder),herd=[],LIMIT=.72,SIZES=[.98,.9,.82,.93];let leash=1;
+    const inside=(x,z,pad=.55)=>Math.hypot(x,z)<outline(Math.atan2(z,x))*LIMIT&&!blocked(x,z,pad);
     loader.load("/models/island/bison.glb",gltf=>{
       if(disposed)return;
       const box=new THREE.Box3().setFromObject(gltf.scene),size=box.getSize(new THREE.Vector3());
-      const spots=[[.2,.5],[.5,-.4],[1.5,.9],[-.3,1.5],[.5,.85]];
-      // The calf keeps within a length and a half of its mother's width of her.
-      leash=Math.max(.32,1.5*size.x*.55/size.y);
+      const spots=[[-.2,.6],[.6,-.7],[1.4,1.0],[-.6,1.8],[.25,1.05]];
       spots.forEach(([x,z],i)=>{
-        const calf=i===spots.length-1,model=i?gltf.scene.clone():gltf.scene,root=new THREE.Group();let gait=null;
+        const calf=i===spots.length-1,model=i?gltf.scene.clone():gltf.scene,root=new THREE.Group();let rig=null;
         model.traverse(o=>{if(!o.isMesh)return;
           if(calf){const g=o.geometry.clone(),c=g.attributes.color,tint=new THREE.Color(),deep=new THREE.Color("#a24f22"),bright=new THREE.Color("#e08a4c");
             if(c)for(let k=0;k<c.count;k++){const l=(c.getX(k)+c.getY(k)+c.getZ(k))/3;tint.copy(deep).lerp(bright,Math.min(1,l*3));c.setXYZ(k,tint.r,tint.g,tint.b);}o.geometry=g;}
-          gait??=createBisonRig(o.geometry);o.material=gait.material;o.frustumCulled=false;});
-        const h=calf?.3:.55;model.scale.setScalar(h/size.y);model.position.y=-box.min.y*h/size.y;root.add(model);
+          rig??=createBisonRig(o.geometry);o.material=rig.material;o.frustumCulled=false;o.castShadow=o.receiveShadow=false;});
+        const h=calf?SIZES[0]*.55:SIZES[i];model.scale.setScalar(h/size.y);model.position.y=-box.min.y*h/size.y;root.add(model);
         root.position.copy(on(x,z));world.add(root);
-        // One of the herd starts the scene lying down, chewing.
+        // Each with its own random seed: its stride starts at a random point, its timers are offset, its pace ±8%.
+        const seed=random(40+i*7),anim=createBisonAnimator(rig,{calf,seed});
+        // One adult starts the scene lying down.
         const resting=i===2;
-        herd.push({root,gait,calf,height:h,yaw:rng()*6,state:resting?"rest":"graze",timer:1+rng()*5,speed:0,gaitName:"Graze",walk:0,run:0,phase:rng(),head:0,eatT:rng()*5,
-          target:new THREE.Vector2(x,z),feeding:false,face:null,eatUntil:0,dipNext:2+rng()*4,dipUntil:0,shift:rng()*6,
-          look:0,lookGoal:0,lookNext:rng()*3,tail:0,tailV:0,flickNext:1+rng()*4,lift:0,rest:resting?1:0,resting,restUntil:resting?14+rng()*10:0,frolicUntil:0});
+        herd.push({root,anim,calf,height:h,length:h*size.z/size.y,radius:h*.5,yaw:seed()*6,state:resting?"rest":"graze",timer:1+seed()*5,gait:"walk",
+          target:new THREE.Vector2(x,z),feeding:false,drink:false,face:null,eatUntil:0,resting,restUntil:resting?40+seed()*40:0,startAt:0,alarmUntil:0});
       });
+      // The calf stays within a body length and a half (of its mother's) of her.
+      leash=herd[0].length*1.5;
       needsRender=true;
     },undefined,()=>{});
-    // Feeding time: the adults and the calf trot over and stand round the far side of the basket.
+    // Feeding time: the standing bison look up (alarm), brace, then trot over and stand round the far side of the
+    // basket; the calf notices a moment after its mother. Bison lying down stay down.
     function callHerd(){
-      // The calf squeezes in at its mother's side.
-      const adults=herd.filter(b=>!b.calf);
-      herd.forEach(b=>{const k=adults.indexOf(b),a=b.calf?Math.PI*.15-.45:Math.PI*(.15+.7*k/Math.max(1,adults.length-1)),r=b.calf?.45:.62;
-        b.target.set(BASKET.x+Math.cos(a)*r,BASKET.z-Math.sin(a)*r);b.feeding=true;b.drink=false;b.resting=false;b.face=null;b.state="move";b.gaitName="Run";b.speed=.85;});
+      const now=time,going=herd.filter(b=>!b.resting),adults=going.filter(b=>!b.calf);
+      going.forEach(b=>{const k=adults.indexOf(b),a=b.calf?Math.PI*.15-.45:Math.PI*(.12+.76*k/Math.max(1,adults.length-1)),r=b.calf?.85:1.05;
+        b.target.set(BASKET.x+Math.cos(a)*r,BASKET.z-Math.sin(a)*r);b.feeding=true;b.drink=false;b.face=null;b.state="move";b.gait="trot";
+        b.startAt=now+.8+(b.calf?.3:0);b.alarmUntil=b.startAt;});
     }
+    function tapBison(b){if(b.resting)return;b.alarmUntil=time+1.6;if(b.state==="move"&&!b.feeding){b.state="graze";b.timer=1.8;}}
+    function wander(b,from,min,max){for(let tries=0;tries<14;tries++){const a=b.anim.state.phase*7+tries*2.4+Math.random(),r=min+Math.random()*(max-min),x=from.x+Math.cos(a)*r,z=from.z+Math.sin(a)*r;if(inside(x,z,b.radius+.15)){b.target.set(x,z);return true;}}return false;}
     function updateBison(b,dt,now){
-      const p=b.root.position;b.timer-=dt;
-      if(b.state==="eat"){if(now>b.eatUntil){b.state="graze";b.feeding=false;b.drink=false;b.face=null;b.timer=0;}}
-      else if(b.state==="rest"){
-        // Lying down: it stays down a while, then gets up (legs first unfold, then it stands and goes on grazing).
-        if(b.resting&&now>b.restUntil)b.resting=false;
-        if(!b.resting&&b.rest<.03){b.state="graze";b.timer=1+rng()*2;}
-      }
-      else if(b.state==="graze"&&b.timer<=0&&rng()<(b.calf?.12:.15)&&herd.filter(o=>o.resting).length<2&&(!b.calf||herd[0].resting)){
-        // Now and then one lies down for a rest (the calf, when its mother does).
-        b.state="rest";b.resting=true;b.restUntil=b.calf?herd[0].restUntil:now+12+rng()*16;
-      }
-      else if(b.state==="graze"&&b.timer<=0&&!b.calf&&rng()<.3&&!herd.some(o=>o.drink)){
-        // Now and then one wanders over to the watering hole for a drink, from whichever side it's on.
-        const a=Math.atan2(p.z-POND.z,p.x-POND.x);b.target.set(POND.x+Math.cos(a)*(POND.r+.38),POND.z+Math.sin(a)*(POND.r+.38));
-        b.drink=true;b.state="move";b.gaitName="Walk";b.speed=.24;
-      }
-      else if(b.state==="graze"&&b.timer<=0&&b.calf&&rng()<.4){
-        // The calf's games: a quick gallop off, a loop, and back to its mother.
-        for(let tries=0;tries<12;tries++){const a=rng()*Math.PI*2,r=leash*(1.8+rng()*1.2),x=p.x+Math.cos(a)*r,z=p.z+Math.sin(a)*r;if(inside(x,z)){b.target.set(x,z);break;}}
-        b.state="move";b.gaitName="Run";b.speed=.75+rng()*.2;b.frolicUntil=now+2.5;
-      }
+      const p=b.root.position,mother=herd[0];b.timer-=dt;
+      if(b.state==="eat"){if(now>b.eatUntil){b.state="graze";b.feeding=false;b.drink=false;b.face=null;b.timer=1+Math.random()*2;}}
+      else if(b.state==="rest"){if(now>b.restUntil){b.resting=false;if(b.anim.state.rest<.04){b.state="graze";b.timer=2;}}}
       else if(b.state==="graze"&&b.timer<=0){
-        // Wander a little; the calf stays by its mother (the first bison).
-        for(let tries=0;tries<12;tries++){const from=b.calf?herd[0].root.position:p,a=rng()*Math.PI*2,r=b.calf?leash*(.6+rng()*.35):.6+rng()*1.4,x=from.x+Math.cos(a)*r,z=from.z+Math.sin(a)*r;if(inside(x,z)){b.target.set(x,z);break;}}
-        b.state="move";b.gaitName="Walk";b.speed=b.calf?.3:.22+rng()*.1;
-      } else if(b.state==="move"){
-        const dx=b.target.x-p.x,dz=b.target.y-p.z,dist=Math.hypot(dx,dz);
-        if(dist<.04){
-          b.gaitName="Graze";b.speed=0;
-          if(b.feeding){b.state="eat";b.eatUntil=now+6;b.face=Math.atan2(BASKET.x-p.x,BASKET.z-p.z);}
-          else if(b.drink){b.state="eat";b.eatUntil=now+4+rng()*3;b.face=Math.atan2(POND.x-p.x,POND.z-p.z);}
-          else{b.state="graze";b.timer=b.calf?.8+rng()*1.6:3+rng()*7;}
+        const r=Math.random();
+        if(!b.calf&&r<.12&&herd.filter(o=>o.resting).length<2){b.state="rest";b.resting=true;b.restUntil=now+30+Math.random()*40;}
+        else if(!b.calf&&r<.35&&!herd.some(o=>o.drink)){
+          // A drink at the watering hole, from whichever side it's on (its muzzle just reaching the water).
+          const a=Math.atan2(p.z-POND.z,p.x-POND.x),d=POND.r+b.length*.42;b.target.set(POND.x+Math.cos(a)*d,POND.z+Math.sin(a)*d);
+          b.drink=true;b.state="move";b.gait="walk";
         }
-        else{
-          // (Getting up first if it was lying down.) It turns toward where it's going, and slows into the turn.
-          let turn=Math.atan2(dx,dz)-b.yaw;turn=Math.atan2(Math.sin(turn),Math.cos(turn));b.yaw+=turn*(1-Math.exp(-dt*4));
-          const step=Math.min(dist,b.speed*dt*(1-b.rest)**2*(.55+.45*Math.cos(Math.min(Math.abs(turn),1.5))));p.x+=dx/dist*step;p.z+=dz/dist*step;
+        else if(b.calf&&r<.35){if(wander(b,mother.root.position,leash*.5,leash*.95)){b.state="move";b.gait="trot";}else b.timer=1;}
+        else if(wander(b,b.calf?mother.root.position:p,b.calf?leash*.3:.8,b.calf?leash*.7:2.2)){b.state="move";b.gait="walk";}
+        else b.timer=1;
+      } else if(b.state==="move"&&now>=b.startAt){
+        const dx=b.target.x-p.x,dz=b.target.y-p.z,dist=Math.hypot(dx,dz);
+        if(dist<.05){
+          if(b.feeding){b.state="eat";b.eatUntil=now+6;b.face=Math.atan2(BASKET.x-p.x,BASKET.z-p.z);}
+          else if(b.drink){b.state="eat";b.eatUntil=now+5+Math.random()*3;b.face=Math.atan2(POND.x-p.x,POND.z-p.z);}
+          else{b.state="graze";b.timer=b.calf?1.5+Math.random()*2:4+Math.random()*7;}
+        } else {
+          // It turns toward where it's going, slowing into the turn, at the pace its stride sets (hooves don't slide).
+          let turn=Math.atan2(dx,dz)-b.yaw;turn=Math.atan2(Math.sin(turn),Math.cos(turn));b.yaw+=turn*(1-Math.exp(-dt*3));
+          const pace=b.anim.speed(b.gait,b.height*.55)*(.5+.5*Math.cos(Math.min(Math.abs(turn),1.5)));
+          const step=Math.min(dist,pace*dt);p.x+=dx/dist*step;p.z+=dz/dist*step;
         }
       }
-      // The calf follows when its mother wanders off: it trots (or runs, if she's well away) back to her side.
-      if(b.calf&&!b.feeding&&b.state!=="rest"&&now>b.frolicUntil){const m=herd[0].root.position,away=Math.hypot(p.x-m.x,p.z-m.z);
-        if(away>leash&&(b.state!=="move"||Math.hypot(b.target.x-m.x,b.target.y-m.z)>leash*.9)){
-          const a=Math.atan2(p.z-m.z,p.x-m.x);b.target.set(m.x+Math.cos(a)*leash*.6,m.z+Math.sin(a)*leash*.6);b.state="move";
-          const off=Math.hypot(b.target.x-POND.x,b.target.y-POND.z);if(off<POND.r+.2){const k=(POND.r+.25)/Math.max(off,1e-3);b.target.set(POND.x+(b.target.x-POND.x)*k,POND.z+(b.target.y-POND.z)*k);}
-          const run=away>leash*1.4;b.gaitName=run?"Run":"Walk";b.speed=run?.9:.35;}}
-      if(b.face!==null){let turn=b.face-b.yaw;turn=Math.atan2(Math.sin(turn),Math.cos(turn));b.yaw+=turn*(1-Math.exp(-dt*4));}
-
-      // Gait: blend weights ease toward the current one; the stride cycle advances by distance over stride length, so
-      // the hooves keep pace with the ground.
-      const moving=b.state==="move"&&b.rest<.05,goalWalk=moving&&b.gaitName==="Walk"?1:0,goalRun=moving&&b.gaitName==="Run"?1:0;
-      b.walk+=(goalWalk-b.walk)*(1-Math.exp(-dt*5));b.run+=(goalRun-b.run)*(1-Math.exp(-dt*5));
-      const stride=b.height*(b.walk*b.gait.stride.walk+b.run*b.gait.stride.run)/Math.max(.001,b.walk+b.run);
-      b.phase+=dt*(moving?b.speed*(1-b.rest)**2:.15*(b.walk+b.run))/Math.max(.05,stride);
-      // Lying down and getting up.
-      b.rest+=((b.resting?1:0)-b.rest)*(1-Math.exp(-dt*1.6));
-      // Head: down to graze every few seconds, down at the basket or the water; up and looking about otherwise.
-      b.eatT+=dt;
-      if(b.state==="graze"&&now>b.dipNext){b.dipUntil=now+1.6+rng()*.8;b.dipNext=now+4+rng()*3;}
-      const down=b.state==="eat"?.62+Math.sin(b.eatT*5.2)*.06:b.state==="graze"&&now<b.dipUntil?.66+Math.sin(b.eatT*5.2)*.05:b.state==="rest"?.08:b.state==="graze"?.08:.12*b.walk;
-      b.head+=(down-b.head)*(1-Math.exp(-dt*(down>b.head?2.6:1.8)));
-      // Looking about: every few seconds it turns its head to something new (just a little while walking, not at all
-      // galloping or with its nose down), and back.
-      if(now>b.lookNext){const still=b.state!=="move";b.lookGoal=still&&rng()<.75?(rng()-.5)*1.3:(rng()-.5)*.25;b.lookNext=now+(still?1.8+rng()*3:2.5+rng()*3);}
-      const lookGoal=b.lookGoal*(1-b.run)*(1-Math.min(1,b.head/.6)*.7);b.look+=(lookGoal-b.look)*(1-Math.exp(-dt*2.2));
-      // Tail: a lazy sway, and every few seconds a flick at a fly (a quick swish that dies away), raised when galloping.
-      if(now>b.flickNext){b.tailV+=(rng()<.5?-1:1)*(5+rng()*4);b.flickNext=now+2+rng()*5;}
-      b.tailV+=(-b.tail*60-b.tailV*5)*dt;b.tail+=b.tailV*dt;
-      b.lift+=(b.run*.9-b.lift)*(1-Math.exp(-dt*3));
-      b.gait.pose({phase:b.phase,walk:b.walk,run:b.run,nod:b.head+b.rest*.05,turn:b.look,tail:b.tail+Math.sin(now*1.3+b.shift)*.12,tailLift:b.lift,rest:b.rest,
-        breath:.012*Math.sin(now*(1.5+b.run*2)+b.shift)});
+      // The calf follows its mother: if she's more than a body length and a half away it goes after her (trotting if
+      // she's well away), a beat after it notices.
+      if(b.calf&&!b.feeding&&mother){const m=mother.root.position,away=Math.hypot(p.x-m.x,p.z-m.z);
+        if(away>leash&&(b.state!=="move"||Math.hypot(b.target.x-m.x,b.target.y-m.z)>leash*.8)){
+          const a=Math.atan2(p.z-m.z,p.x-m.x);b.target.set(m.x+Math.cos(a)*leash*.5,m.z+Math.sin(a)*leash*.5);
+          const off=Math.hypot(b.target.x-POND.x,b.target.y-POND.z);if(off<POND.r+b.radius){const k=(POND.r+b.radius+.05)/Math.max(off,1e-3);b.target.set(POND.x+(b.target.x-POND.x)*k,POND.z+(b.target.y-POND.z)*k);}
+          if(b.state!=="move")b.startAt=now+.3;b.state="move";b.gait=away>leash*1.3?"trot":"walk";}}
+      if(b.face!==null){let turn=b.face-b.yaw;turn=Math.atan2(Math.sin(turn),Math.cos(turn));b.yaw+=turn*(1-Math.exp(-dt*3));}
+      // Big bodies don't overlap: nudge apart from any neighbour that's too close.
+      for(const o of herd){if(o===b)continue;const dx=p.x-o.root.position.x,dz=p.z-o.root.position.z,d=Math.hypot(dx,dz),min=(b.radius+o.radius)*.95;
+        if(d<min&&d>1e-4){const push=(min-d)*.5*Math.min(1,dt*6);p.x+=dx/d*push;p.z+=dz/d*push;}}
+      b.anim.update(dt,{moving:b.state==="move"&&now>=b.startAt&&b.anim.state.rest<.05,gait:b.gait,eating:b.state==="eat",resting:b.resting,alarmed:now<b.alarmUntil});
       p.y=heightAt(p.x,p.z);b.root.rotation.y=b.yaw;
     }
     // Prairie dogs pop up from their mounds, look about, and duck back down.
@@ -362,16 +338,18 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     }
 
     // Pointer: drag to spin the mesa; hover the basket to wobble it, tap it to pour in feed; tap a prairie dog to send it
-    // down its hole.
+    // down its hole; tap a bison to startle it.
     const raycaster=new THREE.Raycaster(),ndc=new THREE.Vector2();let onBasket=false;
     const pick=(event,objects)=>{const rect=canvas.getBoundingClientRect();ndc.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(ndc,camera);return raycaster.intersectObjects(objects,true)[0];};
     const spin=createSpin(canvas,{rest:0,
-      over:event=>(onBasket=!!pick(event,[basket,hay]))||!!pick(event,dogs.map(d=>d.root)),
+      over:event=>(onBasket=!!pick(event,[basket,hay]))||!!pick(event,dogs.map(d=>d.root))||!!pick(event,herd.map(b=>b.root)),
       onTap:event=>{
         if(pick(event,[basket,hay])){pour();return;}
-        const hit=pick(event,dogs.map(d=>d.root));if(!hit)return;
-        const dog=dogs.find(d=>{let o=hit.object;while(o&&o!==d.root)o=o.parent;return o===d.root;});
-        if(dog){dog.state="down";dog.timer=3+rng()*3;needsRender=true;}
+        const owner=(hit,list)=>list.find(x=>{let o=hit.object;while(o&&o!==x.root)o=o.parent;return o===x.root;});
+        const hit=pick(event,dogs.map(d=>d.root));
+        if(hit){const dog=owner(hit,dogs);if(dog){dog.state="down";dog.timer=3+rng()*3;needsRender=true;}return;}
+        // Tap a bison and it startles: head up, tail up, a brace.
+        const struck=pick(event,herd.map(b=>b.root));if(struck){const b=owner(struck,herd);if(b){tapBison(b);needsRender=true;}}
       }});
     canvas.addEventListener("pointerleave",()=>{onBasket=false;hadHover=false;});
     // Hover (a mouse only): the sage near the cursor stirs, the faster the cursor the more. Passive under the drag.
@@ -426,7 +404,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
         bird.position.set(x,y,z);bird.lookAt(world.localToWorld(ahead.set(-.2+Math.cos(u.a+.2)*u.r,y,-2+Math.sin(u.a+.2)*u.r)));
         const flap=Math.sin(time*8+u.flap)*.7;u.wings[0].rotation.z=flap;u.wings[1].rotation.z=-flap;});
       needsRender=false;
-      return falling||rolling||windy||onBasket||spin.busy||herd.some(b=>b.feeding&&b.state==="move")||Math.abs(goal-attitude)>.05||bushes.some(set=>set.sway.some(v=>v>.003));
+      return falling||rolling||windy||onBasket||spin.busy||herd.some(b=>(b.feeding&&b.state==="move")||b.alarmUntil>time)||Math.abs(goal-attitude)>.05||bushes.some(set=>set.sway.some(v=>v>.003));
     }
     // Full rate while feed falls, the herd runs to it or the basket is hovered, 30 fps for the grazing in between.
     let busy=true;

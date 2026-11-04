@@ -1,38 +1,50 @@
 import * as THREE from "three";
 
-// A rig for the bison (Poly by Google's "Bison", which has no skeleton), done in the vertex shader. Joint places are
-// fractions of the model's own size, measured from its mesh (work/island/bison-scan.mjs):
-//  - Legs are separate columns only below ~30% of the height; above that the shoulder and thigh are part of the body.
-//    The real joints sit inside it: the shoulder at ~55% height, the hip at ~58%, so a leg swings as a whole, with
-//    the swing fading out through the shoulder/thigh around its column (the belly between the legs stays put).
-//  - Front leg: knee (carpus) at ~17%, which folds the cannon BACK as the leg swings forward; fetlock at ~6%.
-//  - Hind leg: hock at ~25%, set behind the column, which folds the cannon FORWARD and up; fetlock at ~6%.
-//  - Head and neck pivot at the hump's front (~28% of the length back from the nose, ~55% up): nod and look about.
-//  - The tail is a short stub high on the rump (~63-79% up, at the very back): it swishes and lifts.
-// How a bison moves (as cattle do): the walk is a four-beat lateral sequence, left hind, left front, right hind, right
-// front, each a quarter-cycle apart, a hoof down about two thirds of the time, the head bobbing with the front legs.
-// At speed it gallops: the hinds land close together, then the fronts, a hoof down about a third of the time, the
-// body rocking nose-up, nose-down, the tail raised. Lying down, the legs fold under and the body settles on them.
-// Every leg goes through stance (hoof planted, leg sweeping from forward to back) then swing (joints fold, the hoof
-// lifts and is carried forward), so the hooves are lifted by bending joints, not by sliding the leg up.
+// The Work island's bison: a rig and its animation (walk, idle and grazing, alert and trot, lying down).
+//
+// THE MODEL (Poly by Google's "Bison", one mesh, no skeleton), measured with work/island/bison-scan.mjs:
+//  - The hump peak is the highest point (100% of the height, 53% of the length from the rear): correct.
+//  - FLAGGED: the hindquarters are nearly as tall as the hump (the rump reaches ~91%), so the back is close to
+//    level instead of sloping down from the hump. Corrected in the rest pose: SPINE_1 dips the rump.
+//  - FLAGGED: the head is carried high (the muzzle sits at ~49% of the height). Corrected in the rest pose: the
+//    neck angles forward and down from the hump.
+//  - The neck is thick and the front shaggy (fine). Forelegs and hindlegs are about the same length in this mesh.
+//  - No separate jaw or ears, so there's no chewing or ear flicking (per the brief: not faked).
+// The mesh is not altered.
+//
+// THE RIG: the mesh is one piece, so body parts can't be parented to pivot objects; instead each vertex is skinned
+// in the vertex shader to this hierarchy of pivots (placed from the measurements, as fractions of length and height),
+// applied child first, so each joint carries everything below it:
+//   ROOT
+//   └─ PELVIS (bob, weight-shift roll, pitch)
+//      ├─ SPINE_1 (rump) ─ TAIL_BASE ─ TAIL_TIP
+//      ├─ SPINE_2 (breathing) ─ HUMP (pitch) ─ NECK_BASE (pitch, yaw) ─ NECK_MID ─ HEAD
+//      ├─ FRONT_LEG_L/R (shoulder) ─ FRONT_LOWER (knee) ─ FRONT_HOOF
+//      └─ REAR_LEG_L/R (hip) ─ REAR_LOWER (hock) ─ REAR_HOOF
+// A leg swings as a whole from its shoulder or hip inside the body (the legs are separate columns only below ~30%
+// of the height), its swing fading out through the shoulder or thigh.
 const LEGS = ["FL", "FR", "HL", "HR"];
-const GAITS = {
-  // offsets (fraction of a cycle) per leg, duty factor (stance share), upper swing (rad) front/hind, knee and hock
-  // fold, fetlock flick, stride length (in body heights).
-  walk: { offset: { HL: 0, FL: .25, HR: .5, FR: .75 }, duty: .64, upper: [.3, .26], fold: [1.05, .42], flick: .5, stride: .5 },
-  run: { offset: { HL: 0, HR: .12, FR: .42, FL: .54 }, duty: .36, upper: [.6, .52], fold: [1.6, .7], flick: .75, stride: .8 },
-};
-const ease = t => t * t * (3 - 2 * t);
+const DEG = Math.PI / 180;
+// Footfalls. Walk: the lateral four-beat, rear-left, front-left, rear-right, front-right, a quarter-cycle apart.
+// (A hoof is down 76% of each cycle: with four legs a quarter apart, three hooves stay down only if each is down at
+// least 75%, so the brief's 65% is raised to keep three on the ground.) Trot: diagonal pairs together.
+const WALK = { offset: { HL: 0, FL: .25, HR: .5, FR: .75 }, duty: .76, upper: 18 * DEG, lower: 35 * DEG, cycle: 1.8 };
+const TROT = { offset: { FL: 0, HR: 0, FR: .5, HL: .5 }, duty: .5, upper: 35 * DEG, lower: 55 * DEG, cycle: .7 };
+const smooth = t => { t = Math.min(1, Math.max(0, t)); return t * t * (3 - 2 * t); };
+
+// One leg through its cycle, all on sine curves: in stance the hoof is down and the leg sweeps from forward to back
+// (lingering at the ends); in swing the lower leg folds under the body and the leg reaches forward again. The hoof
+// stays flat to the ground in stance (within ±8°).
 function legPose(p, g, front, out) {
-  const A = g.upper[front ? 0 : 1], K = g.fold[front ? 0 : 1];
   if (p < g.duty) {
-    const s = p / g.duty, heel = ease(Math.max(0, (s - .8) / .2));
-    out[0] = A * (1 - 2 * s); out[1] = 0; out[2] = -.25 * heel;
+    const s = p / g.duty;
+    out[0] = g.upper * Math.cos(Math.PI * s); out[1] = 0;
+    out[2] = Math.max(-8 * DEG, Math.min(8 * DEG, -out[0]));
   } else {
-    const s = (p - g.duty) / (1 - g.duty), flex = Math.sin(Math.PI * Math.min(1, s * 1.12));
-    out[0] = -A + 2 * A * ease(s);
-    out[1] = front ? -K * flex : K * flex;
-    out[2] = -g.flick * flex * (front ? 1 : .25);
+    const s = (p - g.duty) / (1 - g.duty), fold = Math.sin(Math.PI * s);
+    out[0] = -g.upper * Math.cos(Math.PI * s);
+    // Folding under: the front hoof tucks back toward the chest, the rear hoof forward under the belly.
+    out[1] = (front ? -1 : 1) * g.lower * fold; out[2] = (front ? -1 : 1) * 8 * DEG * fold;
   }
   return out;
 }
@@ -40,7 +52,7 @@ function legPose(p, g, front, out) {
 export function createBisonRig(geometry) {
   geometry.computeBoundingBox();
   const box = geometry.boundingBox, H = box.max.y - box.min.y, L = box.max.z - box.min.z, W = box.max.x - box.min.x;
-  const y0 = box.min.y, cx = (box.min.x + box.max.x) / 2, cz = (box.min.z + box.max.z) / 2, pos = geometry.attributes.position;
+  const y0 = box.min.y, z0 = box.min.z, cx = (box.min.x + box.max.x) / 2, cz = (box.min.z + box.max.z) / 2, pos = geometry.attributes.position;
   // The four leg columns: centroids of everything below a fifth of the height, by side and end.
   const sums = { FL: [0, 0, 0], FR: [0, 0, 0], HL: [0, 0, 0], HR: [0, 0, 0] };
   for (let i = 0; i < pos.count; i++) {
@@ -48,86 +60,199 @@ export function createBisonRig(geometry) {
     if (y > y0 + H * .2) continue;
     const s = sums[(z > cz ? "F" : "H") + (x > cx ? "L" : "R")]; s[0] += x; s[1] += z; s[2]++;
   }
-  const column = Object.fromEntries(LEGS.map(k => { const s = sums[k]; return [k, new THREE.Vector2(s[0] / Math.max(1, s[2]), s[1] / Math.max(1, s[2]))]; }));
-  const v4 = () => ({ value: new THREE.Vector4() });
+  const col = LEGS.map(k => [sums[k][0] / Math.max(1, sums[k][2]), sums[k][1] / Math.max(1, sums[k][2])]);
+  const f = n => ({ value: n }), v4 = () => f(new THREE.Vector4());
   const uniforms = {
-    uUpper: v4(), uLower: v4(), uFlick: v4(), uNod: { value: 0 }, uTurn: { value: 0 }, uTail: { value: 0 }, uTailLift: { value: 0 },
-    uBob: { value: 0 }, uPitch: { value: 0 }, uRest: { value: 0 }, uBreath: { value: 0 },
-    // Columns (x, z) per leg, in FL FR HL HR order.
-    uColX: { value: new THREE.Vector4(...LEGS.map(k => column[k].x)) }, uColZ: { value: new THREE.Vector4(...LEGS.map(k => column[k].y)) },
+    uUpper: v4(), uLower: v4(), uHoof: v4(),
+    uBob: f(0), uRoll: f(0), uPelvis: f(0), uSway: f(0), uRump: f(0), uBreath: f(0), uHump: f(0),
+    uNeckBase: f(0), uNeckYaw: f(0), uNeckMid: f(0), uHead: f(0), uTailYaw: f(0), uTailLift: f(0), uTailTip: f(0), uRest: f(0),
+    uColX: f(new THREE.Vector4(...col.map(c => c[0]))), uColZ: f(new THREE.Vector4(...col.map(c => c[1]))),
   };
   const C = n => n.toFixed(5);
   const material = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: .95 });
   material.onBeforeCompile = shader => {
     Object.assign(shader.uniforms, uniforms);
     shader.vertexShader = shader.vertexShader.replace("#include <common>", `#include <common>
-      uniform vec4 uUpper,uLower,uFlick,uColX,uColZ;uniform float uNod,uTurn,uTail,uTailLift,uBob,uPitch,uRest,uBreath;
-      vec3 bend(vec3 p,vec2 pivot,float a,float w){a*=w;float dy=p.y-pivot.x,dz=p.z-pivot.y,c=cos(a),s=sin(a);return vec3(p.x,pivot.x+dz*s+dy*c,pivot.y+dz*c-dy*s);}
+      uniform vec4 uUpper,uLower,uHoof,uColX,uColZ;
+      uniform float uBob,uRoll,uPelvis,uSway,uRump,uBreath,uHump,uNeckBase,uNeckYaw,uNeckMid,uHead,uTailYaw,uTailLift,uTailTip,uRest;
+      // Pitch about a pivot (y, z): positive raises what's in front of it.
+      vec3 pitch(vec3 p,vec2 o,float a){float dy=p.y-o.x,dz=p.z-o.y,c=cos(a),s=sin(a);return vec3(p.x,o.x+dz*s+dy*c,o.y+dz*c-dy*s);}
+      // Yaw about a vertical axis through (x, z).
+      vec3 yaw(vec3 p,vec2 o,float a){float dx=p.x-o.x,dz=p.z-o.y,c=cos(a),s=sin(a);return vec3(o.x+dx*c+dz*s,p.y,o.y-dx*s+dz*c);}
+      // Roll about a lengthwise axis through (x, y).
+      vec3 roll(vec3 p,vec2 o,float a){float dx=p.x-o.x,dy=p.y-o.y,c=cos(a),s=sin(a);return vec3(o.x+dx*c-dy*s,o.y+dx*s+dy*c,p.z);}
       float pick(vec4 v,int i){return i==0?v.x:i==1?v.y:i==2?v.z:v.w;}`)
       .replace("#include <begin_vertex>", `#include <begin_vertex>
       {
-        float Y0=${C(y0)},H=${C(H)},L=${C(L)},CX=${C(cx)},CZ=${C(cz)};
-        vec3 p=transformed;float h=(p.y-Y0)/H;
-        // Which leg: by side and end.
+        float Y0=${C(y0)},Z0=${C(z0)},H=${C(H)},L=${C(L)},CX=${C(cx)},CZ=${C(cz)};
+        vec3 p=transformed;float h=(p.y-Y0)/H,zf=(p.z-Z0)/L;
+        // How much of the body (not the planted lower legs) a vertex is.
+        float body=smoothstep(.12,.36,h);
+
+        // LEGS: hoof, then knee or hock, then the whole leg from its shoulder or hip.
         bool front=p.z>CZ,left=p.x>CX;int i=front?(left?0:1):(left?2:3);
-        float colX=pick(uColX,i),colZ=pick(uColZ,i);
-        // How much of the leg's swing this vertex follows: all of it below the body; above, fading out through the
-        // shoulder or thigh, and only near the leg's own column.
-        float pivotH=front?.55:.58,reach=distance(vec2(p.x,p.z),vec2(colX,colZ))/L;
+        float colX=pick(uColX,i),colZ=pick(uColZ,i),pivotH=front?.55:.58,reach=distance(vec2(p.x,p.z),vec2(colX,colZ))/L;
         float w=h<.3?1.:(1.-smoothstep(.3,pivotH,h))*(1.-smoothstep(.06,.13,reach));
         if(w>0.){
-          float fet=Y0+H*.06,joint=Y0+H*(front?.17:.25),pivot=Y0+H*pivotH;
-          float jointZ=colZ+L*(front?0.:-.058),pivotZ=colZ+L*(front?.01:.034);
-          // Child joints first, in the rest pose: fetlock, then knee or hock, then the whole leg from the shoulder/hip.
-          p=bend(p,vec2(fet,colZ),pick(uFlick,i),smoothstep(fet+H*.02,fet-H*.02,p.y));
-          p=bend(p,vec2(joint,jointZ),pick(uLower,i),smoothstep(joint+H*.03,joint-H*.03,p.y));
-          p=bend(p,vec2(pivot,pivotZ),pick(uUpper,i),w);
+          float hoof=Y0+H*.06,joint=Y0+H*(front?.17:.25),hip=Y0+H*pivotH;
+          p=pitch(p,vec2(hoof,colZ),pick(uHoof,i)*smoothstep(hoof+H*.02,hoof-H*.02,p.y));
+          p=pitch(p,vec2(joint,colZ+L*(front?0.:-.058)),pick(uLower,i)*smoothstep(joint+H*.03,joint-H*.03,p.y));
+          p=pitch(p,vec2(hip,colZ+L*(front?.01:.034)),pick(uUpper,i)*w);
         }
-        // Lying down: the legs fold flat under the body, which settles onto them (and a little to one side).
-        if(uRest>0.){
-          float J=Y0+H*.3;
-          if(p.y<J){p.y=J-(J-p.y)*(1.-.82*uRest);p.x=CX+(p.x-CX)*(1.+.25*uRest);}
-          p.y-=uRest*H*.245;
+        // Lying down: front legs fold back under the chest, rear legs fold out to the sides, all flattened under the
+        // body, which settles onto them.
+        if(uRest>0.&&h<.32){
+          float J=Y0+H*.3,d=(J-p.y)*uRest;
+          p.y=J-(J-p.y)*(1.-.84*uRest);
+          if(front)p.z-=d*.9;else p.x=CX+(p.x-CX)*(1.+.35*uRest);
         }
-        // Breathing: the barrel swells a touch.
-        float barrel=smoothstep(.32,.5,h)*(1.-smoothstep(.75,.95,h));p.x=CX+(p.x-CX)*(1.+uBreath*barrel);
-        // The body bobs and (galloping) rocks about its middle; planted hooves stay put.
-        float body=smoothstep(.12,.35,h);
-        p=bend(p,vec2(Y0+H*.5,CZ),uPitch,body);p.y+=uBob*H*body;
-        // Head and neck: nod (and lower to graze) about the front of the hump, and turn to look about.
-        float neckZ=${C(box.max.z)}-L*.28,neckY=Y0+H*.55,head=smoothstep(neckZ-L*.02,neckZ+L*.1,p.z)*step(.28,h);
-        if(head>0.){
-          p=bend(p,vec2(neckY,neckZ),-uNod,head);
-          float t=uTurn*head,hx=p.x-CX,hz=p.z-neckZ;p.x=CX+hx*cos(t)+hz*sin(t);p.z=neckZ-hx*sin(t)+hz*cos(t);
-        }
-        // Tail: swishes side to side about its root (more toward the tip), and lifts when running.
-        float rootZ=${C(box.min.z)}+L*.02,rootY=Y0+H*.78;
+
+        // TAIL (a short stub high at the rear): the tip lags, the base swings side to side and lifts.
+        float rootZ=Z0+L*.02,rootY=Y0+H*.78;
         if(p.z<rootZ&&abs(p.x-CX)<${C(W * .07)}&&h>.55){
-          float k=smoothstep(rootZ,rootZ-L*.02,p.z),a=uTail*k,dx=p.x-CX,dz=p.z-rootZ;
-          p.x=CX+dx*cos(a)-dz*sin(a);p.z=rootZ+dx*sin(a)+dz*cos(a);
-          p=bend(p,vec2(rootY,rootZ),-uTailLift*k,1.);
+          float k=smoothstep(rootZ,rootZ-L*.02,p.z);
+          p=yaw(p,vec2(CX,rootZ-L*.008),uTailTip*smoothstep(rootZ-L*.008,rootZ-L*.02,p.z));
+          p=yaw(p,vec2(CX,rootZ),uTailYaw*k);
+          p=pitch(p,vec2(rootY,rootZ),-uTailLift*k);
         }
+
+        // HEAD and NECK (head, then neck mid, then neck base with its turn), angled forward and down from the hump.
+        float up=smoothstep(.28,.4,h);
+        p=pitch(p,vec2(Y0+H*.58,Z0+L*.88),-uHead*smoothstep(.86,.93,zf)*up);
+        p=pitch(p,vec2(Y0+H*.62,Z0+L*.8),-uNeckMid*smoothstep(.77,.86,zf)*up);
+        float neck=smoothstep(.66,.78,zf)*up;
+        p=pitch(p,vec2(Y0+H*.72,Z0+L*.7),-uNeckBase*neck);
+        p=yaw(p,vec2(CX,Z0+L*.7),uNeckYaw*neck);
+
+        // HUMP: the front half pitches about the hump (it bounces at a trot, leans forward when bracing).
+        p=pitch(p,vec2(Y0+H*.55,Z0+L*.53),-uHump*smoothstep(.45,.62,zf)*up);
+        // SPINE_1: the rump dips, so the back slopes down from the hump.
+        p=pitch(p,vec2(Y0+H*.6,Z0+L*.32),uRump*(1.-smoothstep(.2,.36,zf))*up);
+        // SPINE_2: breathing, the barrel and hump rise and fall a touch.
+        float barrel=smoothstep(.3,.45,h)*smoothstep(.25,.4,zf)*(1.-smoothstep(.75,.9,zf));p.y=Y0+H*.45+(p.y-Y0-H*.45)*(1.+uBreath*barrel);
+
+        // PELVIS: sway of the front about the middle, pitch about the hips, weight-shift roll, bob; all body only.
+        p=yaw(p,vec2(CX,Z0+L*.45),uSway*smoothstep(.45,.9,zf)*body);
+        p=pitch(p,vec2(Y0+H*.58,Z0+L*.16),uPelvis*body);
+        p=roll(p,vec2(CX,Y0+H*.1),uRoll*body);
+        p.y+=uBob*H*body-uRest*H*.245;
         transformed=p;
       }`);
   };
+  return { material, uniforms, size: { height: H, length: L } };
+}
 
-  const scratch = [0, 0, 0], walkPose = [0, 0, 0], runPose = [0, 0, 0];
-  // Poses the rig. walk/run are blend weights (0 standing); phase is the stride cycle (in cycles).
-  function pose({ phase, walk, run, nod, turn, tail, tailLift, rest, breath }) {
+// The animation for one bison. Each frame the scene says what it's doing (standing, walking or trotting, eating,
+// lying down, alarmed); this turns that into joint angles on sine curves, with timers randomised per bison.
+export function createBisonAnimator(rig, { calf = false, seed = Math.random } = {}) {
+  const r = seed, u = rig.uniforms, legA = [0, 0, 0], legB = [0, 0, 0];
+  const s = {
+    phase: r(), walk: 0, trot: 0, rest: 0, time: r() * 10,
+    speedFactor: 1 + (r() - .5) * .16, // walk speed ±8%
+    // Graze dip: every 4-7 s (calf 3-5), +28° (calf 18°): 1.2 s down, a hold, 1.8 s back up.
+    dip: 0, dipStage: "wait", dipT: 2 + r() * 4, dipHold: 1,
+    // Weight shift: every 6-10 s (calf 3-6), the pelvis rolls ±4° (calf ±6°) over 2 s and one front hoof lifts.
+    shift: 0, shiftFrom: 0, shiftTo: 0, shiftT: 1 + r() * 6, shiftRun: 0,
+    tailFlick: 0, flickT: 1 + r() * 6, look: 0, lookGoal: 0, lookT: 2 + r() * 4,
+    alert: 0, brace: 0, alertAt: -1, tailTip: 0, tipT: r() * 4, tailSeed: r() * 6.3,
+  };
+  const walkCycle = (calf ? 1.4 : WALK.cycle) / s.speedFactor;
+
+  // Ground speed that keeps the hooves planted: in stance a hoof sweeps 2·sin(swing)·leg length, and the body covers
+  // that much once (walk) or twice (trot, diagonal pairs taking turns) per cycle. legHeight is in scene units.
+  function speed(gait, legHeight) {
+    return gait === "trot" ? 2 * 2 * Math.sin(TROT.upper) * legHeight / TROT.cycle : 2 * Math.sin(WALK.upper) * legHeight / walkCycle;
+  }
+
+  // inputs: { moving, gait: "walk" | "trot", eating, resting, alarmed }
+  function update(dt, inputs) {
+    s.time += dt;
+    const t = s.time, moving = inputs.moving, still = !moving && !inputs.resting;
+    s.walk += ((moving && inputs.gait !== "trot" ? 1 : 0) - s.walk) * (1 - Math.exp(-dt * 5));
+    s.trot += ((moving && inputs.gait === "trot" ? 1 : 0) - s.trot) * (1 - Math.exp(-dt * 6));
+    s.rest += ((inputs.resting ? 1 : 0) - s.rest) * (1 - Math.exp(-dt * 1.4));
+    const going = s.walk + s.trot;
+    s.phase += dt * (s.walk / walkCycle + s.trot / TROT.cycle);
+
+    // Alert: the head snaps up, the tail rises (0-0.4 s); then the weight goes back onto the hindquarters (0.4-0.8 s).
+    if (inputs.alarmed && s.alertAt < 0) s.alertAt = t;
+    if (!inputs.alarmed) s.alertAt = -1;
+    const since = s.alertAt < 0 ? -1 : t - s.alertAt;
+    s.alert += ((since >= 0 ? 1 : 0) - s.alert) * (1 - Math.exp(-dt * (since >= 0 ? 12 : 2)));
+    s.brace += ((since >= .4 && !moving ? 1 : 0) - s.brace) * (1 - Math.exp(-dt * 6));
+    const calm = 1 - s.alert;
+
+    // Graze dip (idle only, not while eating at the basket or the water, which holds the head down).
+    const dipDepth = (calf ? 18 : 28) * DEG;
+    if (still && !inputs.eating && s.alert < .1) {
+      s.dipT -= dt;
+      if (s.dipStage === "wait" && s.dipT <= 0) { s.dipStage = "down"; s.dipT = 1.2; }
+      else if (s.dipStage === "down") { s.dip = 1 - Math.cos(Math.PI / 2 * (1 - Math.max(0, s.dipT) / 1.2)); if (s.dipT <= 0) { s.dipStage = "hold"; s.dipT = .8 + r() * .7; s.dip = 1; } }
+      else if (s.dipStage === "hold" && s.dipT <= 0) { s.dipStage = "up"; s.dipT = 1.8; }
+      else if (s.dipStage === "up") { s.dip = Math.cos(Math.PI / 2 * (1 - Math.max(0, s.dipT) / 1.8)); if (s.dipT <= 0) { s.dipStage = "wait"; s.dip = 0; s.dipT = (calf ? 3 : 4) + r() * (calf ? 2 : 3); } }
+    } else { s.dip *= Math.exp(-dt * 2); if (s.dipStage !== "wait") { s.dipStage = "wait"; s.dipT = 2 + r() * 3; } }
+    const eat = inputs.eating ? 1 : 0;
+
+    // Weight shift (idle).
+    s.shiftT -= dt;
+    if (still && s.shiftT <= 0) { s.shiftFrom = s.shift; s.shiftTo = (r() < .5 ? -1 : 1) * (calf ? 6 : 4) * DEG; s.shiftRun = 0; s.shiftT = (calf ? 3 : 6) + r() * (calf ? 3 : 4); }
+    if (s.shiftRun < 1) s.shiftRun = Math.min(1, s.shiftRun + dt / 2);
+    s.shift = (s.shiftFrom + (s.shiftTo - s.shiftFrom) * smooth(s.shiftRun)) * (still ? 1 : Math.exp(-dt * 3));
+    if (!still) s.shiftTo = s.shift;
+
+    // Tail: drift (±12° walking at half the stride rate, ±8° standing) plus flicks at flies (to 35° and back in 0.3 s).
+    s.flickT -= dt; if (s.flickT <= 0) { s.tailFlick = 0; s.flickT = 3 + r() * 5; }
+    s.tailFlick = Math.min(1, s.tailFlick + dt / .3);
+    const flick = s.tailFlick < 1 ? Math.sin(Math.PI * s.tailFlick) * 35 * DEG * (s.flickT % 2 > 1 ? 1 : -1) : 0;
+    // (Its own clock at half the stride rate, not the footfalls, with its own random start.)
+    const drift = Math.sin(t * Math.PI / walkCycle + s.tailSeed), tailDrift = (8 + 4 * s.walk) * DEG * drift;
+    s.tipT -= dt; if (s.tipT <= 0) { s.tipT = 2 + r() * 5; s.tailTip = (r() - .5) * .6; }
+
+    // Looking about: standing or lying, the head turns now and then (slowly, 15-25° lying down).
+    s.lookT -= dt;
+    if (s.lookT <= 0) { s.lookT = 2.5 + r() * 4; s.lookGoal = (still || inputs.resting) && s.dip < .2 && r() < .7 ? (r() < .5 ? -1 : 1) * (15 + r() * 10) * DEG : 0; }
+    s.look += (s.lookGoal * calm * (1 - going) - s.look) * (1 - Math.exp(-dt * 1.5));
+
+    // Legs: walk and trot poses blended by how much it's doing each (standing: straight), plus the idle weight shift
+    // lifting one front hoof, and the brace (front hooves stepping in place).
     for (let k = 0; k < 4; k++) {
       const leg = LEGS[k], front = leg[0] === "F";
-      legPose(((phase + GAITS.walk.offset[leg]) % 1 + 1) % 1, GAITS.walk, front, walkPose);
-      legPose(((phase + GAITS.run.offset[leg]) % 1 + 1) % 1, GAITS.run, front, runPose);
-      for (let j = 0; j < 3; j++) scratch[j] = walkPose[j] * walk + runPose[j] * run;
-      uniforms.uUpper.value.setComponent(k, scratch[0]); uniforms.uLower.value.setComponent(k, scratch[1]); uniforms.uFlick.value.setComponent(k, scratch[2]);
+      legPose(((s.phase + WALK.offset[leg]) % 1 + 1) % 1, WALK, front, legA);
+      legPose(((s.phase + TROT.offset[leg]) % 1 + 1) % 1, TROT, front, legB);
+      let lower = legA[1] * s.walk + legB[1] * s.trot;
+      if (front && still) {
+        // Weight shift: the hoof on the side it shifts away from lifts a little (+6°).
+        if ((leg === "FL") === (s.shift < 0)) lower -= Math.abs(s.shift) / (calf ? 6 : 4) * 6 * DEG;
+        // Bracing: the fronts step in place.
+        lower -= s.brace * Math.max(0, Math.sin(t * 9 + (leg === "FL" ? 0 : Math.PI))) * 20 * DEG;
+      }
+      u.uUpper.value.setComponent(k, legA[0] * s.walk + legB[0] * s.trot);
+      u.uLower.value.setComponent(k, lower);
+      u.uHoof.value.setComponent(k, legA[2] * s.walk + legB[2] * s.trot);
     }
-    const c = phase * Math.PI * 2;
-    // Walking: the body dips twice a stride and the head bobs with the front feet; galloping: the body rocks.
-    uniforms.uBob.value = walk * .008 * Math.cos(2 * c) + run * .03 * Math.max(0, Math.sin(c - .6));
-    uniforms.uPitch.value = run * .07 * Math.sin(c - 1.2);
-    uniforms.uNod.value = nod + walk * .05 * Math.sin(2 * c + .8) + run * .08 * Math.sin(c);
-    uniforms.uTurn.value = turn; uniforms.uTail.value = tail; uniforms.uTailLift.value = tailLift;
-    uniforms.uRest.value = rest; uniforms.uBreath.value = breath;
+
+    const c = s.phase * Math.PI * 2;
+    // Body: bob twice a stride (±2.5% walking, ±5% trotting), sway ±1.5° once a stride a quarter-cycle off the bob,
+    // the hump bouncing at a trot; breathing ±1.2% every 3.5 s.
+    u.uBob.value = s.walk * .025 * Math.sin(2 * c) + s.trot * .05 * Math.sin(2 * c);
+    u.uSway.value = s.walk * 1.5 * DEG * Math.cos(c);
+    u.uHump.value = s.trot * 3 * DEG * Math.sin(2 * c - .6) + s.brace * 6 * DEG;
+    u.uBreath.value = .012 * Math.sin(t * Math.PI * 2 / 3.5);
+    u.uRoll.value = s.shift + s.rest * 7 * DEG;
+    u.uPelvis.value = s.brace * 8 * DEG;
+    // Rest pose: the rump dips (the back slopes down from the hump) and the neck angles forward and down.
+    u.uRump.value = 4 * DEG;
+    // Neck and head: carried low; a ±4° nod walking (±8° trotting); down to graze; down at the basket or water; up and
+    // forward when alarmed; low and level lying down.
+    const nod = s.walk * 4 * DEG * Math.sin(c) + s.trot * 8 * DEG * Math.sin(2 * c);
+    u.uNeckBase.value = 10 * DEG * calm - 4 * DEG * s.alert + s.rest * 6 * DEG;
+    u.uNeckMid.value = (dipDepth * .6 * s.dip + 18 * DEG * eat) * calm - 10 * DEG * s.alert + s.rest * 8 * DEG;
+    u.uHead.value = (dipDepth * .4 * s.dip + 12 * DEG * eat + nod) * calm - 20 * DEG * s.alert + eat * Math.sin(t * 5.2) * 3 * DEG * calm;
+    u.uNeckYaw.value = s.look;
+    u.uTailYaw.value = (tailDrift + flick) * calm;
+    u.uTailLift.value = 25 * DEG * Math.max(s.alert, s.trot);
+    u.uTailTip.value += ((s.tailTip + flick * .4) - u.uTailTip.value) * (1 - Math.exp(-dt * 4));
+    u.uRest.value = s.rest;
   }
-  return { material, uniforms, pose, stride: { walk: GAITS.walk.stride, run: GAITS.run.stride } };
+  return { update, speed, state: s, uniforms: u };
 }
