@@ -88,8 +88,9 @@ function createStage() {
         // An island: drawn into its rectangle grown by half its height above and below, with the projection squeezed to
         // match, so it lands exactly where it would but anything reaching past the stage's edge (the underside of an
         // island as it travels) isn't cut off.
-        const grow = 1 + OVERSCAN * 2, projection = entry.camera.projectionMatrix;
-        renderer.setViewport(r.left, height - r.bottom - r.height * OVERSCAN, r.width, r.height * grow);
+        // (A scene that fills its frame edge to edge, like the coast, sets overscan: 0 and stays inside its rectangle.)
+        const over = entry.overscan ?? OVERSCAN, grow = 1 + over * 2, projection = entry.camera.projectionMatrix;
+        renderer.setViewport(r.left, height - r.bottom - r.height * over, r.width, r.height * grow);
         saved.copy(projection); projection.premultiply(squeeze.makeScale(1, 1 / grow, 1));
         renderer.render(entry.scene, entry.camera);
         projection.copy(saved);

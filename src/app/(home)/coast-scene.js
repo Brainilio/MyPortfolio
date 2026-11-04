@@ -379,7 +379,7 @@ export default function CoastScene({ state, onSpot, onReady, slot = 4, lite: lig
     // Called by the shared frame loop: full rate while on screen. The top of the view fades into the sky, as it arrives
     // under the section above.
     function draw(dt){if(!onScreen()||document.hidden||window.__coastHold)return false;tick(Math.min(dt,.05));return true;}
-    const unregister=shared_.register({mount,scene,camera,draw,exposure:1.05,fade:{side:"top",from:.78}});
+    const unregister=shared_.register({mount,scene,camera,draw,exposure:1.05,overscan:0,fade:{side:"top",from:.78}});
     const readyTimer=setTimeout(()=>ready.current?.(),0);
     if(new URLSearchParams(window.location.search).has("debug"))window.__coast={step:(n=30)=>{for(let i=0;i<n;i++)tick(1/30);},scene,camera,creatures,renderer,aimTarget,THREE};
 
