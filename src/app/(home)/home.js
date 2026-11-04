@@ -106,18 +106,12 @@ export default function Home() {
   const [where, setWhere] = useState({ section: 0, stop: 0 }), [menu, setMenu] = useState(false);
   // Shared with the 3D scenes (read every frame): which sections are on screen and how far through each one we are.
   const scene = useRef({ section: 0, live: [0], progress: [0, 0, 0, 0, 0], tilt: [0, 0, 0, 0, 0] });
-  const [spotted, setSpotted] = useState([]), [still, setStill] = useState(false), [moreIn, setMoreIn] = useState(false), more = useRef(null);
+  const [spotted, setSpotted] = useState([]), [still, setStill] = useState(false);
   // Reduced motion, and phones: the Work postcard shows its still image instead of playing its preview.
   useEffect(() => {
     const queries = [matchMedia("(prefers-reduced-motion: reduce)"), matchMedia("(max-width: 760px)")], sync = () => setStill(queries.some(q => q.matches));
     sync(); queries.forEach(q => q.addEventListener("change", sync));
     return () => queries.forEach(q => q.removeEventListener("change", sync));
-  }, []);
-  // The links under the Work cards fade up the first time a fifth of them is on screen.
-  useEffect(() => {
-    const el = more.current; if (!el) return;
-    const observer = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { setMoreIn(true); observer.disconnect(); } }, { threshold: .2 });
-    observer.observe(el); return () => observer.disconnect();
   }, []);
   const pill = useRef(null), bar = useRef(null);
   const zones = useRef([]), sky = useRef(null), mainRef = useRef(null);
@@ -270,6 +264,10 @@ export default function Home() {
           <div className="ht-work-head">
             <RevealHeading id="ht-work-title" text="Things I’ve built" arrive={50} />
             <p className="ht-drive">Click the basket to feed the herd</p>
+            <p className="ht-more is-shown">
+              <a href="/projects/">All projects <span aria-hidden="true">→</span></a>
+              <a href="/journey/">Lab experiments <span aria-hidden="true">→</span></a>
+            </p>
           </div>
           <ol className="ht-cards">
             {work.map((project, i) => (
@@ -282,10 +280,6 @@ export default function Home() {
               </li>
             ))}
           </ol>
-          <p ref={more} className={`ht-more${moreIn ? " is-shown" : ""}`}>
-            <a href="/projects/">All projects <span aria-hidden="true">→</span></a>
-            <a href="/journey/">Lab experiments <span aria-hidden="true">→</span></a>
-          </p>
         </div>
       </section>
 

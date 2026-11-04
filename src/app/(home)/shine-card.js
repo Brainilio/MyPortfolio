@@ -2,11 +2,11 @@
 import { useEffect, useRef, useState } from "react";
 
 // A Work project card: the picture (or its looping preview), drawn by a shader so it can move like something soft:
-// the faster the page scrolls, the more the card bows, its middle trailing behind its ends, and when the scroll stops
-// it springs back with a little wobble. On top: a faint drifting grain at rest and, under a mouse, a holographic foil
+// the faster the page scrolls, the more the card sways in a slight, fluid ripple, and when the scroll stops it eases
+// back. On top: a faint drifting grain at rest and, under a mouse, a holographic foil
 // (a rainbow whose hue turns with the cursor's angle round the card's centre, strongest at the cursor and gone by the
 // edges) plus a small specular glint; hover fades in over 0.4 s, out over 0.6 s. Touch screens get the bend and the
-// grain, no foil. The card's corners and soft shadow are drawn too, so they bend with it.
+// grain, no foil. The card's corners are drawn too, so they bend with it.
 // All cards share ONE WebGL context (an unattached canvas): each frame, each card on screen is drawn into a corner of
 // it at its own size and copied across to its own 2D canvas. Cards off screen, or a hidden tab, cost nothing. With
 // reduced motion there's no bend and the grain holds still. Without WebGL the plain picture shows.
@@ -21,14 +21,14 @@ float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
 vec3 hsl(float h,float s,float l){vec3 k=clamp(abs(mod(h*6.+vec3(0.,4.,2.),6.)-3.)-1.,0.,1.);return l+(1.-abs(2.*l-1.))*s*(k-.5);}
 float box(vec2 p,vec2 b,float r){vec2 q=abs(p)-b+r;return length(max(q,0.))+min(max(q.x,q.y),0.)-r;}
 void main(){
-  // Card space: x 0-1 across, y 0-1 up the card, its middle pushed down by the bend (sin across, so the ends hold).
+  // Card space: x 0-1 across, y 0-1 up the card. The bend is soft and fluid rather than a fold: a long, shallow
+  // S-shaped sway across the card that drifts slowly (one side trails a little more than the other), never a peak.
   float h=1.-2.*uMargin;vec2 uv=vec2(v.x,(v.y-uMargin)/h);
-  float bow=uBend*sin(3.14159*uv.x);uv.y+=bow;
+  float x=uv.x,flow=sin(3.14159*x)*.55+sin(3.14159*(x+.5)+uTime*.6)*.3+(x-.5)*.25;
+  uv.y+=uBend*flow;
   vec2 px=uv*vec2(uSize.x,uSize.y*h);
   float d=box(px-vec2(uSize.x,uSize.y*h)*.5,vec2(uSize.x,uSize.y*h)*.5,uRadius);
   float inside=1.-smoothstep(-.75,.75,d);
-  // Soft shadow under the bent card.
-  float shade=(1.-smoothstep(-6.,22.,box(px-vec2(uSize.x,uSize.y*h)*.5+vec2(0.,10.),vec2(uSize.x,uSize.y*h)*.5-4.,uRadius+8.)))*.2;
   vec3 pic=uHas>.5?texture2D(uTex,(uv-.5)*uCover+.5).rgb:mix(vec3(.55,.36,.93),vec3(.96,.63,.54),uv.x*.6+uv.y*.4);
   // Grain: three octaves of value noise, drifting slowly, large cells, white at 5% (8% on hover).
   vec2 drift=vec2(uTime*.08)*40.;
@@ -40,9 +40,8 @@ void main(){
   add+=hsl(fract(hue),.9,.65)*.22*(1.-smoothstep(.3,.8,r))*uHover;
   add+=vec3(.3*exp(-r*r/(.15*.15)))*uHover;
   vec3 col=1.-(1.-pic)*(1.-add);
-  // Premultiplied: the card, then its shadow round it.
-  float a=inside+(1.-inside)*shade;
-  gl_FragColor=vec4(col*inside,a);
+  // Premultiplied. (Its shadow is a CSS drop-shadow on the canvas, which follows the bent shape.)
+  gl_FragColor=vec4(col*inside,inside);
 }`;
 
 let shared = null;
@@ -91,8 +90,8 @@ function getShared() {
     if (!still) time += dt;
     // Scroll speed (px/s) → how far the middle of a card trails, as a fraction of its height.
     const y = window.scrollY, speed = dt > 0 ? (y - lastY) / dt : 0; lastY = y;
-    const goal = still ? 0 : Math.max(-.16, Math.min(.16, speed / 9000));
-    bend.v += ((goal - bend.x) * 180 - bend.v * 14) * dt; bend.x += bend.v * dt;
+    const goal = still ? 0 : Math.max(-.055, Math.min(.055, speed / 26000));
+    bend.v += ((goal - bend.x) * 90 - bend.v * 15) * dt; bend.x += bend.v * dt;
     const live = [...cards].filter(c => c.visible);
     if (document.hidden || !live.length) { previous = 0; return; }
     const moving = Math.abs(bend.x) > 2e-4 || Math.abs(bend.v) > 2e-3;
