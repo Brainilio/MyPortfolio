@@ -198,7 +198,9 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       const set=createSwayingInstances(paintGeometry(new THREE.ConeGeometry(.22,3,4).translate(0,1.5,0),"#7f8f4a"),reeds,foliage);bushes.push(set);world.add(set.mesh);}
     // Scene B, the meadow, spinning with the island; C, the cowboy, and E, the hat, each in a scene of its own.
     const meadow=createMeadow({outline,foliage,loader:new GLTFLoader().setMeshoptDecoder(MeshoptDecoder),onLoad:()=>{needsRender=true;}});
-    meadow.group.userData.scene="B";meadow.group.visible=false;scene.add(meadow.group);bushes.push(...meadow.swaying);
+    meadow.group.userData.scene="B";
+    // The meadow island scaled up as a whole (its root group), the camera pulled back to suit.
+    const GROW=1.3;meadow.group.scale.setScalar(GROW);meadow.group.visible=false;scene.add(meadow.group);bushes.push(...meadow.swaying);
     const modelLoader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder),cowboy=createCowboy({loader:modelLoader,onLoad:()=>{needsRender=true;}}),hatScene=createHat({loader:modelLoader,onLoad:()=>{needsRender=true;}});
     const ALONE={C:cowboy,E:hatScene};
     // A few birds wheeling high over the Mittens.
@@ -448,9 +450,14 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     let tall=false,attitude=0;const VIEW=new THREE.Vector3(0,.34,1).normalize(),focus=new THREE.Vector3(0,.9,0),viewDir=new THREE.Vector3();
     // The camera sits on an orbit round the mesa; only its attitude (steeper arriving, lower leaving) changes.
     let closeUp=null;// (?debug only: { from, at } to inspect something up close)
-    function placeCamera(){if(closeUp){camera.position.copy(closeUp.from);camera.lookAt(closeUp.at);return;}camera.position.copy(tilted(VIEW,attitude,viewDir)).multiplyScalar(tall?60:27).add(focus);camera.lookAt(focus);}
+    function placeCamera(){if(closeUp){camera.position.copy(closeUp.from);camera.lookAt(closeUp.at);return;}camera.position.copy(tilted(VIEW,attitude,viewDir)).multiplyScalar(distance).add(focus);camera.lookAt(focus);}
+    // How far back the camera sits, from the screen's shape: the island spans about 65% of the width on a desktop
+    // screen (90% on a phone), whatever its proportions. (Measured: at 27 units back and 4:3, the unscaled island
+    // spans 59% of the width, so its width on screen is ~21.2 / (distance × aspect).)
+    let distance=27;
+    const fit=aspect=>THREE.MathUtils.clamp(21.2*GROW/((aspect<.85?.9:.65)*aspect),24,80);
     function frame(){
-      const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;tall=camera.aspect<.85;cowboy.frame(w,h);hatScene.frame(w,h);
+      const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;tall=camera.aspect<.85;distance=fit(camera.aspect);scene.fog.near=distance+12;scene.fog.far=distance*2.4+20;cowboy.frame(w,h);hatScene.frame(w,h);
       if(tall)camera.setViewOffset(w,h,0,h*.2,w,h);else camera.setViewOffset(w,h,side==="center"?0:(side==="left"?.17:-.17)*w,side==="center"?-h*.13:h*.07,w,h);
       camera.updateProjectionMatrix();placeCamera();needsRender=true;
     }

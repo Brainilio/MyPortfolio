@@ -28,7 +28,7 @@ export const GEYSERS=[[2.65,-1.55],[3.45,.55]];
 const DEER=[[-1.15,-2.2],[-2.35,-1.55]];
 export const BASKET_SPOT=[.3,2.75];
 // The range: (x, z, height, turn). The tallest is ~45% of the island's diameter.
-const PEAKS=[[-1.4,-3.75,4.9,.35],[1.5,-3.8,3.6,2.2],[3.4,-2.75,2.5,1.1]];
+const PEAKS=[[-1.2,-2.75,4.9,.35],[1.7,-2.9,3.6,2.2],[3.05,-2.0,2.5,1.1]];
 
 export function createMeadow({outline,foliage,loader,onLoad}){
   const rng=random(23),group=new THREE.Group();let perch=null;
@@ -131,7 +131,11 @@ export function createMeadow({outline,foliage,loader,onLoad}){
     const size=geometry.boundingBox.getSize(new THREE.Vector3()),LIT=new THREE.Color("#8b9bb0"),MID=new THREE.Color("#6b7a8d"),SHADE=new THREE.Color("#3d4a5c"),SNOW=new THREE.Color("#f0f4f8"),tone=new THREE.Color();
     const material=new THREE.MeshLambertMaterial({vertexColors:true,flatShading:true}),a=new THREE.Vector3(),b=new THREE.Vector3(),c=new THREE.Vector3(),n=new THREE.Vector3();
     PEAKS.forEach(([x,z,tall,turn],index)=>{
-      const k=tall/size.y,g=geometry.clone().rotateY(turn).scale(k*.8,k,k*.8),pos=g.attributes.position,color=g.attributes.color,top=tall;
+      // Its footprint narrowed until every point of its lower half stands inside the island's rim (never overhanging).
+      const k=tall/size.y,src=geometry.clone().rotateY(turn),sp=src.attributes.position;let wide=.8;
+      const overhangs=w=>{for(let i=0;i<sp.count;i++){if(sp.getY(i)*k>tall*.5)continue;const px=x+sp.getX(i)*k*w,pz=z+sp.getZ(i)*k*w;if(Math.hypot(px,pz)>outline(Math.atan2(pz,px))*.9)return true;}return false;};
+      while(wide>.5&&overhangs(wide))wide-=.04;
+      const g=src.scale(k*wide,k,k*wide),pos=g.attributes.position,color=g.attributes.color,top=tall;
       for(let i=0;i<pos.count;i+=3){
         a.fromBufferAttribute(pos,i);b.fromBufferAttribute(pos,i+1);c.fromBufferAttribute(pos,i+2);n.subVectors(b,a).cross(c.clone().sub(a)).normalize();
         const white=color.getX(i)>.85&&color.getZ(i)>.85,high=Math.max(a.y,b.y,c.y)>top*.85;
