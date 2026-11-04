@@ -41,12 +41,12 @@ const SKY = [
   ["#4f8cc6", "#86b1d8", "#c4d7e5", "#d4e0e7", "#d4e0e7"], // Contact, the end
 ].map(stops => stops.map(hex => [1, 3, 5].map(k => parseInt(hex.slice(k, k + 2), 16))));
 const mix = (a, b, t) => a.map((c, k) => Math.round(c + (b[k] - c) * t));
-// Between About, Work, Skills and Contact the page holds a beat of open sky: each of those sections runs on for TAIL
-// screen-heights after its own scroll is done. Its island fades out over FADE (running into the next section's
-// approach), a quarter screen of sky alone follows with a line of motes drifting across it, and the next island starts
-// in once 30% of its section is on screen.
-const TAIL = .4, FADE = .45, ENTER = .7, RISE = .55, ARRIVE = 14, DEPART = 10;
-const tailOf = i => (i > 0 && i < 4 ? TAIL : 0);
+// No gaps between sections. The islands are fixed full-screen layers, one per section, and they crossfade at each
+// border: over the half screen of scroll as the next section comes up from the middle of the screen to near the top
+// (CROSS, centred on its top being halfway up), the outgoing island fades out as the incoming one fades in, so there's
+// always an island on screen. ARRIVE and DEPART tip the cameras during the crossover.
+const CROSS = .5, ARRIVE = 14, DEPART = 10;
+const ease = v => v * v * (3 - 2 * v);
 // Which slot each scene reads in the shared scroll state.
 const ABOUT = 1, WORK = 2, SKILLS_AT = 3, CONTACT = 4;
 const clamp = v => Math.min(1, Math.max(0, v));
@@ -77,37 +77,11 @@ function ContactForm() {
   );
 }
 
-// Between the worlds: a loose line of ten faint motes drifting left to right across the open sky (4 s a crossing),
-// shown only while no island is on screen (strength 0 → 1, set from the scroll). Its own frame loop runs only then.
-function useMotes(canvasRef) {
-  const strength = useRef(0), frame = useRef(0);
-  const start = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || frame.current || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const g = canvas.getContext("2d"), seeds = Array.from({ length: 10 }, (_, i) => ({ at: i / 10 + Math.random() * .05, y: (Math.random() - .5) * 60, wobble: Math.random() * 6, speed: .9 + Math.random() * .2 }));
-    const draw = now => {
-      const k = strength.current, ratio = Math.min(devicePixelRatio, 1.5), w = innerWidth, h = innerHeight;
-      if (canvas.width !== Math.round(w * ratio)) { canvas.width = Math.round(w * ratio); canvas.height = Math.round(h * ratio); }
-      g.setTransform(ratio, 0, 0, ratio, 0, 0); g.clearRect(0, 0, w, h);
-      if (k < .01) { frame.current = 0; return; }
-      g.fillStyle = `rgba(255,255,255,${(.15 * k).toFixed(3)})`;
-      for (const m of seeds) {
-        const x = ((now / 4000) * m.speed + m.at) % 1 * (w + 40) - 20, y = h * .5 + m.y + Math.sin(now / 900 + m.wobble) * 10;
-        g.beginPath(); g.arc(x, y, 1.5, 0, Math.PI * 2); g.fill();
-      }
-      frame.current = requestAnimationFrame(draw);
-    };
-    frame.current = requestAnimationFrame(draw);
-  }, [canvasRef]);
-  useEffect(() => () => cancelAnimationFrame(frame.current), []);
-  return { strength, start };
-}
-
 // A section heading that writes itself in as you arrive: once its section is a fifth of the way up the screen, each
 // word is uncovered left to right, 0.08 s after the one before, then the violet full stop pops in. It resets when you
 // scroll back above the section, so it plays again on the way down. Without JavaScript, or with reduced motion
 // (see the CSS), it's simply there.
-function RevealHeading({ id, text }) {
+function RevealHeading({ id, text, arrive = 20 }) {
   const ref = useRef(null), [armed, setArmed] = useState(false), [shown, setShown] = useState(false), words = text.split(" ");
   useEffect(() => {
     const section = ref.current?.closest("section");
@@ -116,10 +90,10 @@ function RevealHeading({ id, text }) {
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) setShown(true);
       else if (entry.boundingClientRect.top > 0) setShown(false);
-    }, { rootMargin: "0px 0px -20% 0px" });
+    }, { rootMargin: `0px 0px -${arrive}% 0px` });
     observer.observe(section);
     return () => observer.disconnect();
-  }, []);
+  }, [arrive]);
   return (
     <h2 id={id} ref={ref} className={armed ? `ht-reveal${shown ? " is-revealed" : ""}` : undefined} style={{ "--n": words.length }}>
       {words.map((word, i) => <span key={i}><span className="ht-word" style={{ "--w": i }}>{word}</span>{i < words.length - 1 ? " " : ""}</span>)}
@@ -140,7 +114,7 @@ export default function Home() {
     return () => queries.forEach(q => q.removeEventListener("change", sync));
   }, []);
   const pill = useRef(null), bar = useRef(null);
-  const zones = useRef([]), sky = useRef(null), copies = useRef([]), moteCanvas = useRef(null), motes = useMotes(moteCanvas);
+  const zones = useRef([]), sky = useRef(null), copies = useRef([]);
   const { section, stop } = where;
   // Loading: every model is fetched up front (to warm the cache) while the dioramas are built one after another
   // behind the loading screen, each as soon as the previous one reports it's ready. The screen lifts when all are
@@ -170,7 +144,7 @@ export default function Home() {
   const scrollToSection = useCallback((s, q = 0) => {
     const el = zones.current[s];
     if (!el) return;
-    const top = el.offsetTop + q * Math.max(0, el.offsetHeight - window.innerHeight * (1 + tailOf(s))), lenis = lenisRef.current;
+    const top = el.offsetTop + q * Math.max(0, el.offsetHeight - window.innerHeight), lenis = lenisRef.current;
     setMenu(false);
     if (lenis) lenis.scrollTo(top, { duration: 1.4 }); else window.scrollTo({ top, behavior: "auto" });
   }, []);
@@ -183,25 +157,26 @@ export default function Home() {
       frame = 0;
       const y = window.scrollY, vh = window.innerHeight, middle = y + vh / 2, live = [];
       let dominant = 0;
-      const stops = [];let shown = 0;
+      const stops = [], last_ = zones.current.length - 1;
       zones.current.forEach((el, i) => {
         if (!el) return;
-        const top = el.offsetTop, height = el.offsetHeight, run = Math.max(1, height - vh * (1 + tailOf(i)));
+        const top = el.offsetTop, height = el.offsetHeight, run = Math.max(1, height - vh);
         scene.current.progress[i] = clamp((y - top) / run);
         if (top < y + vh && top + height > y) live.push(i);
         if (middle >= top) dominant = i;
-        // Each diorama fades in as its section comes up into view and fades out again before the next one arrives, with
-        // only sky between (the first has nothing to fade in from, the last nothing to leave for). The words go with it.
+        // The crossfades: in across the border at this section's top, out across the border at its bottom. A layer that
+        // is mostly faded lets the pointer through to the one coming in.
         const stage = el.firstElementChild;
         if (stage) {
-          const enter = i ? clamp((y - (top - vh * ENTER)) / (vh * RISE)) : 1;
-          const leave = i === 0 ? clamp((top + height - y - vh * .5) / (vh * .55)) : tailOf(i) ? clamp((top + run + vh * FADE - y) / (vh * FADE)) : 1, o = Math.min(enter, leave);
-          if (top < y + vh && top + height > y) shown = Math.max(shown, o);
-          stage.style.opacity = o.toFixed(3);stage.style.transform = o < 1 ? `scale(${(enter < leave ? .94 + o * .06 : .92 + o * .08).toFixed(4)})` : "";
+          const across = edge => ease(clamp((y - (edge - vh * (.5 + CROSS / 2))) / (vh * CROSS)));
+          const enter = i ? across(top) : 1, leave = i < last_ ? 1 - across(top + height) : 1, o = Math.min(enter, leave);
+          stage.style.opacity = o.toFixed(3);stage.style.transform = o < 1 ? `scale(${(enter < leave ? .94 + enter * .06 : .96 + leave * .04).toFixed(4)})` : "";
+          stage.style.visibility = o > 0 ? "" : "hidden";stage.style.pointerEvents = o < .5 ? "none" : "";
           // The camera's attitude (degrees from its resting angle, the scenes ease toward it): steeper as an island
           // arrives, as if coming in from above, and lower as it leaves, looking back up at it as you pass.
           scene.current.tilt[i] = ARRIVE * (1 - enter) - DEPART * (1 - leave);
-          if (tailOf(i)) copies.current[i]?.style.setProperty("opacity", leave.toFixed(3));
+          // Work's words (heading, hint and cards) arrive with its island; the others scroll in with the page.
+          if (i === WORK) copies.current[i]?.style.setProperty("opacity", enter.toFixed(3));
         }
         stops[i] = i === CONTACT ? top - vh * .6 : i ? top + run * .5 : 0;
       });
@@ -210,7 +185,6 @@ export default function Home() {
       let k = 0; while (k < marks.length - 2 && p > marks[k + 1]) k++;
       const blend = clamp((p - marks[k]) / Math.max(1e-6, marks[k + 1] - marks[k])), colors = SKY[k].map((c, n) => mix(c, SKY[k + 1][n], blend));
       if (sky.current) sky.current.style.background = `linear-gradient(180deg,${colors.map((c, n) => `rgb(${c}) ${[0, 30, 55, 80, 100][n]}%`).join(",")})`;
-      motes.strength.current = clamp(1 - shown * 1.4);if (motes.strength.current > .01) motes.start();
       scene.current.live = live;scene.current.section = dominant;
       pill.current?.style.setProperty("--progress", scene.current.progress[dominant].toFixed(4));
       bar.current?.style.setProperty("--progress", clamp(y / Math.max(1, document.documentElement.scrollHeight - vh)).toFixed(4));
@@ -247,7 +221,7 @@ export default function Home() {
 
   return (
     <main className={`ht${loaded ? " is-entered" : ""}`} data-section={SECTIONS[section].id}>
-      <div className="ht-skies" aria-hidden="true"><div className="ht-sky-live" ref={sky} /><canvas className="ht-motes" ref={moteCanvas} /></div>
+      <div className="ht-skies" aria-hidden="true"><div className="ht-sky-live" ref={sky} /></div>
       <div className="ht-finish" aria-hidden="true" />
       <header className="ht-header">
         <a href="#" className="ht-wordmark" onClick={event => { event.preventDefault(); jump(0); }}>Brainilio<span>.</span></a>
@@ -276,7 +250,7 @@ export default function Home() {
 
       {/* About: an evening by the campfire, the diorama on the right. The bear roasts a marshmallow and the fire crackles on
           their own; on the left, just the person behind it. The words hold in the middle while the island does. */}
-      <section className="ht-zone ht-about ht-pinned" id="about" data-side="right" style={{ "--steps": 1.25 }} ref={el => (zones.current[ABOUT] = el)} aria-labelledby="ht-about-title">
+      <section className="ht-zone ht-about" id="about" data-side="right" ref={el => (zones.current[ABOUT] = el)} aria-labelledby="ht-about-title">
         <div className="ht-stage">{built[ABOUT] && <AboutScene state={scene} slot={ABOUT} side="right" onReady={onReady(ABOUT)} />}</div>
         <div className="ht-copy" ref={el => (copies.current[ABOUT] = el)}>
           {/* Replace with: <Image src="/me.jpg" alt="Brainilio" width={120} height={120} /> (drop me.jpg into /public) */}
@@ -297,7 +271,7 @@ export default function Home() {
         <div className="ht-stage">{built[WORK] && <WorkScene state={scene} slot={WORK} side="center" onReady={onReady(WORK)} />}</div>
         <div className="ht-copy" ref={el => (copies.current[WORK] = el)}>
           <div className="ht-work-head">
-            <RevealHeading id="ht-work-title" text="Things I’ve built" />
+            <RevealHeading id="ht-work-title" text="Things I’ve built" arrive={50} />
             <p className="ht-drive">Click the basket to feed the herd</p>
           </div>
           <ol className="ht-deck">
