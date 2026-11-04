@@ -103,6 +103,31 @@ function useMotes(canvasRef) {
   return { strength, start };
 }
 
+// A section heading that writes itself in as you arrive: once its section is a fifth of the way up the screen, each
+// word is uncovered left to right, 0.08 s after the one before, then the violet full stop pops in. It resets when you
+// scroll back above the section, so it plays again on the way down. Without JavaScript, or with reduced motion
+// (see the CSS), it's simply there.
+function RevealHeading({ id, text }) {
+  const ref = useRef(null), [armed, setArmed] = useState(false), [shown, setShown] = useState(false), words = text.split(" ");
+  useEffect(() => {
+    const section = ref.current?.closest("section");
+    if (!section) return;
+    setArmed(true);
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) setShown(true);
+      else if (entry.boundingClientRect.top > 0) setShown(false);
+    }, { rootMargin: "0px 0px -20% 0px" });
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+  return (
+    <h2 id={id} ref={ref} className={armed ? `ht-reveal${shown ? " is-revealed" : ""}` : undefined} style={{ "--n": words.length }}>
+      {words.map((word, i) => <span key={i}><span className="ht-word" style={{ "--w": i }}>{word}</span>{i < words.length - 1 ? " " : ""}</span>)}
+      <span className="ht-dot">.</span>
+    </h2>
+  );
+}
+
 export default function Home() {
   const [where, setWhere] = useState({ section: 0, stop: 0 }), [menu, setMenu] = useState(false);
   // Shared with the 3D scenes (read every frame): which sections are on screen and how far through each one we are.
@@ -256,7 +281,7 @@ export default function Home() {
         <div className="ht-copy" ref={el => (copies.current[ABOUT] = el)}>
           {/* Replace with: <Image src="/me.jpg" alt="Brainilio" width={120} height={120} /> (drop me.jpg into /public) */}
           <div className="ht-portrait" aria-hidden="true" />
-          <h2 id="ht-about-title">Around the fire<span>.</span></h2>
+          <RevealHeading id="ht-about-title" text="Around the fire" />
           {/* PLACEHOLDER copy: replace the companies with your own. */}
           <p>I&apos;m a software developer who likes building things people enjoy using — from the API to the last bit of motion. Away from the keyboard you&apos;ll find me on a trail, on a road trip through a national park, or by a campfire with a marshmallow on a stick. <span className="ht-now">Currently at [Company] · previously [Company].</span></p>
           <p className="ht-drive">Tap the bear for a marshmallow, or the fire to stoke it</p>
@@ -272,7 +297,7 @@ export default function Home() {
         <div className="ht-stage">{built[WORK] && <WorkScene state={scene} slot={WORK} side="center" onReady={onReady(WORK)} />}</div>
         <div className="ht-copy" ref={el => (copies.current[WORK] = el)}>
           <div className="ht-work-head">
-            <h2 id="ht-work-title">Things I&apos;ve built<span>.</span></h2>
+            <RevealHeading id="ht-work-title" text="Things I’ve built" />
             <p className="ht-drive">Click the basket to feed the herd</p>
           </div>
           <ol className="ht-deck">
@@ -303,7 +328,7 @@ export default function Home() {
       <section className="ht-zone ht-skills ht-pinned" id="skills" data-side="right" style={{ "--steps": SKILLS.length }} ref={el => (zones.current[SKILLS_AT] = el)} aria-labelledby="ht-skills-title">
         <div className="ht-stage">{built[SKILLS_AT] && <SkillsScene state={scene} skills={SKILLS} onCar={onCar} slot={SKILLS_AT} side="right" onReady={onReady(SKILLS_AT)} />}</div>
         <div className="ht-copy" ref={el => (copies.current[SKILLS_AT] = el)}>
-          <h2 id="ht-skills-title">What I bring along<span>.</span></h2>
+          <RevealHeading id="ht-skills-title" text="What I bring along" />
           <p className="ht-drive">Scroll or click the wagon to drive on</p>
           <ol className="ht-list">
             {SKILLS.map((skill, i) => (
@@ -319,7 +344,7 @@ export default function Home() {
       <section className="ht-zone ht-contact" id="contact" ref={el => (zones.current[CONTACT] = el)} aria-labelledby="ht-contact-title">
         <div className="ht-stage">{built[CONTACT] && <CoastScene state={scene} onSpot={setSpotted} slot={CONTACT} lite onReady={onReady(CONTACT)} />}</div>
         <div className="ht-contact-card">
-          <h2 id="ht-contact-title">Let&apos;s build something<span>.</span></h2>
+          <RevealHeading id="ht-contact-title" text="Let’s build something" />
           <p>Have a project, a role or an idea worth exploring? I&apos;d love to hear about it.</p>
           <ContactForm />
           <p className="ht-contact-or">or email directly</p>
