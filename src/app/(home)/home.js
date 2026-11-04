@@ -116,7 +116,7 @@ export default function Home() {
     return () => queries.forEach(q => q.removeEventListener("change", sync));
   }, []);
   const pill = useRef(null), bar = useRef(null);
-  const zones = useRef([]), sky = useRef(null), skiesRef = useRef(null), nameRef = useRef(null);
+  const zones = useRef([]), sky = useRef(null), mainRef = useRef(null);
   const { section, stop } = where;
   // Loading: every model is fetched up front (to warm the cache) while the dioramas are built one after another
   // behind the loading screen, each as soon as the previous one reports it's ready. The screen lifts when all are
@@ -175,10 +175,7 @@ export default function Home() {
       const end = Math.max(1, document.documentElement.scrollHeight - vh), marks = [...stops.slice(0, 5).map(v => v / end), 1], p = clamp(y / end);
       let k = 0; while (k < marks.length - 2 && p > marks[k + 1]) k++;
       const blend = clamp((p - marks[k]) / Math.max(1e-6, marks[k + 1] - marks[k])), colors = SKY[k].map((c, n) => mix(c, SKY[k + 1][n], blend));
-      // Painted on the GPU behind the islands (or, without WebGL, as a CSS gradient).
-      const world = getStage();
-      if (world) world.setSky(colors);
-      else if (sky.current) sky.current.style.background = `linear-gradient(180deg,${colors.map((c, n) => `rgb(${c}) ${[0, 30, 55, 80, 100][n]}%`).join(",")})`;
+      if (sky.current) sky.current.style.background = `linear-gradient(180deg,${colors.map((c, n) => `rgb(${c}) ${[0, 30, 55, 80, 100][n]}%`).join(",")})`;
       { const q = scene.current.progress[WORK], n = PLACE_AT.filter(t => q >= t).length; if (n) setPlaced(was => Math.max(was, n)); }
       scene.current.live = live;scene.current.section = dominant;
       pill.current?.style.setProperty("--progress", scene.current.progress[dominant].toFixed(4));
@@ -193,8 +190,7 @@ export default function Home() {
       }
     };
     // The one WebGL canvas, behind the page.
-    const world = getStage(); if (world && skiesRef.current) world.attach(skiesRef.current);
-    const unpaint = world && nameRef.current ? world.text(nameRef.current) : null;
+    const world = getStage(); if (world && mainRef.current) world.attach(mainRef.current);
     const onScroll = () => { if (!frame) frame = requestAnimationFrame(update); };
     // Start on the section in the URL, if any (and don't let the browser restore an old scroll position over it).
     history.scrollRestoration = "manual";
@@ -207,7 +203,7 @@ export default function Home() {
     // Sections change height as fonts load and the layout settles; keep the measurements fresh.
     const resize = new ResizeObserver(onScroll);resize.observe(document.body);
     window.addEventListener("scroll", onScroll, { passive: true }); window.addEventListener("resize", onScroll);
-    return () => { unpaint?.(); world?.detach(); cancelAnimationFrame(frame); resize.disconnect(); window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); lenis?.destroy(); lenisRef.current = null; };
+    return () => { world?.detach(); cancelAnimationFrame(frame); resize.disconnect(); window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); lenis?.destroy(); lenisRef.current = null; };
   }, []);
 
   // Clicking the wagon glides the page on to the next sign (or back to the first from the last).
@@ -218,8 +214,8 @@ export default function Home() {
   const counter = SECTIONS[section].steps > 1 ? `${stop + 1}/${SECTIONS[section].steps}` : null;
 
   return (
-    <main className={`ht${loaded ? " is-entered" : ""}`} data-section={SECTIONS[section].id}>
-      <div className="ht-skies" aria-hidden="true" ref={skiesRef}><div className="ht-sky-live" ref={sky} /></div>
+    <main ref={mainRef} className={`ht${loaded ? " is-entered" : ""}`} data-section={SECTIONS[section].id}>
+      <div className="ht-skies" aria-hidden="true"><div className="ht-sky-live" ref={sky} /></div>
       <div className="ht-finish" aria-hidden="true" />
       <header className="ht-header">
         <a href="#" className="ht-wordmark" onClick={event => { event.preventDefault(); jump(0); }}>Brainilio<span>.</span></a>
@@ -234,7 +230,8 @@ export default function Home() {
 
       <section className="ht-zone ht-home" id="home" ref={el => (zones.current[0] = el)} aria-label="Introduction">
         <div className="ht-stage"><IslandScene active={scene} onReady={onReady(0)} /></div>
-        <h1 className="ht-name" ref={nameRef}>Brainilio</h1>
+        {/* The name comes in letter by letter, each rising into view through its own little window. */}
+        <h1 className="ht-name" aria-label="Brainilio">{"Brainilio".split("").map((letter, i) => <span key={i} className="ht-name-window" aria-hidden="true" style={{ "--c": i }}><span>{letter}</span></span>)}</h1>
         <div className="ht-intro">
           <p className="ht-roles">I build digital products<span>,</span> and the odd little world<span>.</span></p>
           <p className="ht-lede">Full-stack, from REST APIs to 3D on the web. I explore new ideas and try to leave the world a little better than I found it.</p>
