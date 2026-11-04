@@ -105,3 +105,36 @@ export function createBasket() {
   return new THREE.Mesh(geometry,flatMaterial());
 }
 
+
+// A geyser (the Skills island's, shared with the Work island): a pale sinter cone with a blue vent, steam rising off
+// it, and a spray column that shoots up and rains back during an eruption. uniforms: uTime, uPower (0 → 1 → 0 through
+// an eruption), uScale (point size), and uWisp (0 → 1: the vent steams harder, for a while after an eruption). Pass
+// shared uniforms to drive it with others; built at the origin (place the group).
+export const SPRITE_FRAGMENT=`varying float vAlpha;uniform vec3 uColor;void main(){float d=length(gl_PointCoord-.5)*2.;gl_FragColor=vec4(uColor,vAlpha*smoothstep(1.,.2,d));}`;
+export const STEAM_VERTEX=`attribute vec3 aSeed,aParams;uniform float uTime,uPower,uScale,uWisp;varying float vAlpha;void main(){
+  float boost=(1.+aParams.z*uPower*3.)*(1.+aParams.z*uWisp*.7),t=fract(uTime*(.12+aSeed.x*.08)+aSeed.z);
+  vec3 p=position+vec3(t*t*.9+sin(t*4.+aSeed.y*6.)*.15,t*aParams.x*boost,sin(t*3.+aSeed.x*6.)*.15);
+  vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;
+  gl_PointSize=aParams.y*(.6+t*1.8)*(1.+aParams.z*uPower*1.5)*uScale/-mv.z;vAlpha=sin(t*3.14159)*(.3+aParams.z*uPower*.25+aParams.z*uWisp*.2);}`;
+export function createGeyser(rng,{uniforms={uTime:{value:0},uPower:{value:0},uScale:{value:600}}}={}){
+  uniforms.uWisp??={value:0};
+  const group=new THREE.Group(),paint=(g,hex)=>{const c=new THREE.Color(hex),a=new Float32Array(g.attributes.position.count*3);for(let i=0;i<a.length;i+=3)a.set([c.r,c.g,c.b],i);g.setAttribute("color",new THREE.BufferAttribute(a,3));return g;};
+  const cone=new THREE.Mesh(paint(new THREE.CylinderGeometry(.2,.62,.32,10,1,true).translate(0,.16,0),"#ddd5c3"),new THREE.MeshStandardMaterial({vertexColors:true,flatShading:true,roughness:1,side:THREE.DoubleSide}));group.add(cone);
+  const vent=new THREE.Mesh(new THREE.CircleGeometry(.2,10).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:"#3f6f86"}));vent.position.y=.31;cone.add(vent);
+  {const pos=[],seed=[],params=[];for(let i=0;i<22;i++){const a=rng()*6.28,d=Math.sqrt(rng())*.12;pos.push(Math.cos(a)*d,.4,Math.sin(a)*d);seed.push(rng(),rng(),rng());params.push(.9,.3,1);}
+    const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.Float32BufferAttribute(pos,3));g.setAttribute("aSeed",new THREE.Float32BufferAttribute(seed,3));g.setAttribute("aParams",new THREE.Float32BufferAttribute(params,3));
+    const steam=new THREE.Points(g,new THREE.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{...uniforms,uColor:{value:new THREE.Color("#ffffff")}},vertexShader:STEAM_VERTEX,fragmentShader:SPRITE_FRAGMENT}));
+    steam.frustumCulled=false;steam.renderOrder=2;group.add(steam);}
+  {const count=140,pos=new Float32Array(count*3),seed=[];for(let i=0;i<count;i++){pos.set([0,.3,0],i*3);seed.push(rng(),rng(),rng());}
+    const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.BufferAttribute(pos,3));g.setAttribute("aSeed",new THREE.Float32BufferAttribute(seed,3));
+    const spray=new THREE.Points(g,new THREE.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{...uniforms,uColor:{value:new THREE.Color("#ffffff")}},
+      vertexShader:`attribute vec3 aSeed;uniform float uTime,uPower,uScale;varying float vAlpha;void main(){
+        float t=fract(uTime*(.55+aSeed.y*.25)+aSeed.z),h=5.5*uPower*(.7+.3*aSeed.y),a=aSeed.x*6.2832;
+        float y=h*(1.-pow((t-.62)/.62,2.)),r=(.05+aSeed.y*.3)*t*t*(1.+h*.12);
+        vec3 p=position+vec3(cos(a)*r+t*t*.5,y,sin(a)*r);
+        vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;
+        gl_PointSize=(.12+t*.55)*uScale/-mv.z;vAlpha=uPower*(1.-t*.8)*.85;}`,
+      fragmentShader:SPRITE_FRAGMENT}));
+    spray.frustumCulled=false;spray.renderOrder=3;group.add(spray);}
+  return {group,cone,uniforms};
+}

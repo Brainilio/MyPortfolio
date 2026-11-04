@@ -7,7 +7,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { random, createIsland, createPineGeometry, createSwayingInstances, createFoliageMaterial, flatMaterial, createSpin, tilted, bakeProp } from "./island-parts";
 import { paintGeometry } from "./forest-parts";
-import { createSign } from "./park-parts";
+import { createSign, createGeyser, STEAM_VERTEX, SPRITE_FRAGMENT } from "./park-parts";
 import { loadWagon } from "./wagon";
 
 // Skills as the road trip in miniature, the island's daytime cousin: a floating patch of national park with a road
@@ -81,34 +81,13 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, side = "ri
       const texture=new THREE.CanvasTexture(c);texture.colorSpace=THREE.SRGBColorSpace;
       const pool=new THREE.Mesh(new THREE.CircleGeometry(1.1,32).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({map:texture,transparent:true,depthWrite:false}));pool.position.copy(on(POOL.x,POOL.y,.04));pool.scale.set(1,1,.8);world.add(pool);}
     const geyserAt=on(GEYSER.x,GEYSER.y);
-    const cone=new THREE.Mesh(paintGeometry(new THREE.CylinderGeometry(.2,.62,.32,10,1,true).translate(0,.16,0),"#ddd5c3"),new THREE.MeshStandardMaterial({vertexColors:true,flatShading:true,roughness:1,side:THREE.DoubleSide}));
-    cone.position.copy(geyserAt);world.add(cone);
-    const vent=new THREE.Mesh(new THREE.CircleGeometry(.2,10).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:"#3f6f86"}));vent.position.y=.31;cone.add(vent);
-    // Steam off the spring and the vent; during an eruption (uPower 0→1→0) the spray column shoots up and rains back.
+    // The geyser (park-parts.js), sharing these particle uniforms; the hot spring's steam beside it.
     const particles={uTime:{value:0},uPower:{value:0},uScale:{value:600}};
-    const spriteFragment=`varying float vAlpha;uniform vec3 uColor;void main(){float d=length(gl_PointCoord-.5)*2.;gl_FragColor=vec4(uColor,vAlpha*smoothstep(1.,.2,d));}`;
-    {const pos=[],seed=[],params=[],emit=(p,r,count,height,size,boost)=>{for(let i=0;i<count;i++){const a=rng()*6.28,d=Math.sqrt(rng())*r;pos.push(p.x+Math.cos(a)*d,p.y+.1,p.z+Math.sin(a)*d);seed.push(rng(),rng(),rng());params.push(height,size,boost);}};
-      emit(on(POOL.x,POOL.y),.8,16,1.6,.5,0);emit(geyserAt.clone().setY(geyserAt.y+.3),.12,22,.9,.3,1);
+    {const pos=[],seed=[],params=[];for(let i=0;i<16;i++){const p=on(POOL.x,POOL.y),a=rng()*6.28,d=Math.sqrt(rng())*.8;pos.push(p.x+Math.cos(a)*d,p.y+.1,p.z+Math.sin(a)*d);seed.push(rng(),rng(),rng());params.push(1.6,.5,0);}
       const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.Float32BufferAttribute(pos,3));g.setAttribute("aSeed",new THREE.Float32BufferAttribute(seed,3));g.setAttribute("aParams",new THREE.Float32BufferAttribute(params,3));
-      const steam=new THREE.Points(g,new THREE.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{...particles,uColor:{value:new THREE.Color("#ffffff")}},
-        vertexShader:`attribute vec3 aSeed,aParams;uniform float uTime,uPower,uScale;varying float vAlpha;void main(){
-          float boost=1.+aParams.z*uPower*3.,t=fract(uTime*(.12+aSeed.x*.08)+aSeed.z);
-          vec3 p=position+vec3(t*t*.9+sin(t*4.+aSeed.y*6.)*.15,t*aParams.x*boost,sin(t*3.+aSeed.x*6.)*.15);
-          vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;
-          gl_PointSize=aParams.y*(.6+t*1.8)*(1.+aParams.z*uPower*1.5)*uScale/-mv.z;vAlpha=sin(t*3.14159)*(.3+aParams.z*uPower*.25);}`,
-        fragmentShader:spriteFragment}));
+      const steam=new THREE.Points(g,new THREE.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{...particles,uWisp:{value:0},uColor:{value:new THREE.Color("#ffffff")}},vertexShader:STEAM_VERTEX,fragmentShader:SPRITE_FRAGMENT}));
       steam.frustumCulled=false;steam.renderOrder=2;world.add(steam);}
-    {const count=140,pos=new Float32Array(count*3),seed=[];for(let i=0;i<count;i++){pos.set([geyserAt.x,geyserAt.y+.3,geyserAt.z],i*3);seed.push(rng(),rng(),rng());}
-      const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.BufferAttribute(pos,3));g.setAttribute("aSeed",new THREE.Float32BufferAttribute(seed,3));
-      const spray=new THREE.Points(g,new THREE.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{...particles,uColor:{value:new THREE.Color("#ffffff")}},
-        vertexShader:`attribute vec3 aSeed;uniform float uTime,uPower,uScale;varying float vAlpha;void main(){
-          float t=fract(uTime*(.55+aSeed.y*.25)+aSeed.z),h=5.5*uPower*(.7+.3*aSeed.y),a=aSeed.x*6.2832;
-          float y=h*(1.-pow((t-.62)/.62,2.)),r=(.05+aSeed.y*.3)*t*t*(1.+h*.12);
-          vec3 p=position+vec3(cos(a)*r+t*t*.5,y,sin(a)*r);
-          vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;
-          gl_PointSize=(.12+t*.55)*uScale/-mv.z;vAlpha=uPower*(1.-t*.8)*.85;}`,
-        fragmentShader:spriteFragment}));
-      spray.frustumCulled=false;spray.renderOrder=3;world.add(spray);}
+    const geyserParts=createGeyser(rng,{uniforms:particles});geyserParts.group.position.copy(geyserAt);world.add(geyserParts.group);const cone=geyserParts.cone;
     const geyser={t:-1,wait:9};const erupt=()=>{if(geyser.t<0)geyser.t=0;};
 
     // Where the camera looks from (flat), so signs face it and sit on the far side of the road from it.

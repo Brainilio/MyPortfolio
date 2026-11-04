@@ -414,10 +414,11 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     const raycaster=new THREE.Raycaster(),ndc=new THREE.Vector2();let onBasket=false;
     const pick=(event,objects)=>{const rect=canvas.getBoundingClientRect();ndc.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(ndc,camera);return raycaster.intersectObjects(objects,true)[0];};
     const spin=createSpin(canvas,{rest:0,
-      over:event=>variant==='A'&&((onBasket=!!pick(event,[basket,hay]))||!!pick(event,dogs.map(d=>d.root)))||(variant==='A'||variant==='B')&&!!pick(event,herd.map(b=>b.root)),
+      over:event=>variant==='A'&&((onBasket=!!pick(event,[basket,hay]))||!!pick(event,dogs.map(d=>d.root)))||(variant==='A'||variant==='B')&&!!pick(event,herd.map(b=>b.root))||variant==='B'&&!!pick(event,meadow.geysers),
       onTap:event=>{
         if(variant!=='A'&&variant!=='B')return;
         if(variant==='A'&&pick(event,[basket,hay])){pour();return;}
+        const vent=variant==='B'&&pick(event,meadow.geysers);if(vent){meadow.erupt(vent.object);needsRender=true;return;}
         const owner=(hit,list)=>list.find(x=>{let o=hit.object;while(o&&o!==x.root)o=o.parent;return o===x.root;});
         const hit=variant==='A'&&pick(event,dogs.map(d=>d.root));
         if(hit){const dog=owner(hit,dogs);if(dog){dog.state="down";dog.timer=3+rng()*3;needsRender=true;}return;}
@@ -482,7 +483,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
         bird.position.set(x,y,z);bird.lookAt(flock.localToWorld(ahead.set(-.2+Math.cos(u.a+.2)*u.r,y,-2+Math.sin(u.a+.2)*u.r)));
         const flap=Math.sin(time*8+u.flap)*.7;u.wings[0].rotation.z=flap;u.wings[1].rotation.z=-flap;});
       needsRender=false;
-      return falling||rolling||windy||dusty||onBasket||spin.busy||herd.some(b=>(b.feeding&&b.state==="move")||b.alarmUntil>time)||Math.abs(goal-attitude)>.05||bushes.some(set=>set.sway.some(v=>v>.003));
+      return falling||rolling||windy||dusty||onBasket||spin.busy||variant==="B"&&meadow.erupting()||herd.some(b=>(b.feeding&&b.state==="move")||b.alarmUntil>time)||Math.abs(goal-attitude)>.05||bushes.some(set=>set.sway.some(v=>v>.003));
     }
     // Full rate while feed falls, the herd runs to it or the basket is hovered, 30 fps for the grazing in between.
     let busy=true;

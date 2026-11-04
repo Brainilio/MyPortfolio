@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
+import { createGeyser } from "./park-parts";
 import { createIsland, createWater, createPineGeometry, createSwayingInstances, bakeProp, random } from "./island-parts";
 
 // The Work section's island: a Yellowstone meadow at golden hour. A river rises at the foot of the peaks at the back,
@@ -138,9 +139,31 @@ export function createMeadow({outline,foliage,loader,onLoad}){
   },undefined,()=>{});
   const blocked=(x,z,pad)=>riverAt(x,z).d<.95+pad||lakeE(x,z)<1.15+pad/LAKE.rz||z<-2.2+pad*.5||trees.some(t=>Math.hypot(x-t.position.x,z-t.position.z)<.3+pad)||FALL.some(([fx,fz])=>Math.hypot(x-fx,z-fz)<.3+pad)||GEYSERS.some(([gx,gz])=>Math.hypot(x-gx,z-gz)<.5+pad);
   updateReeds(0);
-  return {group,height,blocked,spots:SPOTS,swaying:pines,
+  // Two geysers (the Skills island's, at 60%): each goes off on its own every 12–20 s for 3–4 s, then steams harder
+  // for 6–8 s. Their eruptions start at least 4 s apart, so they never blow together; a click sets one off at once
+  // (or as soon as that allows).
+  const geysers=GEYSERS.map(([x,z],i)=>{const uniforms={uTime:{value:0},uPower:{value:0},uScale:{value:360},uWisp:{value:0}},g=createGeyser(rng,{uniforms});
+    g.group.scale.setScalar(.6);g.group.position.set(x,height(x,z)-.03,z);group.add(g.group);
+    return {...g,t:-1,wait:5+i*7+rng()*5,dur:3,steam:7,started:-99};});
+  let clock=0;
+  function goOff(g){if(g.t>=0)return;const other=geysers.find(o=>o!==g),gap=clock-other.started;
+    if(gap<4){g.wait=4-gap;return;}g.t=0;g.started=clock;g.dur=3+rng();g.steam=6+rng()*2;}
+  function updateGeysers(time,dt){
+    clock+=dt;
+    for(const g of geysers){
+      if(g.t<0){g.wait-=dt;if(g.wait<=0)goOff(g);}
+      else{g.t+=dt;if(g.t>g.dur+g.steam){g.t=-1;g.wait=12+rng()*8;}}
+      const t=g.t;g.uniforms.uTime.value=time;
+      g.uniforms.uPower.value=t<0?0:smooth(0,.6,t)*(1-smooth(g.dur-1,g.dur,t));
+      g.uniforms.uWisp.value=t<g.dur*.6?0:smooth(g.dur*.6,g.dur,t)*(1-smooth(g.dur,g.dur+g.steam,t));
+    }
+  }
+  return {group,height,blocked,spots:SPOTS,swaying:pines,geysers:geysers.map(g=>g.cone),
+    // Sets off the geyser whose cone this is (from a tap).
+    erupt(cone){const g=geysers.find(x=>x.cone===cone);if(g){g.wait=0;goOff(g);}},
+    erupting:()=>geysers.some(g=>g.t>=0),
     update(time,dt=0){
-      updateLeaves(dt);updateReeds(time);
+      updateLeaves(dt);updateReeds(time);updateGeysers(time,dt);
       water.uniforms.uTime.value=time;water.uniforms.uFlow.value=time*.7;
       const p=lakeShape.attributes.position;for(let i=0;i<p.count;i++)p.setY(i,rest[i*3+1]+.02*Math.sin(time*Math.PI*2/3+rest[i*3]*2.4+rest[i*3+2]*1.7));p.needsUpdate=true;
     },
