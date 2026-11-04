@@ -10,7 +10,7 @@ import { random, createIsland, createSpin, tilted, createSwayingInstances, creat
 import { paintGeometry } from "./forest-parts";
 import { createBasket } from "./park-parts";
 import { createBisonRig, createBisonAnimator } from "./bison-rig";
-import { createMeadow } from "./work-meadow";
+import { createMeadow, BASKET_SPOT } from "./work-meadow";
 import { createCowboy, createHat } from "./work-cowboy";
 
 // Work as the prairie in miniature, the island's golden-hour cousin: rolling prairie climbing to a mesa shelf at the
@@ -272,7 +272,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     // decides where each one goes and what it's doing.
     const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder),herd=[],LIMIT=.72,SIZES=[.98,.9,.82,.93];let leash=1;
     // The ground and obstacles of whichever island the herd is on (A's prairie or B's meadow).
-    const PRAIRIE={height:heightAt,blocked,pond:POND,home:null},MEADOW={height:meadow.height,blocked:meadow.blocked,pond:null};let layout=PRAIRIE;
+    const PRAIRIE={height:heightAt,blocked,pond:POND,basket:[1.1,2]},MEADOW={height:meadow.height,blocked:(x,z,pad)=>meadow.blocked(x,z,pad)||Math.hypot(x-BASKET_SPOT[0],z-BASKET_SPOT[1])<pad+.3,pond:null,basket:BASKET_SPOT};let layout=PRAIRIE;
     const inside=(x,z,pad=.55)=>Math.hypot(x,z)<outline(Math.atan2(z,x))*LIMIT&&!layout.blocked(x,z,pad);
     loader.load("/models/island/bison.glb",gltf=>{
       if(disposed)return;
@@ -373,6 +373,8 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     function settleHerd(){
       const target=variant==="B"?meadow.group:world,next=variant==="B"?MEADOW:PRAIRIE;if(herdOn===target||!herd.length)return;
       herdOn=target;layout=next;const spots=variant==="B"?meadow.spots:PRAIRIE.spots;
+      // The feed basket (and its hay and pellets) goes along too.
+      BASKET.set(layout.basket[0],0,layout.basket[1]);target.add(basket,hay,pelletMesh);basket.position.set(BASKET.x,layout.height(BASKET.x,BASKET.z),BASKET.z);hay.position.copy(basket.position).y+=.1;
       herd.forEach((b,i)=>{const [x,z]=spots[i];target.add(b.root);b.root.position.set(x,layout.height(x,z),z);b.target.set(x,z);
         Object.assign(b,{state:i===2?"rest":"graze",timer:1+Math.random()*3,feeding:false,drink:false,face:null,wallowing:false,resting:i===2,restUntil:i===2?time+40:0,alarmUntil:0,startAt:0});});
     }
@@ -414,10 +416,10 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     const raycaster=new THREE.Raycaster(),ndc=new THREE.Vector2();let onBasket=false;
     const pick=(event,objects)=>{const rect=canvas.getBoundingClientRect();ndc.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(ndc,camera);return raycaster.intersectObjects(objects,true)[0];};
     const spin=createSpin(canvas,{rest:0,
-      over:event=>variant==='A'&&((onBasket=!!pick(event,[basket,hay]))||!!pick(event,dogs.map(d=>d.root)))||(variant==='A'||variant==='B')&&!!pick(event,herd.map(b=>b.root))||variant==='B'&&!!pick(event,meadow.geysers),
+      over:event=>(variant==='A'||variant==='B')&&(onBasket=!!pick(event,[basket,hay]))||variant==='A'&&!!pick(event,dogs.map(d=>d.root))||(variant==='A'||variant==='B')&&!!pick(event,herd.map(b=>b.root))||variant==='B'&&!!pick(event,meadow.geysers),
       onTap:event=>{
         if(variant!=='A'&&variant!=='B')return;
-        if(variant==='A'&&pick(event,[basket,hay])){pour();return;}
+        if(pick(event,[basket,hay])){pour();return;}
         const vent=variant==='B'&&pick(event,meadow.geysers);if(vent){meadow.erupt(vent.object);needsRender=true;return;}
         const owner=(hit,list)=>list.find(x=>{let o=hit.object;while(o&&o!==x.root)o=o.parent;return o===x.root;});
         const hit=variant==='A'&&pick(event,dogs.map(d=>d.root));

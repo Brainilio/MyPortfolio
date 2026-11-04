@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { createGeyser } from "./park-parts";
+import { createWildlife } from "./work-wildlife";
 import { createIsland, createWater, createPineGeometry, createSwayingInstances, bakeProp, random } from "./island-parts";
 
 // The Work section's island: a Yellowstone meadow at golden hour. A river rises at the foot of the peaks at the back,
@@ -17,17 +18,20 @@ const bump=a=>1+.07*Math.sin(7*a+.8)+.04*Math.sin(3*a+2.1)+.025*Math.sin(11*a);
 const lakeE=(x,z)=>{const dx=(x-LAKE.x)/LAKE.rx,dz=(z-LAKE.z)/LAKE.rz;return Math.hypot(dx,dz)/bump(Math.atan2(dz,dx));};
 const LEVEL=-.15;
 // Where the herd stands when it arrives (the last is the calf, beside its mother): the open meadow right of the river.
-const SPOTS=[[1.2,.3],[.4,1.6],[2.2,1.1],[1.4,2.1],[.85,.9]];
+const SPOTS=[[1.2,.3],[.4,1.6],[2.2,1.1],[2.0,-.25],[.85,.9]];
 // Fall trees (mid-island left of the river, and the front right), each its own colour, no two neighbours alike; and
 // the two geysers (rear right at the mountains' foot, and mid right), kept clear of trees and the herd.
 const FALL=[[-2.6,-.5],[-3.05,.45],[-1.75,-.15],[3.0,2.35],[2.25,3.15],[3.65,1.45],[1.25,3.4]];
 const FALL_COLORS=["#e8742a","#d4a020","#c45820","#8b2020","#e8a030"];
 export const GEYSERS=[[2.65,-1.55],[3.45,.55]];
+// The deer, by the pines at the back; and the feed basket, out front where the herd can gather round it.
+const DEER=[[-1.15,-2.2],[-2.35,-1.55]];
+export const BASKET_SPOT=[.3,2.75];
 // The range: (x, z, height, turn). The tallest is ~45% of the island's diameter.
 const PEAKS=[[-1.4,-3.75,4.9,.35],[1.5,-3.8,3.6,2.2],[3.4,-2.75,2.5,1.1]];
 
 export function createMeadow({outline,foliage,loader,onLoad}){
-  const rng=random(23),group=new THREE.Group();
+  const rng=random(23),group=new THREE.Group();let perch=null;
   function height(x,z){
     const edge=Math.hypot(x,z)/outline(Math.atan2(z,x));
     let h=.08*Math.sin(x*1.1+.4)*Math.cos(z*.9-.8)+.045*Math.sin(x*2.3+z*1.7+.6);
@@ -42,7 +46,7 @@ export function createMeadow({outline,foliage,loader,onLoad}){
   // Pines: a loose line along the bank, and a stand at the mountains' foot.
   const trees=[];
   for(let tries=0;trees.length<8&&tries<300;tries++){const p=PATH[4+Math.floor(rng()*40)],a=rng()*Math.PI*2,r=1.1+rng()*.4,x=p.x+Math.cos(a)*r,z=p.z+Math.sin(a)*r;
-    if(riverAt(x,z).d<1.05||lakeE(x,z)<1.3||GEYSERS.some(([gx,gz])=>Math.hypot(x-gx,z-gz)<1)||FALL.some(([fx,fz])=>Math.hypot(x-fx,z-fz)<1)||Math.hypot(x,z)>outline(Math.atan2(z,x))*.82||SPOTS.some(([sx,sz])=>Math.hypot(x-sx,z-sz)<1.1)||trees.some(t=>Math.hypot(x-t.position.x,z-t.position.z)<.7))continue;
+    if(riverAt(x,z).d<1.05||lakeE(x,z)<1.3||GEYSERS.some(([gx,gz])=>Math.hypot(x-gx,z-gz)<1)||FALL.some(([fx,fz])=>Math.hypot(x-fx,z-fz)<1)||DEER.some(([dx,dz])=>Math.hypot(x-dx,z-dz)<.55)||Math.hypot(x,z)>outline(Math.atan2(z,x))*.82||SPOTS.some(([sx,sz])=>Math.hypot(x-sx,z-sz)<1.1)||trees.some(t=>Math.hypot(x-t.position.x,z-t.position.z)<.7))continue;
     trees.push({position:on(x,z),rotation:rng()*6,scale:.42+rng()*.2});}
   for(let tries=0;trees.length<18&&tries<300;tries++){const x=-3.6+rng()*7.2,z=-2.3-rng()*1.1;
     if(riverAt(x,z).d<1||Math.hypot(x,z)>outline(Math.atan2(z,x))*.86||trees.some(t=>Math.hypot(x-t.position.x,z-t.position.z)<.6))continue;
@@ -52,7 +56,7 @@ export function createMeadow({outline,foliage,loader,onLoad}){
     const atBank=tries%2===0,p=PATH[6+Math.floor(rng()*40)],a=rng()*Math.PI*2,cx=atBank?p.x+Math.cos(a)*1.35:-3.2+rng()*6,cz=atBank?p.z+Math.sin(a)*1.35:-2.25-rng()*.8;
     const clump=Math.min(10-added,2+Math.floor(rng()*3));
     for(let k=0;k<clump;k++){const x=cx+(rng()-.5)*.7,z=cz+(rng()-.5)*.7;
-      if(riverAt(x,z).d<1||lakeE(x,z)<1.3||Math.hypot(x,z)>outline(Math.atan2(z,x))*.84||GEYSERS.some(([gx,gz])=>Math.hypot(x-gx,z-gz)<1)||FALL.some(([fx,fz])=>Math.hypot(x-fx,z-fz)<1)||SPOTS.some(([sx,sz])=>Math.hypot(x-sx,z-sz)<1)||trees.some(t=>Math.hypot(x-t.position.x,z-t.position.z)<.32))continue;
+      if(riverAt(x,z).d<1||lakeE(x,z)<1.3||Math.hypot(x,z)>outline(Math.atan2(z,x))*.84||GEYSERS.some(([gx,gz])=>Math.hypot(x-gx,z-gz)<1)||FALL.some(([fx,fz])=>Math.hypot(x-fx,z-fz)<1)||DEER.some(([dx,dz])=>Math.hypot(x-dx,z-dz)<.55)||SPOTS.some(([sx,sz])=>Math.hypot(x-sx,z-sz)<1)||trees.some(t=>Math.hypot(x-t.position.x,z-t.position.z)<.32))continue;
       trees.push({position:on(x,z),rotation:rng()*6,scale:.5*(.8+rng()*.4)});added++;}}
   // Ground colour: golden meadow, greener and wetter toward the lake, darker and rockier at the mountains' foot,
   // a medium green under the pines; a dark wet band right round the lake.
@@ -126,18 +130,21 @@ export function createMeadow({outline,foliage,loader,onLoad}){
     // snow; at least twice as bright lit as shadowed.
     const size=geometry.boundingBox.getSize(new THREE.Vector3()),LIT=new THREE.Color("#8b9bb0"),MID=new THREE.Color("#6b7a8d"),SHADE=new THREE.Color("#3d4a5c"),SNOW=new THREE.Color("#f0f4f8"),tone=new THREE.Color();
     const material=new THREE.MeshLambertMaterial({vertexColors:true,flatShading:true}),a=new THREE.Vector3(),b=new THREE.Vector3(),c=new THREE.Vector3(),n=new THREE.Vector3();
-    PEAKS.forEach(([x,z,tall,turn])=>{
+    PEAKS.forEach(([x,z,tall,turn],index)=>{
       const k=tall/size.y,g=geometry.clone().rotateY(turn).scale(k*.8,k,k*.8),pos=g.attributes.position,color=g.attributes.color,top=tall;
       for(let i=0;i<pos.count;i+=3){
         a.fromBufferAttribute(pos,i);b.fromBufferAttribute(pos,i+1);c.fromBufferAttribute(pos,i+2);n.subVectors(b,a).cross(c.clone().sub(a)).normalize();
         const white=color.getX(i)>.85&&color.getZ(i)>.85,high=Math.max(a.y,b.y,c.y)>top*.85;
         const snowy=white||(n.y>.7&&high);tone.copy(snowy?SNOW:n.x>.3?SHADE:n.x<-.3||n.y>.7?LIT:MID);if(!snowy)tone.multiplyScalar(.95+rng()*.1);
         for(let j=0;j<3;j++)color.setXYZ(i+j,tone.r,tone.g,tone.b);}
-      color.needsUpdate=true;const peak=new THREE.Mesh(g,material);peak.position.set(x,height(x,z)-.3,z);group.add(peak);});
+      color.needsUpdate=true;const peak=new THREE.Mesh(g,material);peak.position.set(x,height(x,z)-.3,z);group.add(peak);
+      // The eagle's perch: the tallest peak's summit.
+      if(index===0){let best=-1;const v=new THREE.Vector3();for(let i=0;i<pos.count;i++)if(pos.getY(i)>best){best=pos.getY(i);v.fromBufferAttribute(pos,i);}perch=v.add(peak.position).add(new THREE.Vector3(0,-.04,0));}});
     geometry.dispose();
     onLoad?.();
   },undefined,()=>{});
-  const blocked=(x,z,pad)=>riverAt(x,z).d<.95+pad||lakeE(x,z)<1.15+pad/LAKE.rz||z<-2.2+pad*.5||trees.some(t=>Math.hypot(x-t.position.x,z-t.position.z)<.3+pad)||FALL.some(([fx,fz])=>Math.hypot(x-fx,z-fz)<.3+pad)||GEYSERS.some(([gx,gz])=>Math.hypot(x-gx,z-gz)<.5+pad);
+  const wildlife=createWildlife({group,height,lake:LAKE,level:LEVEL,loader,perch:()=>perch,deerSpots:DEER,dry:(x,z)=>riverAt(x,z).d>1.1&&lakeE(x,z)>1.25&&z>-2.6});
+  const blocked=(x,z,pad)=>DEER.some(([dx,dz])=>Math.hypot(x-dx,z-dz)<.4+pad)||riverAt(x,z).d<.95+pad||lakeE(x,z)<1.15+pad/LAKE.rz||z<-2.2+pad*.5||trees.some(t=>Math.hypot(x-t.position.x,z-t.position.z)<.3+pad)||FALL.some(([fx,fz])=>Math.hypot(x-fx,z-fz)<.3+pad)||GEYSERS.some(([gx,gz])=>Math.hypot(x-gx,z-gz)<.5+pad);
   updateReeds(0);
   // Two geysers (the Skills island's, at 60%): each goes off on its own every 12–20 s for 3–4 s, then steams harder
   // for 6–8 s. Their eruptions start at least 4 s apart, so they never blow together; a click sets one off at once
@@ -163,7 +170,7 @@ export function createMeadow({outline,foliage,loader,onLoad}){
     erupt(cone){const g=geysers.find(x=>x.cone===cone);if(g){g.wait=0;goOff(g);}},
     erupting:()=>geysers.some(g=>g.t>=0),
     update(time,dt=0){
-      updateLeaves(dt);updateReeds(time);updateGeysers(time,dt);
+      updateLeaves(dt);updateReeds(time);updateGeysers(time,dt);wildlife.update(dt,time);
       water.uniforms.uTime.value=time;water.uniforms.uFlow.value=time*.7;
       const p=lakeShape.attributes.position;for(let i=0;i<p.count;i++)p.setY(i,rest[i*3+1]+.02*Math.sin(time*Math.PI*2/3+rest[i*3]*2.4+rest[i*3+2]*1.7));p.needsUpdate=true;
     },
