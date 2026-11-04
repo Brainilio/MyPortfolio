@@ -7,8 +7,9 @@ import * as THREE from "three";
 // the page as the next one arrives; no layer is ever faded. The stage elements themselves stay in the page as
 // transparent hit areas, so each island's pointer handling (drag to spin, taps, hover) works unchanged.
 //
-// An island registers { mount, scene, camera, draw(dt), exposure }: mount is its stage element, draw advances its
-// animation (it decides how often) and returns true when anything changed, exposure its tone-mapping exposure.
+// An island registers { mount, scene, camera, draw(dt), exposure, fade? }: mount is its stage element, draw advances its
+// animation (it decides how often) and returns true when anything changed, exposure its tone-mapping exposure, and
+// fade ({ side, from }) fades it out toward one edge on wide screens.
 let stage = null;
 
 export function getStage() {
@@ -38,6 +39,18 @@ function createStage() {
       c=mix(c,uColors[3],smoothstep(.55,.8,t));c=mix(c,uColors[4],smoothstep(.8,1.,t));gl_FragColor=vec4(c,1.);}`,
   }));
   sky.frustumCulled = false; skyScene.add(sky);
+  // An island can fade out toward one edge of its rectangle (toward the words beside it): the sky is painted back over
+  // that strip with a rising alpha, which on an island floating in open sky is the same as fading the island itself.
+  const veilUniforms = { uColors: { value: colors }, uScreen: { value: new THREE.Vector2(1, 1) }, uFrom: { value: .75 }, uDir: { value: 1 } };
+  const veilScene = new THREE.Scene(), veil = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({
+    depthTest: false, depthWrite: false, toneMapped: false, transparent: true, uniforms: veilUniforms,
+    vertexShader: "varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}",
+    fragmentShader: `uniform vec3 uColors[5];uniform vec2 uScreen;uniform float uFrom,uDir;varying vec2 vUv;void main(){
+      float t=1.-gl_FragCoord.y/uScreen.y;vec3 c=mix(uColors[0],uColors[1],smoothstep(0.,.3,t));c=mix(c,uColors[2],smoothstep(.3,.55,t));
+      c=mix(c,uColors[3],smoothstep(.55,.8,t));c=mix(c,uColors[4],smoothstep(.8,1.,t));
+      float x=uDir>0.?vUv.x:1.-vUv.x;gl_FragColor=vec4(c,smoothstep(uFrom,1.,x));}`,
+  }));
+  veil.frustumCulled = false; veilScene.add(veil);
 
   const entries = new Set(), last = new Map();
   let width = 0, height = 0, dirty = true, frame = 0, previous = performance.now(), host = null;
@@ -68,6 +81,11 @@ function createStage() {
       // Three's viewport is in CSS pixels from the bottom left; it may run off the canvas, which simply clips it.
       renderer.setViewport(r.left, height - r.bottom, r.width, r.height);
       renderer.render(entry.scene, entry.camera);
+      if (entry.fade) {
+        veilUniforms.uScreen.value.set(width * renderer.getPixelRatio(), height * renderer.getPixelRatio());
+        veilUniforms.uFrom.value = entry.fade.from; veilUniforms.uDir.value = entry.fade.side === "right" ? 1 : -1;
+        renderer.render(veilScene, skyCamera);
+      }
     }
   }
 

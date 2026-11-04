@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { getStage } from "./stage";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { random, createIsland, createBearMaterial, createSpin, tilted, createSwayingInstances, createFoliageMaterial, createBird } from "./island-parts";
@@ -44,12 +45,10 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
   const host=useRef(null);
   useEffect(()=>{
     const mount=host.current;
-    let renderer,disposed=false,raf=0,visible=true;
-    try { renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:"high-performance"}); } catch { ready.current?.(); return; }
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5));
-    renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
-    mount.appendChild(renderer.domElement);
-    const canvas=renderer.domElement;canvas.style.touchAction="pan-y";
+    let disposed=false,visible=true;
+    // Drawn on the page's one shared canvas (stage.js), into this stage's rectangle; the stage is the hit area.
+    const shared_=getStage();if(!shared_){ready.current?.();return;}const renderer=shared_.renderer;
+    const canvas=mount;canvas.style.touchAction="pan-y";
     const preference=matchMedia("(prefers-reduced-motion: reduce)");
     const scene=new THREE.Scene();scene.fog=new THREE.Fog("#eec08e",40,80);
     const camera=new THREE.PerspectiveCamera(30,1,.3,200);
@@ -229,7 +228,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     // The camera sits on an orbit round the mesa; only its attitude (steeper arriving, lower leaving) changes.
     function placeCamera(){camera.position.copy(tilted(VIEW,attitude,viewDir)).multiplyScalar(tall?60:27).add(focus);camera.lookAt(focus);}
     function frame(){
-      const w=mount.clientWidth,h=mount.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;tall=camera.aspect<.85;
+      const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;tall=camera.aspect<.85;
       if(tall)camera.setViewOffset(w,h,0,h*.2,w,h);else camera.setViewOffset(w,h,side==="center"?0:(side==="left"?.17:-.17)*w,side==="center"?-h*.13:h*.07,w,h);
       camera.updateProjectionMatrix();placeCamera();needsRender=true;
     }
@@ -252,28 +251,32 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       birds.forEach(bird=>{const u=bird.userData;u.a+=step*u.speed;const x=-.2+Math.cos(u.a)*u.r,z=-2+Math.sin(u.a)*u.r,y=u.h+Math.sin(time*.8+u.flap)*.25;
         bird.position.set(x,y,z);bird.lookAt(world.localToWorld(ahead.set(-.2+Math.cos(u.a+.2)*u.r,y,-2+Math.sin(u.a+.2)*u.r)));
         const flap=Math.sin(time*8+u.flap)*.7;u.wings[0].rotation.z=flap;u.wings[1].rotation.z=-flap;});
-      renderer.render(scene,camera);needsRender=false;
+      needsRender=false;
       return falling||onBasket||spin.busy||herd.some(b=>b.feeding&&b.state==="move")||Math.abs(goal-attitude)>.05||bushes.some(set=>set.sway.some(v=>v>.003));
     }
     // Full rate while feed falls, the herd runs to it or the basket is hovered, 30 fps for the grazing in between.
     let busy=true;const clock=new THREE.Clock();
-    function draw(){
-      raf=requestAnimationFrame(draw);
-      const dt=Math.min(clock.getDelta(),.05);since+=dt;
-      if(!visible||document.hidden||!state.current.live.includes(slot))return;
-      if(preference.matches&&!needsRender&&!onBasket&&!spin.busy&&!pellets.some(p=>p.state!=="idle"))return;
-      if(!busy&&since<1/30-.002)return;
-      busy=tick(Math.min(since,.1));since=0;
+    // Called by the shared frame loop; returns whether anything changed (so the canvas needs redrawing).
+    function draw(dt){
+      dt=Math.min(dt,.05);since+=dt;
+      if(!visible||document.hidden||!state.current.live.includes(slot))return false;
+      if(preference.matches&&!needsRender&&!onBasket&&!spin.busy&&!pellets.some(p=>p.state!=="idle"))return false;
+      if(!busy&&since<1/30-.002)return false;
+      busy=tick(Math.min(since,.1));since=0;return true;
     }
-    frame();tick(0);mount.dataset.ready="true";draw();
+    frame();tick(0);mount.dataset.ready="true";
+    // On wide screens it fades out toward the words beside it.
+    const entry={mount,scene,camera,draw,exposure:1.05,fade:null},unregister=shared_.register(entry);
+    const wide=matchMedia("(min-width: 761px)"),syncFade=()=>{entry.fade=wide.matches?{side:"right",from:.75}:null;shared_.invalidate();};
+    syncFade();wide.addEventListener("change",syncFade);
     const readyTimer=setTimeout(()=>ready.current?.(),0);
     if(new URLSearchParams(window.location.search).has("debug"))window.__work={camera,herd,world,scene,renderer,pour,THREE};
 
     return()=>{
-      clearTimeout(readyTimer);delete window.__work;disposed=true;cancelAnimationFrame(raf);resize.disconnect();observer.disconnect();
+      clearTimeout(readyTimer);delete window.__work;disposed=true;unregister();wide.removeEventListener("change",syncFade);resize.disconnect();observer.disconnect();
       spin.dispose();canvas.removeEventListener("pointermove",onHover);
       scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat())m?.dispose();});
-      renderer.dispose();canvas.remove();
+      
     };
   },[state,slot]);
   return <div className="ht-canvas" ref={host} aria-hidden="true" />;
