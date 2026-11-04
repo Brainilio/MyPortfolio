@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { random, faceted, createIsland, createWater, createPineGeometry, createSwayingInstances, createFoliageMaterial, flatMaterial, createSpin } from "./island-parts";
-import { paintGeometry, mergeFlat } from "./forest-parts";
+import { paintGeometry, mergeFlat, createAspen } from "./forest-parts";
 import { createRangerBearGeometry, createRangerBearMaterial, bearHandAt } from "./ranger-bear";
 
 // About as a little diorama, the island's evening cousin: a floating riverbank where the ranger bear sits on a log by
@@ -70,6 +70,39 @@ export default function AboutScene({ state, slot = 1, side = "right", onReady })
       spots.push({position:on(x,z),rotation:rng()*Math.PI*2,scale:.95+rng()*.55});
     }
     const pines=createSwayingInstances(createPineGeometry(4),spots,createFoliageMaterial(shared));world.add(pines.mesh);
+    // A few aspens among them, already gold; they shed a leaf or two when the cursor brushes past.
+    const aspenSpots=[];
+    for(let tries=0;aspenSpots.length<5&&tries<400;tries++){
+      const a=rng()*Math.PI*2,r=Math.sqrt(rng())*outline(a)*.84,x=Math.cos(a)*r,z=Math.sin(a)*r;
+      if(riverDistance(x,z).d<1.1||z>.6&&x<1||Math.hypot(x-FIRE.x,z-FIRE.y)<1.4||Math.hypot(x-TENT.x,z-TENT.y)<1.2||Math.hypot(x-SEAT.x,z-SEAT.y)<1.3)continue;
+      if([...spots,...aspenSpots].some(p=>Math.hypot(p.position.x-x,p.position.z-z)<.8))continue;
+      aspenSpots.push({position:on(x,z),rotation:rng()*Math.PI*2,scale:.8+rng()*.3});
+    }
+    const aspens=createSwayingInstances(createAspen(rng).scale(1.9,1.9,1.9),aspenSpots,createFoliageMaterial(shared));world.add(aspens.mesh);
+    const LEAVES=24,leafMesh=new THREE.InstancedMesh(new THREE.PlaneGeometry(.12,.08),new THREE.MeshStandardMaterial({side:THREE.DoubleSide,roughness:1,flatShading:true}),LEAVES);
+    leafMesh.frustumCulled=false;world.add(leafMesh);
+    {const colors=["#f2c443","#e0a92c","#f5b366"].map(c=>new THREE.Color(c));for(let i=0;i<LEAVES;i++)leafMesh.setColorAt(i,colors[i%3]);}
+    const leaves=Array.from({length:LEAVES},()=>({life:-1,pos:new THREE.Vector3(),ground:0,rest:0,phase:0,spin:new THREE.Vector3()})),leafDummy=new THREE.Object3D();
+    function dropLeaf(tree){
+      const leaf=leaves.find(l=>l.life<0),p=aspenSpots[tree];if(!leaf||!p)return;
+      const a=rng()*Math.PI*2,r=rng()*.3*p.scale;
+      leaf.pos.set(p.position.x+Math.cos(a)*r,p.position.y+(1.1+rng()*.6)*p.scale,p.position.z+Math.sin(a)*r);
+      leaf.ground=Math.max(heightAt(leaf.pos.x,leaf.pos.z),-.12)+.02;leaf.life=0;leaf.rest=0;leaf.phase=rng()*6;leaf.spin.set(rng()*3,rng()*3,rng()*3);
+    }
+    function updateLeaves(dt){
+      leaves.forEach((l,i)=>{
+        if(l.life<0)leafDummy.scale.setScalar(0);
+        else{
+          l.life+=dt;
+          if(l.pos.y>l.ground){l.pos.y=Math.max(l.ground,l.pos.y-dt*.4);l.pos.x+=Math.sin(l.life*2.4+l.phase)*dt*.3;l.pos.z+=Math.cos(l.life*1.9+l.phase)*dt*.22;leafDummy.rotation.set(l.life*l.spin.x,l.life*l.spin.y,l.life*l.spin.z);}
+          else{l.rest+=dt;leafDummy.rotation.set(-Math.PI/2,0,l.phase);}
+          leafDummy.position.copy(l.pos);leafDummy.scale.setScalar(l.rest>2?Math.max(0,1-(l.rest-2)):1);
+          if(l.rest>3)l.life=-1;
+        }
+        leafDummy.updateMatrix();leafMesh.setMatrixAt(i,leafDummy.matrix);
+      });
+      leafMesh.instanceMatrix.needsUpdate=true;
+    }
 
     // Bank rocks, the fire ring, the log seat and a few stones along the water.
     const stone=new THREE.DodecahedronGeometry(1,0);
@@ -146,6 +179,7 @@ export default function AboutScene({ state, slot = 1, side = "right", onReady })
     const flyGeometry=new THREE.BufferGeometry();flyGeometry.setAttribute("position",new THREE.BufferAttribute(flyPositions,3));
     const flyMaterial=new THREE.PointsMaterial({color:"#e7ff9a",size:.07,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false});
     world.add(new THREE.Points(flyGeometry,flyMaterial));
+    flies.forEach(fly=>{fly.hx=fly.x;fly.hz=fly.z;});
 
     // The fire can be stoked: it flares, throws a shower of sparks and toasts faster for a while.
     let flare=0,tentWobble=0;
@@ -158,6 +192,26 @@ export default function AboutScene({ state, slot = 1, side = "right", onReady })
     const spin=createSpin(canvas,{rest:-.25,
       over:event=>onMoon(event)||pick(event,[...bearParts,...fireParts,tent]),
       onTap:event=>{if(onMoon(event))shoot();else if(pick(event,bearParts))eat();else if(pick(event,fireParts))stoke();else if(pick(event,[tent])){tentWobble=1;needsRender=true;}}});
+    // Hover (a mouse only; touch keeps to the idle life): the trees near the cursor stir, the aspens shed a leaf or two,
+    // the fireflies drift out of the way and the bear gives a little wave. Passive: a drag spins the island instead.
+    const hover=new THREE.Vector3(),shedAt=new Float32Array(aspenSpots.length).fill(-9);
+    let waving=-1,lastWave=-9,hoverX=0,hoverY=0,hoverAt=0;
+    function onHover(event){
+      if(event.pointerType!=="mouse"||event.buttons||preference.matches)return;
+      const now=performance.now(),speed=Math.hypot(event.clientX-hoverX,event.clientY-hoverY)/Math.max(16,now-hoverAt);hoverX=event.clientX;hoverY=event.clientY;hoverAt=now;
+      const rect=canvas.getBoundingClientRect();ndc.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(ndc,camera);
+      const hit=raycaster.intersectObject(island.surface,false)[0],kick=Math.min(1,speed*.9);if(!hit||kick<.03)return;
+      world.worldToLocal(hover.copy(hit.point));
+      for(const set of [pines,aspens])set.mesh.userData.placements.forEach((p,i)=>{
+        const d=Math.hypot(p.position.x-hover.x,p.position.z-hover.z);if(d>=1.5)return;
+        set.sway[i]=Math.min(.1,set.sway[i]+(1-d/1.5)*kick*.05);
+        if(set===aspens&&time-shedAt[i]>.8){shedAt[i]=time;dropLeaf(i);if(rng()<.5)dropLeaf(i);}
+      });
+      flies.forEach(fly=>{const dx=fly.x-hover.x,dz=fly.z-hover.z,d=Math.hypot(dx,dz);if(d<1.5&&d>.01){fly.x+=dx/d*(1.5-d)*.4;fly.z+=dz/d*(1.5-d)*.4;}});
+      if(Math.hypot(hover.x-SEAT.x,hover.z-SEAT.y)<1.5&&time-lastWave>4&&roast.treat<0){waving=0;lastWave=time;}
+      needsRender=true;
+    }
+    canvas.addEventListener("pointermove",onHover);
 
     // The night sky behind it all (it stays put while the island spins): twinkling stars on a wall far back past the
     // island, a little moon with a halo, and now and then a shooting star, or one on demand when you tap the moon.
@@ -217,7 +271,9 @@ export default function AboutScene({ state, slot = 1, side = "right", onReady })
     const clock=new THREE.Clock();
     function tick(dt){
       const reduced=preference.matches,step=reduced?0:dt;time+=step;flow+=step;
-      shared.uTime.value=time;shared.uBreeze.value=reduced?0:.025;shared.uGust.value=reduced?0:.04;pines.update();
+      shared.uTime.value=time;shared.uBreeze.value=reduced?0:.025;shared.uGust.value=reduced?0:.04;
+      for(const set of [pines,aspens]){for(let i=0;i<set.sway.length;i++)set.sway[i]*=Math.exp(-dt*2.2);set.update();}
+      updateLeaves(step);flies.forEach(fly=>{const k=1-Math.exp(-step*.4);fly.x+=(fly.hx-fly.x)*k;fly.z+=(fly.hz-fly.z)*k;});
       water.uniforms.uTime.value=time;water.uniforms.uFlow.value=flow;
       world.position.y=Math.sin(time*.45)*.12;world.rotation.y=spin.update(dt)+Math.sin(time*.13)*.03;
       lean.lerp(leanTarget,1-Math.exp(-dt*1.5));place();
@@ -252,7 +308,8 @@ export default function AboutScene({ state, slot = 1, side = "right", onReady })
         if(t>1.1&&t<1.4){mallowScale=0;}else if(t>=1.4&&t<1.8){if(roast.toast>0){roast.toast=0;roast.wait=0;roast.cycle++;}mallowScale=smooth(1.4,1.8,t);}
         if(t>2.4)roast.treat=-1;
       }
-      bear.uniforms.uArmA.value.set(hold.x+pull*.35,hold.y);bear.uniforms.uArmB.value.set(rest.x,rest.y);
+      let wave=0;if(waving>=0){waving+=dt;wave=smooth(0,.35,waving)*(1-smooth(1.4,1.8,waving));if(waving>1.8)waving=-1;}
+      bear.uniforms.uArmA.value.set(hold.x+pull*.35,hold.y);bear.uniforms.uArmB.value.set(rest.x+wave*2.1,rest.y+wave*(.5+Math.sin(time*11)*.35));
       bear.uniforms.uBob.value=Math.sin(time*1.6)*.006+chew;
       bearHandAt(bear.uniforms.uArmA.value,hand);stick.position.copy(hand);
       toFire.subVectors(overFire,hand).normalize();dir.copy(toFire).lerp(lifted,pull).normalize();
@@ -276,17 +333,17 @@ export default function AboutScene({ state, slot = 1, side = "right", onReady })
       raf=requestAnimationFrame(draw);
       const dt=Math.min(clock.getDelta(),.05);since+=dt;
       if(!visible||document.hidden||!state.current.live.includes(slot))return;
-      const busy=spin.busy||shooting.t>=0||roast.treat>=0||roast.shake>=0||flare>.05||tentWobble>.02;
+      const busy=spin.busy||shooting.t>=0||roast.treat>=0||roast.shake>=0||flare>.05||tentWobble>.02||waving>=0||leaves.some(l=>l.life>=0)||[...pines.sway,...aspens.sway].some(v=>v>.003);
       if(preference.matches&&!needsRender&&!busy)return;
       if(!busy&&since<1/30-.002)return;
       tick(Math.min(since,.1));since=0;
     }
     frame();tick(0);mount.dataset.ready="true";draw();
     const readyTimer=setTimeout(()=>ready.current?.(),0);
-    if(new URLSearchParams(window.location.search).has("debug"))window.__about={camera,renderer,ranger,stick,mallow,roast,eat,stoke,view};
+    if(new URLSearchParams(window.location.search).has("debug"))window.__about={camera,renderer,ranger,stick,mallow,roast,eat,stoke,view,wave:()=>{waving=0;},dropLeaf,aspens};
 
     return()=>{
-      clearTimeout(readyTimer);delete window.__about;cancelAnimationFrame(raf);resize.disconnect();observer.disconnect();window.removeEventListener("pointermove",onPointer);spin.dispose();
+      clearTimeout(readyTimer);delete window.__about;cancelAnimationFrame(raf);resize.disconnect();observer.disconnect();window.removeEventListener("pointermove",onPointer);canvas.removeEventListener("pointermove",onHover);spin.dispose();
       scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat())if(m){m.map?.dispose();m.dispose();}});
       glowTexture.dispose();puffTexture.dispose();shadowTexture.dispose();renderer.dispose();renderer.domElement.remove();
     };

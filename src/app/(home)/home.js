@@ -11,7 +11,7 @@ const WorkScene = dynamic(() => import("./work-scene"), { ssr: false });
 const SkillsScene = dynamic(() => import("./skills-scene"), { ssr: false });
 const CoastScene = dynamic(() => import("./coast-scene"), { ssr: false });
 import { MODEL_CREDITS } from "./model-credits";
-import { EXPERIENCE, SKILLS } from "./content";
+import { SKILLS } from "./content";
 const work = allProjects.filter(project => project.slug && project.previewImage).slice(0, 5);
 
 // Every model the homepage loads (fetched up front by the loading screen).
@@ -24,7 +24,7 @@ const LOADING_LINES = ["Raising the island", "Stoking the campfire", "Rounding u
 // turns the Work ring, drives the Skills wagon and lights the trail log.
 const SECTIONS = [
   { id: "home", label: "Home", steps: 1 },
-  { id: "about", label: "About", steps: EXPERIENCE.length },
+  { id: "about", label: "About", steps: 1 },
   { id: "work", label: "Work", steps: work.length },
   { id: "skills", label: "Skills", steps: SKILLS.length },
   { id: "contact", label: "Contact", steps: 1 },
@@ -168,25 +168,19 @@ export default function Home() {
         </div>
       </section>
 
-      {/* About: an evening by the river, the diorama on the right. The bear fishes and the fire crackles on their own;
-          the words and the trail log (the career, newest first) scroll past on the left. */}
-      <section className="ht-zone ht-about" id="about" data-side="right" ref={el => (zones.current[ABOUT] = el)} aria-labelledby="ht-about-title">
+      {/* About: an evening by the campfire, the diorama on the right. The bear roasts a marshmallow and the fire crackles on
+          their own; on the left, just the person behind it. The words hold in the middle while the island does. */}
+      <section className="ht-zone ht-about ht-pinned" id="about" data-side="right" style={{ "--steps": 1.25 }} ref={el => (zones.current[ABOUT] = el)} aria-labelledby="ht-about-title">
         <div className="ht-stage">{built[ABOUT] && <AboutScene state={scene} slot={ABOUT} side="right" onReady={onReady(ABOUT)} />}</div>
         <div className="ht-copy">
+          {/* Replace with: <Image src="/me.jpg" alt="Brainilio" width={120} height={120} /> (drop me.jpg into /public) */}
+          <div className="ht-portrait" aria-hidden="true" />
           <h2 id="ht-about-title">Around the fire<span>.</span></h2>
-          {/* PLACEHOLDER copy: replace with your own words. */}
-          <p>I&apos;m a software developer who likes building things people enjoy using, from the API to the last bit of motion. Away from the keyboard you&apos;ll find me on a trail, on a road trip through a national park, or by a campfire with a marshmallow on a stick.</p>
+          {/* PLACEHOLDER copy: replace the companies with your own. */}
+          <p>I&apos;m a software developer who likes building things people enjoy using — from the API to the last bit of motion. Away from the keyboard you&apos;ll find me on a trail, on a road trip through a national park, or by a campfire with a marshmallow on a stick. <span className="ht-now">Currently at [Company] · previously [Company].</span></p>
           <p className="ht-drive">Tap the bear for a marshmallow, or the fire to stoke it</p>
-          <ol className="ht-log">
-            {EXPERIENCE.map((job, i) => (
-              <li key={i} className={section === ABOUT && stop === i ? "is-here" : undefined}>
-                <span className="ht-log-years">{job.years}</span>
-                <h3>{job.role} <em>· {job.org}</em></h3>
-                <p>{job.summary}</p>
-                <span className="ht-log-tags">{job.tags.join(" · ")}</span>
-              </li>
-            ))}
-          </ol>
+          {/* Drop resume.pdf into /public */}
+          <p className="ht-drive"><a className="ht-resume" href="/resume.pdf" target="_blank" rel="noopener noreferrer">Full experience <span aria-hidden="true">→</span></a></p>
         </div>
       </section>
 
