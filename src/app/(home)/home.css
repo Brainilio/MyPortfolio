@@ -90,7 +90,26 @@ body:has(.ht){background:#1b1335}
 .ht-work .ht-copy,.ht-skills .ht-copy{color:var(--ink)}
 .ht-work .ht-copy h2 span,.ht-skills .ht-copy h2 span{color:#7c5cdb}
 .ht-copy>p.ht-drive{margin:14px 0 0;font-size:14px;color:rgba(42,22,54,.6)}
-/* Work and Skills: a plain list beside the diorama; the entry matching the front card or the wagon's stop lights up. */
+.ht-about .ht-copy>p.ht-drive{color:rgba(251,247,255,.6)}
+/* Work: a deck of project cards. --f (set from the scroll) is how far the deal has got; card i is --d = f - i: below
+   zero it waits in the pile (deeper cards a step lower, smaller and tilted), from 0 to 1 it's being dealt off down and to
+   the left toward the mesa, turning as it goes, and past 1 it's gone. Only a dealt card fades, at the end of its throw. */
+.ht-work.ht-pinned .ht-copy{justify-content:flex-start;padding:128px 0 0}
+.ht-deck{position:relative;margin:28px 0 0;padding:0;list-style:none;height:min(380px,calc(100svh - 330px));perspective:1400px}
+.ht-deck li{--d:calc(var(--f,0) - var(--i));--t:clamp(0,var(--d),1);--k:max(0,calc(var(--d) * -1));
+  position:absolute;inset:0 0 auto;transform-origin:50% 50%;will-change:transform,opacity;
+  transform:translate(calc(var(--t) * -130%),calc(var(--k) * 18px + var(--t) * var(--t) * 260px)) rotate(calc(var(--t) * -20deg + var(--k) * 2.4deg)) rotateY(calc(var(--t) * 25deg)) scale(calc(1 - var(--k) * .05 - var(--t) * .15));
+  opacity:calc(1 - max(0,var(--t) - .7) * 3.3 - max(0,var(--k) - 3) * 2)}
+.ht-deck li.is-far{visibility:hidden}
+.ht-deck a{display:block;padding:10px 10px 16px;border-radius:22px;background:#fff8f1;border:1px solid rgba(255,255,255,.7);box-shadow:0 18px 40px rgba(42,22,54,.18),0 2px 6px rgba(42,22,54,.08)}
+.ht-deck-media{display:block;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#2a1636}
+.ht-deck-media img,.ht-deck-media video{display:block;width:100%;height:100%;object-fit:cover}
+.ht-deck-text{display:block;padding:14px 8px 0}
+.ht-deck-text span{display:block;margin-bottom:2px;font-size:13px;color:rgba(42,22,54,.6)}
+.ht-deck b{font-family:var(--font-display),'Inter',sans-serif;font-weight:700;font-size:24px;letter-spacing:-.03em}
+.ht-deck b i{font-style:normal;color:#7c5cdb;transition:margin .3s}
+.ht-deck a:hover b i{margin-left:6px}
+/* Skills: a plain list beside the diorama; the entry for the wagon's stop lights up. */
 .ht-list{margin:30px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
 .ht-list li{padding:16px 20px;border-radius:16px;background:rgba(255,255,255,.38);border:1px solid rgba(255,255,255,.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:background .5s,transform .5s,box-shadow .5s}
 .ht-list li.is-here{background:rgba(255,255,255,.78);transform:translateX(6px);box-shadow:0 12px 30px rgba(42,22,54,.14)}
@@ -198,7 +217,12 @@ html.ht-locked{overflow:hidden}
   /* Phones show only the card or sign the diorama is on (the pill counts them). */
   .ht-list li.is-here,.ht-list:not(:has(.is-here)) li:first-child{display:block;transform:none}
   .ht-list b{font-size:16px}
-  .ht-about .ht-copy>p{padding:14px 16px;border-radius:16px;background:rgba(20,14,44,.42);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  .ht-work.ht-pinned .ht-copy{justify-content:flex-end;padding:0 0 84px}
+  .ht-deck{height:150px;margin-top:14px}
+  .ht-deck-media{display:none}
+  .ht-deck a{padding:6px 8px 14px}
+  .ht-deck b{font-size:18px}
+  .ht-about .ht-copy>p:not(.ht-drive){padding:14px 16px;border-radius:16px;background:rgba(20,14,44,.42);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
   .ht-log li{padding:14px 16px}
   .ht-contact-card{left:16px;right:16px;top:84px;max-width:none;padding:22px}
   .ht-beam-hint{right:16px;bottom:120px}

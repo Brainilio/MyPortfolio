@@ -4,29 +4,31 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
-import { random, createIsland, createPineGeometry, createSwayingInstances, createFoliageMaterial, flatMaterial } from "./island-parts";
+import { random, createIsland, createPineGeometry, createSwayingInstances, createFoliageMaterial, flatMaterial, createSpin } from "./island-parts";
 import { paintGeometry } from "./forest-parts";
-import { createSign, createHalfDome } from "./park-parts";
+import { createSign, createTetons } from "./park-parts";
 import { loadWagon } from "./wagon";
 
 // Skills as the road trip in miniature, the island's daytime cousin: a floating patch of national park with a road
-// winding across it, a park sign at every stop, a little Half Dome, a hot spring and the geyser at the end of the
-// road. Scrolling (or clicking the wagon) drives it to the next sign; the camera keeps the whole diorama in view and
+// winding in from the island's edge, a park sign at every stop, a hot spring, pines, and the geyser at the end of the
+// road, and a little Teton range at the back. Scrolling (or clicking the wagon) drives it to the next sign; the camera keeps the whole diorama in view and
 // leans toward the stop. No real-time shadows; it renders at full rate while driving and 30 fps when idle, only
 // while the section is on screen. The full-size road trip lives in the Lab.
 const smooth=t=>{t=THREE.MathUtils.clamp(t,0,1);return t*t*(3-2*t);};
 const outline=a=>6*(1+.07*Math.sin(3*a+2)+.05*Math.sin(5*a+.6)+.03*Math.sin(9*a));
-const ROAD=new THREE.CatmullRomCurve3([[-4.9,0,2.6],[-2.9,0,3.7],[-.6,0,3.1],[.3,0,1.3],[-.7,0,-.5],[.5,0,-2.3],[2.6,0,-2.5],[4.1,0,-1.1]].map(p=>new THREE.Vector3(...p)),false,"centripetal");
+// The road comes in right at the island's rim (its first point sits on the outline) and ends in a turnaround by the geyser.
+const ENTRY=Math.atan2(2.6,-4.9);
+const ROAD=new THREE.CatmullRomCurve3([[Math.cos(ENTRY)*outline(ENTRY),0,Math.sin(ENTRY)*outline(ENTRY)],[-2.9,0,3.7],[-.6,0,3.1],[.3,0,1.3],[-.7,0,-.5],[.5,0,-2.3],[2.6,0,-2.5],[4.1,0,-1.1]].map(p=>new THREE.Vector3(...p)),false,"centripetal");
 const STATIONS=[.05,.27,.49,.71,.93];
 const roadPoints=ROAD.getSpacedPoints(120);
 const roadDistance=(x,z)=>{let best=1e9;for(const p of roadPoints)best=Math.min(best,(p.x-x)**2+(p.z-z)**2);return Math.sqrt(best);};
-const DOME=new THREE.Vector2(-3.2,-2.6),POOL=new THREE.Vector2(-2.6,.9),GEYSER=new THREE.Vector2(4.6,.3);
+const RANGE=new THREE.Vector2(-2.6,-3),POOL=new THREE.Vector2(-2.6,.9),GEYSER=new THREE.Vector2(4.6,.3);
 function heightAt(x,z) {
   const edge=Math.hypot(x,z)/outline(Math.atan2(z,x));
   let h=.12*Math.sin(x*.8+1.1)*Math.cos(z*.7-.3)+.05*Math.sin(x*2.1+z*1.6);
-  // Flat where the road runs, a rise under the dome, a shallow bowl for the spring.
+  // Flat where the road runs, a rise under the range, a shallow bowl for the spring.
   const road=roadDistance(x,z);h*=smooth((road-.5)/1.2);
-  h+=.6*smooth(1-Math.hypot(x-DOME.x,z-DOME.y)/3)-.12*smooth(1-Math.hypot(x-POOL.x,z-POOL.y)/1.3);
+  h+=.3*smooth(1-Math.hypot(x-RANGE.x,z-RANGE.y)/3)-.12*smooth(1-Math.hypot(x-POOL.x,z-POOL.y)/1.3);
   return h-.2*smooth((edge-.74)/.26);
 }
 // No river on this one: the "river" the island builder asks for is the road, so its banks don't turn to sand.
@@ -62,13 +64,18 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, side = "ri
       const texture=new THREE.CanvasTexture(c);texture.colorSpace=THREE.SRGBColorSpace;texture.wrapT=THREE.RepeatWrapping;texture.anisotropy=4;
       const positions=[],uvs=[],index=[],side=new THREE.Vector3(),up=new THREE.Vector3(0,1,0);let length=0;
       roadPoints.forEach((p,i)=>{if(i)length+=p.distanceTo(roadPoints[i-1]);ROAD.getTangentAt(Math.min(.999,i/(roadPoints.length-1)),side);side.cross(up).normalize();
-        for(const k of [-1,1]){const x=p.x+side.x*.42*k,z=p.z+side.z*.42*k;positions.push(x,heightAt(x,z)+.03,z);uvs.push(k<0?0:1,length/1.4);}
+        // Kept inside the rim, so where the road meets the edge it stops flush with it instead of hanging over.
+        for(const k of [-1,1]){let x=p.x+side.x*.42*k,z=p.z+side.z*.42*k;const r=Math.hypot(x,z),rim=outline(Math.atan2(z,x))*.99;if(r>rim){x*=rim/r;z*=rim/r;}positions.push(x,heightAt(x,z)+.03,z);uvs.push(k<0?0:1,length/1.4);}
         if(i)index.push(i*2-2,i*2-1,i*2,i*2-1,i*2+1,i*2);});
       const geometry=new THREE.BufferGeometry();geometry.setAttribute("position",new THREE.Float32BufferAttribute(positions,3));geometry.setAttribute("uv",new THREE.Float32BufferAttribute(uvs,2));geometry.setIndex(index);geometry.computeVertexNormals();
-      world.add(new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({map:texture,roughness:.95,polygonOffset:true,polygonOffsetFactor:-2})));}
+      const asphalt=new THREE.MeshStandardMaterial({map:texture,roughness:.95,polygonOffset:true,polygonOffsetFactor:-2});
+      world.add(new THREE.Mesh(geometry,asphalt));
+      // A round turnaround where the road ends.
+      const end=roadPoints.at(-1),loop=new THREE.Mesh(new THREE.CircleGeometry(.62,20).rotateX(-Math.PI/2),new THREE.MeshStandardMaterial({color:"#57505e",roughness:.95,polygonOffset:true,polygonOffsetFactor:-1}));
+      loop.position.copy(on(end.x,end.z,.025));world.add(loop);}
 
-    // Half Dome at the back, a hot spring in rings of colour, and the geyser's sinter cone where the road ends.
-    const dome=createHalfDome(rng);dome.scale.set(1.5,1.5,1.5);dome.position.copy(on(DOME.x,DOME.y,-.15));dome.rotation.y=-1.75;world.add(dome);
+    // The Tetons at the back, a hot spring in rings of colour, and the geyser's sinter cone where the road ends.
+    const tetons=createTetons(rng);tetons.position.copy(on(RANGE.x,RANGE.y,-.2));tetons.rotation.y=.42;tetons.scale.setScalar(.95);world.add(tetons);
     {const c=document.createElement("canvas");c.width=c.height=128;const g=c.getContext("2d"),grad=g.createRadialGradient(64,64,0,64,64,64);
       [[0,"#1f6f9a"],[.35,"#3fa7c4"],[.55,"#8fd1b0"],[.7,"#f2d36a"],[.84,"#e9883e"],[.96,"#c4572e"],[1,"rgba(196,87,46,0)"]].forEach(([k,col])=>grad.addColorStop(k,col));g.fillStyle=grad;g.fillRect(0,0,128,128);
       const texture=new THREE.CanvasTexture(c);texture.colorSpace=THREE.SRGBColorSpace;
@@ -112,11 +119,11 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, side = "ri
       sign.scale.setScalar(.4);sign.position.copy(on(p.x+s.x*.95,p.z+s.z*.95));sign.rotation.y=Math.atan2(viewFlat.x,viewFlat.z);world.add(sign);return sign;
     });
 
-    // Pines where nothing else is: off the road, clear of the signs, the dome, the spring and the geyser.
+    // Pines where nothing else is: off the road, clear of the signs, the spring and the geyser.
     const spots=[];
-    for(let tries=0;spots.length<16&&tries<800;tries++){
+    for(let tries=0;spots.length<20&&tries<800;tries++){
       const a=rng()*Math.PI*2,r=Math.sqrt(rng())*outline(a)*.88,x=Math.cos(a)*r,z=Math.sin(a)*r;
-      if(roadDistance(x,z)<1.1||Math.hypot(x-DOME.x,z-DOME.y)<2||Math.hypot(x-POOL.x,z-POOL.y)<1.5||Math.hypot(x-GEYSER.x,z-GEYSER.y)<1.4)continue;
+      if(roadDistance(x,z)<1.1||Math.hypot(x-RANGE.x,z-RANGE.y)<2.3||Math.hypot(x-POOL.x,z-POOL.y)<1.5||Math.hypot(x-GEYSER.x,z-GEYSER.y)<1.4)continue;
       // Nothing tall between the camera and a sign, or right beside the road on the camera's side.
       const hides=sign=>{const dx=x-sign.position.x,dz=z-sign.position.z,along=dx*viewFlat.x+dz*viewFlat.z,across=Math.abs(dx*viewFlat.z-dz*viewFlat.x);return Math.hypot(dx,dz)<1.3||along>0&&along<9&&across<1.8;};
       if(signs.some(hides)||spots.some(p=>Math.hypot(p.position.x-x,p.position.z-z)<.9))continue;
@@ -130,7 +137,7 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, side = "ri
     // Low shrubs fill the open ground (short enough never to hide a sign).
     {const tints=["#7f9a58","#6f8c4e","#8aa35f","#9aa968"].map(c=>new THREE.Color(c)),count=40,shrubs=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1,0).scale(1,.6,1),new THREE.MeshStandardMaterial({flatShading:true,roughness:1}),count),d=new THREE.Object3D();let n=0;
       for(let tries=0;n<count&&tries<500;tries++){const a=rng()*Math.PI*2,r=Math.sqrt(rng())*outline(a)*.9,x=Math.cos(a)*r,z=Math.sin(a)*r;
-        if(roadDistance(x,z)<.7||Math.hypot(x-POOL.x,z-POOL.y)<1.3||Math.hypot(x-GEYSER.x,z-GEYSER.y)<.9||Math.hypot(x-DOME.x,z-DOME.y)<1.6)continue;
+        if(roadDistance(x,z)<.7||Math.hypot(x-POOL.x,z-POOL.y)<1.3||Math.hypot(x-GEYSER.x,z-GEYSER.y)<.9||Math.hypot(x-RANGE.x,z-RANGE.y)<2)continue;
         const s=.12+rng()*.14;d.position.copy(on(x,z,s*.2));d.rotation.y=rng()*6;d.scale.setScalar(s);d.updateMatrix();shrubs.setMatrixAt(n,d.matrix);shrubs.setColorAt(n,tints[n%4]);n++;}
       shrubs.count=n;world.add(shrubs);}
 
@@ -146,18 +153,17 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, side = "ri
     const s2=shadowCanvas.getContext("2d"),sg=s2.createRadialGradient(32,32,0,32,32,32);sg.addColorStop(0,"rgba(60,40,30,.45)");sg.addColorStop(1,"rgba(60,40,30,0)");s2.fillStyle=sg;s2.fillRect(0,0,64,64);
     const shadowTexture=new THREE.CanvasTexture(shadowCanvas),blob=new THREE.Mesh(new THREE.PlaneGeometry(.8,1.3).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({map:shadowTexture,transparent:true,depthWrite:false}));world.add(blob);
 
-    // Clicking the wagon hops it and drives on; clicking the geyser sets it off.
+    // Drag to spin the diorama; tapping the wagon hops it and drives on, tapping the geyser sets it off.
     const raycaster=new THREE.Raycaster(),ndc=new THREE.Vector2();let overCar=false,overGeyser=false;
-    function onMove(event){const r=canvas.getBoundingClientRect();ndc.set((event.clientX-r.left)/r.width*2-1,-(event.clientY-r.top)/r.height*2+1);raycaster.setFromCamera(ndc,camera);
-      overCar=carReady&&raycaster.intersectObject(car,true).length>0;overGeyser=!overCar&&raycaster.intersectObject(cone,false).length>0;canvas.style.cursor=overCar||overGeyser?"pointer":"default";}
-    function onClick(){if(overGeyser){erupt();needsRender=true;return;}if(!overCar)return;hop=0;carClick.current?.();}
-    canvas.addEventListener("pointermove",onMove);canvas.addEventListener("click",onClick);
+    function aimAt(event){const r=canvas.getBoundingClientRect();ndc.set((event.clientX-r.left)/r.width*2-1,-(event.clientY-r.top)/r.height*2+1);raycaster.setFromCamera(ndc,camera);
+      overCar=carReady&&raycaster.intersectObject(car,true).length>0;overGeyser=!overCar&&raycaster.intersectObject(cone,false).length>0;return overCar||overGeyser;}
+    const spin=createSpin(canvas,{rest:0,over:aimAt,onTap:event=>{aimAt(event);if(overGeyser){erupt();needsRender=true;return;}if(!overCar)return;hop=0;carClick.current?.();}});
 
     // Framing: the whole diorama to one side (the words scroll past on the other), further off when tall.
     let tall=false;const target=new THREE.Vector3(),aim=new THREE.Vector3();
     function frame(){
       const w=mount.clientWidth,h=mount.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;tall=camera.aspect<.85;
-      if(tall)camera.setViewOffset(w,h,0,h*.14,w,h);else camera.setViewOffset(w,h,(side==="left"?.22:-.22)*w,-h*.05,w,h);
+      if(tall)camera.setViewOffset(w,h,0,h*.14,w,h);else camera.setViewOffset(w,h,(side==="left"?.1:-.1)*w,h*.02,w,h);
       camera.updateProjectionMatrix();particles.uScale.value=h*renderer.getPixelRatio()/(2*Math.tan(camera.fov*Math.PI/360));needsRender=true;
     }
     const resize=new ResizeObserver(frame);resize.observe(mount);
@@ -187,11 +193,11 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, side = "ri
       particles.uTime.value=time;particles.uPower.value=geyser.t<0?0:smooth(geyser.t/.8)*(1-smooth((geyser.t-3.8)/2.2));
       shared.uTime.value=time;shared.uBreeze.value=reduced?0:.03;pines.update();
       // The camera keeps the diorama in frame and leans toward the wagon's stop; on a tall screen it follows the wagon.
-      world.position.y=Math.sin(time*.45)*.1;
-      aim.copy(car.position).multiplyScalar(tall?.85:.4);aim.y=.2;target.lerp(aim,jump?1:1-Math.exp(-dt*2));
-      camera.position.copy(VIEW).multiplyScalar(tall?38:27).add(target);camera.lookAt(target);
+      world.position.y=Math.sin(time*.45)*.1;world.rotation.y=spin.update(dt);world.updateMatrixWorld();
+      car.getWorldPosition(aim).multiplyScalar(tall?.85:.4);aim.y=.2;target.lerp(aim,jump?1:1-Math.exp(-dt*2));
+      camera.position.copy(VIEW).multiplyScalar(tall?33:24).add(target);camera.lookAt(target);
       renderer.render(scene,camera);needsRender=false;
-      return Math.abs(uVel)>1e-4||hop>=0||geyser.t>=0||Math.abs(turn-(end?1:0))>.01;
+      return spin.busy||Math.abs(uVel)>1e-4||hop>=0||geyser.t>=0||Math.abs(turn-(end?1:0))>.01;
     }
     // Full rate while something is moving, 30 fps when it's just the breeze.
     let busy=true;const clock=new THREE.Clock();
@@ -200,17 +206,17 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, side = "ri
       const dt=Math.min(clock.getDelta(),.05);since+=dt;
       const live=visible&&!document.hidden&&state.current.live.includes(slot);if(live&&!wasLive)snap=true;wasLive=live;
       if(!live)return;
-      if(preference.matches&&!needsRender&&!snap)return;
+      if(preference.matches&&!needsRender&&!snap&&!spin.busy)return;
       if(!busy&&since<1/30-.002)return;
       busy=tick(Math.min(since,.1));since=0;
     }
     frame();target.set(0,.2,0);tick(0);mount.dataset.ready="true";draw();
     const readyTimer=setTimeout(()=>ready.current?.(),0);
-    if(new URLSearchParams(window.location.search).has("debug"))window.__skills={camera,dome,car,world,scene,renderer,THREE};
+    if(new URLSearchParams(window.location.search).has("debug"))window.__skills={camera,car,world,scene,renderer,THREE};
 
     return()=>{
       clearTimeout(readyTimer);delete window.__skills;disposed=true;cancelAnimationFrame(raf);resize.disconnect();observer.disconnect();
-      canvas.removeEventListener("pointermove",onMove);canvas.removeEventListener("click",onClick);
+      spin.dispose();
       scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat())if(m){m.map?.dispose();m.dispose();}});
       signs.forEach(sign=>sign.userData.texture.dispose());shadowTexture.dispose();renderer.dispose();canvas.remove();
     };

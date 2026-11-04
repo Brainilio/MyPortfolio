@@ -4,29 +4,38 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
-import { random, createIsland, createBearMaterial } from "./island-parts";
-import { createFin } from "./park-parts";
-import { drawCard, createCardMaterial, videoTexture, coverCrop } from "./prairie-cards";
+import { random, createIsland, createBearMaterial, createSpin } from "./island-parts";
+import { createFin, createBasket } from "./park-parts";
 
-// Work as the prairie in miniature, the island's golden-hour cousin: a floating mesa with Garden-of-the-Gods fins,
-// a small bison herd with a calf and prairie dogs on their mounds. The project cards orbit it like a ring, the
-// front one large and facing you; scrolling turns the ring, and a card opens its project. No real-time shadows;
-// full rate while the ring turns or a card is hovered, 30 fps otherwise, only while the section is on screen.
-// The full-size prairie lives in the Lab.
+// Work as the prairie in miniature, the island's golden-hour cousin: rolling prairie with Garden-of-the-Gods fins and
+// scattered sandstone boulders, a small
+// bison herd with a calf, prairie dogs on their mounds, and a feed basket: click it and the herd comes running. The
+// project cards themselves roll down an arc beside it (in the page). No real-time shadows; full rate while feed
+// falls or the basket is hovered, 30 fps otherwise, only while the section is on screen. The full-size prairie lives
+// in the Lab.
 const smooth=t=>{t=THREE.MathUtils.clamp(t,0,1);return t*t*(3-2*t);};
-const outline=a=>5.4*(1+.08*Math.sin(3*a+.4)+.05*Math.sin(5*a+1.7)+.03*Math.sin(8*a));
+const outline=a=>5.4*(1+.06*Math.sin(2*a+.9)+.05*Math.sin(5*a+1.7)+.03*Math.sin(9*a));
+// Rolling prairie: the back rises into a bench where the fins stand, swells and little knolls roll across the middle,
+// and a shallow dry wash winds through the front. Several sizes of roll at once, so no one or two big humps.
 function heightAt(x,z) {
   const edge=Math.hypot(x,z)/outline(Math.atan2(z,x));
-  return .14*Math.sin(x*.9+.6)*Math.cos(z*.8-.2)+.06*Math.sin(x*2.2+z*1.7)-.2*smooth((edge-.74)/.26);
+  let h=.42*smooth((-z-.6)/2.6)*(.8+.2*Math.sin(x*1.3));
+  h+=.13*Math.sin(x*1.15+.4)*Math.cos(z*1.35-.7)+.07*Math.sin(x*2.6-z*2.1+1.3)+.035*Math.sin(x*5.1+z*4.3);
+  for(const [kx,kz,r,k] of KNOLLS)h+=k*smooth(1-Math.hypot(x-kx,z-kz)/r);
+  const wash=z-1.15-.45*Math.sin(x*.85+.6);h-=.2*Math.exp(-wash*wash/.18);
+  return h-.3*smooth((edge-.84)/.16);
 }
 const noRiver=()=>({d:99,t:0});
-const CARD=new THREE.Vector2(4.2,2.1);
 // Bison gaits: leg swing (rad), stride rate, bob (fraction of height), knee fold, foot lift (fraction), nod.
 const GAITS={Graze:[0,1.1,.003,0,0,.04],Walk:[.36,3.4,.006,.6,.035,.09],Run:[.62,7.5,.02,.95,.06,.14]};
-// Fins at the back of the mesa (x, z, width, height, depth, lean) and the prairie dogs' mounds near the front.
-const FINS=[[-2.6,-2.4,1.5,2.6,.6,.05],[-1.1,-3.3,1.1,1.9,.5,-.04],[2.4,-2.6,1.3,2.2,.55,.06]],MOUNDS=[[2.2,1.6],[-2.8,1.4],[.4,2.8]];
+// Fins along the back bench and a few smaller ones out toward the sides (x, z, width, height, depth, lean); knolls
+// (x, z, radius, height); the prairie dogs' mounds and the feed basket near the front.
+const FINS=[[-2.6,-2.4,1.5,2.6,.6,.05],[-1.1,-3.3,1.1,1.9,.5,-.04],[2.4,-2.6,1.3,2.2,.55,.06],[.7,-3.7,.7,1.3,.35,.03],[3.6,-.9,.8,1.25,.4,-.08],[-3.7,-.6,.75,1.1,.38,.07]];
+const KNOLLS=[[-1.6,.2,1.1,.16],[1.8,.1,1.2,.13],[.1,-1.4,.9,.1],[-2.8,2,.9,.08]];
+const MOUNDS=[[2.4,1.3],[-2.9,1.2],[-.6,3]],BASKET=new THREE.Vector3(1.1,0,2);
+const blocked=(x,z,pad)=>FINS.some(([fx,fz,w])=>Math.hypot(x-fx,z-fz)<w*.55+pad)||Math.hypot(x-BASKET.x,z-BASKET.z)<pad+.3;
 
-export default function WorkScene({ state, projects, slot = 2, side = "left", onReady }) {
+export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
   const ready=useRef(onReady);ready.current=onReady;
   const host=useRef(null);
   useEffect(()=>{
@@ -48,37 +57,52 @@ export default function WorkScene({ state, projects, slot = 2, side = "left", on
     const fill=new THREE.DirectionalLight("#ffd9c2",.8);fill.position.set(6,5,10);scene.add(fill);
 
     const world=new THREE.Group();scene.add(world);
-    const island=createIsland(13,{outline,heightAt,riverDistance:noRiver,depth:.62,grass:["#b89a52","#c4a65a","#a98d4c"],edge:"#9a7c46"});world.add(island.group);
+    const island=createIsland(13,{outline,heightAt,riverDistance:noRiver,depth:.85,hub:new THREE.Vector2(-1.1,-3.3),scatter:.8,grass:["#b89a52","#c4a65a","#a98d4c"],edge:"#9a7c46"});world.add(island.group);
     const on=(x,z,lift=0)=>new THREE.Vector3(x,heightAt(x,z)+lift,z);
     FINS.forEach(([x,z,w,h,d,lean])=>{const fin=createFin(rng,w,h,d);fin.position.copy(on(x,z,-.15));fin.rotation.set(0,(rng()-.5)*.6,lean);world.add(fin);});
+    // Sandstone boulders: scree piled at the foot of each fin, and a few loners out on the grass.
+    {const tints=["#a8562f","#bd6a3e","#8f4426","#c98a5a"].map(c=>new THREE.Color(c)),spots=[];
+      FINS.forEach(([fx,fz,w])=>{for(let k=0;k<4;k++){const a=rng()*Math.PI*2,r=w*.5+.15+rng()*.35;spots.push([fx+Math.cos(a)*r,fz+Math.sin(a)*r*.7,.07+rng()*.12]);}});
+      [[-1.5,-1.4,.22],[-1.15,-1.7,.13],[1.9,-1,.17],[.6,.7,.12],[-.4,-2.2,.16],[2.9,.9,.1],[-2.2,1.6,.13]].forEach(p=>spots.push(p));
+      const rocks=new THREE.InstancedMesh(new THREE.DodecahedronGeometry(1,0),new THREE.MeshStandardMaterial({flatShading:true,roughness:1}),spots.length),d=new THREE.Object3D();
+      spots.forEach(([x,z,s],i)=>{d.position.copy(on(x,z,s*.25));d.rotation.set(rng(),rng()*6,rng());d.scale.set(s,s*.7,s*(.8+rng()*.4));d.updateMatrix();rocks.setMatrixAt(i,d.matrix);rocks.setColorAt(i,tints[i%4]);});
+      world.add(rocks);}
     // Sage bushes dotted over the grass.
     {const tints=["#8a9a5c","#7a8b52","#94a066"].map(c=>new THREE.Color(c)),count=34,bushes=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1,0).scale(1,.6,1),new THREE.MeshStandardMaterial({flatShading:true,roughness:1}),count),d=new THREE.Object3D();let n=0;
       for(let tries=0;n<count&&tries<400;tries++){const a=rng()*Math.PI*2,r=Math.sqrt(rng())*outline(a)*.88,x=Math.cos(a)*r,z=Math.sin(a)*r;
-        if(FINS.some(([fx,fz])=>Math.hypot(x-fx,z-fz)<1)||MOUNDS.some(([mx,mz])=>Math.hypot(x-mx,z-mz)<.6))continue;
+        if(blocked(x,z,.3)||MOUNDS.some(([mx,mz])=>Math.hypot(x-mx,z-mz)<.6))continue;
         const s=.1+rng()*.14;d.position.copy(on(x,z,s*.2));d.rotation.y=rng()*6;d.scale.setScalar(s);d.updateMatrix();bushes.setMatrixAt(n,d.matrix);bushes.setColorAt(n,tints[n%3]);n++;}
       bushes.count=n;world.add(bushes);}
 
-    // The project cards, on a ring around the mesa.
-    const cards=projects.map((project,i)=>{
-      const blank=document.createElement("canvas");blank.width=blank.height=4;
-      const {material,uniforms}=createCardMaterial(new THREE.CanvasTexture(blank),CARD);
-      const mesh=new THREE.Mesh(new THREE.PlaneGeometry(CARD.x,CARD.y,24,24),material);mesh.userData={project,i};world.add(mesh);
-      // Media: a looping muted video if the project has one (previewVideo), otherwise its preview image.
-      let video=null;
-      if(project.previewVideo){
-        video=document.createElement("video");Object.assign(video,{src:project.previewVideo,muted:true,loop:true,playsInline:true,preload:"metadata"});
-        video.addEventListener("loadedmetadata",()=>{if(disposed)return;uniforms.uMap.value.dispose();uniforms.uMap.value=videoTexture(video);coverCrop(video.videoWidth/video.videoHeight,CARD,uniforms.uCrop.value);},{once:true});
-      } else {
-        const image=new Image();image.decoding="async";
-        const paint=img=>{if(disposed)return;uniforms.uMap.value.dispose();uniforms.uMap.value=drawCard(img);};
-        image.onload=()=>paint(image);image.onerror=()=>paint(null);image.src=project.previewImage;
-      }
-      return {mesh,uniforms,video,hover:0,depth:1};
-    });
+    // The feed basket, its hay, and the pellets that pour into it.
+    const basket=createBasket();basket.position.copy(on(BASKET.x,BASKET.z));basket.scale.setScalar(.34);basket.rotation.y=.4;world.add(basket);
+    const hay=new THREE.Mesh(new THREE.IcosahedronGeometry(.2,1).scale(1,.4,1),new THREE.MeshStandardMaterial({color:"#e2c46a",flatShading:true,roughness:1}));
+    hay.position.copy(basket.position).y+=.1;hay.visible=false;world.add(hay);
+    const PELLETS=30,pelletMesh=new THREE.InstancedMesh(new THREE.DodecahedronGeometry(.028,0),new THREE.MeshStandardMaterial({color:"#c9a24e",flatShading:true,roughness:1}),PELLETS);
+    pelletMesh.frustumCulled=false;world.add(pelletMesh);
+    const pellets=Array.from({length:PELLETS},()=>({state:"idle",wait:0,t:0,pos:new THREE.Vector3(),vel:new THREE.Vector3(),spin:new THREE.Vector3()}));
+    let food=0;const dummy=new THREE.Object3D();
+    function pour(){
+      if(preference.matches){food=1;needsRender=true;return callHerd();}
+      pellets.forEach((p,i)=>{p.state="wait";p.wait=i*.03;p.t=0;const a=rng()*Math.PI*2,r=rng()*.12;p.pos.set(BASKET.x+Math.cos(a)*r,basket.position.y+1.4+rng()*.3,BASKET.z+Math.sin(a)*r);p.vel.set(0,-.5,0);p.spin.set(rng()*8,rng()*8,rng()*8);});
+      callHerd();
+    }
+    function updatePellets(dt){
+      let falling=false;
+      pellets.forEach((p,i)=>{
+        if(p.state==="wait"){p.wait-=dt;falling=true;if(p.wait<=0)p.state="fall";}
+        if(p.state==="fall"){falling=true;p.t+=dt;p.vel.y-=6*dt;p.pos.addScaledVector(p.vel,dt);if(p.pos.y<hay.position.y+food*.05){food=Math.min(1,food+1.4/PELLETS);p.state="idle";}}
+        dummy.position.copy(p.pos);dummy.rotation.set(p.t*p.spin.x,p.t*p.spin.y,p.t*p.spin.z);dummy.scale.setScalar(p.state==="fall"?1:0);
+        dummy.updateMatrix();pelletMesh.setMatrixAt(i,dummy.matrix);
+      });
+      pelletMesh.instanceMatrix.needsUpdate=true;
+      hay.scale.setScalar(.2+food*.8);hay.visible=food>.02;
+      return falling;
+    }
 
     // The herd: a few bison grazing and ambling about the mesa, the calf (red coat) never far from its mother.
     const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder),herd=[],LIMIT=.72;
-    const inside=(x,z)=>Math.hypot(x,z)<outline(Math.atan2(z,x))*LIMIT&&!FINS.some(([fx,fz])=>Math.hypot(x-fx,z-fz)<1.1);
+    const inside=(x,z)=>Math.hypot(x,z)<outline(Math.atan2(z,x))*LIMIT&&!blocked(x,z,.35);
     loader.load("/models/island/bison.glb",gltf=>{
       if(disposed)return;
       const box=new THREE.Box3().setFromObject(gltf.scene),size=box.getSize(new THREE.Vector3());
@@ -91,24 +115,35 @@ export default function WorkScene({ state, projects, slot = 2, side = "left", on
           gait??=createBearMaterial(o.geometry,{hip:.27});o.material=gait.material;o.frustumCulled=false;});
         const h=calf?.32:.55;model.scale.setScalar(h/size.y);model.position.y=-box.min.y*h/size.y;root.add(model);
         root.position.copy(on(x,z));world.add(root);
-        herd.push({root,gait,calf,yaw:rng()*6,state:"graze",timer:1+rng()*5,speed:0,gaitName:"Graze",swing:0,phase:rng()*6,head:0,turn:0,eatT:rng()*5,target:new THREE.Vector2(x,z)});
+        herd.push({root,gait,calf,yaw:rng()*6,state:"graze",timer:1+rng()*5,speed:0,gaitName:"Graze",swing:0,phase:rng()*6,head:0,turn:0,eatT:rng()*5,target:new THREE.Vector2(x,z),feeding:false,face:null,eatUntil:0});
       });
       needsRender=true;
     },undefined,()=>{});
+    // Feeding time: the adults and the calf trot over and stand round the far side of the basket.
+    function callHerd(){
+      herd.forEach((b,k)=>{const a=Math.PI*(.15+.7*k/Math.max(1,herd.length-1)),r=b.calf?.42:.62;
+        b.target.set(BASKET.x+Math.cos(a)*r,BASKET.z-Math.sin(a)*r);b.feeding=true;b.face=null;b.state="move";b.gaitName="Run";b.speed=b.calf?1:.85;});
+    }
     function updateBison(b,dt,now){
       const p=b.root.position;b.timer-=dt;
-      if(b.state==="graze"&&b.timer<=0){
+      if(b.state==="eat"){if(now>b.eatUntil){b.state="graze";b.feeding=false;b.face=null;b.timer=0;}}
+      else if(b.state==="graze"&&b.timer<=0){
         // Wander a little; the calf stays by its mother (the first bison).
         for(let tries=0;tries<12;tries++){const from=b.calf?herd[0].root.position:p,a=rng()*Math.PI*2,r=b.calf?.4+rng()*.5:.6+rng()*1.4,x=from.x+Math.cos(a)*r,z=from.z+Math.sin(a)*r;if(inside(x,z)){b.target.set(x,z);break;}}
         b.state="move";const run=b.calf&&rng()<.5;b.gaitName=run?"Run":"Walk";b.speed=run?.9:.22+rng()*.1;
       } else if(b.state==="move"){
         const dx=b.target.x-p.x,dz=b.target.y-p.z,dist=Math.hypot(dx,dz);
-        if(dist<.04){b.state="graze";b.gaitName="Graze";b.speed=0;b.timer=b.calf?.8+rng()*1.6:3+rng()*7;}
+        if(dist<.04){
+          b.gaitName="Graze";b.speed=0;
+          if(b.feeding){b.state="eat";b.eatUntil=now+6;b.face=Math.atan2(BASKET.x-p.x,BASKET.z-p.z);}
+          else{b.state="graze";b.timer=b.calf?.8+rng()*1.6:3+rng()*7;}
+        }
         else{const step=Math.min(dist,b.speed*dt);p.x+=dx/dist*step;p.z+=dz/dist*step;let turn=Math.atan2(dx,dz)-b.yaw;turn=Math.atan2(Math.sin(turn),Math.cos(turn));b.yaw+=turn*(1-Math.exp(-dt*4));}
       }
+      if(b.face!==null){let turn=b.face-b.yaw;turn=Math.atan2(Math.sin(turn),Math.cos(turn));b.yaw+=turn*(1-Math.exp(-dt*4));}
       const [swing,rate,bob,knee,lift,nod]=GAITS[b.gaitName];
       b.swing+=(swing-b.swing)*(1-Math.exp(-dt*4));b.phase+=dt*rate*(b.calf?1.25:1);
-      const grazing=b.state==="graze";b.eatT+=dt;
+      const grazing=b.state==="graze"||b.state==="eat";b.eatT+=dt;
       b.head+=((grazing?.5+Math.sin(b.eatT*5.2)*.08:0)-b.head)*(1-Math.exp(-dt*6));b.turn+=((grazing?Math.sin(b.eatT*.8)*.05:0)-b.turn)*(1-Math.exp(-dt*3));
       const walking=Math.min(1,b.swing/.36),u=b.gait.uniforms;
       u.uPhase.value=b.phase;u.uSwing.value=b.swing;u.uKnee.value=Math.max(knee,GAITS.Walk[3]*walking);u.uLift.value=Math.max(lift,GAITS.Walk[4]*walking)*u.uHeight.value;u.uNod.value=nod;
@@ -139,77 +174,63 @@ export default function WorkScene({ state, projects, slot = 2, side = "left", on
       d.root.position.y=d.base-.25+d.up;d.root.rotation.y+=(d.look-d.root.rotation.y)*(1-Math.exp(-dt*4));
     }
 
-    // Pointer: hover a card to ripple it, click to open its project.
-    const raycaster=new THREE.Raycaster(),ndc=new THREE.Vector2();let hovered=null;
-    function onMove(event){
-      const rect=canvas.getBoundingClientRect();ndc.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);
-      raycaster.setFromCamera(ndc,camera);
-      const card=raycaster.intersectObjects(cards.filter(c=>c.depth>.3).map(c=>c.mesh),false)[0];
-      hovered=card?cards.find(c=>c.mesh===card.object):null;if(card)hovered.uniforms.uMouse.value.copy(card.uv);
-      canvas.style.cursor=hovered?"pointer":"default";
-    }
-    function onClick(){if(hovered)window.location.href=`/project/${hovered.mesh.userData.project.slug}/`;}
-    canvas.addEventListener("pointermove",onMove);canvas.addEventListener("click",onClick);
-    canvas.addEventListener("pointerleave",()=>{hovered=null;});
+    // Pointer: drag to spin the mesa; hover the basket to wobble it, tap it to pour in feed; tap a prairie dog to send it
+    // down its hole.
+    const raycaster=new THREE.Raycaster(),ndc=new THREE.Vector2();let onBasket=false;
+    const pick=(event,objects)=>{const rect=canvas.getBoundingClientRect();ndc.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(ndc,camera);return raycaster.intersectObjects(objects,true)[0];};
+    const spin=createSpin(canvas,{rest:0,
+      over:event=>(onBasket=!!pick(event,[basket,hay]))||!!pick(event,dogs.map(d=>d.root)),
+      onTap:event=>{
+        if(pick(event,[basket,hay])){pour();return;}
+        const hit=pick(event,dogs.map(d=>d.root));if(!hit)return;
+        const dog=dogs.find(d=>{let o=hit.object;while(o&&o!==d.root)o=o.parent;return o===d.root;});
+        if(dog){dog.state="down";dog.timer=3+rng()*3;needsRender=true;}
+      }});
+    canvas.addEventListener("pointerleave",()=>{onBasket=false;});
 
-    // Framing: the mesa and its ring to one side (the words scroll past on the other), further off when tall.
+    // Framing: the mesa to one side (the words scroll past on the other), further off when tall.
     let tall=false;const VIEW=new THREE.Vector3(0,.34,1).normalize(),focus=new THREE.Vector3(0,.9,0);
     function frame(){
       const w=mount.clientWidth,h=mount.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;tall=camera.aspect<.85;
-      if(tall)camera.setViewOffset(w,h,0,h*.14,w,h);else camera.setViewOffset(w,h,(side==="left"?.2:-.2)*w,-h*.05,w,h);
-      camera.updateProjectionMatrix();camera.position.copy(VIEW).multiplyScalar(tall?50:33).add(focus);camera.lookAt(focus);needsRender=true;
+      if(tall)camera.setViewOffset(w,h,0,h*.2,w,h);else camera.setViewOffset(w,h,(side==="left"?.17:-.17)*w,h*.07,w,h);
+      camera.updateProjectionMatrix();camera.position.copy(VIEW).multiplyScalar(tall?54:24).add(focus);camera.lookAt(focus);needsRender=true;
     }
     const resize=new ResizeObserver(frame);resize.observe(mount);
     const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;});observer.observe(mount);
 
-    let spin=0,spinVelocity=0,time=0,since=0,needsRender=true,snap=true,wasLive=false;
+    let time=0,since=0,needsRender=true;
     function tick(dt){
       const reduced=preference.matches,step=reduced?0:dt;time+=step;
-      // Scrolling through Work turns the ring from the first card to the last; it eases round rather than snapping.
-      const n=cards.length,turnTo=-state.current.progress[slot]*(n-1)/n*Math.PI*2,before=spin;
-      if(snap){snap=false;spin=turnTo;}
-      spin=reduced?turnTo:spin+(turnTo-spin)*(1-Math.exp(-dt*4));spinVelocity=(spin-before)/Math.max(dt,1/120);
-      const rx=tall?4.4:6.6,rz=tall?5.4:6,lift=tall?1.1:1.2;
-      cards.forEach((card,i)=>{
-        const a=spin+i/n*Math.PI*2,depth=Math.cos(a);card.depth=depth;
-        // Videos only play while their card is facing us.
-        if(card.video){const play=!reduced&&depth>-.2;if(play&&card.video.paused)card.video.play().catch(()=>{});else if(!play&&!card.video.paused)card.video.pause();}
-        card.hover+=((card===hovered?1:0)-card.hover)*(1-Math.exp(-dt*7));
-        // Seen a little from above, the back of the ring rides higher than the front.
-        card.mesh.position.set(Math.sin(a)*rx,lift-depth*.55+Math.sin(time*.5+i)*.05+card.hover*.1,depth*rz+card.hover*.3);
-        card.mesh.rotation.set(0,Math.atan2(Math.sin(a)/rx,Math.cos(a)/rz),0);
-        // The card in focus grows as it comes round to the front.
-        const front=smooth((depth-.55)/.45);card.mesh.scale.setScalar(((tall?.8:.6)+front*(tall?.85:.62))*(1+card.hover*.04));
-        const v=card.uniforms;v.uTime.value=time;v.uHover.value=card.hover;v.uShade.value=.62+.38*smooth((depth+1)/2);
-        v.uVelocity.value=reduced?0:THREE.MathUtils.clamp(-spinVelocity*.6,-1,1);
-      });
+      const falling=updatePellets(dt);
+      // Food drains while the herd eats.
+      if(herd.some(b=>b.state==="eat"))food=Math.max(0,food-dt*.12);
+      basket.rotation.z=onBasket&&!reduced?Math.sin(time*9)*.04:0;
+      world.rotation.y=spin.update(dt);
       herd.forEach(b=>updateBison(b,step,time));dogs.forEach(d=>updateDog(d,step));
       world.position.y=Math.sin(time*.45)*.1;
       renderer.render(scene,camera);needsRender=false;
-      return Math.abs(spinVelocity)>.01||cards.some(c=>c.hover>.01);
+      return falling||onBasket||spin.busy||herd.some(b=>b.feeding&&b.state==="move");
     }
-    // Full rate while the ring turns or a card is hovered, 30 fps for the grazing in between.
+    // Full rate while feed falls, the herd runs to it or the basket is hovered, 30 fps for the grazing in between.
     let busy=true;const clock=new THREE.Clock();
     function draw(){
       raf=requestAnimationFrame(draw);
       const dt=Math.min(clock.getDelta(),.05);since+=dt;
-      const live=visible&&!document.hidden&&state.current.live.includes(slot);if(live&&!wasLive)snap=true;wasLive=live;
-      if(!live)return;
-      if(preference.matches&&!needsRender&&!snap)return;
+      if(!visible||document.hidden||!state.current.live.includes(slot))return;
+      if(preference.matches&&!needsRender&&!onBasket&&!spin.busy&&!pellets.some(p=>p.state!=="idle"))return;
       if(!busy&&since<1/30-.002)return;
       busy=tick(Math.min(since,.1));since=0;
     }
     frame();tick(0);mount.dataset.ready="true";draw();
     const readyTimer=setTimeout(()=>ready.current?.(),0);
-    if(new URLSearchParams(window.location.search).has("debug"))window.__work={camera,cards,herd,world,scene,renderer,THREE};
+    if(new URLSearchParams(window.location.search).has("debug"))window.__work={camera,herd,world,scene,renderer,pour,THREE};
 
     return()=>{
       clearTimeout(readyTimer);delete window.__work;disposed=true;cancelAnimationFrame(raf);resize.disconnect();observer.disconnect();
-      cards.forEach(c=>{if(c.video){c.video.pause();c.video.removeAttribute("src");c.video.load();}});
-      canvas.removeEventListener("pointermove",onMove);canvas.removeEventListener("click",onClick);
-      scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat())if(m){m.map?.dispose();m.uniforms?.uMap?.value?.dispose();m.dispose();}});
+      spin.dispose();
+      scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat())m?.dispose();});
       renderer.dispose();canvas.remove();
     };
-  },[state,projects,slot]);
+  },[state,slot]);
   return <div className="ht-canvas" ref={host} aria-hidden="true" />;
 }

@@ -8,6 +8,7 @@ import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { clone as cloneSkinned } from "three/addons/utils/SkeletonUtils.js";
 import { random, createBearMaterial, createPineGeometry, createCloud, flatMaterial, faceted } from "./island-parts";
+import { createBasket } from "./park-parts";
 import { drawCard, createCardMaterial, videoTexture, coverCrop } from "./prairie-cards";
 import { createFin } from "./park-parts";
 
@@ -69,16 +70,6 @@ function createTuft() {
   const g=faceted(tris,(tri,c)=>c.setRGB(1,1,1)),pos=g.attributes.position,col=g.attributes.color;
   for(let i=0;i<pos.count;i++){const s=.72+.35*pos.getY(i)/.74;col.setXYZ(i,s,s,s);}
   return g;
-}
-
-// A woven basket: a lathe-turned bowl with alternating bands.
-function createBasket() {
-  const profile=[[0,.02],[.5,.02],[.62,.12],[.7,.3],[.74,.46],[.8,.5],[.76,.54],[.66,.5],[.6,.32],[.5,.14],[0,.12]].map(([x,y])=>new THREE.Vector2(x,y));
-  const geometry=new THREE.LatheGeometry(profile,14).toNonIndexed(),pos=geometry.attributes.position,colors=new Float32Array(pos.count*3);
-  const light=new THREE.Color("#c48a4a"),dark=new THREE.Color("#8e5a2c");
-  for(let i=0;i<pos.count;i+=3){const y=(pos.getY(i)+pos.getY(i+1)+pos.getY(i+2))/3,a=Math.atan2(pos.getZ(i),pos.getX(i)),c=(Math.floor(y*14)+Math.floor((a+Math.PI)*2.2))%2?light:dark;for(let k=0;k<3;k++)colors.set([c.r,c.g,c.b],(i+k)*3);}
-  geometry.setAttribute("color",new THREE.BufferAttribute(colors,3));geometry.computeVertexNormals();
-  return new THREE.Mesh(geometry,flatMaterial());
 }
 
 export default function PrairieScene({ state, projects, onReady, slot = 1 }) {

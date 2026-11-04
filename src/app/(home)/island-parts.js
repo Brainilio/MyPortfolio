@@ -53,13 +53,16 @@ export const flatMaterial=()=>new THREE.MeshStandardMaterial({vertexColors:true,
 // The floating chunk: grassy top with a carved river bed, and a jagged, layered underside. Shaped by the island's
 // layout unless another one is passed (the About diorama has its own); `depth` scales how far the underside hangs and
 // `sand` is how far the sandy banks reach from the river; `grass` and `edge` recolour the top.
-export function createIsland(seed=7,{outline:edgeAt=outline,heightAt:groundAt=heightAt,riverDistance:riverAt=riverDistance,depth=1,sand:bank=1.6,grass=PALETTE.grass,edge:rim=PALETTE.edge}={}) {
+// Options: hub moves the point every ring closes in on (somewhere it's hidden, say under a rock), and scatter nudges the
+// inner points sideways (a fraction of a segment) so the facets don't line up into spokes on open ground.
+export function createIsland(seed=7,{outline:edgeAt=outline,heightAt:groundAt=heightAt,riverDistance:riverAt=riverDistance,depth=1,sand:bank=1.6,grass=PALETTE.grass,edge:rim=PALETTE.edge,hub=null,scatter=0}={}) {
   const r=random(seed),SEG=64,RINGS=14,top=[],grid=[];
   for(let ring=0;ring<=RINGS;ring++){
     const row=[];
     for(let s=0;s<SEG;s++){
-      const a=s/SEG*Math.PI*2,k=ring/RINGS,jitter=ring>0&&ring<RINGS?(r()-.5)*.25:0;
-      const radius=edgeAt(a)*k+jitter,x=Math.cos(a)*radius,z=Math.sin(a)*radius;
+      const inner=ring>0&&ring<RINGS,a=s/SEG*Math.PI*2+(inner&&scatter?(r()-.5)*scatter*Math.PI*2/SEG:0),k=ring/RINGS,jitter=inner?(r()-.5)*.25:0;
+      const radius=edgeAt(a)*k+jitter;let x=Math.cos(a)*radius,z=Math.sin(a)*radius;
+      if(hub){x+=hub.x*(1-k);z+=hub.y*(1-k);}
       row.push(new THREE.Vector3(x,groundAt(x,z),z));
       if(ring===0)break;
     }
@@ -92,45 +95,53 @@ export function createIsland(seed=7,{outline:edgeAt=outline,heightAt:groundAt=he
 }
 
 // River and waterfall: ribbons with a flowing, banded water shader. The river follows `path` (the island's unless
-// another is passed) until it leaves the land at `edgeAt`, then pours off the edge and drops `fall` units, fading
-// out over the lower part of the drop.
-export function createWater(path=riverPoints,edgeAt=outline,{width=1,fall=8,fade=Math.max(.6,fall*.19)}={}) {
-  const uniforms={uTime:{value:0},uFlow:{value:0},uSurge:{value:0},uLength:{value:1},uFade:{value:fade},uShallow:{value:new THREE.Color(PALETTE.water)},uDeep:{value:new THREE.Color(PALETTE.waterDeep)}};
+// another is passed) at height `level` until it leaves the land at `edgeAt`, then pours off the edge and drops `fall`
+// units, fading out over the lower part of the drop (and in over `head` at the start). `volume` rounds the ribbon's cross-section (a fraction of its
+// width): the river swells up in the middle and the waterfall bows outward, so it reads as a body of water.
+export function createWater(path=riverPoints,edgeAt=outline,{width=1,fall=8,fade=Math.max(.6,fall*.19),level=-.2,volume=0,head=.25}={}) {
+  const uniforms={uTime:{value:0},uFlow:{value:0},uSurge:{value:0},uLength:{value:1},uFade:{value:fade},uHead:{value:head},uShallow:{value:new THREE.Color(PALETTE.water)},uDeep:{value:new THREE.Color(PALETTE.waterDeep)}};
   const material=new THREE.ShaderMaterial({uniforms,transparent:true,depthWrite:false,side:THREE.DoubleSide,
     vertexShader:`varying vec2 vUv;uniform float uSurge,uTime;void main(){vUv=uv;vec3 p=position;p.y+=uSurge*.07*(1.+sin(uv.y*9.-uTime*8.));gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}`,
-    fragmentShader:`varying vec2 vUv;uniform float uTime,uFlow,uSurge,uLength,uFade;uniform vec3 uShallow,uDeep;
+    fragmentShader:`varying vec2 vUv;uniform float uTime,uFlow,uSurge,uLength,uFade,uHead;uniform vec3 uShallow,uDeep;
       void main(){
         float across=abs(vUv.x-.5)*2.,flow=fract(vUv.y*1.6-uFlow*.5+sin(vUv.x*9.+vUv.y*5.)*.06);
         float band=smoothstep(.0,.08,flow)*smoothstep(.22,.1,flow)*(1.-across*.7);
         float foam=smoothstep(.72,.95,across+sin(vUv.y*16.-uTime*3.)*.04);
         vec3 color=mix(uDeep,uShallow,across*.7+.15)+band*(.3+uSurge*.5)+foam*(.55+uSurge*.4)+uSurge*.12;
-        float fade=smoothstep(0.,.25,vUv.y)*(1.-smoothstep(uLength-uFade,uLength,vUv.y));
+        float fade=smoothstep(0.,uHead,vUv.y)*(1.-smoothstep(uLength-uFade,uLength,vUv.y));
         gl_FragColor=vec4(color,.92*fade);
         #include <colorspace_fragment>
       }`});
   const ribbon=(points,widthAt)=>{
-    const positions=[],uvs=[],index=[],side=new THREE.Vector3(1,0,0),flat=new THREE.Vector3(),up=new THREE.Vector3(0,1,0);
+    const positions=[],uvs=[],index=[],side=new THREE.Vector3(1,0,0),flat=new THREE.Vector3(),up=new THREE.Vector3(0,1,0),along=new THREE.Vector3(),bow=new THREE.Vector3(),rows=volume?3:2;
     const lengths=[0];for(let i=1;i<points.length;i++)lengths.push(lengths[i-1]+points[i].distanceTo(points[i-1]));
     const total=lengths.at(-1);
     points.forEach((p,i)=>{
       // Side stays horizontal: from the flow direction while it runs flat, frozen once it pours straight down.
       flat.subVectors(points[Math.min(i+1,points.length-1)],points[Math.max(i-1,0)]).setY(0);
       if(flat.lengthSq()>.02)side.crossVectors(flat.normalize(),up).normalize();
-      const k=lengths[i]/total,w=widthAt(k);
-      positions.push(p.x-side.x*w,p.y,p.z-side.z*w,p.x+side.x*w,p.y,p.z+side.z*w);
-      uvs.push(0,lengths[i]/4,1,lengths[i]/4);
-      if(i)index.push(i*2-2,i*2-1,i*2,i*2-1,i*2+1,i*2);
+      const k=lengths[i]/total,w=widthAt(k),v=lengths[i]/4;
+      if(!volume){
+        positions.push(p.x-side.x*w,p.y,p.z-side.z*w,p.x+side.x*w,p.y,p.z+side.z*w);uvs.push(0,v,1,v);
+        if(i)index.push(i*2-2,i*2-1,i*2,i*2-1,i*2+1,i*2);
+        return;
+      }
+      // A middle row lifted off the sheet (up while it flows, outward once it falls) gives it a rounded body.
+      along.subVectors(points[Math.min(i+1,points.length-1)],points[Math.max(i-1,0)]).normalize();bow.crossVectors(side,along).normalize().multiplyScalar(w*volume);
+      positions.push(p.x-side.x*w,p.y,p.z-side.z*w,p.x+bow.x,p.y+bow.y,p.z+bow.z,p.x+side.x*w,p.y,p.z+side.z*w);uvs.push(0,v,.5,v,1,v);
+      if(i){const a=(i-1)*rows,b=i*rows;index.push(a,a+1,b,a+1,b+1,b,a+1,a+2,b+1,a+2,b+2,b+1);}
     });
     const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));g.setIndex(index);
     return g;
   };
   // The river runs until it leaves the island, then pours off the edge.
   const flowing=[];
-  for(const p of path){const inside=Math.hypot(p.x,p.z)<edgeAt(Math.atan2(p.z,p.x))-.05;flowing.push(new THREE.Vector3(p.x,-.2,p.z));if(!inside)break;}
+  for(const p of path){const inside=Math.hypot(p.x,p.z)<edgeAt(Math.atan2(p.z,p.x))-.05;flowing.push(new THREE.Vector3(p.x,level,p.z));if(!inside)break;}
   // One continuous sheet: the river curls over the lip and pours straight down.
   const lip=flowing.at(-1),out=new THREE.Vector3(lip.x,0,lip.z).normalize(),stream=[...flowing];
-  [[.22,-.24],[.42,-.36],[.56,-.62],[.62,-1]].forEach(([o,y])=>stream.push(new THREE.Vector3(lip.x+out.x*o,y,lip.z+out.z*o)));
-  for(let i=1;i<=20;i++){const t=i/20;stream.push(new THREE.Vector3(lip.x+out.x*(.62+t*t*1.3),-1-t*fall,lip.z+out.z*(.62+t*t*1.3)));}
+  const drop=level+.2;
+  [[.22,-.24],[.42,-.36],[.56,-.62],[.62,-1]].forEach(([o,y])=>stream.push(new THREE.Vector3(lip.x+out.x*o,y+drop,lip.z+out.z*o)));
+  for(let i=1;i<=20;i++){const t=i/20;stream.push(new THREE.Vector3(lip.x+out.x*(.62+t*t*1.3),-1+drop-t*fall,lip.z+out.z*(.62+t*t*1.3)));}
   const span=list=>list.reduce((sum,p,i)=>i?sum+p.distanceTo(list[i-1]):0,0),riverShare=span(flowing)/span(stream);
   const geometry=ribbon(stream,k=>width*(k<riverShare?.62+.3*(k/riverShare)+.08*Math.sin(k*20):.92-(k-riverShare)*.45));
   uniforms.uLength.value=geometry.attributes.uv.array.at(-1);
@@ -300,4 +311,25 @@ export function createFish(seed) {
   const tail=new THREE.Mesh(tailGeometry,new THREE.MeshStandardMaterial({color:'#7d93a3',flatShading:true,side:THREE.DoubleSide}));tail.position.z=-.14;
   fish.add(body,tail);fish.userData.tail=tail;
   return fish;
+}
+
+// Drag to spin, like the hero island: a horizontal drag flings the diorama round with inertia, and it drifts back
+// to its resting angle once let go. A press that doesn't drag is a tap (handed to onTap); `over` says whether the
+// pointer is on something tappable (pointer cursor instead of grab). Vertical drags still scroll the page on touch.
+export function createSpin(canvas,{rest=0,onTap,over}={}) {
+  let yaw=rest,velocity=0,pressed=false,dragging=false,downX=0,lastX=0;
+  const cursor=event=>{canvas.style.cursor=dragging?"grabbing":over?.(event)?"pointer":"grab";};
+  const onDown=event=>{pressed=true;dragging=false;downX=lastX=event.clientX;};
+  const onMove=event=>{
+    if(pressed&&(dragging||Math.abs(event.clientX-downX)>5)){dragging=true;velocity+=(event.clientX-lastX)*.0009;}
+    lastX=event.clientX;if(event.target===canvas)cursor(event);
+  };
+  const onUp=event=>{if(pressed&&!dragging&&event.target===canvas)onTap?.(event);pressed=dragging=false;if(event.target===canvas)cursor(event);};
+  canvas.style.cursor="grab";canvas.style.touchAction="pan-y";
+  canvas.addEventListener("pointerdown",onDown);window.addEventListener("pointermove",onMove);window.addEventListener("pointerup",onUp);window.addEventListener("pointercancel",onUp);
+  return {
+    get busy(){return dragging||Math.abs(velocity)>2e-4||Math.abs(yaw-rest)>.01;},
+    update(dt){yaw+=velocity;velocity*=Math.exp(-dt*3.5);if(!dragging)yaw+=(rest-yaw)*(1-Math.exp(-dt*.25));return yaw;},
+    dispose(){canvas.removeEventListener("pointerdown",onDown);window.removeEventListener("pointermove",onMove);window.removeEventListener("pointerup",onUp);window.removeEventListener("pointercancel",onUp);},
+  };
 }

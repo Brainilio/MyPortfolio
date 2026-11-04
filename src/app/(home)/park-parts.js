@@ -94,3 +94,33 @@ export function createFin(rng,width,height,depth) {
   const geometry=faceted(tris,(tri,c)=>{const y=(tri[0].y+tri[1].y+tri[2].y)/3/height,band=Math.min(3,Math.floor(y*4.4+rng()*.5));c.copy(FIN_COLORS[band]);});
   return new THREE.Mesh(geometry,flatMaterial());
 }
+
+// A woven basket: a lathe-turned bowl with alternating bands.
+export function createBasket() {
+  const profile=[[0,.02],[.5,.02],[.62,.12],[.7,.3],[.74,.46],[.8,.5],[.76,.54],[.66,.5],[.6,.32],[.5,.14],[0,.12]].map(([x,y])=>new THREE.Vector2(x,y));
+  const geometry=new THREE.LatheGeometry(profile,14).toNonIndexed(),pos=geometry.attributes.position,colors=new Float32Array(pos.count*3);
+  const light=new THREE.Color("#c48a4a"),dark=new THREE.Color("#8e5a2c");
+  for(let i=0;i<pos.count;i+=3){const y=(pos.getY(i)+pos.getY(i+1)+pos.getY(i+2))/3,a=Math.atan2(pos.getZ(i),pos.getX(i)),c=(Math.floor(y*14)+Math.floor((a+Math.PI)*2.2))%2?light:dark;for(let k=0;k<3;k++)colors.set([c.r,c.g,c.b],(i+k)*3);}
+  geometry.setAttribute("color",new THREE.BufferAttribute(colors,3));geometry.computeVertexNormals();
+  return new THREE.Mesh(geometry,flatMaterial());
+}
+
+// A little Teton range: a cluster of jagged, faceted peaks round a tall central spire (the Grand), closed all the way
+// round so it holds up from any side. Slate blue rock, snow streaked over the upper facets.
+const SLATE=["#4a5577","#56618a","#69739a"].map(c=>new THREE.Color(c)),SNOW=new THREE.Color("#eceaf4");
+export function createTetons(rng,peaks=[[0,0,1.15,3.3],[-1.15,.25,.95,2.3],[1.05,.15,.9,2.6],[-2.1,.45,.85,1.5],[2,.4,.75,1.7]]) {
+  const tris=[],SEG=7;
+  for(const [px,pz,r,h] of peaks){
+    const rings=[[0,1],[.38,.66],[.72,.3]].map(([t,k])=>Array.from({length:SEG},(_,s)=>{const a=s/SEG*Math.PI*2+(rng()-.5)*.5,rr=r*k*(.75+rng()*.5);return new THREE.Vector3(px+Math.cos(a)*rr,h*t*(.9+rng()*.2),pz+Math.sin(a)*rr*.75);}));
+    const tip=new THREE.Vector3(px+(rng()-.5)*r*.25,h,pz+(rng()-.5)*r*.2);
+    for(let k=1;k<rings.length;k++)for(let s=0;s<SEG;s++){const a=rings[k-1][s],b=rings[k-1][(s+1)%SEG],c=rings[k][s],d=rings[k][(s+1)%SEG];tris.push([a,b,c],[b,d,c]);}
+    for(let s=0;s<SEG;s++)tris.push([rings[2][s],rings[2][(s+1)%SEG],tip]);
+    tris.forEach(tri=>{tri.peak??=h;});
+  }
+  const geometry=faceted(tris,(tri,c)=>{
+    const k=(tri[0].y+tri[1].y+tri[2].y)/3/tri.peak;
+    c.copy(SLATE[Math.floor(rng()*3)]);
+    if(k>.55&&rng()<(k-.45)*1.6)c.lerp(SNOW,.8+rng()*.15);
+  });
+  return new THREE.Mesh(geometry,flatMaterial());
+}
