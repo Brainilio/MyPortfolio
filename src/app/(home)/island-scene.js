@@ -384,7 +384,7 @@ export default function IslandScene({ onEvent, active, onReady } = {}) {
     canvas.addEventListener("pointerleave",()=>{pointerInside=false;});
 
     // Framing: the island centred, a little low, under the name.
-    const HERO=new THREE.Vector3(.32,.36,.88).normalize(),aim=new THREE.Vector3(),view=new THREE.Vector3();let distance=36;
+    const HERO=new THREE.Vector3(.32,.36,.88).normalize(),aim=new THREE.Vector3(),view=new THREE.Vector3();let distance=36,attitude=0;
     let tall=false;
     function frame(){
       const w=mount.clientWidth,h=mount.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;tall=camera.aspect<.85;
@@ -395,7 +395,8 @@ export default function IslandScene({ onEvent, active, onReady } = {}) {
     // lifts, so it reads as landing on the island.
     function placeCamera(){
       const at=live.current?.current.introAt,k=preference.matches?1:at?THREE.MathUtils.clamp((performance.now()-at)/1400,0,1):0,ease=1-(1-k)**3;
-      camera.position.copy(tilted(HERO,8*(1-ease),view)).multiplyScalar(distance);camera.lookAt(aim);
+      attitude+=((preference.matches?0:live.current?.current.tilt?.[0]??0)-attitude)*.12;
+      camera.position.copy(tilted(HERO,8*(1-ease)+attitude,view)).multiplyScalar(distance);camera.lookAt(aim);
     }
     const resize=new ResizeObserver(frame);resize.observe(mount);frame();
     const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;});observer.observe(mount);

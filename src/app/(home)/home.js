@@ -44,7 +44,7 @@ const mix = (a, b, t) => a.map((c, k) => Math.round(c + (b[k] - c) * t));
 // Between About, Work, Skills and Contact the page holds a beat of open sky: each of those sections runs on for TAIL
 // screen-heights after its own scroll is done. Its island fades out over FADE of that, the sky alone holds for the
 // rest, and the next island starts in once 30% of its section is on screen. The skies blend across the beat.
-const TAIL = .6, FADE = .45, ENTER = .7, RISE = .55;
+const TAIL = .6, FADE = .45, ENTER = .7, RISE = .55, ARRIVE = 14, DEPART = 10;
 const tailOf = i => (i > 0 && i < 4 ? TAIL : 0);
 // Which slot each scene reads in the shared scroll state.
 const ABOUT = 1, WORK = 2, SKILLS_AT = 3, CONTACT = 4;
@@ -79,7 +79,7 @@ function ContactForm() {
 export default function Home() {
   const [where, setWhere] = useState({ section: 0, stop: 0 }), [menu, setMenu] = useState(false);
   // Shared with the 3D scenes (read every frame): which sections are on screen and how far through each one we are.
-  const scene = useRef({ section: 0, live: [0], progress: [0, 0, 0, 0, 0], shift: [0, 0, 0, 0, 0] });
+  const scene = useRef({ section: 0, live: [0], progress: [0, 0, 0, 0, 0], shift: [0, 0, 0, 0, 0], tilt: [0, 0, 0, 0, 0] });
   const [spotted, setSpotted] = useState([]), [still, setStill] = useState(false);
   // Reduced motion, and phones: the Work postcard shows its still image instead of playing its preview.
   useEffect(() => {
@@ -144,7 +144,10 @@ export default function Home() {
         if (stage) {
           const enter = i ? clamp((y - (top - vh * ENTER)) / (vh * RISE)) : 1;
           const leave = i === 0 ? clamp((top + height - y - vh * .5) / (vh * .55)) : tailOf(i) ? clamp((top + run + vh * FADE - y) / (vh * FADE)) : 1, o = Math.min(enter, leave);
-          stage.style.opacity = o.toFixed(3);stage.style.transform = o < 1 ? `scale(${(.94 + o * .06).toFixed(4)})` : "";
+          stage.style.opacity = o.toFixed(3);stage.style.transform = o < 1 ? `scale(${(enter < leave ? .94 + o * .06 : .92 + o * .08).toFixed(4)})` : "";
+          // The camera's attitude (degrees from its resting angle, the scenes ease toward it): steeper as an island
+          // arrives, as if coming in from above, and lower as it leaves, looking back up at it as you pass.
+          scene.current.tilt[i] = ARRIVE * (1 - enter) - DEPART * (1 - leave);
           if (tailOf(i)) copies.current[i]?.style.setProperty("opacity", leave.toFixed(3));
         }
         stops[i] = i === CONTACT ? top - vh * .6 : i ? top + run * .5 : 0;

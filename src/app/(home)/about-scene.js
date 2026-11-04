@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
-import { random, faceted, createIsland, createWater, createPineGeometry, createSwayingInstances, createFoliageMaterial, flatMaterial, createSpin } from "./island-parts";
+import { random, faceted, createIsland, createWater, createPineGeometry, createSwayingInstances, createFoliageMaterial, flatMaterial, createSpin, tilted } from "./island-parts";
 import { paintGeometry, mergeFlat, createAspen } from "./forest-parts";
 import { createRangerBearGeometry, createRangerBearMaterial, bearHandAt } from "./ranger-bear";
 
@@ -252,7 +252,7 @@ export default function AboutScene({ state, slot = 1, side = "right", onReady })
     }
 
     // Framing: the diorama to one side on wide screens (the words scroll past on the other), centred and further off when tall.
-    let tall=false,lean=new THREE.Vector2(),leanTarget=new THREE.Vector2();
+    let tall=false,lean=new THREE.Vector2(),leanTarget=new THREE.Vector2(),attitude=0;const viewDir=new THREE.Vector3();
     const view={w:1,h:1};
     function frame(){
       const w=mount.clientWidth,h=mount.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;tall=camera.aspect<.85;view.w=w;view.h=h;
@@ -260,7 +260,7 @@ export default function AboutScene({ state, slot = 1, side = "right", onReady })
       camera.updateProjectionMatrix();place();starUniforms.uPixel.value=renderer.getPixelRatio();needsRender=true;
     }
     function place(){
-      const distance=tall?42:21.5;camera.position.set(.42+lean.x*.06,.4+lean.y*.04,.8).normalize().multiplyScalar(distance);camera.lookAt(0,tall?-.4:.3,0);
+      const distance=tall?42:21.5;tilted(viewDir.set(.42+lean.x*.06,.4+lean.y*.04,.8).normalize(),attitude,camera.position).multiplyScalar(distance);camera.lookAt(0,tall?-.4:.3,0);
     }
     const resize=new ResizeObserver(frame);resize.observe(mount);
     const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;});observer.observe(mount);
@@ -276,7 +276,7 @@ export default function AboutScene({ state, slot = 1, side = "right", onReady })
       updateLeaves(step);flies.forEach(fly=>{const k=1-Math.exp(-step*.4);fly.x+=(fly.hx-fly.x)*k;fly.z+=(fly.hz-fly.z)*k;});
       water.uniforms.uTime.value=time;water.uniforms.uFlow.value=flow;
       world.position.y=Math.sin(time*.45)*.12;world.rotation.y=spin.update(dt)+Math.sin(time*.13)*.03;
-      lean.lerp(leanTarget,1-Math.exp(-dt*1.5));place();
+      lean.lerp(leanTarget,1-Math.exp(-dt*1.5));attitude+=((reduced?0:state.current.tilt[slot])-attitude)*(1-Math.exp(-dt*6));place();
       // Fire: each cone flickers on its own beat; the light breathes with it.
       flare*=Math.exp(-dt*.7);const big=1+flare*.9;
       flames.forEach((flame,i)=>{const f=(.8+.2*Math.sin(time*(9+i*3)+i)+.12*Math.sin(time*(23+i*5)))*big;flame.scale.set((1+.1*Math.sin(time*13+i))*(1+flare*.3),f,(1+.1*Math.cos(time*11+i))*(1+flare*.3));flame.rotation.y=time*(.6+i*.3);});

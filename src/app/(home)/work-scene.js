@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
-import { random, createIsland, createBearMaterial, createSpin } from "./island-parts";
+import { random, createIsland, createBearMaterial, createSpin, tilted } from "./island-parts";
 import { createButte, createBasket } from "./park-parts";
 
 // Work as the prairie in miniature, the island's golden-hour cousin: rolling prairie climbing to a mesa shelf at the
@@ -207,11 +207,13 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     canvas.addEventListener("pointerleave",()=>{onBasket=false;});
 
     // Framing: the mesa to one side (the words scroll past on the other), further off when tall.
-    let tall=false;const VIEW=new THREE.Vector3(0,.34,1).normalize(),focus=new THREE.Vector3(0,.9,0);
+    let tall=false,attitude=0;const VIEW=new THREE.Vector3(0,.34,1).normalize(),focus=new THREE.Vector3(0,.9,0),viewDir=new THREE.Vector3();
+    // The camera sits on an orbit round the mesa; only its attitude (steeper arriving, lower leaving) changes.
+    function placeCamera(){camera.position.copy(tilted(VIEW,attitude,viewDir)).multiplyScalar(tall?54:24).add(focus);camera.lookAt(focus);}
     function frame(){
       const w=mount.clientWidth,h=mount.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;tall=camera.aspect<.85;
       if(tall)camera.setViewOffset(w,h,0,h*.2,w,h);else camera.setViewOffset(w,h,(side==="left"?.17:-.17)*w,h*.07,w,h);
-      camera.updateProjectionMatrix();camera.position.copy(VIEW).multiplyScalar(tall?54:24).add(focus);camera.lookAt(focus);needsRender=true;
+      camera.updateProjectionMatrix();placeCamera();needsRender=true;
     }
     const resize=new ResizeObserver(frame);resize.observe(mount);
     const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;});observer.observe(mount);
@@ -224,10 +226,11 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       if(herd.some(b=>b.state==="eat"))food=Math.max(0,food-dt*.12);
       basket.rotation.z=onBasket&&!reduced?Math.sin(time*9)*.04:0;
       world.rotation.y=spin.update(dt);
+      const goal=reduced?0:state.current.tilt[slot];attitude+=(goal-attitude)*(1-Math.exp(-dt*6));placeCamera();
       herd.forEach(b=>updateBison(b,step,time));dogs.forEach(d=>updateDog(d,step));
       world.position.y=Math.sin(time*.45)*.1;
       renderer.render(scene,camera);needsRender=false;
-      return falling||onBasket||spin.busy||herd.some(b=>b.feeding&&b.state==="move");
+      return falling||onBasket||spin.busy||herd.some(b=>b.feeding&&b.state==="move")||Math.abs(goal-attitude)>.05;
     }
     // Full rate while feed falls, the herd runs to it or the basket is hovered, 30 fps for the grazing in between.
     let busy=true;const clock=new THREE.Clock();

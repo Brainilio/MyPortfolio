@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
-import { random, createIsland, createPineGeometry, createSwayingInstances, createFoliageMaterial, flatMaterial, createSpin } from "./island-parts";
+import { random, createIsland, createPineGeometry, createSwayingInstances, createFoliageMaterial, flatMaterial, createSpin, tilted } from "./island-parts";
 import { paintGeometry } from "./forest-parts";
 import { createSign, createTetons } from "./park-parts";
 import { loadWagon } from "./wagon";
@@ -162,7 +162,7 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, side = "ri
     const spin=createSpin(canvas,{rest:0,over:aimAt,onTap:event=>{aimAt(event);if(overGeyser){erupt();needsRender=true;return;}if(!overCar)return;hop=0;carClick.current?.();}});
 
     // Framing: the whole diorama to one side (the words scroll past on the other), further off when tall.
-    let tall=false,orbit=0;const target=new THREE.Vector3(0,.2,0),aim=new THREE.Vector3(),Y=new THREE.Vector3(0,1,0),BASE=Math.atan2(VIEW.x,VIEW.z),SWING=THREE.MathUtils.degToRad(9);
+    let tall=false,orbit=0,attitude=0;const viewDir=new THREE.Vector3();const target=new THREE.Vector3(0,.2,0),aim=new THREE.Vector3(),Y=new THREE.Vector3(0,1,0),BASE=Math.atan2(VIEW.x,VIEW.z),SWING=THREE.MathUtils.degToRad(9);
     function frame(){
       const w=mount.clientWidth,h=mount.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;tall=camera.aspect<.85;
       if(tall)camera.setViewOffset(w,h,0,h*.14,w,h);else camera.setViewOffset(w,h,(side==="left"?.17:-.17)*w,h*.03,w,h);
@@ -200,9 +200,10 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, side = "ri
       world.position.y=Math.sin(time*.45)*.1;world.rotation.y=spin.update(dt);world.updateMatrixWorld();
       car.getWorldPosition(aim);let lean=Math.atan2(aim.x,aim.z)-BASE;lean=Math.atan2(Math.sin(lean),Math.cos(lean));
       const goalYaw=reduced?0:THREE.MathUtils.clamp(lean*.3,-SWING,SWING);orbit+=(goalYaw-orbit)*(jump?1:1-Math.exp(-dt*5));
-      camera.position.copy(VIEW).applyAxisAngle(Y,orbit).multiplyScalar(tall?33:27.5).add(target);camera.lookAt(target);
+      attitude+=((reduced?0:state.current.tilt[slot])-attitude)*(jump?1:1-Math.exp(-dt*6));
+      tilted(viewDir.copy(VIEW).applyAxisAngle(Y,orbit),attitude,camera.position).multiplyScalar(tall?33:27.5).add(target);camera.lookAt(target);
       renderer.render(scene,camera);needsRender=false;
-      return spin.busy||Math.abs(uVel)>1e-4||hop>=0||geyser.t>=0||Math.abs(turn-(end?1:0))>.01;
+      return spin.busy||Math.abs(attitude-state.current.tilt[slot])>.05||Math.abs(uVel)>1e-4||hop>=0||geyser.t>=0||Math.abs(turn-(end?1:0))>.01;
     }
     // Full rate while something is moving, 30 fps when it's just the breeze.
     let busy=true;const clock=new THREE.Clock();
