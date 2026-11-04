@@ -212,7 +212,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     function placeCamera(){camera.position.copy(tilted(VIEW,attitude,viewDir)).multiplyScalar(tall?54:24).add(focus);camera.lookAt(focus);}
     function frame(){
       const w=mount.clientWidth,h=mount.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;tall=camera.aspect<.85;
-      if(tall)camera.setViewOffset(w,h,0,h*.2,w,h);else camera.setViewOffset(w,h,(side==="left"?.17:-.17)*w,h*.07,w,h);
+      if(tall)camera.setViewOffset(w,h,0,h*.2,w,h);else camera.setViewOffset(w,h,side==="center"?0:(side==="left"?.17:-.17)*w,side==="center"?-h*.06:h*.07,w,h);
       camera.updateProjectionMatrix();placeCamera();needsRender=true;
     }
     const resize=new ResizeObserver(frame);resize.observe(mount);

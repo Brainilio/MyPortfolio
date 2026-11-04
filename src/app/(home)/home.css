@@ -27,7 +27,7 @@ body:has(.ht){background:#1b1335}
 .ht-zone[data-side=left] .ht-copy{margin-left:auto;margin-right:var(--gutter)}
 .ht-copy a{pointer-events:auto}
 /* Work and Skills pin their words too (a stretch of scroll per card or sign), so the list stays beside the diorama. */
-.ht-pinned{min-height:calc(160svh + var(--steps) * 40svh)}
+.ht-pinned{min-height:calc(160svh + var(--steps) * var(--step,40svh))}
 .ht-zone.ht-pinned .ht-copy{position:sticky;top:0;height:100svh;display:flex;flex-direction:column;justify-content:center;padding:60px 0 0}
 .ht-copy h2{margin:0;font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:clamp(34px,4.2vw,68px);line-height:.95;letter-spacing:-.05em}
 .ht-copy h2 span{color:var(--violet)}
@@ -90,24 +90,25 @@ body:has(.ht){background:#1b1335}
 .ht-skills .ht-stage{-webkit-mask-image:linear-gradient(270deg,#000 75%,transparent);mask-image:linear-gradient(270deg,#000 75%,transparent)}
 .ht-list li{color:var(--ink)}
 .ht-list b i{color:#7c5cdb}
-.ht-copy>p.ht-drive{margin:14px 0 0;font-size:14px;color:rgba(251,247,255,.62)}
-/* Work: a pile of postcards. --f (set from the scroll) is how far the deal has got; card i is --d = f - i: below zero
-   it waits in the pile, --k places deep (the top card -1.5°, then +1.2°, -0.8°, +2°; each 10px lower, smaller, a
-   little darker and with a weaker shadow), from 0 to 1 it's tossed off in an arc down and to the left toward the mesa,
-   spinning as it goes, and fades only at the end of the throw; past 1 it's gone. */
-.ht-work.ht-pinned .ht-copy{justify-content:flex-start;padding:128px 0 0}
-.ht-deck{position:relative;margin:28px 0 0;padding:0;list-style:none;height:min(380px,calc(100svh - 380px));perspective:1400px}
-.ht-deck li{--d:calc(var(--f,0) - var(--i));--t:clamp(0,var(--d),1);--k:clamp(0,calc(var(--d) * -1),3);
-  --tilt:calc(-1.5deg + clamp(0,var(--k),1) * 2.7deg - clamp(0,var(--k) - 1,1) * 2deg + clamp(0,var(--k) - 2,1) * 2.8deg);
-  position:absolute;inset:0 0 auto;transform-origin:50% 60%;will-change:transform,opacity;
-  transform:translate(calc(var(--t) * -190%),calc(var(--k) * 10px - var(--t) * 70px + var(--t) * var(--t) * 330px)) rotate(calc(var(--tilt) - var(--t) * 14deg)) rotateY(calc(var(--t) * 18deg))
-    scale(calc(1 - clamp(0,var(--k),1) * .05 - clamp(0,var(--k) - 1,2) * .04 - var(--t) * .2));
-  filter:brightness(calc(1 - clamp(0,var(--k),1) * .08 - clamp(0,var(--k) - 1,1) * .07));
-  opacity:calc(1 - max(0,var(--t) - .72) * 3.6)}
+.ht-copy p.ht-drive{margin:14px 0 0;font-size:14px;color:rgba(251,247,255,.62)}
+/* Work: the island in the middle with its heading above, and the cards floating off its right edge in 3D: a
+   perspective box, each card turned to show its left edge (a little spine) and casting a shadow down and to the left.
+   Cards in the pile (--k deep) sit further left, lower and back in z, leaning a touch more and in less light; a dealt
+   card is tossed down onto the prairie (0.7 s), and the next springs up into place with a little overshoot (0.5 s). */
+.ht-deck{position:relative;margin:28px 0 0;padding:0;list-style:none;height:min(300px,calc(100svh - 380px));perspective:1200px;perspective-origin:30% 50%}
+.ht-deck li{--k:0;position:absolute;inset:0 0 auto;transform-style:preserve-3d;
+  transform:translate3d(calc(var(--k) * -16px),calc(var(--k) * 8px),calc(var(--k) * -40px)) rotateY(calc(var(--k) * -2deg));
+  transition:transform .5s cubic-bezier(.34,1.56,.64,1),opacity .4s ease}
+.ht-deck li.is-dealt{transform:translate3d(-380px,80px,0) rotateZ(-25deg) rotateY(-27deg);opacity:0;pointer-events:none;transition:transform .7s ease-in,opacity .7s ease-in}
 .ht-deck li.is-far{visibility:hidden}
-/* The postcard: a warm white polaroid frame, wider at the foot for the caption. */
-.ht-deck a{--fade:pow(.6,var(--k));display:block;padding:12px 12px 0;border-radius:12px;background:#fefcf8;color:var(--ink);
-  box-shadow:0 12px 40px rgba(0,0,0,calc(.22 * var(--fade))),0 4px 12px rgba(0,0,0,calc(.12 * var(--fade)))}
+.ht-deck a{position:relative;display:block;padding:12px 12px 0;border-radius:12px;background:#fefcf8;color:var(--ink);transform-style:preserve-3d;
+  transform:rotateY(-18deg) rotateX(3deg);transition:transform .4s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:-12px 24px 48px rgba(0,0,0,.28),-4px 8px 16px rgba(0,0,0,.16)}
+.ht-deck li.is-here a:hover,.ht-deck li.is-here a:focus-visible{transform:rotateY(-8deg) rotateX(1deg) translateZ(24px)}
+.ht-deck a:focus-visible{outline:2px solid var(--violet);outline-offset:4px}
+.ht-deck a:before{content:'';position:absolute;left:-8px;top:4px;bottom:-4px;width:8px;background:linear-gradient(180deg,#d4c8b8,#a09080);transform:rotateY(90deg);transform-origin:right center}
+/* Less light deeper in the pile. */
+.ht-deck a:after{content:'';position:absolute;inset:0;border-radius:12px;background:#000;opacity:calc(1 - pow(.88,var(--k)));pointer-events:none;transition:opacity .5s}
 .ht-deck-media{position:relative;display:block;aspect-ratio:16/10;border-radius:3px;overflow:hidden;background:linear-gradient(135deg,var(--violet),#f4a089)}
 .ht-deck-media img,.ht-deck-media video{display:block;width:100%;height:100%;object-fit:cover}
 .ht-deck-text{display:block;padding:10px 2px 12px}
@@ -115,6 +116,13 @@ body:has(.ht){background:#1b1335}
 .ht-deck-text b{display:block;margin-top:2px;font-size:.95rem;font-weight:600}
 .ht-deck-text i{font-style:normal;color:#7c5cdb;display:inline-block;transition:transform .3s}
 .ht-deck a:hover .ht-deck-text i{transform:translateX(4px)}
+@media(min-width:761px){
+  .ht-zone.ht-work .ht-copy{width:auto;margin:-100svh 0 0;padding:0;display:block;pointer-events:none}
+  .ht-work-head{position:absolute;z-index:2;top:clamp(92px,12svh,128px);left:50%;width:min(480px,90vw);transform:translateX(-50%);text-align:center}
+  .ht-work-head p.ht-drive{margin-top:10px}
+  .ht-work .ht-deck{position:absolute;z-index:1;margin:0;left:calc(77.5% - 80px);top:50%;width:min(330px,22vw);transform:translateY(-38%)}
+  .ht-work .ht-copy>p.ht-more{position:absolute;z-index:2;left:50%;bottom:clamp(28px,6svh,64px);transform:translateX(-50%);margin:0;justify-content:center}
+}
 /* Below the pile: the rest of the work, and the Lab. */
 .ht-copy>p.ht-more{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 0}
 .ht-more a{padding:6px 16px;border-radius:999px;border:1px solid var(--violet);color:var(--violet);font-size:.8rem;font-weight:600;transition:background .3s,color .3s}
@@ -239,7 +247,11 @@ html.ht-locked{overflow:hidden}
   .ht-list li.is-here,.ht-list:not(:has(.is-here)) li:first-child{display:block;transform:none}
   .ht-list b{font-size:16px}
   .ht-work.ht-pinned .ht-copy{justify-content:flex-end;padding:0 0 84px}
-  .ht-deck{height:236px;margin-top:14px;width:min(300px,100%)}
+  .ht-deck{height:236px;margin-top:14px;width:min(300px,100%);perspective:none}
+  .ht-deck li{transform:translateY(calc(var(--k) * 10px)) scale(calc(1 - var(--k) * .04))}
+  .ht-deck li.is-dealt{transform:translateX(-120%) translateY(40px) rotate(-14deg)}
+  .ht-deck a,.ht-deck li.is-here a:hover{transform:none;box-shadow:0 8px 24px rgba(0,0,0,.22)}
+  .ht-deck a:before{display:none}
   .ht-deck a{padding:8px 8px 0}
   .ht-deck-media{aspect-ratio:16/8}
   .ht-deck-text{padding:6px 2px 8px}
@@ -270,4 +282,5 @@ html.ht-locked{overflow:hidden}
 .ht.is-entered .ht-intro>:nth-child(3){animation-delay:1.7s}
 .ht.is-entered .ht-intro>:nth-child(4){animation-delay:1.85s}
 @media(prefers-reduced-motion:reduce){.ht-finish:after{animation:none}.ht-canvas{transition:none}
+  .ht-deck li,.ht-deck a{transition:none}
   .ht.is-entered .ht-home .ht-canvas,.ht.is-entered .ht-name,.ht.is-entered .ht-intro>*{animation:ht-show .4s ease both;animation-delay:0s!important}}

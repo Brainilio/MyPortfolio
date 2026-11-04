@@ -87,7 +87,7 @@ export default function Home() {
     sync(); queries.forEach(q => q.addEventListener("change", sync));
     return () => queries.forEach(q => q.removeEventListener("change", sync));
   }, []);
-  const pill = useRef(null), bar = useRef(null), deck = useRef(null);
+  const pill = useRef(null), bar = useRef(null);
   const zones = useRef([]), sky = useRef(null), copies = useRef([]);
   const { section, stop } = where;
   // Loading: every model is fetched up front (to warm the cache) while the dioramas are built one after another
@@ -159,9 +159,6 @@ export default function Home() {
       if (sky.current) sky.current.style.background = `linear-gradient(180deg,rgb(${colors[0]}) 0%,rgb(${colors[1]}) 50%,rgb(${colors[2]}) 100%)`;
       scene.current.live = live;scene.current.section = dominant;
       pill.current?.style.setProperty("--progress", scene.current.progress[dominant].toFixed(4));
-      // The Work deck deals with the scroll, resting a moment on each card.
-      const f = scene.current.progress[WORK] * (work.length - 1), whole = Math.min(work.length - 2, Math.floor(f)), t = f - whole;
-      deck.current?.style.setProperty("--f", (whole + clamp((t - .2) / .6) ** 2 * (3 - 2 * clamp((t - .2) / .6))).toFixed(4));
       bar.current?.style.setProperty("--progress", clamp(y / Math.max(1, document.documentElement.scrollHeight - vh)).toFixed(4));
       // If someone gets ahead of the background builds, build the neighbours now.
       setBuilt(was => was.some((b, i) => !b && Math.abs(i - dominant) <= 1) ? was.map((b, i) => b || Math.abs(i - dominant) <= 1) : was);
@@ -239,19 +236,22 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Work: the bison mesa on the left; on the right a pile of postcards, one per project. Scrolling tosses the top
-          one off toward the mesa and the next one, now on top, plays its preview. */}
-      <section className="ht-zone ht-work ht-pinned" id="work" data-side="left" style={{ "--steps": work.length }} ref={el => (zones.current[WORK] = el)} aria-labelledby="ht-work-title">
-        <div className="ht-stage">{built[WORK] && <WorkScene state={scene} slot={WORK} side="left" onReady={onReady(WORK)} />}</div>
+      {/* Work: the bison mesa in the middle, its heading above it, and the projects as a pile of cards floating in the air
+          off its right edge, angled in 3D like objects in the world. Each step of the scroll tosses the top card down onto
+          the prairie and the next one springs up into its place. */}
+      <section className="ht-zone ht-work ht-pinned" id="work" data-side="left" style={{ "--steps": work.length, "--step": "50svh" }} ref={el => (zones.current[WORK] = el)} aria-labelledby="ht-work-title">
+        <div className="ht-stage">{built[WORK] && <WorkScene state={scene} slot={WORK} side="center" onReady={onReady(WORK)} />}</div>
         <div className="ht-copy" ref={el => (copies.current[WORK] = el)}>
-          <h2 id="ht-work-title">Things I&apos;ve built<span>.</span></h2>
-          <p className="ht-drive">Click the basket to feed the herd</p>
-          <ol className="ht-deck" ref={deck} style={{ "--n": work.length }}>
+          <div className="ht-work-head">
+            <h2 id="ht-work-title">Things I&apos;ve built<span>.</span></h2>
+            <p className="ht-drive">Click the basket to feed the herd</p>
+          </div>
+          <ol className="ht-deck">
             {work.map((project, i) => {
-              const at = section === WORK ? stop : 0, here = at === i;
+              const at = section === WORK ? stop : 0, here = at === i, depth = i - at;
               return (
-                <li key={project.slug} style={{ "--i": i, zIndex: work.length - i }} className={here ? "is-here" : i < at - 1 ? "is-far" : undefined} aria-current={here ? "true" : undefined}>
-                  <a href={`/project/${project.slug}/`} onFocus={() => scrollToSection(WORK, i / Math.max(1, work.length - 1))}>
+                <li key={project.slug} style={{ "--k": Math.max(0, depth), zIndex: work.length - i }} className={here ? "is-here" : depth < 0 ? "is-dealt" : depth > 3 ? "is-far" : undefined} aria-current={here ? "true" : undefined}>
+                  <a href={`/project/${project.slug}/`} tabIndex={depth < 0 ? -1 : undefined} onFocus={() => scrollToSection(WORK, i / Math.max(1, work.length - 1))}>
                     <span className="ht-deck-media" aria-hidden="true">
                       {here && section === WORK && !still && project.previewVideo
                         ? <video src={project.previewVideo} poster={project.previewImage} autoPlay muted loop playsInline />
