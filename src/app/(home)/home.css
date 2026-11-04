@@ -323,3 +323,11 @@ html.ht-locked{overflow:hidden}
   .ht.is-entered .ht-home .ht-canvas,.ht.is-entered .ht-intro>*{animation:ht-show .4s ease both;animation-delay:0s!important}
   .ht.is-entered .ht-name-window,.ht.is-entered .ht-name{animation:none}
   .ht.is-entered .ht-name-window>span{animation:ht-show .4s ease both!important}}
+
+/* The Work section's scene tester (A·B·C·D), a small glass pill below the header. */
+.ht-tester{position:fixed;top:80px;left:24px;z-index:9999;display:flex;flex-direction:column;align-items:center;gap:4px}
+.ht-tester-pill{display:flex;gap:2px;padding:4px;border:1px solid rgba(255,255,255,.2);border-radius:999px;background:rgba(255,255,255,.12);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.ht-tester-pill button{width:32px;height:32px;border:0;border-radius:999px;background:transparent;color:#fff;font:600 .75rem/1 'Satoshi','Inter',sans-serif;cursor:pointer}
+.ht-tester-pill button[aria-pressed="true"]{background:rgba(255,255,255,.25)}
+.ht-tester-pill button:focus-visible{outline:2px solid #fff;outline-offset:1px}
+.ht-tester-label{font:500 .6rem/1 'Satoshi','Inter',sans-serif;color:#fff}

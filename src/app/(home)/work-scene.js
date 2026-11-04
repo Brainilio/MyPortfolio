@@ -10,6 +10,8 @@ import { random, createIsland, createSpin, tilted, createSwayingInstances, creat
 import { paintGeometry } from "./forest-parts";
 import { createBasket } from "./park-parts";
 import { createBisonRig, createBisonAnimator } from "./bison-rig";
+import { createMeadow } from "./work-meadow";
+import { createCowboy } from "./work-cowboy";
 
 // Work as the prairie in miniature, the island's golden-hour cousin: rolling prairie climbing to a mesa shelf at the
 // back, where flat-topped sandstone buttes stand (Monument Valley), rounded boulders at their feet, a small bison herd
@@ -38,7 +40,9 @@ const noRiver=()=>({d:99,t:0});
 // Mitten ~38% of the island's ~10.8 diameter tall at the back left; the East Mitten ~27% at the back right, sky between
 // them; the mesa ~13%, stretched wider than tall, mid-left in front. The right and the front stay open for the herd. Swells (x, z, radius, height);
 // the prairie dogs' mounds and the feed basket near the front.
-const BUTTES=[[-2,-2.6,"WestMitten",4.1,.3,1,1.1],[2.2,-2.6,"EastMitten",2.9,-.6,1,.95],[-3.2,.6,"Mesa",1.4,.9,1.7,1.2]];
+// Scene A of the scene tester pushes them all into the back third (the mesa back ~40% of the radius; the Mittens as far
+// as they go and still stand on the island), a backdrop, leaving the front two thirds to the herd.
+const BUTTES=[[-2,-3.45,"WestMitten",4.1,.3,1,1.1],[2.2,-3.45,"EastMitten",2.9,-.6,1,.95],[-3.3,-1.55,"Mesa",1.4,.9,1.7,1.2]];
 const footOf=b=>b[6];
 const SWELLS=[[-1.4,.5,1.7,.13],[1.9,.6,1.6,.11],[.1,2.9,1.4,.08]];
 const MOUNDS=[[2.4,1.3],[0,2.5],[-.6,3.15]],BASKET=new THREE.Vector3(1.1,0,2);
@@ -65,7 +69,11 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     const sun=new THREE.DirectionalLight("#ffc27a",3);sun.position.set(-10,7,-8);scene.add(sun);
     const fill=new THREE.DirectionalLight("#ffd9c2",.8);fill.position.set(6,5,10);scene.add(fill);
 
-    const world=new THREE.Group();scene.add(world);
+    // The scene tester (A·B·C·D, home.js): each scene is built up front and switching only flips visibility. A is this
+    // island (world); B, the Yellowstone meadow (work-meadow.js); C, the cowboy on the open prairie, a scene and camera
+    // of its own (work-cowboy.js); D, only the sky's sun, clouds and birds. The birds fly in A, B and D.
+    const world=new THREE.Group();world.userData.scene="A";scene.add(world);
+    const flock=new THREE.Group();flock.userData.scene="ABD";scene.add(flock);
     const island=createIsland(13,{outline,heightAt,riverDistance:noRiver,depth:.85,hub:new THREE.Vector2(-1.1,-3.3),scatter:.8,grass:["#b89a52","#c4a65a","#a98d4c"],edge:"#9a7c46"});world.add(island.group);
     const on=(x,z,lift=0)=>new THREE.Vector3(x,heightAt(x,z)+lift,z);
     // The buttes: each model's faces recoloured by which way they face, in three sandstone tones: sun-bleached tops,
@@ -187,9 +195,13 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       const reeds=[];for(let k=0;k<9;k++){const a=-.6+k*.32+rng()*.2,r=POND.r*(.95+rng()*.2);
         reeds.push({position:on(POND.x+Math.cos(a)*r*1.05,POND.z+Math.sin(a)*r*.85),rotation:rng()*6,scale:(.05+rng()*.035)});}
       const set=createSwayingInstances(paintGeometry(new THREE.ConeGeometry(.22,3,4).translate(0,1.5,0),"#7f8f4a"),reeds,foliage);bushes.push(set);world.add(set.mesh);}
+    // Scene B, the meadow, spinning with the island; scene C, the cowboy, in a scene of its own.
+    const meadow=createMeadow({outline,foliage,loader:new GLTFLoader().setMeshoptDecoder(MeshoptDecoder),onLoad:()=>{needsRender=true;}});
+    meadow.group.userData.scene="B";meadow.group.visible=false;scene.add(meadow.group);bushes.push(meadow.swaying);
+    const cowboy=createCowboy();
     // A few birds wheeling high over the Mittens.
     const birdMaterial=new THREE.MeshStandardMaterial({color:"#3b2b33",flatShading:true,roughness:1,side:THREE.DoubleSide});
-    const birds=Array.from({length:5},(_,i)=>{const bird=createBird(birdMaterial);bird.scale.setScalar(.9);Object.assign(bird.userData,{a:i/5*Math.PI*2,r:2.2+(i%3)*.7,h:6.4+(i%2)*.8,speed:.28+(i%4)*.05,flap:i*1.7});world.add(bird);return bird;});
+    const birds=Array.from({length:5},(_,i)=>{const bird=createBird(birdMaterial);bird.scale.setScalar(.9);Object.assign(bird.userData,{a:i/5*Math.PI*2,r:2.2+(i%3)*.7,h:6.4+(i%2)*.8,speed:.28+(i%4)*.05,flap:i*1.7});flock.add(bird);return bird;});
     const ahead=new THREE.Vector3();
     // Sunrise: you've come from a night by the campfire, so as the section scrolls on, the sun climbs out from behind
     // the mesa (deep orange low down, paler gold as it rises), its light warming the scene with it. It sits in the
@@ -200,7 +212,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       g.fillStyle=grad;g.fillRect(0,0,256,256);}
     const sunTexture=new THREE.CanvasTexture(sunCanvas);sunTexture.colorSpace=THREE.SRGBColorSpace;
     const sunDisc=new THREE.Sprite(new THREE.SpriteMaterial({map:sunTexture,color:"#ffffff",transparent:true,depthWrite:false,fog:false,toneMapped:false}));
-    sunDisc.scale.setScalar(16);sunDisc.renderOrder=-1;scene.add(sunDisc);
+    sunDisc.scale.setScalar(16);sunDisc.renderOrder=-1;scene.add(camera);camera.add(sunDisc);
     const LOW=new THREE.Color("#ff8a4c"),HIGH=new THREE.Color("#fff2d6");let risen=-1;
     // A few warm clouds drifting round the mesa, lit pink and gold from below.
     const clouds=[[7.5,2.6,.8,0],[8.5,3.6,.65,1.7],[9,1.6,.7,3.4],[8,4.4,.55,4.8]].map(([r,y,k,a],i)=>{
@@ -257,11 +269,13 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     // mother) never more than a body length and a half from her. The rig and the animation are in bison-rig.js; this
     // decides where each one goes and what it's doing.
     const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder),herd=[],LIMIT=.72,SIZES=[.98,.9,.82,.93];let leash=1;
-    const inside=(x,z,pad=.55)=>Math.hypot(x,z)<outline(Math.atan2(z,x))*LIMIT&&!blocked(x,z,pad);
+    // The ground and obstacles of whichever island the herd is on (A's prairie or B's meadow).
+    const PRAIRIE={height:heightAt,blocked,pond:POND,home:null},MEADOW={height:meadow.height,blocked:meadow.blocked,pond:null};let layout=PRAIRIE;
+    const inside=(x,z,pad=.55)=>Math.hypot(x,z)<outline(Math.atan2(z,x))*LIMIT&&!layout.blocked(x,z,pad);
     loader.load("/models/island/bison.glb",gltf=>{
       if(disposed)return;
       const box=new THREE.Box3().setFromObject(gltf.scene),size=box.getSize(new THREE.Vector3());
-      const spots=[[-.2,.6],[.6,-.7],[1.4,1.0],[-.6,1.8],[.25,1.05]];
+      const spots=[[-.2,.6],[.6,-.7],[1.4,1.0],[-.6,1.8],[.25,1.05]];PRAIRIE.spots=spots;
       spots.forEach(([x,z],i)=>{
         const calf=i===spots.length-1,model=i?gltf.scene.clone():gltf.scene,root=new THREE.Group();let rig=null;
         model.traverse(o=>{if(!o.isMesh)return;
@@ -278,7 +292,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       });
       // The calf stays within a body length and a half (of its mother's) of her.
       leash=herd[0].length*1.5;
-      needsRender=true;
+      settleHerd();needsRender=true;
     },undefined,()=>{});
     // Feeding time: the standing bison look up (alarm), brace, then trot over and stand round the far side of the
     // basket; the calf notices a moment after its mother. Bison lying down stay down.
@@ -302,7 +316,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
           // A dust bath: down, a few rolls onto its side with the legs kicking, then back up.
           b.state="rest";b.resting=true;b.wallowing=true;b.restUntil=now+9;}
         else if(!b.calf&&r<.18&&herd.filter(o=>o.resting).length<2){b.state="rest";b.resting=true;b.restUntil=now+30+Math.random()*40;}
-        else if(!b.calf&&r<.35&&!herd.some(o=>o.drink)){
+        else if(!b.calf&&r<.35&&layout.pond&&!herd.some(o=>o.drink)){
           // A drink at the watering hole, from whichever side it's on (its muzzle just reaching the water).
           const a=Math.atan2(p.z-POND.z,p.x-POND.x),d=POND.r+b.length*.42;b.target.set(POND.x+Math.cos(a)*d,POND.z+Math.sin(a)*d);
           b.drink=true;b.state="move";b.gait="walk";
@@ -340,7 +354,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       if(b.calf&&!b.feeding&&mother){const m=mother.root.position,away=Math.hypot(p.x-m.x,p.z-m.z);
         if(away>leash&&(b.state!=="move"||Math.hypot(b.target.x-m.x,b.target.y-m.z)>leash*.8)){
           const a=Math.atan2(p.z-m.z,p.x-m.x);b.target.set(m.x+Math.cos(a)*leash*.5,m.z+Math.sin(a)*leash*.5);
-          const off=Math.hypot(b.target.x-POND.x,b.target.y-POND.z);if(off<POND.r+b.radius){const k=(POND.r+b.radius+.05)/Math.max(off,1e-3);b.target.set(POND.x+(b.target.x-POND.x)*k,POND.z+(b.target.y-POND.z)*k);}
+          const off=Math.hypot(b.target.x-POND.x,b.target.y-POND.z);if(layout.pond&&off<POND.r+b.radius){const k=(POND.r+b.radius+.05)/Math.max(off,1e-3);b.target.set(POND.x+(b.target.x-POND.x)*k,POND.z+(b.target.y-POND.z)*k);}
           if(b.state!=="move")b.startAt=now+.3;b.state="move";b.gait=away>leash*1.3?"gallop":"trot";}}
       if(b.face!==null){let turn=b.face-b.yaw;turn=Math.atan2(Math.sin(turn),Math.cos(turn));b.yaw+=turn*(1-Math.exp(-dt*3));}
       // Big bodies never overlap: pushed apart from any neighbour that's too close (all the way if the other is lying
@@ -349,7 +363,23 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
         if(d<min&&d>1e-4&&!b.resting){const push=(min-d)*(o.resting?1:.5)*Math.min(1,dt*10);p.x+=dx/d*push;p.z+=dz/d*push;}}
       b.anim.update(dt,{moving:b.state==="move"&&now>=b.startAt&&b.anim.state.rest<.05,gait:b.gait,eating:b.state==="eat",resting:b.resting,alarmed:now<b.alarmUntil,wallow:!!b.wallowing});
       if(b.anim.state.dust>.05)emitDust(b,b.anim.state.dust,dt);
-      p.y=heightAt(p.x,p.z);b.root.rotation.y=b.yaw;
+      p.y=layout.height(p.x,p.z);b.root.rotation.y=b.yaw;
+    }
+    // Moving between A and B, the herd goes along: back to its starting spots on the new island, all standing and
+    // grazing (the one that starts lying down lies down again).
+    let variant="A",herdOn=world,stageEntry=null;
+    function settleHerd(){
+      const target=variant==="B"?meadow.group:world,next=variant==="B"?MEADOW:PRAIRIE;if(herdOn===target||!herd.length)return;
+      herdOn=target;layout=next;const spots=variant==="B"?meadow.spots:PRAIRIE.spots;
+      herd.forEach((b,i)=>{const [x,z]=spots[i];target.add(b.root);b.root.position.set(x,layout.height(x,z),z);b.target.set(x,z);
+        Object.assign(b,{state:i===2?"rest":"graze",timer:1+Math.random()*3,feeding:false,drink:false,face:null,wallowing:false,resting:i===2,restUntil:i===2?time+40:0,alarmUntil:0,startAt:0});});
+    }
+    function setVariant(v){
+      variant=v;world.visible=v==="A";meadow.group.visible=v==="B";flock.visible=v!=="C";
+      // B's sun is low on the left, lighting the scene from that side.
+      if(v==="B")sun.position.set(-12,6,2);else sun.position.set(-10,7,-8);
+      if(stageEntry){stageEntry.scene=v==="C"?cowboy.scene:scene;stageEntry.camera=v==="C"?cowboy.camera:camera;}
+      settleHerd();frame();shared_.invalidate();
     }
     // Prairie dogs pop up from their mounds, look about, and duck back down.
     const dogs=[];
@@ -379,11 +409,12 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     const raycaster=new THREE.Raycaster(),ndc=new THREE.Vector2();let onBasket=false;
     const pick=(event,objects)=>{const rect=canvas.getBoundingClientRect();ndc.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(ndc,camera);return raycaster.intersectObjects(objects,true)[0];};
     const spin=createSpin(canvas,{rest:0,
-      over:event=>(onBasket=!!pick(event,[basket,hay]))||!!pick(event,dogs.map(d=>d.root))||!!pick(event,herd.map(b=>b.root)),
+      over:event=>variant==='A'&&((onBasket=!!pick(event,[basket,hay]))||!!pick(event,dogs.map(d=>d.root)))||(variant==='A'||variant==='B')&&!!pick(event,herd.map(b=>b.root)),
       onTap:event=>{
-        if(pick(event,[basket,hay])){pour();return;}
+        if(variant!=='A'&&variant!=='B')return;
+        if(variant==='A'&&pick(event,[basket,hay])){pour();return;}
         const owner=(hit,list)=>list.find(x=>{let o=hit.object;while(o&&o!==x.root)o=o.parent;return o===x.root;});
-        const hit=pick(event,dogs.map(d=>d.root));
+        const hit=variant==='A'&&pick(event,dogs.map(d=>d.root));
         if(hit){const dog=owner(hit,dogs);if(dog){dog.state="down";dog.timer=3+rng()*3;needsRender=true;}return;}
         // Tap a bison and it startles: head up, tail up, a brace.
         const struck=pick(event,herd.map(b=>b.root));if(struck){const b=owner(struck,herd);if(b){tapBison(b);needsRender=true;}}
@@ -393,7 +424,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     // Brushing through the tumbleweed kicks it the way the cursor was going.
     const hover=new THREE.Vector3(),lastHover=new THREE.Vector3();let hoverX=0,hoverY=0,hoverAt=0,hadHover=false;
     function onHover(event){
-      if(event.pointerType!=="mouse"||event.buttons||preference.matches)return;
+      if(event.pointerType!=="mouse"||event.buttons||preference.matches||variant!=="A")return;
       const now=performance.now(),speed=Math.hypot(event.clientX-hoverX,event.clientY-hoverY)/Math.max(16,now-hoverAt);hoverX=event.clientX;hoverY=event.clientY;hoverAt=now;
       const hit=pick(event,[island.surface,tumbleweed]),kick=Math.min(1,speed*.9);if(!hit){hadHover=false;return;}
       lastHover.copy(hover);world.worldToLocal(hover.copy(hit.point));
@@ -406,12 +437,14 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     canvas.addEventListener("pointermove",onHover);
 
     // Framing: the mesa to one side (the words scroll past on the other), further off when tall.
-    let tall=false,attitude=0;const VIEW=new THREE.Vector3(0,.34,1).normalize(),focus=new THREE.Vector3(0,.9,0),viewDir=new THREE.Vector3();
+    // Every scene in the tester is seen from 38° above the horizontal.
+    const ELEVATION=38;
+    let tall=false,attitude=0;const VIEW=new THREE.Vector3(0,Math.tan(ELEVATION*Math.PI/180),1).normalize(),focus=new THREE.Vector3(0,.9,0),viewDir=new THREE.Vector3();
     // The camera sits on an orbit round the mesa; only its attitude (steeper arriving, lower leaving) changes.
     let closeUp=null;// (?debug only: { from, at } to inspect something up close)
     function placeCamera(){if(closeUp){camera.position.copy(closeUp.from);camera.lookAt(closeUp.at);return;}camera.position.copy(tilted(VIEW,attitude,viewDir)).multiplyScalar(tall?60:27).add(focus);camera.lookAt(focus);}
     function frame(){
-      const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;tall=camera.aspect<.85;
+      const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;tall=camera.aspect<.85;cowboy.frame(w,h);
       if(tall)camera.setViewOffset(w,h,0,h*.2,w,h);else camera.setViewOffset(w,h,side==="center"?0:(side==="left"?.17:-.17)*w,side==="center"?-h*.13:h*.07,w,h);
       camera.updateProjectionMatrix();placeCamera();needsRender=true;
     }
@@ -421,25 +454,28 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     let time=0,since=0,needsRender=true;
     function tick(dt){
       const reduced=preference.matches,step=reduced?0:dt;time+=step;
+      const wanted=state.current.workVariant??"A";if(wanted!==variant)setVariant(wanted);
+      // C: only the cowboy (always moving, so drawn at full rate).
+      if(variant==="C"){cowboy.update(step);needsRender=false;return !reduced;}
       const falling=updatePellets(dt);
       // Food drains while the herd eats.
       if(herd.some(b=>b.state==="eat"))food=Math.max(0,food-dt*.12);
       basket.rotation.z=onBasket&&!reduced?Math.sin(time*9)*.04:0;
       world.rotation.y=spin.update(dt);
       const goal=reduced?0:state.current.tilt[slot];attitude+=(goal-attitude)*(1-Math.exp(-dt*6));placeCamera();
-      herd.forEach(b=>updateBison(b,step,time));dogs.forEach(d=>updateDog(d,step));
-      const dusty=updateDust(step);
+      if(variant!=="D")herd.forEach(b=>updateBison(b,step,time));dogs.forEach(d=>updateDog(d,step));
+      const dusty=variant==="D"?false:updateDust(step);
       const rolling=updateTumble(step),windy=reduced?false:updateWind(step);
-      world.position.y=Math.sin(time*.45)*.1;
+      world.position.y=Math.sin(time*.45)*.1;meadow.group.rotation.y=flock.rotation.y=world.rotation.y;meadow.group.position.y=flock.position.y=world.position.y;meadow.update(time);
       // The sun's climb follows the scroll through the section (reduced motion: already up).
       const rise=reduced?1:smooth(state.current.progress[slot]/.75);
-      if(Math.abs(rise-risen)>1e-3){risen=rise;sunDisc.position.set(-15+rise*2,-4+rise*9,-32);sunDisc.material.color.copy(LOW).lerp(HIGH,rise);
+      if(Math.abs(rise-risen)>1e-3){risen=rise;sunDisc.position.set(-15+rise*2,-6+rise*9,-40);sunDisc.material.color.copy(LOW).lerp(HIGH,rise);
         sun.intensity=1.8+rise*1.4;sun.color.copy(LOW).lerp(HIGH,rise*.8);}
       clouds.forEach(cloud=>{const u=cloud.userData;u.a+=step*u.speed;cloud.position.set(Math.cos(u.a)*u.r,u.y+Math.sin(time*.2+u.r)*.2,-Math.abs(Math.sin(u.a))*u.r-1.5);});
       shared.uTime.value=time;shared.uBreeze.value=reduced?0:.3;shared.uGust.value=reduced?0:.3+gustPower*.9;
       for(const set of bushes){for(let i=0;i<set.sway.length;i++)set.sway[i]*=Math.exp(-dt*2.2);set.update();}
       birds.forEach(bird=>{const u=bird.userData;u.a+=step*u.speed;const x=-.2+Math.cos(u.a)*u.r,z=-2+Math.sin(u.a)*u.r,y=u.h+Math.sin(time*.8+u.flap)*.25;
-        bird.position.set(x,y,z);bird.lookAt(world.localToWorld(ahead.set(-.2+Math.cos(u.a+.2)*u.r,y,-2+Math.sin(u.a+.2)*u.r)));
+        bird.position.set(x,y,z);bird.lookAt(flock.localToWorld(ahead.set(-.2+Math.cos(u.a+.2)*u.r,y,-2+Math.sin(u.a+.2)*u.r)));
         const flap=Math.sin(time*8+u.flap)*.7;u.wings[0].rotation.z=flap;u.wings[1].rotation.z=-flap;});
       needsRender=false;
       return falling||rolling||windy||dusty||onBasket||spin.busy||herd.some(b=>(b.feeding&&b.state==="move")||b.alarmUntil>time)||Math.abs(goal-attitude)>.05||bushes.some(set=>set.sway.some(v=>v>.003));
@@ -456,17 +492,17 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     }
     frame();tick(0);mount.dataset.ready="true";
     // On wide screens it fades out toward the words beside it.
-    const entry={mount,scene,camera,draw,exposure:1.05,fade:null},unregister=shared_.register(entry);
+    const entry={mount,scene,camera,draw,exposure:1.05,fade:null},unregister=shared_.register(entry);stageEntry=entry;setVariant(variant);
     const wide=matchMedia("(min-width: 761px)"),syncFade=()=>{entry.fade=wide.matches?{side:"right",from:.75}:null;shared_.invalidate();};
     syncFade();wide.addEventListener("change",syncFade);
     const readyTimer=setTimeout(()=>ready.current?.(),0);
-    if(new URLSearchParams(window.location.search).has("debug"))window.__work={camera,herd,world,scene,renderer,pour,THREE,tumble,tumbleweed,kickTumble,gust:()=>{gustIn=0;},closeUp:v=>{closeUp=v;}};
+    if(new URLSearchParams(window.location.search).has("debug"))window.__work={camera,herd,world,scene,renderer,pour,THREE,tumble,tumbleweed,kickTumble,gust:()=>{gustIn=0;},closeUp:v=>{closeUp=v;},cowboy,meadow,variant:v=>{state.current.workVariant=v;}};
 
     return()=>{
       clearTimeout(readyTimer);delete window.__work;disposed=true;unregister();wide.removeEventListener("change",syncFade);resize.disconnect();observer.disconnect();
       spin.dispose();canvas.removeEventListener("pointermove",onHover);
       scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat())m?.dispose();});
-      sunTexture.dispose();
+      sunTexture.dispose();cowboy.dispose();
       
     };
   },[state,slot]);

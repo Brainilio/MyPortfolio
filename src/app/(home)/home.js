@@ -50,6 +50,8 @@ const ARRIVE = 14, DEPART = 10;
 // Which slot each scene reads in the shared scroll state.
 const ABOUT = 1, WORK = 2, SKILLS_AT = 3, CONTACT = 4;
 const clamp = v => Math.min(1, Math.max(0, v));
+// The Work section's scene tester: which 3D scene its island shows (work-scene.js builds all four up front).
+const WORK_SCENES = { A: "Current fixed", B: "Yellowstone", C: "Cowboy", D: "Sky only" };
 
 // The contact form posts to Formspree with fetch, so the card stays put and thanks you in place.
 // Replace REPLACE_WITH_ID with your Formspree form ID from formspree.io; until then the form says to email instead.
@@ -107,6 +109,8 @@ export default function Home() {
   // Shared with the 3D scenes (read every frame): which sections are on screen and how far through each one we are.
   const scene = useRef({ section: 0, live: [0], progress: [0, 0, 0, 0, 0], tilt: [0, 0, 0, 0, 0] });
   const [spotted, setSpotted] = useState([]), [still, setStill] = useState(false);
+  const [workScene, setWorkScene] = useState("A");
+  useEffect(() => { scene.current.workVariant = workScene; }, [workScene]);
   // Reduced motion, and phones: the Work postcard shows its still image instead of playing its preview.
   useEffect(() => {
     const queries = [matchMedia("(prefers-reduced-motion: reduce)"), matchMedia("(max-width: 760px)")], sync = () => setStill(queries.some(q => q.matches));
@@ -337,6 +341,15 @@ export default function Home() {
       </div>
 
       <div className="ht-progress" ref={bar} aria-hidden="true" />
+      {/* The Work scene tester: shown only while Work is the section on screen. */}
+      {section === WORK && (
+        <div className="ht-tester">
+          <div className="ht-tester-pill" role="group" aria-label="Work scene">
+            {Object.keys(WORK_SCENES).map(key => <button key={key} type="button" aria-pressed={workScene === key} title={WORK_SCENES[key]} onClick={() => setWorkScene(key)}>{key}</button>)}
+          </div>
+          <span className="ht-tester-label">{WORK_SCENES[workScene]}</span>
+        </div>
+      )}
       {/* Where you are, and a way to jump anywhere. */}
       <nav className="ht-pill" aria-label="Sections" ref={pill}>
         <button type="button" aria-expanded={menu} onClick={() => setMenu(open => !open)}>
