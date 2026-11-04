@@ -42,9 +42,10 @@ const SKY = [
 ].map(stops => stops.map(hex => [1, 3, 5].map(k => parseInt(hex.slice(k, k + 2), 16))));
 const mix = (a, b, t) => a.map((c, k) => Math.round(c + (b[k] - c) * t));
 // Between About, Work, Skills and Contact the page holds a beat of open sky: each of those sections runs on for TAIL
-// screen-heights after its own scroll is done. Its island fades out over FADE of that, the sky alone holds for the
-// rest, and the next island starts in once 30% of its section is on screen. The skies blend across the beat.
-const TAIL = .6, FADE = .45, ENTER = .7, RISE = .55, ARRIVE = 14, DEPART = 10;
+// screen-heights after its own scroll is done. Its island fades out over FADE (running into the next section's
+// approach), a quarter screen of sky alone follows with a line of motes drifting across it, and the next island starts
+// in once 30% of its section is on screen.
+const TAIL = .4, FADE = .45, ENTER = .7, RISE = .55, ARRIVE = 14, DEPART = 10;
 const tailOf = i => (i > 0 && i < 4 ? TAIL : 0);
 // Which slot each scene reads in the shared scroll state.
 const ABOUT = 1, WORK = 2, SKILLS_AT = 3, CONTACT = 4;
@@ -76,6 +77,32 @@ function ContactForm() {
   );
 }
 
+// Between the worlds: a loose line of ten faint motes drifting left to right across the open sky (4 s a crossing),
+// shown only while no island is on screen (strength 0 → 1, set from the scroll). Its own frame loop runs only then.
+function useMotes(canvasRef) {
+  const strength = useRef(0), frame = useRef(0);
+  const start = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || frame.current || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const g = canvas.getContext("2d"), seeds = Array.from({ length: 10 }, (_, i) => ({ at: i / 10 + Math.random() * .05, y: (Math.random() - .5) * 60, wobble: Math.random() * 6, speed: .9 + Math.random() * .2 }));
+    const draw = now => {
+      const k = strength.current, ratio = Math.min(devicePixelRatio, 1.5), w = innerWidth, h = innerHeight;
+      if (canvas.width !== Math.round(w * ratio)) { canvas.width = Math.round(w * ratio); canvas.height = Math.round(h * ratio); }
+      g.setTransform(ratio, 0, 0, ratio, 0, 0); g.clearRect(0, 0, w, h);
+      if (k < .01) { frame.current = 0; return; }
+      g.fillStyle = `rgba(255,255,255,${(.15 * k).toFixed(3)})`;
+      for (const m of seeds) {
+        const x = ((now / 4000) * m.speed + m.at) % 1 * (w + 40) - 20, y = h * .5 + m.y + Math.sin(now / 900 + m.wobble) * 10;
+        g.beginPath(); g.arc(x, y, 1.5, 0, Math.PI * 2); g.fill();
+      }
+      frame.current = requestAnimationFrame(draw);
+    };
+    frame.current = requestAnimationFrame(draw);
+  }, [canvasRef]);
+  useEffect(() => () => cancelAnimationFrame(frame.current), []);
+  return { strength, start };
+}
+
 export default function Home() {
   const [where, setWhere] = useState({ section: 0, stop: 0 }), [menu, setMenu] = useState(false);
   // Shared with the 3D scenes (read every frame): which sections are on screen and how far through each one we are.
@@ -88,7 +115,7 @@ export default function Home() {
     return () => queries.forEach(q => q.removeEventListener("change", sync));
   }, []);
   const pill = useRef(null), bar = useRef(null);
-  const zones = useRef([]), sky = useRef(null), copies = useRef([]);
+  const zones = useRef([]), sky = useRef(null), copies = useRef([]), moteCanvas = useRef(null), motes = useMotes(moteCanvas);
   const { section, stop } = where;
   // Loading: every model is fetched up front (to warm the cache) while the dioramas are built one after another
   // behind the loading screen, each as soon as the previous one reports it's ready. The screen lifts when all are
@@ -131,7 +158,7 @@ export default function Home() {
       frame = 0;
       const y = window.scrollY, vh = window.innerHeight, middle = y + vh / 2, live = [];
       let dominant = 0;
-      const stops = [];
+      const stops = [];let shown = 0;
       zones.current.forEach((el, i) => {
         if (!el) return;
         const top = el.offsetTop, height = el.offsetHeight, run = Math.max(1, height - vh * (1 + tailOf(i)));
@@ -144,6 +171,7 @@ export default function Home() {
         if (stage) {
           const enter = i ? clamp((y - (top - vh * ENTER)) / (vh * RISE)) : 1;
           const leave = i === 0 ? clamp((top + height - y - vh * .5) / (vh * .55)) : tailOf(i) ? clamp((top + run + vh * FADE - y) / (vh * FADE)) : 1, o = Math.min(enter, leave);
+          if (top < y + vh && top + height > y) shown = Math.max(shown, o);
           stage.style.opacity = o.toFixed(3);stage.style.transform = o < 1 ? `scale(${(enter < leave ? .94 + o * .06 : .92 + o * .08).toFixed(4)})` : "";
           // The camera's attitude (degrees from its resting angle, the scenes ease toward it): steeper as an island
           // arrives, as if coming in from above, and lower as it leaves, looking back up at it as you pass.
@@ -157,6 +185,7 @@ export default function Home() {
       let k = 0; while (k < marks.length - 2 && p > marks[k + 1]) k++;
       const blend = clamp((p - marks[k]) / Math.max(1e-6, marks[k + 1] - marks[k])), colors = SKY[k].map((c, n) => mix(c, SKY[k + 1][n], blend));
       if (sky.current) sky.current.style.background = `linear-gradient(180deg,rgb(${colors[0]}) 0%,rgb(${colors[1]}) 50%,rgb(${colors[2]}) 100%)`;
+      motes.strength.current = clamp(1 - shown * 1.4);if (motes.strength.current > .01) motes.start();
       scene.current.live = live;scene.current.section = dominant;
       pill.current?.style.setProperty("--progress", scene.current.progress[dominant].toFixed(4));
       bar.current?.style.setProperty("--progress", clamp(y / Math.max(1, document.documentElement.scrollHeight - vh)).toFixed(4));
@@ -193,7 +222,7 @@ export default function Home() {
 
   return (
     <main className={`ht${loaded ? " is-entered" : ""}`} data-section={SECTIONS[section].id}>
-      <div className="ht-skies" aria-hidden="true"><div className="ht-sky-live" ref={sky} /></div>
+      <div className="ht-skies" aria-hidden="true"><div className="ht-sky-live" ref={sky} /><canvas className="ht-motes" ref={moteCanvas} /></div>
       <div className="ht-finish" aria-hidden="true" />
       <header className="ht-header">
         <a href="#" className="ht-wordmark" onClick={event => { event.preventDefault(); jump(0); }}>Brainilio<span>.</span></a>
