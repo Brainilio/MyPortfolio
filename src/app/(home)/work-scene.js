@@ -44,7 +44,7 @@ const footOf=b=>b[6];
 const SWELLS=[[-1.4,.5,1.7,.13],[1.9,.6,1.6,.11],[.1,2.9,1.4,.08]];
 const MOUNDS=[[2.4,1.3],[0,2.5],[-.6,3.15]],BASKET=new THREE.Vector3(1.1,0,2);
 // A small watering hole on the open right of the prairie, where the herd wanders over now and then to drink.
-const POND={x:2.6,z:-.25,r:.7};
+const POND={x:2.4,z:-.2,r:.95};
 const blocked=(x,z,pad)=>BUTTES.some(b=>Math.hypot(x-b[0],z-b[1])<footOf(b)+pad)||Math.hypot(x-BASKET.x,z-BASKET.z)<pad+.3||Math.hypot(x-POND.x,z-POND.z)<POND.r+pad;
 
 export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
@@ -163,45 +163,16 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       const d=Math.hypot(dx,dz)||1,v=tumble.vel,push=Math.min(2.6,strength*2.2);
       v.x+=dx/d*push;v.y+=dz/d*push;if(v.length()>3)v.setLength(3);tumble.hop=Math.max(tumble.hop,.9+push*.5);tumble.gust=7+rng()*8;
     }
-    // Wind: a steady breeze through the sage, and every few seconds a gust you can see: a little 3D whirl of air in the
-    // tumbleweed's straw tones (two pale ribbons corkscrewing round each other, a few loose stems tumbling along inside)
-    // that sweeps across the island from the back left. Each ribbon is a helix-shaped tube revealed along its length
-    // (a sliding window of its triangles), so the whirl draws itself in at the front and unwinds at the back. The sage
-    // leans hard as it passes, and it often shoves the tumbleweed.
-    const SEGMENTS=90,RADIAL=4,LENGTH=3.2,TURNS=2.6;
-    const helix=phase=>new THREE.CatmullRomCurve3(Array.from({length:40},(_,k)=>{const t=k/39,r=.22*Math.sin(Math.PI*Math.min(1,t*1.15))+.04,a=t*TURNS*Math.PI*2+phase;
-      return new THREE.Vector3(t*LENGTH,Math.sin(a)*r+Math.sin(t*Math.PI)*.18,Math.cos(a)*r);}));
-    const ribbonMaterials=["#ead6aa","#d2b27a"].map(c=>new THREE.MeshLambertMaterial({color:c,flatShading:true,transparent:true,opacity:0,depthWrite:false}));
-    const stemGeometry=new THREE.TorusGeometry(.08,.013,3,6,Math.PI*1.2),stemMaterial=new THREE.MeshLambertMaterial({color:"#b8935a",flatShading:true,transparent:true,opacity:0});
-    const gusts=Array.from({length:2},()=>{
-      const group=new THREE.Group();group.visible=false;world.add(group);
-      const ribbons=[0,Math.PI].map((phase,k)=>{const m=new THREE.Mesh(new THREE.TubeGeometry(helix(phase),SEGMENTS,.03,RADIAL,false),ribbonMaterials[k]);group.add(m);return m;});
-      const curve=helix(Math.PI/2),stems=Array.from({length:5},(_,k)=>{const m=new THREE.Mesh(stemGeometry,stemMaterial);m.userData={lag:k*.06,spin:new THREE.Vector3(2+rng()*4,3+rng()*4,1+rng()*3)};group.add(m);return m;});
-      return {group,ribbons,stems,curve,t:-1,life:2};});
-    let gustIn=2,gustPower=0;const at=new THREE.Vector3();
+    // Wind: a steady breeze through the sage, and every few seconds a gust that rolls across the island (the bushes and
+    // reeds lean hard as it passes) and often shoves the tumbleweed.
+    let gustIn=2,gustPower=0;
     function updateWind(dt){
       if((gustIn-=dt)<=0){
-        gustIn=3.5+rng()*4;const g=gusts.find(x=>x.t<0);
-        if(g){g.t=0;g.life=2+rng()*.6;g.group.visible=true;
-          // From the back left (where the light comes from) toward the front right, a little above the grass.
-          const x=-4.2+rng()*1.2,z=-1.2+rng()*2.8,k=1.05+rng()*.35;g.group.position.set(x,heightAt(x,z)+.25+rng()*.35,z);
-          g.group.rotation.set(0,-.25-rng()*.35,0);g.group.scale.setScalar(k);g.roll=rng()*6;}
-        gustPower=1;
+        gustIn=3.5+rng()*4;gustPower=1;
         if(rng()<.6){tumble.vel.x+=.5+rng()*.5;tumble.vel.y+=(rng()-.3)*.4;tumble.hop=Math.max(tumble.hop,.8);}
       }
       gustPower=Math.max(0,gustPower-dt*.5);
-      let showing=false;
-      for(const g of gusts){if(g.t<0)continue;g.t+=dt;const u=g.t/g.life;
-        if(u>=1){g.t=-1;g.group.visible=false;continue;}showing=true;
-        // Head races ahead, the tail follows; the whirl also drifts with the wind and spins slowly about its path.
-        const head=Math.min(1,u*1.45),tail=Math.max(0,u*1.45-.5),per=RADIAL*6,fade=Math.min(1,u*5)*Math.min(1,(1-u)*4);
-        for(const r of g.ribbons)r.geometry.setDrawRange(Math.floor(tail*SEGMENTS)*per,Math.max(0,Math.ceil((head-tail)*SEGMENTS))*per);
-        ribbonMaterials[0].opacity=.92*fade;ribbonMaterials[1].opacity=.85*fade;stemMaterial.opacity=fade;
-        g.group.position.x+=dt*.9;
-        for(const m of g.stems){const q=Math.max(0,Math.min(1,head-.06-m.userData.lag));g.curve.getPointAt(q,at);m.position.copy(at);
-          const sp=m.userData.spin;m.rotation.set(g.t*sp.x,g.t*sp.y,g.t*sp.z);m.visible=q>tail;}
-      }
-      return showing||gustPower>.01;
+      return gustPower>.01;
     }
     // The watering hole: a shallow pool sunk in its bowl, a muddy rim, and a few reeds that sway with the sage.
     // (The water's level comes from the ground mesh itself, which is coarser than the bowl: just below the lowest
@@ -269,7 +240,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     loader.load("/models/island/bison.glb",gltf=>{
       if(disposed)return;
       const box=new THREE.Box3().setFromObject(gltf.scene),size=box.getSize(new THREE.Vector3());
-      const spots=[[.2,.5],[.5,-.4],[1.8,.6],[-.3,1.5],[.5,.85]];
+      const spots=[[.2,.5],[.5,-.4],[1.5,.9],[-.3,1.5],[.5,.85]];
       // The calf keeps within a length and a half of its mother's width of her.
       leash=Math.max(.32,1.5*size.x*.55/size.y);
       spots.forEach(([x,z],i)=>{
@@ -296,7 +267,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       if(b.state==="eat"){if(now>b.eatUntil){b.state="graze";b.feeding=false;b.drink=false;b.face=null;b.timer=0;}}
       else if(b.state==="graze"&&b.timer<=0&&!b.calf&&rng()<.3&&!herd.some(o=>o.drink)){
         // Now and then one wanders over to the watering hole for a drink, from whichever side it's on.
-        const a=Math.atan2(p.z-POND.z,p.x-POND.x);b.target.set(POND.x+Math.cos(a)*(POND.r+.28),POND.z+Math.sin(a)*(POND.r+.28));
+        const a=Math.atan2(p.z-POND.z,p.x-POND.x);b.target.set(POND.x+Math.cos(a)*(POND.r+.38),POND.z+Math.sin(a)*(POND.r+.38));
         b.drink=true;b.state="move";b.gaitName="Walk";b.speed=.24;
       }
       else if(b.state==="graze"&&b.timer<=0){

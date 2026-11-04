@@ -138,6 +138,14 @@ body:has(.ht){background:#1b1335}
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:.8rem;font-weight:500;line-height:1.2}
 /* The links sit right under the title (and stay with it). */
 .ht-work-head p.ht-more{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:16px 0 0;pointer-events:auto}
+/* They arrive with the title: once its words have written in, the hint and then each button rise into place, one after
+   the other; they leave with it when you scroll back above the section. */
+.ht-work-head h2.ht-reveal~p.ht-drive,.ht-work-head h2.ht-reveal~p.ht-more a{opacity:0}
+.ht-work-head h2.ht-reveal.is-revealed~p.ht-drive{opacity:1;animation:ht-head-rise .6s cubic-bezier(.16,1,.3,1) .45s backwards}
+.ht-work-head h2.ht-reveal.is-revealed~p.ht-more a{opacity:1;animation:ht-pop .7s cubic-bezier(.34,1.56,.64,1) .6s backwards}
+.ht-work-head h2.ht-reveal.is-revealed~p.ht-more a:last-child{animation-delay:.72s}
+@keyframes ht-head-rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes ht-pop{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:none}}
 /* Below the pile: the rest of the work, and the Lab. */
 .ht-copy>p.ht-more{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 0;opacity:0;pointer-events:none;transform:translateY(16px);transition:opacity .4s ease-out,transform .4s ease-out}
 .ht-copy>p.ht-more.is-shown{opacity:1;pointer-events:auto;transform:none}
@@ -310,6 +318,7 @@ html.ht-locked{overflow:hidden}
 .ht.is-entered .ht-intro>:nth-child(4){animation-delay:1.85s}
 @media(prefers-reduced-motion:reduce){.ht-finish:after{animation:none}
   .ht-reveal .ht-word,.ht-reveal .ht-dot{clip-path:none;transform:none;transition:none}
+  .ht-work-head h2.ht-reveal~p.ht-drive,.ht-work-head h2.ht-reveal~p.ht-more a{opacity:1;animation:none!important}
   .ht-shine,.ht-copy>p.ht-more{transition:none}.ht-shine,.ht-shine.is-right{transform:none}
   .ht.is-entered .ht-home .ht-canvas,.ht.is-entered .ht-intro>*{animation:ht-show .4s ease both;animation-delay:0s!important}
   .ht.is-entered .ht-name-window,.ht.is-entered .ht-name{animation:none}
