@@ -137,8 +137,6 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     const rollAxis=new THREE.Vector3(),rollTurn=new THREE.Quaternion();
     function updateTumble(dt){
       const t=tumble,p=t.pos,v=t.vel;
-      // A gust every so often, from the back left like the light.
-      if((t.gust-=dt)<=0){t.gust=7+rng()*8;if(v.length()<.2){v.x+=.35+rng()*.35;v.y+=.15+rng()*.3;t.hop=Math.max(t.hop,.6);}}
       p.x+=v.x*dt;p.z+=v.y*dt;v.multiplyScalar(Math.exp(-dt*1.1));
       // The fence near the edge: bounce back in.
       const a=Math.atan2(p.z,p.x),edge=outline(a)*.8,r=Math.hypot(p.x,p.z);
@@ -160,6 +158,36 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     function kickTumble(dx,dz,strength){
       const d=Math.hypot(dx,dz)||1,v=tumble.vel,push=Math.min(2.6,strength*2.2);
       v.x+=dx/d*push;v.y+=dz/d*push;if(v.length()>3)v.setLength(3);tumble.hop=Math.max(tumble.hop,.9+push*.5);tumble.gust=7+rng()*8;
+    }
+    // Wind: a steady breeze through the sage, and every few seconds a gust: a cartoon swoosh (a white streak that curls
+    // up at its tip) draws itself across the island, the bushes lean hard as it passes, and it may shove the tumbleweed.
+    // Each swoosh is a thin tube revealed along its length (a sliding window of its triangles), fading in and out.
+    const SWOOSH=[];{const pts=[new THREE.Vector3(0,0,0),new THREE.Vector3(.7,.04,0),new THREE.Vector3(1.4,.1,0),new THREE.Vector3(1.85,.16,0)];
+      for(let k=0;k<=10;k++){const a=-Math.PI/2+k/10*Math.PI*1.7,r=.2*(1-k/10*.35);pts.push(new THREE.Vector3(1.95+Math.cos(a)*r,.36+Math.sin(a)*r,0));}
+      SWOOSH.push(new THREE.CatmullRomCurve3(pts));}
+    const SEGMENTS=60,RADIAL=4,gusts=Array.from({length:3},()=>{
+      const mesh=new THREE.Mesh(new THREE.TubeGeometry(SWOOSH[0],SEGMENTS,.035,RADIAL,false),new THREE.MeshBasicMaterial({color:"#fffaf2",transparent:true,opacity:0,depthWrite:false,fog:false,toneMapped:false}));
+      mesh.visible=false;mesh.renderOrder=2;world.add(mesh);return {mesh,t:-1,life:1.8};});
+    let gustIn=2,gustPower=0;
+    function updateWind(dt){
+      if((gustIn-=dt)<=0){
+        gustIn=3.5+rng()*4;const g=gusts.find(x=>x.t<0);
+        if(g){g.t=0;g.life=1.6+rng()*.6;const m=g.mesh;m.visible=true;
+          // Blowing from the back left (where the light comes from) across toward the front right.
+          const x=-4+rng()*1.5,z=-1+rng()*3.2,k=1.1+rng()*.5;m.position.set(x,heightAt(x,z)+.5+rng()*.9,z);m.rotation.set(0,-.35+rng()*.3,0);m.scale.set(k*1.6,k,k);}
+        gustPower=1;
+        if(rng()<.6){tumble.vel.x+=.5+rng()*.5;tumble.vel.y+=(rng()-.3)*.4;tumble.hop=Math.max(tumble.hop,.8);}
+      }
+      gustPower=Math.max(0,gustPower-dt*.55);
+      let showing=false;
+      for(const g of gusts){if(g.t<0)continue;g.t+=dt;const u=g.t/g.life;
+        if(u>=1){g.t=-1;g.mesh.visible=false;continue;}showing=true;
+        // Head races ahead, the tail follows: a streak a third of the path long, drawn and erased along it.
+        const head=Math.min(1,u*1.5),tail=Math.max(0,u*1.5-.45),per=RADIAL*6;
+        g.mesh.geometry.setDrawRange(Math.floor(tail*SEGMENTS)*per,Math.max(0,Math.ceil((head-tail)*SEGMENTS))*per);
+        g.mesh.material.opacity=.85*Math.min(1,u*6)*Math.min(1,(1-u)*4);
+        g.mesh.position.x+=dt*1.2;}
+      return showing||gustPower>.01;
     }
     // A few birds wheeling high over the Mittens.
     const birdMaterial=new THREE.MeshStandardMaterial({color:"#3b2b33",flatShading:true,roughness:1,side:THREE.DoubleSide});
@@ -345,20 +373,20 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       world.rotation.y=spin.update(dt);
       const goal=reduced?0:state.current.tilt[slot];attitude+=(goal-attitude)*(1-Math.exp(-dt*6));placeCamera();
       herd.forEach(b=>updateBison(b,step,time));dogs.forEach(d=>updateDog(d,step));
-      const rolling=updateTumble(step);
+      const rolling=updateTumble(step),windy=reduced?false:updateWind(step);
       world.position.y=Math.sin(time*.45)*.1;
       // The sun's climb follows the scroll through the section (reduced motion: already up).
       const rise=reduced?1:smooth(state.current.progress[slot]/.75);
       if(Math.abs(rise-risen)>1e-3){risen=rise;sunDisc.position.set(-15+rise*2,-4+rise*9,-32);sunDisc.material.color.copy(LOW).lerp(HIGH,rise);
         sun.intensity=1.8+rise*1.4;sun.color.copy(LOW).lerp(HIGH,rise*.8);}
       clouds.forEach(cloud=>{const u=cloud.userData;u.a+=step*u.speed;cloud.position.set(Math.cos(u.a)*u.r,u.y+Math.sin(time*.2+u.r)*.2,-Math.abs(Math.sin(u.a))*u.r-1.5);});
-      shared.uTime.value=time;shared.uBreeze.value=reduced?0:.03;shared.uGust.value=reduced?0:.05;
+      shared.uTime.value=time;shared.uBreeze.value=reduced?0:.3;shared.uGust.value=reduced?0:.3+gustPower*.9;
       for(const set of bushes){for(let i=0;i<set.sway.length;i++)set.sway[i]*=Math.exp(-dt*2.2);set.update();}
       birds.forEach(bird=>{const u=bird.userData;u.a+=step*u.speed;const x=-.2+Math.cos(u.a)*u.r,z=-2+Math.sin(u.a)*u.r,y=u.h+Math.sin(time*.8+u.flap)*.25;
         bird.position.set(x,y,z);bird.lookAt(world.localToWorld(ahead.set(-.2+Math.cos(u.a+.2)*u.r,y,-2+Math.sin(u.a+.2)*u.r)));
         const flap=Math.sin(time*8+u.flap)*.7;u.wings[0].rotation.z=flap;u.wings[1].rotation.z=-flap;});
       needsRender=false;
-      return falling||rolling||onBasket||spin.busy||herd.some(b=>b.feeding&&b.state==="move")||Math.abs(goal-attitude)>.05||bushes.some(set=>set.sway.some(v=>v>.003));
+      return falling||rolling||windy||onBasket||spin.busy||herd.some(b=>b.feeding&&b.state==="move")||Math.abs(goal-attitude)>.05||bushes.some(set=>set.sway.some(v=>v>.003));
     }
     // Full rate while feed falls, the herd runs to it or the basket is hovered, 30 fps for the grazing in between.
     let busy=true;
@@ -376,7 +404,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     const wide=matchMedia("(min-width: 761px)"),syncFade=()=>{entry.fade=wide.matches?{side:"right",from:.75}:null;shared_.invalidate();};
     syncFade();wide.addEventListener("change",syncFade);
     const readyTimer=setTimeout(()=>ready.current?.(),0);
-    if(new URLSearchParams(window.location.search).has("debug"))window.__work={camera,herd,world,scene,renderer,pour,THREE,tumble,tumbleweed,kickTumble};
+    if(new URLSearchParams(window.location.search).has("debug"))window.__work={camera,herd,world,scene,renderer,pour,THREE,tumble,tumbleweed,kickTumble,gust:()=>{gustIn=0;}};
 
     return()=>{
       clearTimeout(readyTimer);delete window.__work;disposed=true;unregister();wide.removeEventListener("change",syncFade);resize.disconnect();observer.disconnect();
