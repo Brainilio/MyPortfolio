@@ -30,6 +30,10 @@ const DEG = Math.PI / 180;
 // least 75%, so the brief's 65% is raised to keep three on the ground.) Trot: diagonal pairs together.
 const WALK = { offset: { HL: 0, FL: .25, HR: .5, FR: .75 }, duty: .76, upper: 18 * DEG, lower: 35 * DEG, cycle: 1.8 };
 const TROT = { offset: { FL: 0, HR: 0, FR: .5, HL: .5 }, duty: .5, upper: 35 * DEG, lower: 55 * DEG, cycle: .7 };
+// Lying (as bison do, on the belly): fore legs folded right under the chest, the knee forward and the cannon tucked
+// back flat beneath; hind legs folded alongside, the thigh forward, the hock behind on the ground and the cannon
+// forward under the belly. (upper, lower, hoof) per front / hind.
+const LIE = { front: [38 * DEG, -168 * DEG, -25 * DEG], hind: [50 * DEG, 120 * DEG, 25 * DEG] };
 const smooth = t => { t = Math.min(1, Math.max(0, t)); return t * t * (3 - 2 * t); };
 
 // One leg through its cycle, all on sine curves: in stance the hoof is down and the leg sweeps from forward to back
@@ -65,7 +69,7 @@ export function createBisonRig(geometry) {
   const uniforms = {
     uUpper: v4(), uLower: v4(), uHoof: v4(),
     uBob: f(0), uRoll: f(0), uPelvis: f(0), uSway: f(0), uRump: f(0), uBreath: f(0), uHump: f(0),
-    uNeckBase: f(0), uNeckYaw: f(0), uNeckMid: f(0), uHead: f(0), uTailYaw: f(0), uTailLift: f(0), uTailTip: f(0), uRest: f(0),
+    uNeckBase: f(0), uNeckYaw: f(0), uNeckMid: f(0), uHead: f(0), uTailYaw: f(0), uTailLift: f(0), uTailTip: f(0), uRest: f(0), uWallow: f(0), uWallowLift: f(0),
     uColX: f(new THREE.Vector4(...col.map(c => c[0]))), uColZ: f(new THREE.Vector4(...col.map(c => c[1]))),
   };
   const C = n => n.toFixed(5);
@@ -74,7 +78,7 @@ export function createBisonRig(geometry) {
     Object.assign(shader.uniforms, uniforms);
     shader.vertexShader = shader.vertexShader.replace("#include <common>", `#include <common>
       uniform vec4 uUpper,uLower,uHoof,uColX,uColZ;
-      uniform float uBob,uRoll,uPelvis,uSway,uRump,uBreath,uHump,uNeckBase,uNeckYaw,uNeckMid,uHead,uTailYaw,uTailLift,uTailTip,uRest;
+      uniform float uBob,uRoll,uPelvis,uSway,uRump,uBreath,uHump,uNeckBase,uNeckYaw,uNeckMid,uHead,uTailYaw,uTailLift,uTailTip,uRest,uWallow,uWallowLift;
       // Pitch about a pivot (y, z): positive raises what's in front of it.
       vec3 pitch(vec3 p,vec2 o,float a){float dy=p.y-o.x,dz=p.z-o.y,c=cos(a),s=sin(a);return vec3(p.x,o.x+dz*s+dy*c,o.y+dz*c-dy*s);}
       // Yaw about a vertical axis through (x, z).
@@ -99,13 +103,9 @@ export function createBisonRig(geometry) {
           p=pitch(p,vec2(joint,colZ+L*(front?0.:-.058)),pick(uLower,i)*smoothstep(joint+H*.03,joint-H*.03,p.y));
           p=pitch(p,vec2(hip,colZ+L*(front?.01:.034)),pick(uUpper,i)*w);
         }
-        // Lying down: front legs fold back under the chest, rear legs fold out to the sides, all flattened under the
-        // body, which settles onto them.
-        if(uRest>0.&&h<.32){
-          float J=Y0+H*.3,d=(J-p.y)*uRest;
-          p.y=J-(J-p.y)*(1.-.84*uRest);
-          if(front)p.z-=d*.9;else p.x=CX+(p.x-CX)*(1.+.35*uRest);
-        }
+        // Lying down, the legs are folded at their joints (by the animation); the hind legs also lie out a little
+        // to the sides, under the hips.
+        if(uRest>0.&&!front&&h<.4)p.x=CX+(p.x-CX)*(1.+.22*uRest*(1.-smoothstep(.2,.4,h)));
 
         // TAIL (a short stub high at the rear): the tip lags, the base swings side to side and lifts.
         float rootZ=Z0+L*.02,rootY=Y0+H*.78;
@@ -135,7 +135,11 @@ export function createBisonRig(geometry) {
         p=yaw(p,vec2(CX,Z0+L*.45),uSway*smoothstep(.45,.9,zf)*body);
         p=pitch(p,vec2(Y0+H*.58,Z0+L*.16),uPelvis*body);
         p=roll(p,vec2(CX,Y0+H*.1),uRoll*body);
-        p.y+=uBob*H*body-uRest*H*.245;
+        // Lying: the whole animal settles until its belly is on the ground (nothing sinks below it).
+        p.y+=uBob*H*body-uRest*H*.3;
+        p.y=mix(p.y,max(p.y,Y0+H*.004),uRest);
+        // Wallowing: it rolls onto its side about its middle, lifted or lowered so it keeps touching the ground.
+        if(uWallow!=0.){p=roll(p,vec2(CX,Y0+H*.33),uWallow);p.y+=uWallowLift*H;}
         transformed=p;
       }`);
   };
@@ -154,7 +158,7 @@ export function createBisonAnimator(rig, { calf = false, seed = Math.random } = 
     // Weight shift: every 6-10 s (calf 3-6), the pelvis rolls ±4° (calf ±6°) over 2 s and one front hoof lifts.
     shift: 0, shiftFrom: 0, shiftTo: 0, shiftT: 1 + r() * 6, shiftRun: 0,
     tailFlick: 0, flickT: 1 + r() * 6, look: 0, lookGoal: 0, lookT: 2 + r() * 4,
-    alert: 0, brace: 0, alertAt: -1, tailTip: 0, tipT: r() * 4, tailSeed: r() * 6.3,
+    alert: 0, brace: 0, alertAt: -1, tailTip: 0, tipT: r() * 4, wallow: 0, wallowT: 0, roll: 0, dust: 0, tailSeed: r() * 6.3,
   };
   const walkCycle = (calf ? 1.4 : WALK.cycle) / s.speedFactor;
 
@@ -164,7 +168,7 @@ export function createBisonAnimator(rig, { calf = false, seed = Math.random } = 
     return gait === "trot" ? 2 * 2 * Math.sin(TROT.upper) * legHeight / TROT.cycle : 2 * Math.sin(WALK.upper) * legHeight / walkCycle;
   }
 
-  // inputs: { moving, gait: "walk" | "trot", eating, resting, alarmed }
+  // inputs: { moving, gait: "walk" | "trot", eating, resting, alarmed, wallow }
   function update(dt, inputs) {
     s.time += dt;
     const t = s.time, moving = inputs.moving, still = !moving && !inputs.resting;
@@ -213,6 +217,14 @@ export function createBisonAnimator(rig, { calf = false, seed = Math.random } = 
     if (s.lookT <= 0) { s.lookT = 2.5 + r() * 4; s.lookGoal = (still || inputs.resting) && s.dip < .2 && r() < .7 ? (r() < .5 ? -1 : 1) * (15 + r() * 10) * DEG : 0; }
     s.look += (s.lookGoal * calm * (1 - going) - s.look) * (1 - Math.exp(-dt * 1.5));
 
+    // Wallowing (once it's down): it rolls over onto its side and back, three times, legs kicking, raising dust,
+    // then rights itself.
+    const rolling = inputs.wallow && s.rest > .85;
+    s.wallow += ((rolling ? 1 : 0) - s.wallow) * (1 - Math.exp(-dt * 3));
+    if (rolling) s.wallowT += dt; else s.wallowT = 0;
+    const before = s.roll;
+    s.roll = s.wallow * 1.35 * (.5 - .5 * Math.cos(Math.PI * 2 * s.wallowT / 1.6)) * (s.side ??= r() < .5 ? -1 : 1);
+    s.dust = s.wallow * Math.min(1, Math.abs(s.roll - before) / Math.max(dt, 1e-3) / 2.5);
     // Legs: walk and trot poses blended by how much it's doing each (standing: straight), plus the idle weight shift
     // lifting one front hoof, and the brace (front hooves stepping in place).
     for (let k = 0; k < 4; k++) {
@@ -226,9 +238,14 @@ export function createBisonAnimator(rig, { calf = false, seed = Math.random } = 
         // Bracing: the fronts step in place.
         lower -= s.brace * Math.max(0, Math.sin(t * 9 + (leg === "FL" ? 0 : Math.PI))) * 20 * DEG;
       }
-      u.uUpper.value.setComponent(k, legA[0] * s.walk + legB[0] * s.trot);
+      // Lying: blend to the folded pose; wallowing on its side, the legs kick in the air.
+      const lie = LIE[front ? "front" : "hind"], kick = s.wallow * Math.min(1, Math.abs(s.roll) / .9);
+      let upper = (legA[0] * s.walk + legB[0] * s.trot) * (1 - s.rest) + lie[0] * s.rest;
+      lower = lower * (1 - s.rest) + lie[1] * s.rest;
+      upper += kick * .6 * Math.sin(t * 7 + k * 1.7) - kick * lie[0] * .7; lower -= kick * lie[1] * .55 * (.6 + .4 * Math.sin(t * 6 + k));
+      u.uUpper.value.setComponent(k, upper);
       u.uLower.value.setComponent(k, lower);
-      u.uHoof.value.setComponent(k, legA[2] * s.walk + legB[2] * s.trot);
+      u.uHoof.value.setComponent(k, (legA[2] * s.walk + legB[2] * s.trot) * (1 - s.rest) + lie[2] * s.rest);
     }
 
     const c = s.phase * Math.PI * 2;
@@ -238,14 +255,14 @@ export function createBisonAnimator(rig, { calf = false, seed = Math.random } = 
     u.uSway.value = s.walk * 1.5 * DEG * Math.cos(c);
     u.uHump.value = s.trot * 3 * DEG * Math.sin(2 * c - .6) + s.brace * 6 * DEG;
     u.uBreath.value = .012 * Math.sin(t * Math.PI * 2 / 3.5);
-    u.uRoll.value = s.shift + s.rest * 7 * DEG;
+    u.uRoll.value = s.shift + s.rest * 5 * DEG * (s.side ?? 1);
     u.uPelvis.value = s.brace * 8 * DEG;
     // Rest pose: the rump dips (the back slopes down from the hump) and the neck angles forward and down.
     u.uRump.value = 4 * DEG;
     // Neck and head: carried low; a ±4° nod walking (±8° trotting); down to graze; down at the basket or water; up and
     // forward when alarmed; low and level lying down.
     const nod = s.walk * 4 * DEG * Math.sin(c) + s.trot * 8 * DEG * Math.sin(2 * c);
-    u.uNeckBase.value = 10 * DEG * calm - 4 * DEG * s.alert + s.rest * 6 * DEG;
+    u.uNeckBase.value = 10 * DEG * calm - 4 * DEG * s.alert + s.rest * 4 * DEG;
     u.uNeckMid.value = (dipDepth * .6 * s.dip + 18 * DEG * eat) * calm - 10 * DEG * s.alert + s.rest * 8 * DEG;
     u.uHead.value = (dipDepth * .4 * s.dip + 12 * DEG * eat + nod) * calm - 20 * DEG * s.alert + eat * Math.sin(t * 5.2) * 3 * DEG * calm;
     u.uNeckYaw.value = s.look;
@@ -253,6 +270,8 @@ export function createBisonAnimator(rig, { calf = false, seed = Math.random } = 
     u.uTailLift.value = 25 * DEG * Math.max(s.alert, s.trot);
     u.uTailTip.value += ((s.tailTip + flick * .4) - u.uTailTip.value) * (1 - Math.exp(-dt * 4));
     u.uRest.value = s.rest;
+    const a = Math.abs(s.roll);
+    u.uWallow.value = s.roll; u.uWallowLift.value = a > 0 ? .33 * Math.cos(a) + .22 * Math.sin(a) - .33 : 0;
   }
   return { update, speed, state: s, uniforms: u };
 }

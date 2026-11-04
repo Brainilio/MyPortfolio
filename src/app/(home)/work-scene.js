@@ -233,6 +233,25 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       return falling;
     }
 
+    // Dust: soft tan puffs kicked up by a wallowing bison, swelling as they rise and drift off, then fading away.
+    const DUST=40,dustMesh=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1,0),new THREE.MeshLambertMaterial({color:"#dcc296",flatShading:true,transparent:true,opacity:.55,depthWrite:false}),DUST);
+    dustMesh.frustumCulled=false;world.add(dustMesh);
+    const dust=Array.from({length:DUST},()=>({life:0,age:0,pos:new THREE.Vector3(),vel:new THREE.Vector3(),size:0,spin:0})),puff=new THREE.Object3D();let dustNext=0;
+    function emitDust(b,amount,dt){
+      dustNext-=amount*dt*18;
+      while(dustNext<0){dustNext+=1;const d=dust.find(x=>x.age>=x.life);if(!d)break;const a=Math.random()*Math.PI*2,r=b.length*(.15+Math.random()*.35),p=b.root.position;
+        d.pos.set(p.x+Math.cos(a)*r,p.y+.05,p.z+Math.sin(a)*r);d.vel.set(Math.cos(a)*.25,.35+Math.random()*.35,Math.sin(a)*.25);
+        d.age=0;d.life=1.4+Math.random()*.9;d.size=b.height*(.08+Math.random()*.08);d.spin=Math.random()*6;}
+    }
+    function updateDust(dt){
+      let any=false;
+      dust.forEach((d,i)=>{
+        if(d.age<d.life){any=true;d.age+=dt;d.pos.addScaledVector(d.vel,dt);d.vel.multiplyScalar(Math.exp(-dt*1.6));d.vel.y-=.05*dt;}
+        const u=Math.min(1,d.age/d.life),grow=d.age<d.life?d.size*(1+u*2.2)*Math.sin(Math.PI*Math.min(1,u*1.15+.05)):0;
+        puff.position.copy(d.pos);puff.rotation.set(d.spin+u,d.spin*.7,0);puff.scale.setScalar(Math.max(0,grow));puff.updateMatrix();dustMesh.setMatrixAt(i,puff.matrix);
+      });
+      dustMesh.instanceMatrix.needsUpdate=true;return any;
+    }
     // The herd: big, cartoon-scale bison (like the hero island's animals, sized for the diorama, not for the buttes),
     // each a little different in size, grazing and ambling about; one or two lying down; the red calf (55% of its
     // mother) never more than a body length and a half from her. The rig and the animation are in bison-rig.js; this
@@ -275,10 +294,13 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     function updateBison(b,dt,now){
       const p=b.root.position,mother=herd[0];b.timer-=dt;
       if(b.state==="eat"){if(now>b.eatUntil){b.state="graze";b.feeding=false;b.drink=false;b.face=null;b.timer=1+Math.random()*2;}}
-      else if(b.state==="rest"){if(now>b.restUntil){b.resting=false;if(b.anim.state.rest<.04){b.state="graze";b.timer=2;}}}
+      else if(b.state==="rest"){if(now>b.restUntil-(b.wallowing?1.6:0))b.wallowing=false;if(now>b.restUntil){b.resting=false;if(b.anim.state.rest<.04){b.state="graze";b.timer=2;}}}
       else if(b.state==="graze"&&b.timer<=0){
         const r=Math.random();
-        if(!b.calf&&r<.12&&herd.filter(o=>o.resting).length<2){b.state="rest";b.resting=true;b.restUntil=now+30+Math.random()*40;}
+        if(!b.calf&&r<.08&&!herd.some(o=>o.wallowing)){
+          // A dust bath: down, a few rolls onto its side with the legs kicking, then back up.
+          b.state="rest";b.resting=true;b.wallowing=true;b.restUntil=now+9;}
+        else if(!b.calf&&r<.18&&herd.filter(o=>o.resting).length<2){b.state="rest";b.resting=true;b.restUntil=now+30+Math.random()*40;}
         else if(!b.calf&&r<.35&&!herd.some(o=>o.drink)){
           // A drink at the watering hole, from whichever side it's on (its muzzle just reaching the water).
           const a=Math.atan2(p.z-POND.z,p.x-POND.x),d=POND.r+b.length*.42;b.target.set(POND.x+Math.cos(a)*d,POND.z+Math.sin(a)*d);
@@ -311,7 +333,8 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       // Big bodies don't overlap: nudge apart from any neighbour that's too close.
       for(const o of herd){if(o===b)continue;const dx=p.x-o.root.position.x,dz=p.z-o.root.position.z,d=Math.hypot(dx,dz),min=(b.radius+o.radius)*.95;
         if(d<min&&d>1e-4){const push=(min-d)*.5*Math.min(1,dt*6);p.x+=dx/d*push;p.z+=dz/d*push;}}
-      b.anim.update(dt,{moving:b.state==="move"&&now>=b.startAt&&b.anim.state.rest<.05,gait:b.gait,eating:b.state==="eat",resting:b.resting,alarmed:now<b.alarmUntil});
+      b.anim.update(dt,{moving:b.state==="move"&&now>=b.startAt&&b.anim.state.rest<.05,gait:b.gait,eating:b.state==="eat",resting:b.resting,alarmed:now<b.alarmUntil,wallow:!!b.wallowing});
+      if(b.anim.state.dust>.05)emitDust(b,b.anim.state.dust,dt);
       p.y=heightAt(p.x,p.z);b.root.rotation.y=b.yaw;
     }
     // Prairie dogs pop up from their mounds, look about, and duck back down.
@@ -391,6 +414,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       world.rotation.y=spin.update(dt);
       const goal=reduced?0:state.current.tilt[slot];attitude+=(goal-attitude)*(1-Math.exp(-dt*6));placeCamera();
       herd.forEach(b=>updateBison(b,step,time));dogs.forEach(d=>updateDog(d,step));
+      const dusty=updateDust(step);
       const rolling=updateTumble(step),windy=reduced?false:updateWind(step);
       world.position.y=Math.sin(time*.45)*.1;
       // The sun's climb follows the scroll through the section (reduced motion: already up).
@@ -404,7 +428,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
         bird.position.set(x,y,z);bird.lookAt(world.localToWorld(ahead.set(-.2+Math.cos(u.a+.2)*u.r,y,-2+Math.sin(u.a+.2)*u.r)));
         const flap=Math.sin(time*8+u.flap)*.7;u.wings[0].rotation.z=flap;u.wings[1].rotation.z=-flap;});
       needsRender=false;
-      return falling||rolling||windy||onBasket||spin.busy||herd.some(b=>(b.feeding&&b.state==="move")||b.alarmUntil>time)||Math.abs(goal-attitude)>.05||bushes.some(set=>set.sway.some(v=>v>.003));
+      return falling||rolling||windy||dusty||onBasket||spin.busy||herd.some(b=>(b.feeding&&b.state==="move")||b.alarmUntil>time)||Math.abs(goal-attitude)>.05||bushes.some(set=>set.sway.some(v=>v>.003));
     }
     // Full rate while feed falls, the herd runs to it or the basket is hovered, 30 fps for the grazing in between.
     let busy=true;
