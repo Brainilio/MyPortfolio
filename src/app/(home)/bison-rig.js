@@ -30,10 +30,11 @@ const DEG = Math.PI / 180;
 // least 75%, so the brief's 65% is raised to keep three on the ground.) Trot: diagonal pairs together.
 const WALK = { offset: { HL: 0, FL: .25, HR: .5, FR: .75 }, duty: .76, upper: 18 * DEG, lower: 35 * DEG, cycle: 1.8 };
 const TROT = { offset: { FL: 0, HR: 0, FR: .5, HL: .5 }, duty: .5, upper: 35 * DEG, lower: 55 * DEG, cycle: .7 };
-// Lying (as bison do, on the belly): fore legs folded right under the chest, the knee forward and the cannon tucked
-// back flat beneath; hind legs folded alongside, the thigh forward, the hock behind on the ground and the cannon
-// forward under the belly. (upper, lower, hoof) per front / hind.
-const LIE = { front: [38 * DEG, -168 * DEG, -25 * DEG], hind: [50 * DEG, 120 * DEG, 25 * DEG] };
+// Lying (as bison do, on the belly), legs folded compactly under the body, nothing sticking out: fore legs under the
+// chest, the knee just forward and the cannon tucked back flat beneath; hind legs folded tight under the haunch, the
+// thigh barely forward and the hock folded right up so the cannon lies under the thigh. (upper, lower, hoof) per front
+// / hind, tuned side-on against a photo of a resting bison.
+const LIE = { front: [18 * DEG, -165 * DEG, -20 * DEG], hind: [12 * DEG, 150 * DEG, 10 * DEG] };
 const smooth = t => { t = Math.min(1, Math.max(0, t)); return t * t * (3 - 2 * t); };
 
 // One leg through its cycle, all on sine curves: in stance the hoof is down and the leg sweeps from forward to back
@@ -158,7 +159,7 @@ export function createBisonAnimator(rig, { calf = false, seed = Math.random } = 
     // Weight shift: every 6-10 s (calf 3-6), the pelvis rolls ±4° (calf ±6°) over 2 s and one front hoof lifts.
     shift: 0, shiftFrom: 0, shiftTo: 0, shiftT: 1 + r() * 6, shiftRun: 0,
     tailFlick: 0, flickT: 1 + r() * 6, look: 0, lookGoal: 0, lookT: 2 + r() * 4,
-    alert: 0, brace: 0, alertAt: -1, tailTip: 0, tipT: r() * 4, wallow: 0, wallowT: 0, roll: 0, dust: 0, tailSeed: r() * 6.3,
+    alert: 0, brace: 0, alertAt: -1, tailTip: 0, tipT: r() * 4, wallow: 0, wallowT: 0, roll: 0, dust: 0, lie: { front: [...LIE.front], hind: [...LIE.hind] }, tailSeed: r() * 6.3,
   };
   const walkCycle = (calf ? 1.4 : WALK.cycle) / s.speedFactor;
 
@@ -239,7 +240,7 @@ export function createBisonAnimator(rig, { calf = false, seed = Math.random } = 
         lower -= s.brace * Math.max(0, Math.sin(t * 9 + (leg === "FL" ? 0 : Math.PI))) * 20 * DEG;
       }
       // Lying: blend to the folded pose; wallowing on its side, the legs kick in the air.
-      const lie = LIE[front ? "front" : "hind"], kick = s.wallow * Math.min(1, Math.abs(s.roll) / .9);
+      const lie = s.lie[front ? "front" : "hind"], kick = s.wallow * Math.min(1, Math.abs(s.roll) / .9);
       let upper = (legA[0] * s.walk + legB[0] * s.trot) * (1 - s.rest) + lie[0] * s.rest;
       lower = lower * (1 - s.rest) + lie[1] * s.rest;
       upper += kick * .6 * Math.sin(t * 7 + k * 1.7) - kick * lie[0] * .7; lower -= kick * lie[1] * .55 * (.6 + .4 * Math.sin(t * 6 + k));
