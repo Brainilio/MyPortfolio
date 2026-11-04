@@ -28,12 +28,14 @@ function heightAt(x,z) {
 const noRiver=()=>({d:99,t:0});
 // Bison gaits: leg swing (rad), stride rate, bob (fraction of height), knee fold, foot lift (fraction), nod.
 const GAITS={Graze:[0,1.1,.003,0,0,.04],Walk:[.36,3.4,.006,.6,.035,.09],Run:[.62,7.5,.02,.95,.06,.14]};
-// Buttes (x, z, width, height, depth, turn): a taller and a shorter one up on the shelf, one mid-left; the right and the
-// front stay open for the herd. Swells (x, z, radius, height); the prairie dogs' mounds and the feed basket near the front.
-const BUTTES=[[-1.6,-3.3,3,1.2,1.45,.12],[1.95,-3.05,2.2,.85,1.1,-.2],[-3.25,-.45,1.75,.65,1,.5]];
+// Buttes: two up on the shelf at the back, one mid-left; the right and the front stay open for the herd. Swells (x, z, radius, height); the prairie dogs' mounds and the feed basket near the front.
+// Sized against the island's ~10.8 diameter (x, z, height, top width, turn): A the tallest at the back left, B a little
+// shorter at the back right and a step forward, C a low wide mesa stub mid-left, in front of both.
+const BUTTES=[[-1.3,-2.55,4.1,2.4,.3],[1.9,-2.3,3,1.95,-.4],[-3,.3,1.7,2.15,.9]];
+const footOf=([,,,top])=>top/2/.6*1.08;
 const SWELLS=[[-1.4,.5,1.7,.13],[1.9,.6,1.6,.11],[.1,2.9,1.4,.08]];
-const MOUNDS=[[2.4,1.3],[-2.9,1.2],[-.6,3]],BASKET=new THREE.Vector3(1.1,0,2);
-const blocked=(x,z,pad)=>BUTTES.some(([bx,bz,w,,d])=>Math.hypot((x-bx)/(w*.62+pad),(z-bz)/(d*.62+pad))<1)||Math.hypot(x-BASKET.x,z-BASKET.z)<pad+.3;
+const MOUNDS=[[2.4,1.3],[-1.9,2.5],[-.6,3.1]],BASKET=new THREE.Vector3(1.1,0,2);
+const blocked=(x,z,pad)=>BUTTES.some(b=>Math.hypot(x-b[0],z-b[1])<footOf(b)+pad)||Math.hypot(x-BASKET.x,z-BASKET.z)<pad+.3;
 
 export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
   const ready=useRef(onReady);ready.current=onReady;
@@ -60,14 +62,15 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     const island=createIsland(13,{outline,heightAt,riverDistance:noRiver,depth:.85,hub:new THREE.Vector2(-1.1,-3.3),scatter:.8,grass:["#b89a52","#c4a65a","#a98d4c"],edge:"#9a7c46"});world.add(island.group);
     const on=(x,z,lift=0)=>new THREE.Vector3(x,heightAt(x,z)+lift,z);
     // Each butte sits on the lowest ground under its footprint, so no edge floats on the slope.
-    BUTTES.forEach(([x,z,w,h,d,turn])=>{const butte=createButte(rng,w,h,d);let low=heightAt(x,z);
-      for(let k=0;k<12;k++){const a=k/12*Math.PI*2;low=Math.min(low,heightAt(x+Math.cos(a)*w*.55,z+Math.sin(a)*d*.55));}
-      butte.position.set(x,low-.04,z);butte.rotation.y=turn;world.add(butte);});
-    // Rounded sandstone boulders about the buttes' feet.
-    {const tints=["#c1693a","#a8522a","#b8653c","#cf8458"].map(c=>new THREE.Color(c));
-      const spots=[[-3.4,-2.5,.2],[-.2,-2.75,.15],[.55,-2.5,.24],[3.2,-2.4,.17],[-2.3,.55,.19],[-4.1,.35,.14]];
-      const rocks=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1,1),new THREE.MeshStandardMaterial({flatShading:true,roughness:1}),spots.length),d=new THREE.Object3D();
-      spots.forEach(([x,z,s],i)=>{d.position.copy(on(x,z,s*.3));d.rotation.set(rng()*.4,rng()*6,rng()*.4);d.scale.set(s*(1.1+rng()*.3),s*.72,s*(.9+rng()*.2));d.updateMatrix();rocks.setMatrixAt(i,d.matrix);rocks.setColorAt(i,tints[i%4]);});
+    BUTTES.forEach(b=>{const [x,z,h,top,turn]=b,foot=footOf(b),butte=createButte(rng,h,top);let low=heightAt(x,z);
+      for(let k=0;k<12;k++){const a=k/12*Math.PI*2;low=Math.min(low,heightAt(x+Math.cos(a)*foot,z+Math.sin(a)*foot));}
+      butte.position.set(x,low-.05,z);butte.rotation.y=turn;world.add(butte);});
+    // Rounded sandstone boulders tumbled at the buttes' feet, on the sides facing out.
+    {const base=new THREE.Color("#9e5226"),spots=[];
+      BUTTES.forEach((b,i)=>[.9,2.2].forEach(a=>{const r=footOf(b)+.15+rng()*.2,angle=a+i*.7;spots.push([b[0]+Math.cos(angle)*r,b[1]+Math.sin(angle)*r,.13+rng()*.12]);}));
+      const rocks=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1,1),new THREE.MeshLambertMaterial({flatShading:true}),spots.length),d=new THREE.Object3D();
+      spots.forEach(([x,z,s],i)=>{d.position.copy(on(x,z,s*.3));d.rotation.set(rng()*.4,rng()*6,rng()*.4);d.scale.set(s*(1.1+rng()*.3),s*.72,s*(.9+rng()*.2));d.updateMatrix();rocks.setMatrixAt(i,d.matrix);
+        rocks.setColorAt(i,base.clone().offsetHSL((rng()-.5)*.02,(rng()-.5)*.1,(rng()-.5)*.08));});
       world.add(rocks);}
     // Sage bushes dotted over the grass.
     {const tints=["#8a9a5c","#7a8b52","#94a066"].map(c=>new THREE.Color(c)),count=34,bushes=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1,0).scale(1,.6,1),new THREE.MeshStandardMaterial({flatShading:true,roughness:1}),count),d=new THREE.Object3D();let n=0;
@@ -108,7 +111,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     loader.load("/models/island/bison.glb",gltf=>{
       if(disposed)return;
       const box=new THREE.Box3().setFromObject(gltf.scene),size=box.getSize(new THREE.Vector3());
-      const spots=[[-1.4,.2],[.4,-.9],[1.6,.4],[-.3,1.1],[-1.1,.5]];
+      const spots=[[.2,.5],[.5,-.4],[1.8,.6],[-.3,1.5],[.5,.85]];
       // The calf keeps within a length and a half of its mother's width of her.
       leash=Math.max(.32,1.5*size.x*.55/size.y);
       spots.forEach(([x,z],i)=>{

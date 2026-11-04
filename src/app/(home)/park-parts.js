@@ -96,25 +96,35 @@ export function createFin(rng,width,height,depth) {
 }
 
 // A woven basket: a lathe-turned bowl with alternating bands.
-// A sandstone butte (Monument Valley): a wide, flat-topped block with sheer banded cliffs standing on a talus apron,
-// a slightly overhanging caprock and a sun-bleached top. width and depth are the footprint, height the cliff top.
-const BUTTE={talus:"#c27a4c",bands:["#c1693a","#a8522a","#b65e33"],cap:"#97462a",top:"#e0a87c"};
-export function createButte(rng,width,height,depth) {
-  const SEG=10,noise=Array.from({length:SEG},()=>.78+rng()*.34);
-  // Rings from the foot up: the talus apron, the cliff's foot, two strata breaks, the caprock and its lip.
-  const levels=[[0,1.18],[.24,.86],[.5,.84],[.76,.83],[.9,.82],[1,.86]],rings=levels.map(([t,r])=>Array.from({length:SEG},(_,s)=>{
-    const a=s/SEG*Math.PI*2,k=noise[s]*r*(t?1:1+(rng()-.5)*.08);return new THREE.Vector3(Math.cos(a)*width/2*k,t*height,Math.sin(a)*depth/2*k);}));
-  const tris=[],paint=new Map(),top=new THREE.Vector3(0,height*1.004,0);
-  for(let k=0;k<rings.length-1;k++)for(let s=0;s<SEG;s++){
-    const a=rings[k][s],b=rings[k][(s+1)%SEG],c=rings[k+1][(s+1)%SEG],d=rings[k+1][s],color=k===0?BUTTE.talus:k===rings.length-2?BUTTE.cap:BUTTE.bands[(k+s%2)%3];
-    for(const tri of [[a,c,b],[a,d,c]]){tris.push(tri);paint.set(tri,color);}
+// A sandstone butte (Monument Valley), from a lathed profile: a talus flare at the foot, sides leaning in about 11° as
+// they rise to a top 60% the width of the base, two or three sedimentary shelves standing out round the middle, and a
+// ragged, eroded rim. Every vertex above the talus is nudged a little (seeded, by position, so seams stay closed), and
+// it's flat shaded: faceted terracotta sides, a sun-bleached top. height and topWidth in world units.
+const BUTTE_SIDE=new THREE.Color("#b5602e"),BUTTE_TOP=new THREE.Color("#c8855a");
+export function createButte(rng,height,topWidth) {
+  const H=height,R=topWidth/2/.6,radius=t=>R*(1-.4*Math.max(0,(t-.15)/.85));
+  // Shelves at irregular heights through the middle, each sticking out ~5% of the width.
+  const count=2+(rng()<.5?1:0),shelves=Array.from({length:count},(_,i)=>.3+(i+.2+rng()*.6)*.5/count);
+  const profile=[[R*1.08,0],[R,.15*H]];
+  for(const t of shelves)profile.push([radius(t-.03),(t-.03)*H],[radius(t)+R*.1,t*H],[radius(t+.04),(t+.04)*H]);
+  profile.push([radius(1),H],[0,H]);
+  const geometry=new THREE.LatheGeometry(profile.map(([r,y])=>new THREE.Vector2(r,y)),12).toNonIndexed();
+  const pos=geometry.attributes.position,hash=(x,y,z,k)=>{const v=Math.sin(x*127.1+y*311.7+z*74.7+k*19.3+seed)*43758.5453;return v-Math.floor(v)-.5;},seed=rng()*100;
+  for(let i=0;i<pos.count;i++){
+    const x=Math.round(pos.getX(i)*1e4)/1e4,y=pos.getY(i),z=Math.round(pos.getZ(i)*1e4)/1e4;
+    if(y<.15*H-1e-4)continue;
+    // The rim is torn the most (±10% of the width); the cliffs just a few percent.
+    const rim=y>H-1e-4&&Math.hypot(x,z)>1e-3,amp=rim?.2*topWidth:.08*R;
+    pos.setXYZ(i,x+hash(x,y,z,1)*amp,y+(rim?0:hash(x,y,z,3)*.03*H),z+hash(x,y,z,2)*amp);
   }
-  for(let s=0;s<SEG;s++){const tri=[rings.at(-1)[s],top,rings.at(-1)[(s+1)%SEG]];tris.push(tri);paint.set(tri,BUTTE.top);}
-  // Underneath, so it can sink a little into a slope without showing a hole.
-  for(let s=0;s<SEG;s++){const tri=[rings[0][s],rings[0][(s+1)%SEG],new THREE.Vector3(0,0,0)];tris.push(tri);paint.set(tri,BUTTE.talus);}
-  const geometry=faceted(tris,(tri,color)=>color.set(paint.get(tri)));
-  const material=flatMaterial();material.side=THREE.DoubleSide;
-  return new THREE.Mesh(geometry,material);
+  // Colour by face: the flat top light, everything else terracotta, each face a shade off its neighbours.
+  const colors=new Float32Array(pos.count*3),c=new THREE.Color();
+  for(let f=0;f<pos.count;f+=3){
+    const top=[0,1,2].every(k=>pos.getY(f+k)>H-1e-4);c.copy(top?BUTTE_TOP:BUTTE_SIDE).multiplyScalar(.95+rng()*.1);
+    for(let k=0;k<3;k++)colors.set([c.r,c.g,c.b],(f+k)*3);
+  }
+  geometry.setAttribute("color",new THREE.BufferAttribute(colors,3));geometry.deleteAttribute("uv");geometry.computeVertexNormals();
+  return new THREE.Mesh(geometry,new THREE.MeshLambertMaterial({vertexColors:true,flatShading:true,side:THREE.DoubleSide}));
 }
 
 export function createBasket() {

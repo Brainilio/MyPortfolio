@@ -13,8 +13,6 @@ const CoastScene = dynamic(() => import("./coast-scene"), { ssr: false });
 import { MODEL_CREDITS } from "./model-credits";
 import { SKILLS } from "./content";
 const work = allProjects.filter(project => project.slug && project.previewImage).slice(0, 4);
-// Each postcard sits a little askew in the pile.
-const TILTS = [-1.5, 2, -.8, 1.2];
 
 // Every model the homepage loads (fetched up front by the loading screen).
 const MODELS = ["kit", "stag", "deer", "fox", "bear", "eagle", "bison", "prairiedog", "wagon", "moose", "orca", "shark", "sealion", "kayak"].map(name => `/models/island/${name}.glb`);
@@ -237,15 +235,14 @@ export default function Home() {
             {work.map((project, i) => {
               const at = section === WORK ? stop : 0, here = at === i;
               return (
-                <li key={project.slug} style={{ "--i": i, "--r": `${TILTS[i % TILTS.length]}deg`, zIndex: work.length - i }} className={here ? "is-here" : i < at - 1 ? "is-far" : undefined} aria-current={here ? "true" : undefined}>
+                <li key={project.slug} style={{ "--i": i, zIndex: work.length - i }} className={here ? "is-here" : i < at - 1 ? "is-far" : undefined} aria-current={here ? "true" : undefined}>
                   <a href={`/project/${project.slug}/`} onFocus={() => scrollToSection(WORK, i / Math.max(1, work.length - 1))}>
                     <span className="ht-deck-media" aria-hidden="true">
                       {here && section === WORK && !still && project.previewVideo
                         ? <video src={project.previewVideo} poster={project.previewImage} autoPlay muted loop playsInline />
                         : <img src={project.previewImage} alt="" loading="lazy" decoding="async" />}
-                      <span className="ht-stamp">{project.category}</span>
                     </span>
-                    <span className="ht-deck-text">{String(i + 1).padStart(2, "0")} · {project.name}<i aria-hidden="true">→</i></span>
+                    <span className="ht-deck-text"><small>{String(i + 1).padStart(2, "0")} · {project.category}</small><b>{project.name} <i aria-hidden="true">→</i></b></span>
                   </a>
                 </li>
               );
