@@ -132,7 +132,8 @@ function getShared() {
   });
 }
 
-export default function ShineCard({ index, href, name, children }) {
+// (tag: "span" when it sits inside a link of its own, as in the Work card tester's focused layout.)
+export default function ShineCard({ index, href, name, children, tag: Tag = "a" }) {
   const card = useRef(null), canvas = useRef(null), [shown, setShown] = useState(false), [drawn, setDrawn] = useState(false);
   const state = useRef(null);
   useEffect(() => {
@@ -172,11 +173,11 @@ export default function ShineCard({ index, href, name, children }) {
 
   const number = String(index + 1).padStart(2, "0");
   return (
-    <a ref={card} href={href} className={`ht-shine${index % 2 ? " is-right" : " is-left"}${shown ? " is-in" : ""}${drawn ? " is-drawn" : ""}`}
-      aria-label={`${name}: view the project`} onPointerEnter={track} onPointerMove={track} onPointerLeave={leave}>
+    <Tag ref={card} href={Tag === "a" ? href : undefined} className={`ht-shine${index % 2 ? " is-right" : " is-left"}${shown ? " is-in" : ""}${drawn ? " is-drawn" : ""}`}
+      aria-label={Tag === "a" ? `${name}: view the project` : undefined} onPointerEnter={track} onPointerMove={track} onPointerLeave={leave}>
       <span className="ht-shine-media">{children}</span>
       <canvas ref={canvas} className="ht-shine-overlay" aria-hidden="true" />
       <span className="ht-shine-pill" aria-hidden="true">{number} · {name} →</span>
-    </a>
+    </Tag>
   );
 }

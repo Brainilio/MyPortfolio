@@ -331,3 +331,73 @@ html.ht-locked{overflow:hidden}
 .ht-tester-pill button[aria-pressed="true"]{background:rgba(255,255,255,.25)}
 .ht-tester-pill button:focus-visible{outline:2px solid #fff;outline-offset:1px}
 .ht-tester-label{font:500 .6rem/1 'Satoshi','Inter',sans-serif;color:#fff}
+
+/* The Work card-layout tester (work-cards.js). On wide screens the cards ride a full-screen layer pinned over the
+   island for the length of the section; it lets the pointer through except on the cards themselves. Every layout
+   uses the original card design (.ht-shine); A bends the same picture and pill round its ring. */
+.ht-tester-cards{left:auto;right:24px}
+.ht-tester-name{align-self:center;padding:0 6px 0 10px;color:#fff;font:600 .7rem/1 'Satoshi','Inter',sans-serif}
+.ht-wc{position:relative;z-index:1;height:300svh;margin-top:-300px}
+.ht-wc-pin{position:sticky;top:0;height:100svh;overflow:hidden;pointer-events:none}
+.ht-wc-card{display:block;color:inherit;text-decoration:none;pointer-events:auto}
+.ht-wc-card:focus-visible{outline:2px solid var(--violet);outline-offset:6px}
+.ht-wc .ht-shine,.ht-wc .ht-shine.is-right{width:100%;margin:0}
+.ht-wc-pill{position:absolute;z-index:2;left:14px;bottom:14px;padding:7px 14px;border-radius:999px;background:rgba(0,0,0,.5);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:.8rem;font-weight:500;line-height:1.2;white-space:nowrap}
+/* A: the 3D carousel. The stage holds the perspective; the ring is turned by script; each strip of a card is placed
+   on the cylinder by script, and darkens (--dim) as its card turns away. */
+.ht-wc-stage{position:absolute;left:50%;top:58%;width:0;height:0;perspective:1500px;perspective-origin:50% 20%}
+.ht-wc-ring{position:absolute;left:0;top:0;transform-style:preserve-3d;will-change:transform}
+.ht-wc-a-card{position:absolute;left:0;top:0;transform-style:preserve-3d;transition:transform .3s cubic-bezier(.34,1.56,.64,1);--dim:0}
+.ht-wc-a-strip{position:absolute;left:0;top:0;height:var(--h);background-repeat:no-repeat;backface-visibility:visible}
+.ht-wc-a-strip:after{content:"";position:absolute;inset:0;background:#160f2a;opacity:var(--dim)}
+.ht-wc-a-strip.is-first{border-radius:6px 0 0 6px}
+.ht-wc-a-strip.is-last{border-radius:0 6px 6px 0}
+.ht-wc-a-card .ht-wc-pill{left:0;bottom:auto;top:0;transform-origin:0 50%;backface-visibility:hidden;transition:opacity .3s ease;opacity:calc(1 - var(--dim) * 2)}
+.ht-wc-a-card.is-active:hover{transform:translateY(-8px) scale(1.06)}
+/* B: the ticker along the foot of the screen; the card under the cursor lifts and brightens. */
+.ht-wc-b-clip{position:absolute;left:0;right:0;bottom:48px;overflow:hidden;padding:20px 0 34px}
+.ht-wc-b-strip{display:flex;gap:24px;width:max-content;padding:0 24px;will-change:transform}
+.ht-wc-b-card{width:clamp(320px,26vw,420px);transition:transform .3s ease}
+.ht-wc-b-card:hover{transform:translateY(-12px)}
+.ht-wc-b-card:hover .ht-shine{filter:brightness(1.08)}
+/* C: the staggered column right of the island, a card dealt in per quarter; under the cursor it straightens up. */
+.ht-wc-c-col{--w:min(26vw,calc((100svh - 300px) / 4 * 1.6));position:absolute;top:55%;left:calc(85vw - var(--w) / 2);width:var(--w);display:flex;flex-direction:column;gap:20px;transform:translateY(-50%)}
+.ht-wc-c-card{border-radius:6px;opacity:0;transform:translateX(calc(var(--x) + 100px)) translateY(16px) rotate(var(--r));
+  transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1),outline-color .35s ease;outline:2px solid transparent;outline-offset:2px}
+.ht-wc-c-card.is-in{opacity:1;transform:translateX(var(--x)) rotate(var(--r))}
+.ht-wc-c-card.is-in:hover{transform:translateX(var(--x)) translateY(-8px) rotate(0deg) scale(1.04);outline-color:#7c3aed;transition:transform .35s cubic-bezier(.34,1.56,.64,1),outline-color .35s ease}
+/* D: one large card at a time, breathing gently; the outgoing card slides off right, the next comes in from the left. */
+.ht-wc-d-card{position:absolute;left:75%;top:50%;width:38vw;opacity:0;pointer-events:none;transform:translate(-50%,-50%) translateX(-60px) rotate(-3deg)}
+.ht-wc-d-card.is-current{opacity:1;pointer-events:auto;transform:translate(-50%,-50%);transition:opacity .6s ease-out .6s,transform .6s ease-out .6s}
+.ht-wc-d-card.is-out{opacity:0;transform:translate(-50%,-50%) translateX(120px) rotate(6deg);transition:opacity .5s ease-in,transform .5s ease-in}
+.ht-wc-d-card.is-instant{transition:none}
+.ht-wc-d-float{display:block;animation:ht-wc-float 4s ease-in-out infinite}
+.ht-wc-d-card:hover .ht-wc-d-float{animation-play-state:paused}
+@keyframes ht-wc-float{0%,100%{transform:translateY(-6px)}50%{transform:translateY(6px)}}
+.ht-wc-d-body{display:block;transition:transform .4s ease}
+.ht-wc-d-card:hover .ht-wc-d-body{transform:scale(1.03)}
+.ht-wc-d-dots{position:absolute;left:75%;top:calc(50% + 38vw * 10 / 32 + 30px);display:flex;gap:8px;transform:translateX(-50%)}
+.ht-wc-d-dot{display:block;width:6px;height:6px;border-radius:999px;background:rgba(255,255,255,.6);transition:width .35s ease,background-color .35s ease}
+.ht-wc-d-dot.is-current{width:24px;background:#7c3aed}
+/* Phones: every layout is a plain full-width column of the original cards, each rising in as it comes on screen. */
+@media(max-width:760px){
+  .ht-wc{height:auto;margin:58svh 0 0}
+  .ht-wc-pin{position:static;height:auto;overflow:visible;display:flex;flex-direction:column;gap:24px}
+  .ht-wc-b-clip,.ht-wc-c-col{position:static;overflow:visible;padding:0;width:auto;transform:none}
+  .ht-wc-b-strip{flex-direction:column;width:auto;padding:0;transform:none!important}
+  .ht-wc-c-col{display:flex;gap:24px}
+  .ht-wc-d-dots{display:none}
+  .ht-wc-stage,.ht-wc-ring{position:static;width:auto;height:auto;perspective:none;transform:none!important;display:flex;flex-direction:column;gap:24px}
+  .ht-wc-a-card{aspect-ratio:16/10;border-radius:6px;overflow:hidden}
+  .ht-wc-a-strip{display:none}
+  .ht-wc-a-strip.is-first{display:block;position:absolute;inset:0;width:auto!important;height:auto;transform:none!important;background-size:cover!important;background-position:center!important;border-radius:6px}
+  .ht-wc-a-card .ht-wc-pill{top:auto;bottom:14px;left:14px;transform:none!important;opacity:1}
+  .ht-wc-card,.ht-wc-b-card{position:relative!important;left:auto!important;top:auto!important;width:100%!important;z-index:auto!important;pointer-events:auto!important;
+    opacity:0!important;transform:translateY(40px)!important;transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)!important}
+  .ht-wc-card.is-seen{opacity:1!important;transform:none!important}
+  .ht-wc-d-float{animation:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .ht-wc-d-float{animation:none}
+  .ht-wc-card,.ht-wc-d-card.is-current,.ht-wc-d-card.is-out{transition:none!important}
+}

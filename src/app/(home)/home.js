@@ -6,7 +6,7 @@ import "lenis/dist/lenis.css";
 import allProjects from "../../lib/projects";
 import "./home.css";
 import { getStage } from "./stage";
-import ShineCard from "./shine-card";
+import WorkCards from "./work-cards";
 const IslandScene = dynamic(() => import("./island-scene"), { ssr: false });
 const AboutScene = dynamic(() => import("./about-scene"), { ssr: false });
 const WorkScene = dynamic(() => import("./work-scene"), { ssr: false });
@@ -52,6 +52,8 @@ const ABOUT = 1, WORK = 2, SKILLS_AT = 3, CONTACT = 4;
 const clamp = v => Math.min(1, Math.max(0, v));
 // The Work section's scene tester: which 3D scene its island shows (work-scene.js builds all four up front).
 const WORK_SCENES = { A: "Current fixed", B: "Yellowstone", C: "Cowboy", D: "Sky only", E: "Cowboy hat" };
+// The Work section's card-layout tester (work-cards.js).
+const CARD_LAYOUTS = { A: "Orbital ring", B: "Ticker", C: "Staggered stack", D: "Focused" };
 
 // The contact form posts to Formspree with fetch, so the card stays put and thanks you in place.
 // Replace REPLACE_WITH_ID with your Formspree form ID from formspree.io; until then the form says to email instead.
@@ -109,7 +111,7 @@ export default function Home() {
   // Shared with the 3D scenes (read every frame): which sections are on screen and how far through each one we are.
   const scene = useRef({ section: 0, live: [0], progress: [0, 0, 0, 0, 0], tilt: [0, 0, 0, 0, 0] });
   const [spotted, setSpotted] = useState([]), [still, setStill] = useState(false);
-  const [workScene, setWorkScene] = useState("A");
+  const [workScene, setWorkScene] = useState("A"), [cardLayout, setCardLayout] = useState("A");
   useEffect(() => { scene.current.workVariant = workScene; }, [workScene]);
   // Reduced motion, and phones: the Work postcard shows its still image instead of playing its preview.
   useEffect(() => {
@@ -273,17 +275,7 @@ export default function Home() {
               <a href="/journey/">Lab experiments <span aria-hidden="true">→</span></a>
             </p>
           </div>
-          <ol className="ht-cards">
-            {work.map((project, i) => (
-              <li key={project.slug}>
-                <ShineCard index={i} href={`/project/${project.slug}/`} name={project.name}>
-                  {section === WORK && !still && project.previewVideo
-                    ? <video src={project.previewVideo} poster={project.previewImage} autoPlay muted loop playsInline />
-                    : <img src={project.previewImage} alt="" loading="lazy" decoding="async" />}
-                </ShineCard>
-              </li>
-            ))}
-          </ol>
+          <WorkCards variant={cardLayout} work={work} scene={scene} slot={WORK} playing={section === WORK && !still} />
         </div>
       </section>
 
@@ -348,6 +340,16 @@ export default function Home() {
             {Object.keys(WORK_SCENES).map(key => <button key={key} type="button" aria-pressed={workScene === key} title={WORK_SCENES[key]} onClick={() => setWorkScene(key)}>{key}</button>)}
           </div>
           <span className="ht-tester-label">{WORK_SCENES[workScene]}</span>
+        </div>
+      )}
+      {/* The Work card-layout tester, on the other side: shown only while Work is the section on screen. */}
+      {section === WORK && (
+        <div className="ht-tester ht-tester-cards">
+          <div className="ht-tester-pill" role="group" aria-label="Card layout">
+            <span className="ht-tester-name" aria-hidden="true">Cards:</span>
+            {Object.keys(CARD_LAYOUTS).map(key => <button key={key} type="button" aria-pressed={cardLayout === key} aria-label={`Cards ${key}: ${CARD_LAYOUTS[key]}`} title={CARD_LAYOUTS[key]} onClick={() => setCardLayout(key)}>{key}</button>)}
+          </div>
+          <span className="ht-tester-label">{CARD_LAYOUTS[cardLayout]}</span>
         </div>
       )}
       {/* Where you are, and a way to jump anywhere. */}
