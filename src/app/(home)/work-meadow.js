@@ -31,9 +31,25 @@ export function createMeadow({outline,foliage,loader,onLoad}){
     const cut=Math.max(smooth(1.05,.42,riverAt(x,z).d),smooth(1.25,.92,lakeE(x,z)));
     return h*(1-cut)-.36*cut;
   }
-  const island=createIsland(13,{outline,heightAt:height,riverDistance:riverAt,depth:.85,sand:.75,hub:new THREE.Vector2(1.4,2),scatter:.8,grass:["#8b9e5a","#c4a84a","#a9a552","#98a35a"],edge:"#7f8a4c",
-    // The wet shore: a dark band round the lake.
-    paint:(x,z,c)=>{const e=lakeE(x,z);if(e>.9&&e<1.12)c.multiplyScalar(.72);}});
+  const on=(x,z)=>new THREE.Vector3(x,height(x,z),z);
+  // Pines: a loose line along the bank, and a stand at the mountains' foot.
+  const trees=[];
+  for(let tries=0;trees.length<8&&tries<300;tries++){const p=PATH[4+Math.floor(rng()*40)],a=rng()*Math.PI*2,r=1.1+rng()*.4,x=p.x+Math.cos(a)*r,z=p.z+Math.sin(a)*r;
+    if(riverAt(x,z).d<1.05||lakeE(x,z)<1.3||Math.hypot(x,z)>outline(Math.atan2(z,x))*.82||SPOTS.some(([sx,sz])=>Math.hypot(x-sx,z-sz)<1.1)||trees.some(t=>Math.hypot(x-t.position.x,z-t.position.z)<.7))continue;
+    trees.push({position:on(x,z),rotation:rng()*6,scale:.42+rng()*.2});}
+  for(let tries=0;trees.length<18&&tries<300;tries++){const x=-3.6+rng()*7.2,z=-2.3-rng()*1.1;
+    if(riverAt(x,z).d<1||Math.hypot(x,z)>outline(Math.atan2(z,x))*.86||trees.some(t=>Math.hypot(x-t.position.x,z-t.position.z)<.6))continue;
+    trees.push({position:on(x,z),rotation:rng()*6,scale:.45+rng()*.25});}
+  // Ground colour: golden meadow, greener and wetter toward the lake, darker and rockier at the mountains' foot,
+  // a medium green under the pines; a dark wet band right round the lake.
+  const GOLD=new THREE.Color("#c4a84a"),WET=new THREE.Color("#7a8f5a"),ROCKY=new THREE.Color("#6b7a5a"),GREEN=new THREE.Color("#8b9e5a");
+  const paint=(x,z,c)=>{
+    const e=lakeE(x,z),near=Math.min(...trees.map(t=>Math.hypot(x-t.position.x,z-t.position.z)));
+    c.copy(GOLD).multiplyScalar(.93+rng()*.12);
+    c.lerp(GREEN,.75*smooth(.9,.3,near));c.lerp(ROCKY,.8*smooth(-1.9,-2.9,z));c.lerp(WET,.85*smooth(2,1.1,e));
+    if(e>.9&&e<1.12)c.multiplyScalar(.72);
+  };
+  const island=createIsland(13,{outline,heightAt:height,riverDistance:riverAt,depth:.85,sand:.75,hub:new THREE.Vector2(1.4,2),scatter:.8,grass:["#c4a84a"],edge:"#7f8a4c",paint});
   group.add(island.group);
   // The river: narrowing as it nears the lake and fading out under its surface, so the two run together.
   const water=createWater(PATH,outline,{width:.62,fade:.9,level:LEVEL,volume:.3,head:.04,pour:false,shape:k=>(.75+.1*Math.sin(k*18))*(1-.5*smooth(.7,1,k))});
@@ -47,24 +63,25 @@ export function createMeadow({outline,foliage,loader,onLoad}){
   lakeShape.rotateX(-Math.PI/2);const rest=Float32Array.from(lakeShape.attributes.position.array);
   const lake=new THREE.Mesh(lakeShape,new THREE.MeshStandardMaterial({color:"#7ec8e3",emissive:"#2f6a80",emissiveIntensity:.25,roughness:.2,metalness:.1,envMap:skyTexture,envMapIntensity:.4,flatShading:true,transparent:true,opacity:.94}));
   lake.position.set(LAKE.x,LEVEL+.005,LAKE.z);group.add(lake);
-  const on=(x,z)=>new THREE.Vector3(x,height(x,z),z);
-  // Pines: a loose line along the bank, and a stand at the mountains' foot.
-  const trees=[];
-  for(let tries=0;trees.length<8&&tries<300;tries++){const p=PATH[4+Math.floor(rng()*40)],a=rng()*Math.PI*2,r=1.1+rng()*.4,x=p.x+Math.cos(a)*r,z=p.z+Math.sin(a)*r;
-    if(riverAt(x,z).d<1.05||lakeE(x,z)<1.3||Math.hypot(x,z)>outline(Math.atan2(z,x))*.82||SPOTS.some(([sx,sz])=>Math.hypot(x-sx,z-sz)<1.1)||trees.some(t=>Math.hypot(x-t.position.x,z-t.position.z)<.7))continue;
-    trees.push({position:on(x,z),rotation:rng()*6,scale:.42+rng()*.2});}
-  for(let tries=0;trees.length<18&&tries<300;tries++){const x=-3.6+rng()*7.2,z=-2.3-rng()*1.1;
-    if(riverAt(x,z).d<1||Math.hypot(x,z)>outline(Math.atan2(z,x))*.86||trees.some(t=>Math.hypot(x-t.position.x,z-t.position.z)<.6))continue;
-    trees.push({position:on(x,z),rotation:rng()*6,scale:.45+rng()*.25});}
   const pines=createSwayingInstances(createPineGeometry(11),trees,foliage);group.add(pines.mesh);
   // The peaks, loaded from the hero's kit (already in the cache): faces recoloured grey-blue, the snow left white.
   loader.load("/models/island/kit.glb",gltf=>{
     let node=null;gltf.scene.traverse(o=>{if(!node&&o.name.startsWith("Mountain"))node=o;});if(!node)return;
     node.position.set(0,0,0);const geometry=bakeProp(node);geometry.translate(0,-geometry.boundingBox.min.y,0);
-    const size=geometry.boundingBox.getSize(new THREE.Vector3()),color=geometry.attributes.color,slate=new THREE.Color("#6b7a8d"),snow=new THREE.Color("#f6f4f0"),tone=new THREE.Color();
-    for(let i=0;i<color.count;i+=3){const white=color.getX(i)>.85&&color.getZ(i)>.85;tone.copy(white?snow:slate).multiplyScalar(white?1:.92+rng()*.16);for(let k=0;k<3;k++)color.setXYZ(i+k,tone.r,tone.g,tone.b);}
-    const material=new THREE.MeshLambertMaterial({vertexColors:true,flatShading:true});
-    PEAKS.forEach(([x,z,tall,turn])=>{const peak=new THREE.Mesh(geometry,material),k=tall/size.y;peak.scale.set(k*.8,k,k*.8);peak.position.set(x,height(x,z)-.3,z);peak.rotation.y=turn;group.add(peak);});
+    // Each peak coloured by which way its faces point once it's turned into place: lit blue-grey on the sun's side
+    // (left, and the tops), deep shadow on the right, cool white snow on the high flat faces and the model's own
+    // snow; at least twice as bright lit as shadowed.
+    const size=geometry.boundingBox.getSize(new THREE.Vector3()),LIT=new THREE.Color("#8b9bb0"),MID=new THREE.Color("#6b7a8d"),SHADE=new THREE.Color("#3d4a5c"),SNOW=new THREE.Color("#f0f4f8"),tone=new THREE.Color();
+    const material=new THREE.MeshLambertMaterial({vertexColors:true,flatShading:true}),a=new THREE.Vector3(),b=new THREE.Vector3(),c=new THREE.Vector3(),n=new THREE.Vector3();
+    PEAKS.forEach(([x,z,tall,turn])=>{
+      const k=tall/size.y,g=geometry.clone().rotateY(turn).scale(k*.8,k,k*.8),pos=g.attributes.position,color=g.attributes.color,top=tall;
+      for(let i=0;i<pos.count;i+=3){
+        a.fromBufferAttribute(pos,i);b.fromBufferAttribute(pos,i+1);c.fromBufferAttribute(pos,i+2);n.subVectors(b,a).cross(c.clone().sub(a)).normalize();
+        const white=color.getX(i)>.85&&color.getZ(i)>.85,high=Math.max(a.y,b.y,c.y)>top*.85;
+        const snowy=white||(n.y>.7&&high);tone.copy(snowy?SNOW:n.x>.3?SHADE:n.x<-.3||n.y>.7?LIT:MID);if(!snowy)tone.multiplyScalar(.95+rng()*.1);
+        for(let j=0;j<3;j++)color.setXYZ(i+j,tone.r,tone.g,tone.b);}
+      color.needsUpdate=true;const peak=new THREE.Mesh(g,material);peak.position.set(x,height(x,z)-.3,z);group.add(peak);});
+    geometry.dispose();
     onLoad?.();
   },undefined,()=>{});
   const blocked=(x,z,pad)=>riverAt(x,z).d<.95+pad||lakeE(x,z)<1.15+pad/LAKE.rz||z<-2.2+pad*.5||trees.some(t=>Math.hypot(x-t.position.x,z-t.position.z)<.3+pad);

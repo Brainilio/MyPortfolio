@@ -65,7 +65,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     const rng=random(5);
 
     // Golden hour: a low warm sun from the back left, a peach sky light.
-    scene.add(new THREE.HemisphereLight("#ffe6c4","#5b3048",1.35));
+    const sky=new THREE.HemisphereLight("#ffe6c4","#5b3048",1.35),ambient=new THREE.AmbientLight("#ffe8c0",0);scene.add(sky,ambient);
     const sun=new THREE.DirectionalLight("#ffc27a",3);sun.position.set(-10,7,-8);scene.add(sun);
     const fill=new THREE.DirectionalLight("#ffd9c2",.8);fill.position.set(6,5,10);scene.add(fill);
 
@@ -379,7 +379,10 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     function setVariant(v){
       variant=v;world.visible=v==="A";meadow.group.visible=v==="B";flock.visible=!ALONE[v];
       // B's sun is low on the left, lighting the scene from that side.
-      if(v==="B")sun.position.set(-12,6,2);else sun.position.set(-10,7,-8);
+      // B: the sun low on the left (where it hangs in the sky) and little ambient, so the peaks' lit and shadowed
+      // sides stand apart; a warm golden sky light with earth-coloured bounce from below.
+      if(v==="B"){sun.position.set(-8,12,6);sun.intensity=2.2;sun.color.set("#ffd580");fill.intensity=0;ambient.intensity=.35;sky.color.set("#ffd4a0");sky.groundColor.set("#8b7340");sky.intensity=.4;}
+      else{sun.position.set(-10,7,-8);fill.intensity=.8;ambient.intensity=0;sky.color.set("#ffe6c4");sky.groundColor.set("#5b3048");sky.intensity=1.35;risen=-1;}
       if(stageEntry){stageEntry.scene=ALONE[v]?.scene??scene;stageEntry.camera=ALONE[v]?.camera??camera;}
       settleHerd();frame();shared_.invalidate();
     }
@@ -471,7 +474,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       // The sun's climb follows the scroll through the section (reduced motion: already up).
       const rise=reduced?1:smooth(state.current.progress[slot]/.75);
       if(Math.abs(rise-risen)>1e-3){risen=rise;sunDisc.position.set(-15+rise*2,-6+rise*9,-40);sunDisc.material.color.copy(LOW).lerp(HIGH,rise);
-        sun.intensity=1.8+rise*1.4;sun.color.copy(LOW).lerp(HIGH,rise*.8);}
+        if(variant!=="B"){sun.intensity=1.8+rise*1.4;sun.color.copy(LOW).lerp(HIGH,rise*.8);}}
       clouds.forEach(cloud=>{const u=cloud.userData;u.a+=step*u.speed;cloud.position.set(Math.cos(u.a)*u.r,u.y+Math.sin(time*.2+u.r)*.2,-Math.abs(Math.sin(u.a))*u.r-1.5);});
       shared.uTime.value=time;shared.uBreeze.value=reduced?0:.3;shared.uGust.value=reduced?0:.3+gustPower*.9;
       for(const set of bushes){for(let i=0;i<set.sway.length;i++)set.sway[i]*=Math.exp(-dt*2.2);set.update();}
