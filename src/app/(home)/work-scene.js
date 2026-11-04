@@ -6,9 +6,10 @@ import { getStage } from "./stage";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
-import { random, createIsland, createBearMaterial, createSpin, tilted, createSwayingInstances, createFoliageMaterial, createBird, createCloud } from "./island-parts";
+import { random, createIsland, createSpin, tilted, createSwayingInstances, createFoliageMaterial, createBird, createCloud } from "./island-parts";
 import { paintGeometry } from "./forest-parts";
 import { createBasket } from "./park-parts";
+import { createBisonRig } from "./bison-rig";
 
 // Work as the prairie in miniature, the island's golden-hour cousin: rolling prairie climbing to a mesa shelf at the
 // back, where flat-topped sandstone buttes stand (Monument Valley), rounded boulders at their feet, a small bison herd
@@ -31,8 +32,6 @@ function heightAt(x,z) {
   return h-.3*smooth((edge-.84)/.16);
 }
 const noRiver=()=>({d:99,t:0});
-// Bison gaits: leg swing (rad), stride rate, bob (fraction of height), knee fold, foot lift (fraction), nod.
-const GAITS={Graze:[0,1.1,.003,0,0,.04],Walk:[.36,3.4,.006,.6,.035,.09],Run:[.62,7.5,.02,.95,.06,.14]};
 // Monument Valley, from real low-poly models (public/models/island/buttes.glb): Kenney's "Large Rock Formation" (CC0) as
 // the West Mitten, Danni Bittman's "Desert Pillar" (CC BY 3.0) as the East Mitten, and Poly by Google's layered "Cliff"
 // (CC BY 3.0) as the mesa. (x, z, node, height, turn, widen, foot radius): kept cartoon-small, like the hero island's peaks: the West
@@ -248,10 +247,14 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
         model.traverse(o=>{if(!o.isMesh)return;
           if(calf){const g=o.geometry.clone(),c=g.attributes.color,tint=new THREE.Color(),deep=new THREE.Color("#a24f22"),bright=new THREE.Color("#e08a4c");
             if(c)for(let k=0;k<c.count;k++){const l=(c.getX(k)+c.getY(k)+c.getZ(k))/3;tint.copy(deep).lerp(bright,Math.min(1,l*3));c.setXYZ(k,tint.r,tint.g,tint.b);}o.geometry=g;}
-          gait??=createBearMaterial(o.geometry,{hip:.27,diagonal:true});o.material=gait.material;o.frustumCulled=false;});
+          gait??=createBisonRig(o.geometry);o.material=gait.material;o.frustumCulled=false;});
         const h=calf?.3:.55;model.scale.setScalar(h/size.y);model.position.y=-box.min.y*h/size.y;root.add(model);
         root.position.copy(on(x,z));world.add(root);
-        herd.push({root,gait,calf,yaw:rng()*6,state:"graze",timer:1+rng()*5,speed:0,gaitName:"Graze",swing:0,phase:rng()*6,head:0,turn:0,eatT:rng()*5,target:new THREE.Vector2(x,z),feeding:false,face:null,eatUntil:0,dipNext:2+rng()*4,dipUntil:0,shift:rng()*6});
+        // One of the herd starts the scene lying down, chewing.
+        const resting=i===2;
+        herd.push({root,gait,calf,height:h,yaw:rng()*6,state:resting?"rest":"graze",timer:1+rng()*5,speed:0,gaitName:"Graze",walk:0,run:0,phase:rng(),head:0,eatT:rng()*5,
+          target:new THREE.Vector2(x,z),feeding:false,face:null,eatUntil:0,dipNext:2+rng()*4,dipUntil:0,shift:rng()*6,
+          look:0,lookGoal:0,lookNext:rng()*3,tail:0,tailV:0,flickNext:1+rng()*4,lift:0,rest:resting?1:0,resting,restUntil:resting?14+rng()*10:0,frolicUntil:0});
       });
       needsRender=true;
     },undefined,()=>{});
@@ -260,15 +263,29 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       // The calf squeezes in at its mother's side.
       const adults=herd.filter(b=>!b.calf);
       herd.forEach(b=>{const k=adults.indexOf(b),a=b.calf?Math.PI*.15-.45:Math.PI*(.15+.7*k/Math.max(1,adults.length-1)),r=b.calf?.45:.62;
-        b.target.set(BASKET.x+Math.cos(a)*r,BASKET.z-Math.sin(a)*r);b.feeding=true;b.drink=false;b.face=null;b.state="move";b.gaitName="Run";b.speed=.85;});
+        b.target.set(BASKET.x+Math.cos(a)*r,BASKET.z-Math.sin(a)*r);b.feeding=true;b.drink=false;b.resting=false;b.face=null;b.state="move";b.gaitName="Run";b.speed=.85;});
     }
     function updateBison(b,dt,now){
       const p=b.root.position;b.timer-=dt;
       if(b.state==="eat"){if(now>b.eatUntil){b.state="graze";b.feeding=false;b.drink=false;b.face=null;b.timer=0;}}
+      else if(b.state==="rest"){
+        // Lying down: it stays down a while, then gets up (legs first unfold, then it stands and goes on grazing).
+        if(b.resting&&now>b.restUntil)b.resting=false;
+        if(!b.resting&&b.rest<.03){b.state="graze";b.timer=1+rng()*2;}
+      }
+      else if(b.state==="graze"&&b.timer<=0&&rng()<(b.calf?.12:.15)&&herd.filter(o=>o.resting).length<2&&(!b.calf||herd[0].resting)){
+        // Now and then one lies down for a rest (the calf, when its mother does).
+        b.state="rest";b.resting=true;b.restUntil=b.calf?herd[0].restUntil:now+12+rng()*16;
+      }
       else if(b.state==="graze"&&b.timer<=0&&!b.calf&&rng()<.3&&!herd.some(o=>o.drink)){
         // Now and then one wanders over to the watering hole for a drink, from whichever side it's on.
         const a=Math.atan2(p.z-POND.z,p.x-POND.x);b.target.set(POND.x+Math.cos(a)*(POND.r+.38),POND.z+Math.sin(a)*(POND.r+.38));
         b.drink=true;b.state="move";b.gaitName="Walk";b.speed=.24;
+      }
+      else if(b.state==="graze"&&b.timer<=0&&b.calf&&rng()<.4){
+        // The calf's games: a quick gallop off, a loop, and back to its mother.
+        for(let tries=0;tries<12;tries++){const a=rng()*Math.PI*2,r=leash*(1.8+rng()*1.2),x=p.x+Math.cos(a)*r,z=p.z+Math.sin(a)*r;if(inside(x,z)){b.target.set(x,z);break;}}
+        b.state="move";b.gaitName="Run";b.speed=.75+rng()*.2;b.frolicUntil=now+2.5;
       }
       else if(b.state==="graze"&&b.timer<=0){
         // Wander a little; the calf stays by its mother (the first bison).
@@ -282,27 +299,43 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
           else if(b.drink){b.state="eat";b.eatUntil=now+4+rng()*3;b.face=Math.atan2(POND.x-p.x,POND.z-p.z);}
           else{b.state="graze";b.timer=b.calf?.8+rng()*1.6:3+rng()*7;}
         }
-        else{const step=Math.min(dist,b.speed*dt);p.x+=dx/dist*step;p.z+=dz/dist*step;let turn=Math.atan2(dx,dz)-b.yaw;turn=Math.atan2(Math.sin(turn),Math.cos(turn));b.yaw+=turn*(1-Math.exp(-dt*4));}
+        else{
+          // (Getting up first if it was lying down.) It turns toward where it's going, and slows into the turn.
+          let turn=Math.atan2(dx,dz)-b.yaw;turn=Math.atan2(Math.sin(turn),Math.cos(turn));b.yaw+=turn*(1-Math.exp(-dt*4));
+          const step=Math.min(dist,b.speed*dt*(1-b.rest)**2*(.55+.45*Math.cos(Math.min(Math.abs(turn),1.5))));p.x+=dx/dist*step;p.z+=dz/dist*step;
+        }
       }
       // The calf follows when its mother wanders off: it trots (or runs, if she's well away) back to her side.
-      if(b.calf&&!b.feeding){const m=herd[0].root.position,away=Math.hypot(p.x-m.x,p.z-m.z);
+      if(b.calf&&!b.feeding&&b.state!=="rest"&&now>b.frolicUntil){const m=herd[0].root.position,away=Math.hypot(p.x-m.x,p.z-m.z);
         if(away>leash&&(b.state!=="move"||Math.hypot(b.target.x-m.x,b.target.y-m.z)>leash*.9)){
           const a=Math.atan2(p.z-m.z,p.x-m.x);b.target.set(m.x+Math.cos(a)*leash*.6,m.z+Math.sin(a)*leash*.6);b.state="move";
           const off=Math.hypot(b.target.x-POND.x,b.target.y-POND.z);if(off<POND.r+.2){const k=(POND.r+.25)/Math.max(off,1e-3);b.target.set(POND.x+(b.target.x-POND.x)*k,POND.z+(b.target.y-POND.z)*k);}
           const run=away>leash*1.4;b.gaitName=run?"Run":"Walk";b.speed=run?.9:.35;}}
       if(b.face!==null){let turn=b.face-b.yaw;turn=Math.atan2(Math.sin(turn),Math.cos(turn));b.yaw+=turn*(1-Math.exp(-dt*4));}
-      const [swing,rate,bob,knee,lift,nod]=GAITS[b.gaitName];
-      b.swing+=(swing-b.swing)*(1-Math.exp(-dt*4));b.phase+=dt*rate*(b.calf?1.25:1);
-      // Standing about, the head is mostly up and dips to crop the grass every four to six seconds; at the basket it stays down.
-      const grazing=b.state==="graze"||b.state==="eat";b.eatT+=dt;
-      if(b.state==="graze"&&now>b.dipNext){b.dipUntil=now+1.4+rng()*.6;b.dipNext=now+4+rng()*2;}
-      const down=b.state==="eat"?.5+Math.sin(b.eatT*5.2)*.08:b.state==="graze"&&now<b.dipUntil?.55+Math.sin(b.eatT*5.2)*.06:b.state==="graze"?.06:0;
-      b.head+=(down-b.head)*(1-Math.exp(-dt*(down>b.head?3:2)));b.turn+=((grazing?Math.sin(b.eatT*.8)*.05:0)-b.turn)*(1-Math.exp(-dt*3));
-      const walking=Math.min(1,b.swing/.36),u=b.gait.uniforms;
-      u.uPhase.value=b.phase;u.uSwing.value=b.swing;u.uKnee.value=Math.max(knee,GAITS.Walk[3]*walking);u.uLift.value=Math.max(lift,GAITS.Walk[4]*walking)*u.uHeight.value;u.uNod.value=nod;
-      u.uHeadDown.value=b.head;u.uHeadTurn.value=b.turn;u.uTail.value=Math.sin(now*1.7+b.phase*.3)*.22;
-      // Moving, the body bobs with each stride; standing, it shifts its weight on a slow two-second sway.
-      u.uBob.value=b.swing>.05?Math.abs(Math.sin(b.phase))*Math.max(bob,GAITS.Walk[2]*walking):Math.sin(now*Math.PI+b.shift)*.006;
+
+      // Gait: blend weights ease toward the current one; the stride cycle advances by distance over stride length, so
+      // the hooves keep pace with the ground.
+      const moving=b.state==="move"&&b.rest<.05,goalWalk=moving&&b.gaitName==="Walk"?1:0,goalRun=moving&&b.gaitName==="Run"?1:0;
+      b.walk+=(goalWalk-b.walk)*(1-Math.exp(-dt*5));b.run+=(goalRun-b.run)*(1-Math.exp(-dt*5));
+      const stride=b.height*(b.walk*b.gait.stride.walk+b.run*b.gait.stride.run)/Math.max(.001,b.walk+b.run);
+      b.phase+=dt*(moving?b.speed*(1-b.rest)**2:.15*(b.walk+b.run))/Math.max(.05,stride);
+      // Lying down and getting up.
+      b.rest+=((b.resting?1:0)-b.rest)*(1-Math.exp(-dt*1.6));
+      // Head: down to graze every few seconds, down at the basket or the water; up and looking about otherwise.
+      b.eatT+=dt;
+      if(b.state==="graze"&&now>b.dipNext){b.dipUntil=now+1.6+rng()*.8;b.dipNext=now+4+rng()*3;}
+      const down=b.state==="eat"?.62+Math.sin(b.eatT*5.2)*.06:b.state==="graze"&&now<b.dipUntil?.66+Math.sin(b.eatT*5.2)*.05:b.state==="rest"?.08:b.state==="graze"?.08:.12*b.walk;
+      b.head+=(down-b.head)*(1-Math.exp(-dt*(down>b.head?2.6:1.8)));
+      // Looking about: every few seconds it turns its head to something new (just a little while walking, not at all
+      // galloping or with its nose down), and back.
+      if(now>b.lookNext){const still=b.state!=="move";b.lookGoal=still&&rng()<.75?(rng()-.5)*1.3:(rng()-.5)*.25;b.lookNext=now+(still?1.8+rng()*3:2.5+rng()*3);}
+      const lookGoal=b.lookGoal*(1-b.run)*(1-Math.min(1,b.head/.6)*.7);b.look+=(lookGoal-b.look)*(1-Math.exp(-dt*2.2));
+      // Tail: a lazy sway, and every few seconds a flick at a fly (a quick swish that dies away), raised when galloping.
+      if(now>b.flickNext){b.tailV+=(rng()<.5?-1:1)*(5+rng()*4);b.flickNext=now+2+rng()*5;}
+      b.tailV+=(-b.tail*60-b.tailV*5)*dt;b.tail+=b.tailV*dt;
+      b.lift+=(b.run*.9-b.lift)*(1-Math.exp(-dt*3));
+      b.gait.pose({phase:b.phase,walk:b.walk,run:b.run,nod:b.head+b.rest*.05,turn:b.look,tail:b.tail+Math.sin(now*1.3+b.shift)*.12,tailLift:b.lift,rest:b.rest,
+        breath:.012*Math.sin(now*(1.5+b.run*2)+b.shift)});
       p.y=heightAt(p.x,p.z);b.root.rotation.y=b.yaw;
     }
     // Prairie dogs pop up from their mounds, look about, and duck back down.
@@ -360,7 +393,8 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     // Framing: the mesa to one side (the words scroll past on the other), further off when tall.
     let tall=false,attitude=0;const VIEW=new THREE.Vector3(0,.34,1).normalize(),focus=new THREE.Vector3(0,.9,0),viewDir=new THREE.Vector3();
     // The camera sits on an orbit round the mesa; only its attitude (steeper arriving, lower leaving) changes.
-    function placeCamera(){camera.position.copy(tilted(VIEW,attitude,viewDir)).multiplyScalar(tall?60:27).add(focus);camera.lookAt(focus);}
+    let closeUp=null;// (?debug only: { from, at } to inspect something up close)
+    function placeCamera(){if(closeUp){camera.position.copy(closeUp.from);camera.lookAt(closeUp.at);return;}camera.position.copy(tilted(VIEW,attitude,viewDir)).multiplyScalar(tall?60:27).add(focus);camera.lookAt(focus);}
     function frame(){
       const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;tall=camera.aspect<.85;
       if(tall)camera.setViewOffset(w,h,0,h*.2,w,h);else camera.setViewOffset(w,h,side==="center"?0:(side==="left"?.17:-.17)*w,side==="center"?-h*.13:h*.07,w,h);
@@ -410,7 +444,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     const wide=matchMedia("(min-width: 761px)"),syncFade=()=>{entry.fade=wide.matches?{side:"right",from:.75}:null;shared_.invalidate();};
     syncFade();wide.addEventListener("change",syncFade);
     const readyTimer=setTimeout(()=>ready.current?.(),0);
-    if(new URLSearchParams(window.location.search).has("debug"))window.__work={camera,herd,world,scene,renderer,pour,THREE,tumble,tumbleweed,kickTumble,gust:()=>{gustIn=0;}};
+    if(new URLSearchParams(window.location.search).has("debug"))window.__work={camera,herd,world,scene,renderer,pour,THREE,tumble,tumbleweed,kickTumble,gust:()=>{gustIn=0;},closeUp:v=>{closeUp=v;}};
 
     return()=>{
       clearTimeout(readyTimer);delete window.__work;disposed=true;unregister();wide.removeEventListener("change",syncFade);resize.disconnect();observer.disconnect();
