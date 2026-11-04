@@ -318,6 +318,14 @@ export function createFish(seed) {
 // Drag to spin, like the hero island: a horizontal drag flings the diorama round with inertia, and it drifts back
 // to its resting angle once let go. A press that doesn't drag is a tap (handed to onTap); `over` says whether the
 // pointer is on something tappable (pointer cursor instead of grab). Vertical drags still scroll the page on touch.
+// The camera's attitude: tips a view direction (pointing from the target to the camera) up by deg degrees (down if
+// negative), about the horizontal axis across it, so the camera looks more steeply down onto the island.
+const UP=new THREE.Vector3(0,1,0),ACROSS=new THREE.Vector3();
+export function tilted(dir,deg,out=new THREE.Vector3()) {
+  ACROSS.crossVectors(dir,UP).normalize();
+  return out.copy(dir).applyAxisAngle(ACROSS,deg*Math.PI/180);
+}
+
 export function createSpin(canvas,{rest=0,onTap,over}={}) {
   let yaw=rest,velocity=0,pressed=false,dragging=false,downX=0,lastX=0;
   const cursor=event=>{canvas.style.cursor=dragging?"grabbing":over?.(event)?"pointer":"grab";};

@@ -256,4 +256,18 @@ html.ht-locked{overflow:hidden}
   .ht-beam-hint{right:16px;top:78px;bottom:auto}
   .ht-credits{left:16px;right:16px;top:118px;bottom:auto;font-size:9px}
   }
-@media(prefers-reduced-motion:reduce){.ht-finish:after{animation:none}.ht-canvas{transition:none}}
+/* The entrance, once the loading screen lifts: the island rises and lands (0.3–1.4 s), the name drops in (0.8–1.6 s),
+   then the words and buttons follow one by one (from 1.4 s). With reduced motion it's a short fade, no movement. */
+@keyframes ht-arrive{from{opacity:0;transform:translateY(60px) scale(.88)}}
+@keyframes ht-drop{from{opacity:0;transform:translateY(-16px)}}
+@keyframes ht-lift{from{opacity:0;transform:translateY(12px)}}
+@keyframes ht-show{from{opacity:0}}
+.ht.is-entered .ht-home .ht-canvas{animation:ht-arrive 1.1s cubic-bezier(.16,1,.3,1) .3s both}
+.ht.is-entered .ht-name{animation:ht-drop .8s ease-out .8s both}
+.ht.is-entered .ht-intro>*{animation:ht-lift .6s ease-out both}
+.ht.is-entered .ht-intro>:nth-child(1){animation-delay:1.4s}
+.ht.is-entered .ht-intro>:nth-child(2){animation-delay:1.55s}
+.ht.is-entered .ht-intro>:nth-child(3){animation-delay:1.7s}
+.ht.is-entered .ht-intro>:nth-child(4){animation-delay:1.85s}
+@media(prefers-reduced-motion:reduce){.ht-finish:after{animation:none}.ht-canvas{transition:none}
+  .ht.is-entered .ht-home .ht-canvas,.ht.is-entered .ht-name,.ht.is-entered .ht-intro>*{animation:ht-show .4s ease both;animation-delay:0s!important}}

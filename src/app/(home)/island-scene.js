@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { clone as cloneSkinned } from "three/addons/utils/SkeletonUtils.js";
-import { PALETTE, MOUNTAIN, outline, heightAt, riverDistance, random, createIsland, createWater, createPineGeometry, bakeProp, createSwayingInstances, createFoliageMaterial, createCloud, createBird, createEagle, createBearMaterial, createFish } from "./island-parts";
+import { PALETTE, MOUNTAIN, outline, heightAt, riverDistance, random, createIsland, createWater, createPineGeometry, bakeProp, createSwayingInstances, createFoliageMaterial, createCloud, createBird, createEagle, createBearMaterial, createFish, tilted } from "./island-parts";
 
 // Animal sizes (world units tall) and gaits (units per second).
 const ANIMALS={stag:{height:1.55,walk:.75,run:3.6},deer:{height:1.2,walk:.65,run:3.3},fox:{height:.66,walk:.8,run:3.8},bear:{height:1.3,walk:.6,run:3.2}};
@@ -384,11 +384,18 @@ export default function IslandScene({ onEvent, active, onReady } = {}) {
     canvas.addEventListener("pointerleave",()=>{pointerInside=false;});
 
     // Framing: the island centred, a little low, under the name.
+    const HERO=new THREE.Vector3(.32,.36,.88).normalize(),aim=new THREE.Vector3(),view=new THREE.Vector3();let distance=36;
     let tall=false;
     function frame(){
       const w=mount.clientWidth,h=mount.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;tall=camera.aspect<.85;
-      const distance=tall?60:36;scene.fog.near=distance+3;scene.fog.far=distance*2.2+8;camera.position.set(.32,.36,.88).normalize().multiplyScalar(distance);
-      camera.lookAt(0,tall?.2:2.2,0);camera.clearViewOffset();camera.updateProjectionMatrix();needsRender=true;
+      distance=tall?60:36;scene.fog.near=distance+3;scene.fog.far=distance*2.2+8;aim.set(0,tall?.2:2.2,0);placeCamera();
+      camera.clearViewOffset();camera.updateProjectionMatrix();needsRender=true;
+    }
+    // The camera arrives steeper (8° above its resting angle) and eases down to rest over 1.4 s once the loading screen
+    // lifts, so it reads as landing on the island.
+    function placeCamera(){
+      const at=live.current?.current.introAt,k=preference.matches?1:at?THREE.MathUtils.clamp((performance.now()-at)/1400,0,1):0,ease=1-(1-k)**3;
+      camera.position.copy(tilted(HERO,8*(1-ease),view)).multiplyScalar(distance);camera.lookAt(aim);
     }
     const resize=new ResizeObserver(frame);resize.observe(mount);frame();
     const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;});observer.observe(mount);
@@ -420,7 +427,7 @@ export default function IslandScene({ onEvent, active, onReady } = {}) {
         bird.position.set(x,y,z);bird.lookAt(world.localToWorld(new THREE.Vector3(MOUNTAIN.x+Math.cos(u.a+.2)*r,y,MOUNTAIN.y+Math.sin(u.a+.2)*r)));
         const flap=Math.sin(time*(9+scatter*8)+u.flap)*.75;bird.userData.wings[0].rotation.z=flap;bird.userData.wings[1].rotation.z=-flap;});
       clouds.forEach(cloud=>{const u=cloud.userData;u.a+=step*u.speed;cloud.position.set(Math.sin(u.a)*u.r,u.y+Math.sin(time*.2+u.r)*.3,-Math.abs(Math.cos(u.a))*u.r-2);});
-      renderer.render(scene,camera);needsRender=false;
+      placeCamera();renderer.render(scene,camera);needsRender=false;
     }
     draw();
     const readyTimer=setTimeout(()=>ready.current?.(),0);

@@ -108,6 +108,9 @@ export default function Home() {
   const progress = Math.min(1, (loading.fetched / MODELS.length) * .3 + (loading.ready / SECTIONS.length) * .7);
   const loaded = loading.done || progress >= 1;
   useEffect(() => { document.documentElement.classList.toggle("ht-locked", !loaded); }, [loaded]);
+  // The entrance: once the loading screen lifts, the hero island rises into place and its camera lands (see the CSS and
+  // island-scene), starting 0.3 s in.
+  useEffect(() => { if (loaded) scene.current.introAt = performance.now() + 300; }, [loaded]);
 
   // Smooth scrolling (Lenis), off with reduced motion. Menu and header links glide to a section's top, or to a point
   // inside it (q: how far through its pinned stretch).
@@ -189,7 +192,7 @@ export default function Home() {
   const counter = SECTIONS[section].steps > 1 ? `${stop + 1}/${SECTIONS[section].steps}` : null;
 
   return (
-    <main className="ht" data-section={SECTIONS[section].id}>
+    <main className={`ht${loaded ? " is-entered" : ""}`} data-section={SECTIONS[section].id}>
       <div className="ht-skies" aria-hidden="true"><div className="ht-sky-live" ref={sky} /></div>
       <div className="ht-finish" aria-hidden="true" />
       <header className="ht-header">
