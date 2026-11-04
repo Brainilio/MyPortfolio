@@ -19,6 +19,10 @@ body:has(.ht){background:#1b1335}
 /* The skies: fixed behind the page, each fading in as its section arrives (opacity set on scroll). */
 .ht-skies{position:fixed;inset:0;z-index:0;pointer-events:none}
 .ht-world{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* The giant name is painted on the shared canvas behind the island; the heading keeps its place, invisibly. */
+.ht .ht-name.is-painted{color:transparent;text-shadow:none}
+/* The CSS sky is only the fallback for when there's no WebGL. */
+.has-world .ht-sky-live{display:none}
 .ht-sky-live{position:absolute;inset:0;background:linear-gradient(180deg,#1b1335 0%,#33225a 30%,#6e4a8f 55%,#c9849c 80%,#f3b89c 100%)}
 /* A section: the diorama's stage stays pinned while the words scroll past on the other side. */
 .ht-zone{position:relative;min-height:100svh}

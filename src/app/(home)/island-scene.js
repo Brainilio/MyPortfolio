@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { getStage } from "./stage";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { clone as cloneSkinned } from "three/addons/utils/SkeletonUtils.js";
@@ -21,11 +22,9 @@ export default function IslandScene({ onEvent, active, onReady } = {}) {
   event.current=onEvent;
   useEffect(()=>{
     const mount=host.current;
-    let renderer,disposed=false,raf=0,visible=true;
-    try { renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:"high-performance"}); } catch { ready.current?.(); return; }
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5));
-    renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
-    mount.appendChild(renderer.domElement);
+    let disposed=false,visible=true;
+    // Drawn on the page's one shared canvas (stage.js), into this stage's rectangle; the stage is the hit area.
+    const shared_=getStage();if(!shared_){ready.current?.();return;}const renderer=shared_.renderer;
     const preference=matchMedia("(prefers-reduced-motion: reduce)");
     const scene=new THREE.Scene();scene.fog=new THREE.Fog("#b98fc9",34,70);
     const camera=new THREE.PerspectiveCamera(32,1,.3,200);
@@ -359,13 +358,13 @@ export default function IslandScene({ onEvent, active, onReady } = {}) {
     // Pointer: stir the trees and scare the animals near it; drag to turn the island; click the mountain.
     const raycaster=new THREE.Raycaster(),ndc=new THREE.Vector2(),hit=new THREE.Vector3();
     let pointerInside=false,lastX=0,lastY=0,lastMove=0,dragging=false,downX=0,yawVelocity=0,yaw=-.35,bounce=0,needsRender=true;
-    const pick=(event,objects)=>{const rect=renderer.domElement.getBoundingClientRect();ndc.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(ndc,camera);return raycaster.intersectObjects(objects,false)[0];};
+    const pick=(event,objects)=>{const rect=mount.getBoundingClientRect();ndc.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(ndc,camera);return raycaster.intersectObjects(objects,false)[0];};
     function onMove(event){
       const now=performance.now(),dt=Math.max(16,now-lastMove),speed=Math.hypot(event.clientX-lastX,event.clientY-lastY)/dt;
       if(dragging||(event.buttons&1&&Math.abs(event.clientX-downX)>5)){dragging=true;yawVelocity+= (event.clientX-lastX)*.0009;}
       lastX=event.clientX;lastY=event.clientY;lastMove=now;
       const onMountain=mountain&&pick(event,[mountain]);
-      renderer.domElement.style.cursor=dragging?"grabbing":onMountain?"pointer":"grab";
+      mount.style.cursor=dragging?"grabbing":onMountain?"pointer":"grab";
       const ground=pick(event,[island.surface]);
       if(!ground)return;
       hit.copy(world.worldToLocal(ground.point.clone()));pointerInside=true;
@@ -377,9 +376,9 @@ export default function IslandScene({ onEvent, active, onReady } = {}) {
     function onDown(event){downX=event.clientX;lastX=event.clientX;lastY=event.clientY;dragging=false;}
     function onUp(event){
       if(!dragging&&mountain&&pick(event,[mountain]))startle();
-      dragging=false;renderer.domElement.style.cursor="grab";needsRender=true;
+      dragging=false;mount.style.cursor="grab";needsRender=true;
     }
-    const canvas=renderer.domElement;canvas.style.cursor="grab";canvas.style.touchAction="pan-y";
+    const canvas=mount;canvas.style.cursor="grab";canvas.style.touchAction="pan-y";
     canvas.addEventListener("pointermove",onMove);canvas.addEventListener("pointerdown",onDown);window.addEventListener("pointerup",onUp);
     canvas.addEventListener("pointerleave",()=>{pointerInside=false;});
 
@@ -387,7 +386,7 @@ export default function IslandScene({ onEvent, active, onReady } = {}) {
     const HERO=new THREE.Vector3(.32,.36,.88).normalize(),aim=new THREE.Vector3(),view=new THREE.Vector3();let distance=36,attitude=0;
     let tall=false;
     function frame(){
-      const w=mount.clientWidth,h=mount.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;tall=camera.aspect<.85;
+      const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;tall=camera.aspect<.85;
       distance=tall?60:36;scene.fog.near=distance+3;scene.fog.far=distance*2.2+8;aim.set(0,tall?.2:2.2,0);placeCamera();
       camera.clearViewOffset();camera.updateProjectionMatrix();needsRender=true;
     }
@@ -401,14 +400,14 @@ export default function IslandScene({ onEvent, active, onReady } = {}) {
     const resize=new ResizeObserver(frame);resize.observe(mount);frame();
     const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;});observer.observe(mount);
 
-    const clock=new THREE.Clock();let time=0;
-    function draw(){
-      raf=requestAnimationFrame(draw);
-      const dt=Math.min(clock.getDelta(),.05);
+    let time=0;
+    // Called by the shared frame loop; returns whether anything changed (so the canvas needs redrawing).
+    function draw(dt){
+      dt=Math.min(dt,.05);
       // Paused while another section is on screen (section 0 is the hero).
-      if(!visible||document.hidden||(live.current&&!live.current.current.live.includes(0)))return;
-      if(preference.matches&&!needsRender)return;
-      tick(dt);
+      if(!visible||document.hidden||(live.current&&!live.current.current.live.includes(0)))return false;
+      if(preference.matches&&!needsRender)return false;
+      tick(dt);return true;
     }
     function tick(dt){
       const reduced=preference.matches,step=reduced?0:dt;time+=step;
@@ -428,9 +427,9 @@ export default function IslandScene({ onEvent, active, onReady } = {}) {
         bird.position.set(x,y,z);bird.lookAt(world.localToWorld(new THREE.Vector3(MOUNTAIN.x+Math.cos(u.a+.2)*r,y,MOUNTAIN.y+Math.sin(u.a+.2)*r)));
         const flap=Math.sin(time*(9+scatter*8)+u.flap)*.75;bird.userData.wings[0].rotation.z=flap;bird.userData.wings[1].rotation.z=-flap;});
       clouds.forEach(cloud=>{const u=cloud.userData;u.a+=step*u.speed;cloud.position.set(Math.sin(u.a)*u.r,u.y+Math.sin(time*.2+u.r)*.3,-Math.abs(Math.cos(u.a))*u.r-2);});
-      placeCamera();renderer.render(scene,camera);needsRender=false;
+      placeCamera();needsRender=false;
     }
-    draw();
+    const unregister=shared_.register({mount,scene,camera,draw,exposure:1.05});
     const readyTimer=setTimeout(()=>ready.current?.(),0);
     // ?debug: step frames by hand (background tabs throttle requestAnimationFrame).
     if(new URLSearchParams(window.location.search).has("debug"))window.__islandStep=(frames=30)=>{for(let i=0;i<frames;i++)tick(1/30);return animals.map(a=>`${a.kind}:${a.state}`).join(" ");};
@@ -438,11 +437,11 @@ export default function IslandScene({ onEvent, active, onReady } = {}) {
 
     return()=>{
       clearTimeout(readyTimer);delete window.__islandStep;delete window.__island;
-      disposed=true;cancelAnimationFrame(raf);resize.disconnect();observer.disconnect();
+      disposed=true;unregister();resize.disconnect();observer.disconnect();
       canvas.removeEventListener("pointermove",onMove);canvas.removeEventListener("pointerdown",onDown);window.removeEventListener("pointerup",onUp);
       animals.forEach(a=>a.mixer?.stopAllAction());
       scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat())if(m){m.map?.dispose();m.dispose();}});
-      shadowTexture.dispose();glareTexture.dispose();puffTexture.dispose();renderer.dispose();canvas.remove();
+      shadowTexture.dispose();glareTexture.dispose();puffTexture.dispose();
     };
   },[]);
   return <div className="ht-canvas" ref={host} aria-hidden="true" />;

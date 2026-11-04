@@ -58,6 +58,7 @@ function createStage() {
       if (last.get(entry) !== key) { last.set(entry, key); dirty = true; }
       if (r.width > 0 && r.bottom > 0 && r.top < height) visible.push([entry, r]);
     }
+    visible.sort((a, b) => (a[0].order ?? 1) - (b[0].order ?? 1));
     if (!dirty || document.hidden) return;
     dirty = false;
     renderer.setViewport(0, 0, width, height); renderer.clear(); renderer.render(skyScene, skyCamera);
@@ -75,7 +76,7 @@ function createStage() {
     // Put the canvas in the page (behind everything) and start the loop.
     attach(element) {
       if (host === element) return;
-      host = element; element.prepend(canvas);
+      host = element; element.prepend(canvas); element.classList.add("has-world");
       if (!frame) { previous = performance.now(); frame = requestAnimationFrame(loop); }
     },
     register(entry) { entries.add(entry); dirty = true; return () => { entries.delete(entry); last.delete(entry); dirty = true; }; },
@@ -83,8 +84,36 @@ function createStage() {
     // (Written to the screen as given: the sky shader skips colour management, so these stay the exact sRGB values.)
     setSky(rgb) { rgb.forEach((c, i) => colors[i].setRGB(c[0] / 255, c[1] / 255, c[2] / 255)); dirty = true; },
     invalidate() { dirty = true; },
+    // Paints an element's text (the hero's giant name) onto the canvas, behind the islands, so the peaks can rise in
+    // front of it; the element stays in the page for screen readers and layout, its own text made invisible.
+    text(element) {
+      const paint = document.createElement("canvas"), texture = new THREE.CanvasTexture(paint);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, depthTest: false, depthWrite: false, toneMapped: false });
+      const layer = new THREE.Scene(), plane = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
+      plane.frustumCulled = false; layer.add(plane);
+      let opacity = -1;
+      const draw = () => {
+        const r = element.getBoundingClientRect(), style = getComputedStyle(element), ratio = renderer.getPixelRatio(), g = paint.getContext("2d");
+        paint.width = Math.max(1, Math.round(r.width * ratio)); paint.height = Math.max(1, Math.round(r.height * ratio));
+        g.scale(ratio, ratio);
+        g.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`; g.letterSpacing = style.letterSpacing;
+        g.textAlign = "center"; g.textBaseline = "middle"; g.fillStyle = element.dataset.color || "#fbf7ff";
+        g.shadowColor = "rgba(255,190,170,.25)"; g.shadowBlur = 80;
+        g.fillText(element.textContent, r.width / 2, r.height / 2);
+        texture.needsUpdate = true; dirty = true;
+      };
+      element.classList.add("is-painted");
+      draw(); document.fonts?.ready.then(draw);
+      const onResize = () => draw(); window.addEventListener("resize", onResize);
+      const entry = { mount: element, scene: layer, camera: skyCamera, order: 0, exposure: 1,
+        // Follows the element's own fade (its entrance animation).
+        draw() { const o = +getComputedStyle(element).opacity; if (o === opacity) return false; opacity = o; material.opacity = o; return true; } };
+      const unregister = this.register(entry);
+      return () => { unregister(); window.removeEventListener("resize", onResize); element.classList.remove("is-painted"); texture.dispose(); material.dispose(); };
+    },
     detach() {
-      cancelAnimationFrame(frame); frame = 0; host = null; canvas.remove();
+      cancelAnimationFrame(frame); frame = 0; host?.classList.remove("has-world"); host = null; canvas.remove();
     },
   };
 }

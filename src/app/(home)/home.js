@@ -115,7 +115,7 @@ export default function Home() {
     return () => queries.forEach(q => q.removeEventListener("change", sync));
   }, []);
   const pill = useRef(null), bar = useRef(null);
-  const zones = useRef([]), sky = useRef(null), copies = useRef([]), skiesRef = useRef(null);
+  const zones = useRef([]), sky = useRef(null), copies = useRef([]), skiesRef = useRef(null), nameRef = useRef(null);
   const { section, stop } = where;
   // Loading: every model is fetched up front (to warm the cache) while the dioramas are built one after another
   // behind the loading screen, each as soon as the previous one reports it's ready. The screen lifts when all are
@@ -193,6 +193,7 @@ export default function Home() {
     };
     // The one WebGL canvas, behind the page.
     const world = getStage(); if (world && skiesRef.current) world.attach(skiesRef.current);
+    const unpaint = world && nameRef.current ? world.text(nameRef.current) : null;
     const onScroll = () => { if (!frame) frame = requestAnimationFrame(update); };
     // Start on the section in the URL, if any (and don't let the browser restore an old scroll position over it).
     history.scrollRestoration = "manual";
@@ -205,7 +206,7 @@ export default function Home() {
     // Sections change height as fonts load and the layout settles; keep the measurements fresh.
     const resize = new ResizeObserver(onScroll);resize.observe(document.body);
     window.addEventListener("scroll", onScroll, { passive: true }); window.addEventListener("resize", onScroll);
-    return () => { world?.detach(); cancelAnimationFrame(frame); resize.disconnect(); window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); lenis?.destroy(); lenisRef.current = null; };
+    return () => { unpaint?.(); world?.detach(); cancelAnimationFrame(frame); resize.disconnect(); window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); lenis?.destroy(); lenisRef.current = null; };
   }, []);
 
   // Clicking the wagon glides the page on to the next sign (or back to the first from the last).
@@ -232,7 +233,7 @@ export default function Home() {
 
       <section className="ht-zone ht-home" id="home" ref={el => (zones.current[0] = el)} aria-label="Introduction">
         <div className="ht-stage"><IslandScene active={scene} onReady={onReady(0)} /></div>
-        <h1 className="ht-name">Brainilio</h1>
+        <h1 className="ht-name" ref={nameRef}>Brainilio</h1>
         <div className="ht-intro">
           <p className="ht-roles">I build digital products<span>,</span> and the odd little world<span>.</span></p>
           <p className="ht-lede">Full-stack, from REST APIs to 3D on the web. I explore new ideas and try to leave the world a little better than I found it.</p>
