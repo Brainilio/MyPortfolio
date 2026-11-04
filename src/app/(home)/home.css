@@ -22,9 +22,11 @@ body:has(.ht){background:#1b1335}
 .ht-sky-live{position:absolute;inset:0;background:linear-gradient(180deg,#1b1335 0%,#33225a 30%,#6e4a8f 55%,#c9849c 80%,#f3b89c 100%)}
 /* A section: the diorama's stage stays pinned while the words scroll past on the other side. */
 .ht-zone{position:relative;min-height:100svh}
-/* Each island is a fixed full-screen layer; the page crossfades them as you cross from one section into the next. */
-.ht-stage{position:fixed;inset:0;z-index:2;height:100svh}
-.ht-zone[data-side] .ht-copy{position:relative;z-index:4;width:min(440px,36vw);padding:30svh 0 40svh;pointer-events:none}
+/* Each section's stage is sticky: its island holds while the section is pinned and travels up and away with the page
+   as the next one arrives. The islands are drawn on the one shared canvas into the stage's rectangle; the stage
+   itself is the island's hit area. */
+.ht-stage{position:sticky;top:0;z-index:2;height:100svh}
+.ht-zone[data-side] .ht-copy{position:relative;z-index:4;margin-top:-100svh;width:min(440px,36vw);padding:30svh 0 40svh;pointer-events:none}
 .ht-zone[data-side=right] .ht-copy{margin-left:var(--gutter)}
 .ht-zone[data-side=left] .ht-copy{margin-left:auto;margin-right:var(--gutter)}
 .ht-copy a{pointer-events:auto}
@@ -123,7 +125,7 @@ body:has(.ht){background:#1b1335}
 .ht-card-text i{font-style:normal;color:#7c3aed;transition:transform .25s ease}
 .ht-card a:hover .ht-card-text i{transform:translateX(3px)}
 @media(min-width:761px){
-  .ht-zone.ht-work .ht-copy{width:auto;margin:0;padding:0;display:block;pointer-events:none}
+  .ht-zone.ht-work .ht-copy{width:auto;margin:-100svh 0 0;padding:0;display:block;pointer-events:none}
   .ht-work-head{position:absolute;z-index:2;top:clamp(92px,12svh,128px);left:50%;width:min(480px,90vw);transform:translateX(-50%);text-align:center}
   .ht-work-head p.ht-drive{margin-top:10px}
   /* Right-hand cards just off the island's right edge, left-hand ones off its left, at staggered heights. */
@@ -249,7 +251,7 @@ html.ht-locked{overflow:hidden}
     .ht-lede{font-size:14px;margin-top:12px;max-width:320px}
   .ht-links{margin-top:14px}
   .ht-button{padding:12px 18px;font-size:14px}
-  .ht-zone[data-side] .ht-copy{width:auto;margin:0 16px!important;padding:58svh 0 30svh}
+  .ht-zone[data-side] .ht-copy{width:auto;margin:-100svh 16px 0!important;padding:58svh 0 30svh}
   .ht-zone.ht-about .ht-copy{justify-content:flex-end;padding:0 0 84px}
   .ht-copy>p{font-size:14px;margin-top:10px}
   .ht-zone.ht-pinned .ht-copy{justify-content:flex-end;padding:0 0 84px}

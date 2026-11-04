@@ -44,12 +44,10 @@ const SKY = [
   ["#4f8cc6", "#86b1d8", "#c4d7e5", "#d4e0e7", "#d4e0e7"], // Contact, the end
 ].map(stops => stops.map(hex => [1, 3, 5].map(k => parseInt(hex.slice(k, k + 2), 16))));
 const mix = (a, b, t) => a.map((c, k) => Math.round(c + (b[k] - c) * t));
-// No gaps between sections. The islands are fixed full-screen layers, one per section, and they crossfade at each
-// border: over the half screen of scroll as the next section comes up from the middle of the screen to near the top
-// (CROSS, centred on its top being halfway up), the outgoing island fades out as the incoming one fades in, so there's
-// always an island on screen. ARRIVE and DEPART tip the cameras during the crossover.
-const CROSS = .5, ARRIVE = 14, DEPART = 10;
-const ease = v => v * v * (3 - 2 * v);
+// No gaps between sections and no fading: each island holds while its section is pinned and travels up and away with
+// the page as the next one rises into view (its stage is sticky). ARRIVE and DEPART tip each island's camera while it
+// travels: steeper as it comes up, lower as it leaves.
+const ARRIVE = 14, DEPART = 10;
 // Which slot each scene reads in the shared scroll state.
 const ABOUT = 1, WORK = 2, SKILLS_AT = 3, CONTACT = 4;
 const clamp = v => Math.min(1, Math.max(0, v));
@@ -167,20 +165,9 @@ export default function Home() {
         scene.current.progress[i] = clamp((y - top) / run);
         if (top < y + vh && top + height > y) live.push(i);
         if (middle >= top) dominant = i;
-        // The crossfades: in across the border at this section's top, out across the border at its bottom. A layer that
-        // is mostly faded lets the pointer through to the one coming in.
-        const stage = el.firstElementChild;
-        if (stage) {
-          const across = edge => ease(clamp((y - (edge - vh * (.5 + CROSS / 2))) / (vh * CROSS)));
-          const enter = i ? across(top) : 1, leave = i < last_ ? 1 - across(top + height) : 1, o = Math.min(enter, leave);
-          stage.style.opacity = o.toFixed(3);stage.style.transform = o < 1 ? `scale(${(enter < leave ? .94 + enter * .06 : .96 + leave * .04).toFixed(4)})` : "";
-          stage.style.visibility = o > 0 ? "" : "hidden";stage.style.pointerEvents = o < .5 ? "none" : "";
-          // The camera's attitude (degrees from its resting angle, the scenes ease toward it): steeper as an island
-          // arrives, as if coming in from above, and lower as it leaves, looking back up at it as you pass.
-          scene.current.tilt[i] = ARRIVE * (1 - enter) - DEPART * (1 - leave);
-          // Work's words (heading, hint and cards) arrive with its island; the others scroll in with the page.
-          if (i === WORK) copies.current[i]?.style.setProperty("opacity", enter.toFixed(3));
-        }
+        // How far its island has still to travel in (from below) and has travelled out (above), 0 → 1 a screen each.
+        const arriving = i ? clamp((top - y) / vh) : 0, leaving = i < last_ ? clamp((y - (top + height - vh)) / vh) : 0;
+        scene.current.tilt[i] = ARRIVE * arriving - DEPART * leaving;
         stops[i] = i === CONTACT ? top - vh * .6 : i ? top + run * .5 : 0;
       });
       // The sky: find the two section stops either side of this scroll position and blend between them.
