@@ -6,7 +6,7 @@ import "lenis/dist/lenis.css";
 import allProjects from "../../lib/projects";
 import "./home.css";
 import { getStage } from "./stage";
-import LiquidCard from "./liquid-card";
+import ShineCard from "./shine-card";
 const IslandScene = dynamic(() => import("./island-scene"), { ssr: false });
 const AboutScene = dynamic(() => import("./about-scene"), { ssr: false });
 const WorkScene = dynamic(() => import("./work-scene"), { ssr: false });
@@ -15,8 +15,6 @@ const CoastScene = dynamic(() => import("./coast-scene"), { ssr: false });
 import { MODEL_CREDITS } from "./model-credits";
 import { SKILLS } from "./content";
 const work = allProjects.filter(project => project.slug && project.previewImage).slice(0, 4);
-// The Work cards are placed one by one as the section's scroll passes each of these points (then the links), and stay.
-const PLACE_AT = [.15, .35, .55, .75, .85], TILTS = [1.5, -2, .8, -1.2];
 
 // Every model the homepage loads (fetched up front by the loading screen).
 const MODELS = ["kit", "stag", "deer", "fox", "bear", "eagle", "bison", "prairiedog", "wagon", "buttes", "moose", "orca", "shark", "sealion", "kayak"].map(name => `/models/island/${name}.glb`);
@@ -108,12 +106,18 @@ export default function Home() {
   const [where, setWhere] = useState({ section: 0, stop: 0 }), [menu, setMenu] = useState(false);
   // Shared with the 3D scenes (read every frame): which sections are on screen and how far through each one we are.
   const scene = useRef({ section: 0, live: [0], progress: [0, 0, 0, 0, 0], tilt: [0, 0, 0, 0, 0] });
-  const [spotted, setSpotted] = useState([]), [still, setStill] = useState(false), [placed, setPlaced] = useState(0);
+  const [spotted, setSpotted] = useState([]), [still, setStill] = useState(false), [moreIn, setMoreIn] = useState(false), more = useRef(null);
   // Reduced motion, and phones: the Work postcard shows its still image instead of playing its preview.
   useEffect(() => {
     const queries = [matchMedia("(prefers-reduced-motion: reduce)"), matchMedia("(max-width: 760px)")], sync = () => setStill(queries.some(q => q.matches));
     sync(); queries.forEach(q => q.addEventListener("change", sync));
     return () => queries.forEach(q => q.removeEventListener("change", sync));
+  }, []);
+  // The links under the Work cards fade up the first time a fifth of them is on screen.
+  useEffect(() => {
+    const el = more.current; if (!el) return;
+    const observer = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { setMoreIn(true); observer.disconnect(); } }, { threshold: .2 });
+    observer.observe(el); return () => observer.disconnect();
   }, []);
   const pill = useRef(null), bar = useRef(null);
   const zones = useRef([]), sky = useRef(null), mainRef = useRef(null);
@@ -176,7 +180,6 @@ export default function Home() {
       let k = 0; while (k < marks.length - 2 && p > marks[k + 1]) k++;
       const blend = clamp((p - marks[k]) / Math.max(1e-6, marks[k + 1] - marks[k])), colors = SKY[k].map((c, n) => mix(c, SKY[k + 1][n], blend));
       if (sky.current) sky.current.style.background = `linear-gradient(180deg,${colors.map((c, n) => `rgb(${c}) ${[0, 30, 55, 80, 100][n]}%`).join(",")})`;
-      { const q = scene.current.progress[WORK], n = PLACE_AT.filter(t => q >= t).length; if (n) setPlaced(was => Math.max(was, n)); }
       scene.current.live = live;scene.current.section = dominant;
       pill.current?.style.setProperty("--progress", scene.current.progress[dominant].toFixed(4));
       bar.current?.style.setProperty("--progress", clamp(y / Math.max(1, document.documentElement.scrollHeight - vh)).toFixed(4));
@@ -259,9 +262,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Work: Monument Valley in the middle, its heading above it, and the projects placed round it as polaroids, one
-          per step of the scroll, alternating right and left, building up a little constellation that stays. */}
-      <section className="ht-zone ht-work ht-pinned" id="work" data-side="left" style={{ "--steps": work.length, "--step": "50svh" }} ref={el => (zones.current[WORK] = el)} aria-labelledby="ht-work-title">
+      {/* Work: Monument Valley held in the middle (its stage is sticky), its heading above it, and the projects as a plain
+          column of cards scrolling past over it, alternating left and right, each sliding in from its side. */}
+      <section className="ht-zone ht-work" id="work" data-side="left" ref={el => (zones.current[WORK] = el)} aria-labelledby="ht-work-title">
         <div className="ht-stage">{built[WORK] && <WorkScene state={scene} slot={WORK} side="center" onReady={onReady(WORK)} />}</div>
         <div className="ht-copy">
           <div className="ht-work-head">
@@ -269,20 +272,17 @@ export default function Home() {
             <p className="ht-drive">Click the basket to feed the herd</p>
           </div>
           <ol className="ht-cards">
-            {work.map((project, i) => {
-              const shown = i < placed;
-              return (
-                <li key={project.slug} className={`ht-card ${i % 2 ? "is-left" : "is-right"}${shown ? " is-placed" : ""}`} style={{ "--r": `${TILTS[i % TILTS.length]}deg`, zIndex: i + 1 }}>
-                  <LiquidCard id={`ht-liquid-${i}`} href={`/project/${project.slug}/`} label={`${project.name}: view the project`} placed={shown}>
-                    {shown && section === WORK && !still && project.previewVideo
-                      ? <video src={project.previewVideo} poster={project.previewImage} autoPlay muted loop playsInline />
-                      : <img src={project.previewImage} alt="" loading="lazy" decoding="async" />}
-                  </LiquidCard>
-                </li>
-              );
-            })}
+            {work.map((project, i) => (
+              <li key={project.slug}>
+                <ShineCard index={i} href={`/project/${project.slug}/`} name={project.name}>
+                  {section === WORK && !still && project.previewVideo
+                    ? <video src={project.previewVideo} poster={project.previewImage} autoPlay muted loop playsInline />
+                    : <img src={project.previewImage} alt="" loading="lazy" decoding="async" />}
+                </ShineCard>
+              </li>
+            ))}
           </ol>
-          <p className={`ht-more${placed > work.length ? " is-shown" : ""}`}>
+          <p ref={more} className={`ht-more${moreIn ? " is-shown" : ""}`}>
             <a href="/projects/">All projects <span aria-hidden="true">→</span></a>
             <a href="/journey/">Lab experiments <span aria-hidden="true">→</span></a>
           </p>
