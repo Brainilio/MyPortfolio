@@ -96,35 +96,50 @@ export function createFin(rng,width,height,depth) {
 }
 
 // A woven basket: a lathe-turned bowl with alternating bands.
-// A sandstone butte (Monument Valley), from a lathed profile: a talus flare at the foot, sides leaning in about 11° as
-// they rise to a top 60% the width of the base, two or three sedimentary shelves standing out round the middle, and a
-// ragged, eroded rim. Every vertex above the talus is nudged a little (seeded, by position, so seams stay closed), and
-// it's flat shaded: faceted terracotta sides, a sun-bleached top. height and topWidth in world units.
-const BUTTE_SIDE=new THREE.Color("#b5602e"),BUTTE_TOP=new THREE.Color("#c8855a");
-export function createButte(rng,height,topWidth) {
-  const H=height,R=topWidth/2/.6,radius=t=>R*(1-.4*Math.max(0,(t-.15)/.85));
-  // Shelves at irregular heights through the middle, each sticking out ~5% of the width.
-  const count=2+(rng()<.5?1:0),shelves=Array.from({length:count},(_,i)=>.3+(i+.2+rng()*.6)*.5/count);
-  const profile=[[R*1.08,0],[R,.15*H]];
-  for(const t of shelves)profile.push([radius(t-.03),(t-.03)*H],[radius(t)+R*.1,t*H],[radius(t+.04),(t+.04)*H]);
-  profile.push([radius(1),H],[0,H]);
-  const geometry=new THREE.LatheGeometry(profile.map(([r,y])=>new THREE.Vector2(r,y)),12).toNonIndexed();
-  const pos=geometry.attributes.position,hash=(x,y,z,k)=>{const v=Math.sin(x*127.1+y*311.7+z*74.7+k*19.3+seed)*43758.5453;return v-Math.floor(v)-.5;},seed=rng()*100;
-  for(let i=0;i<pos.count;i++){
-    const x=Math.round(pos.getX(i)*1e4)/1e4,y=pos.getY(i),z=Math.round(pos.getZ(i)*1e4)/1e4;
-    if(y<.15*H-1e-4)continue;
-    // The rim is torn the most (±10% of the width); the cliffs just a few percent.
-    const rim=y>H-1e-4&&Math.hypot(x,z)>1e-3,amp=rim?.2*topWidth:.08*R;
-    pos.setXYZ(i,x+hash(x,y,z,1)*amp,y+(rim?0:hash(x,y,z,3)*.03*H),z+hash(x,y,z,2)*amp);
-  }
-  // Colour by face: the flat top light, everything else terracotta, each face a shade off its neighbours.
-  const colors=new Float32Array(pos.count*3),c=new THREE.Color();
-  for(let f=0;f<pos.count;f+=3){
-    const top=[0,1,2].every(k=>pos.getY(f+k)>H-1e-4);c.copy(top?BUTTE_TOP:BUTTE_SIDE).multiplyScalar(.95+rng()*.1);
-    for(let k=0;k<3;k++)colors.set([c.r,c.g,c.b],(f+k)*3);
-  }
-  geometry.setAttribute("color",new THREE.BufferAttribute(colors,3));geometry.deleteAttribute("uv");geometry.computeVertexNormals();
-  return new THREE.Mesh(geometry,new THREE.MeshLambertMaterial({vertexColors:true,flatShading:true,side:THREE.DoubleSide}));
+// A Monument Valley butte (the Mittens): a convex talus skirt of fallen rock, a sheer, nearly vertical cliff shaft
+// with two or three strata ledges, and a flat cap with a broken, eroded top edge, optionally with a "thumb" spire on
+// its right. Three colours tell it: the dark shadowed cliffs, the mid-tone talus catching the light, and the
+// sun-bleached top. height is the whole butte's; width (optional) sets the cap's diameter, for a wide mesa stub.
+const MITTEN={talus:"#b5602e",cliff:"#8b3a1a",cap:"#d4854a"};
+// A closed ring-built solid: rings of [y, radius] from the bottom up, each radius nudged per side by the same wobble so
+// the walls stay straight, with an optional bump per ring and per side for an eroded edge. Faces coloured by ring.
+function ringSolid(rng,rings,sides,wobble,colorOf,{bottom=false,top=false,topJitter=null}={}) {
+  const pts=rings.map(([y,r,jag],k)=>Array.from({length:sides},(_,s)=>{
+    const a=s/sides*Math.PI*2,k2=wobble[s]*(1+(jag?(rng()-.5)*2*jag:0));
+    return new THREE.Vector3(Math.cos(a)*r*k2,y+(top&&k===rings.length-1&&topJitter?topJitter(rng):0),Math.sin(a)*r*k2);}));
+  const tris=[],paint=new Map(),add=(tri,c)=>{tris.push(tri);paint.set(tri,c);};
+  for(let k=0;k<pts.length-1;k++)for(let s=0;s<sides;s++){
+    const a=pts[k][s],b=pts[k][(s+1)%sides],c=pts[k+1][(s+1)%sides],d=pts[k+1][s],col=colorOf(k);
+    add([a,c,b],col);add([a,d,c],col);}
+  const last=pts.at(-1),cy=last.reduce((m,v)=>m+v.y,0)/sides,centre=new THREE.Vector3(0,cy,0);
+  if(top)for(let s=0;s<sides;s++)add([last[s],centre,last[(s+1)%sides]],colorOf(-1));
+  if(bottom)for(let s=0;s<sides;s++)add([pts[0][(s+1)%sides],new THREE.Vector3(0,pts[0][0].y,0),pts[0][s]],colorOf(0));
+  return faceted(tris,(tri,color)=>color.set(paint.get(tri)));
+}
+export function createButte(rng,height,{width=null,thumb=false}={}) {
+  const H=height,shaft=width?width/2:.18*H,talusH=.2*H,shaftH=.75*H,capH=.05*H,skirt=shaft+.27*H;
+  const parts=[];
+  // The talus skirt: wide at the ground, curving in (convex) to meet the cliff, its outer edge ragged.
+  const skirtWobble=Array.from({length:11},()=>.92+rng()*.16);
+  parts.push(ringSolid(rng,[[0,skirt,.08],[talusH*.35,shaft+(skirt-shaft)*.55],[talusH*.75,shaft+(skirt-shaft)*.18],[talusH,shaft*1.02]],11,skirtWobble,()=>MITTEN.talus,{bottom:true}));
+  // The cliff shaft: an uneven 8-sided column, barely leaning in, with strata ledges at irregular heights.
+  const sides=8,wobble=Array.from({length:sides},()=>.86+rng()*.26),rings=[[talusH*.9,shaft]],top=shaft*(width?.97:.9);
+  const radiusAt=t=>shaft+(top-shaft)*t;
+  const ledges=Array.from({length:2+(rng()<.5?1:0)},(_,i,_a)=>.22+i*.26+rng()*.12);
+  for(const t of ledges){const y=talusH+t*shaftH,r=radiusAt(t),bump=r*(.03+rng()*.02),tall=shaftH*(.04+rng()*.02);
+    rings.push([y-tall/2,r],[y-tall/2+.001,r+bump],[y+tall/2,r+bump],[y+tall/2+.001,r]);}
+  rings.push([talusH+shaftH,top]);
+  parts.push(ringSolid(rng,rings,sides,wobble,()=>MITTEN.cliff));
+  // The cap: a thin slab of the lighter rock, its top edge broken (some corners up, some down).
+  parts.push(ringSolid(rng,[[talusH+shaftH,top*1.03],[talusH+shaftH+capH,top*1.03]],sides,wobble,()=>MITTEN.cap,
+    {top:true,topJitter:r=>r()<.6?r()*.08*H:-r()*.05*H}));
+  // The West Mitten's thumb: a slim spire standing against the right side of the shaft.
+  if(thumb){const h=.25*H,r=shaft*.3,tw=Array.from({length:6},()=>.85+rng()*.3);
+    const spire=ringSolid(rng,[[talusH*.8,r],[talusH*.8+h*.9,r*.85],[talusH*.8+h,r*.85]],6,tw,k=>k===1||k<0?MITTEN.cap:MITTEN.cliff,{top:true,topJitter:q=>q()*.03*H});
+    spire.translate(shaft*1.05,0,shaft*.15);parts.push(spire);}
+  const material=new THREE.MeshLambertMaterial({vertexColors:true,flatShading:true,side:THREE.DoubleSide});
+  const mesh=new THREE.Mesh(mergeGeometries(parts),material);mesh.userData.foot=skirt;
+  return mesh;
 }
 
 export function createBasket() {

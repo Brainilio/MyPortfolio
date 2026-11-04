@@ -105,40 +105,37 @@ body:has(.ht){background:#1b1335}
 .ht-work .ht-copy h2 .ht-dot,.ht-skills .ht-copy h2 .ht-dot{color:#7c5cdb}
 .ht-work .ht-copy p.ht-drive,.ht-skills .ht-copy p.ht-drive{color:rgba(42,22,54,.6)}
 .ht-copy p.ht-drive{margin:14px 0 0;font-size:14px;color:rgba(251,247,255,.62)}
-/* Work: the island in the middle with its heading above, and the cards floating off its right edge in 3D: a
-   perspective box, each card turned to show its left edge (a little spine) and casting a shadow down and to the left.
-   Cards in the pile (--k deep) sit further left, lower and back in z, leaning a touch more and in less light; a dealt
-   card is tossed down onto the prairie (0.7 s), and the next springs up into place with a little overshoot (0.5 s). */
-.ht-deck{position:relative;margin:28px 0 0;padding:0;list-style:none;height:min(300px,calc(100svh - 380px));perspective:1200px;perspective-origin:30% 50%}
-.ht-deck li{--k:0;position:absolute;inset:0 0 auto;transform-style:preserve-3d;
-  transform:translate3d(calc(var(--k) * -16px),calc(var(--k) * 8px),calc(var(--k) * -40px)) rotateY(calc(var(--k) * -2deg));
-  transition:transform .5s cubic-bezier(.34,1.56,.64,1),opacity .4s ease}
-.ht-deck li.is-dealt{transform:translate3d(-380px,80px,0) rotateZ(-25deg) rotateY(-27deg);opacity:0;pointer-events:none;transition:transform .7s ease-in,opacity .7s ease-in}
-.ht-deck li.is-far{visibility:hidden}
-.ht-deck a{position:relative;display:block;padding:12px 12px 0;border-radius:12px;background:#fefcf8;color:var(--ink);transform-style:preserve-3d;
-  transform:rotateY(-18deg) rotateX(3deg);transition:transform .4s cubic-bezier(.34,1.56,.64,1);
-  box-shadow:-12px 24px 48px rgba(0,0,0,.28),-4px 8px 16px rgba(0,0,0,.16)}
-.ht-deck li.is-here a:hover,.ht-deck li.is-here a:focus-visible{transform:rotateY(-8deg) rotateX(1deg) translateZ(24px)}
-.ht-deck a:focus-visible{outline:2px solid var(--violet);outline-offset:4px}
-.ht-deck a:before{content:'';position:absolute;left:-8px;top:4px;bottom:-4px;width:8px;background:linear-gradient(180deg,#d4c8b8,#a09080);transform:rotateY(90deg);transform-origin:right center}
-/* Less light deeper in the pile. */
-.ht-deck a:after{content:'';position:absolute;inset:0;border-radius:12px;background:#000;opacity:calc(1 - pow(.88,var(--k)));pointer-events:none;transition:opacity .5s}
-.ht-deck-media{position:relative;display:block;aspect-ratio:16/10;border-radius:3px;overflow:hidden;background:linear-gradient(135deg,var(--violet),#f4a089)}
-.ht-deck-media img,.ht-deck-media video{display:block;width:100%;height:100%;object-fit:cover}
-.ht-deck-text{display:block;padding:10px 2px 12px}
-.ht-deck-text small{display:block;font-size:.65rem;letter-spacing:.06em;color:rgba(42,22,54,.55)}
-.ht-deck-text b{display:block;margin-top:2px;font-size:.95rem;font-weight:600}
-.ht-deck-text i{font-style:normal;color:#7c5cdb;display:inline-block;transition:transform .3s}
-.ht-deck a:hover .ht-deck-text i{transform:translateX(4px)}
+/* Work: the island in the middle with its heading above, and the projects as polaroids placed round it one by one
+   as you scroll, alternating right and left: each drifts in from its side with a little spring and lands at its own
+   slight tilt (--r), and stays. */
+.ht-cards{margin:0;padding:0;list-style:none}
+.ht-card{position:absolute;width:280px;opacity:0;pointer-events:none;transform:translate(120px,20px) rotate(4deg);transition:transform .7s cubic-bezier(.34,1.56,.64,1),opacity .5s ease}
+.ht-card.is-left{transform:translate(-120px,20px) rotate(-4deg)}
+.ht-card.is-placed{opacity:1;pointer-events:auto;transform:rotate(var(--r))}
+.ht-card.is-placed:hover{transform:translateY(-6px) rotate(var(--r));transition:transform .25s ease,opacity .5s ease}
+.ht-card a{display:block;padding:8px 8px 0;border-radius:14px;background:#fefcf8;color:var(--ink);box-shadow:0 8px 32px rgba(0,0,0,.14),0 2px 8px rgba(0,0,0,.08);transition:box-shadow .25s ease}
+.ht-card a:hover{box-shadow:0 14px 40px rgba(0,0,0,.2),0 4px 12px rgba(0,0,0,.1)}
+.ht-card a:focus-visible{outline:2px solid var(--violet);outline-offset:4px}
+.ht-card-media{display:block;aspect-ratio:16/10;border-radius:8px 8px 0 0;overflow:hidden;background:linear-gradient(135deg,var(--violet),#f4a089)}
+.ht-card-media img,.ht-card-media video{display:block;width:100%;height:100%;object-fit:cover}
+.ht-card-text{display:flex;align-items:center;justify-content:space-between;height:40px;padding:0 4px;font-family:'Inter',sans-serif;font-size:.82rem;font-weight:500}
+.ht-card-text i{font-style:normal;color:#7c3aed;transition:transform .25s ease}
+.ht-card a:hover .ht-card-text i{transform:translateX(3px)}
 @media(min-width:761px){
   .ht-zone.ht-work .ht-copy{width:auto;margin:0;padding:0;display:block;pointer-events:none}
   .ht-work-head{position:absolute;z-index:2;top:clamp(92px,12svh,128px);left:50%;width:min(480px,90vw);transform:translateX(-50%);text-align:center}
   .ht-work-head p.ht-drive{margin-top:10px}
-  .ht-work .ht-deck{position:absolute;z-index:1;margin:0;left:calc(77.5% - 80px);top:50%;width:min(330px,22vw);transform:translateY(-38%)}
-  .ht-work .ht-copy>p.ht-more{position:absolute;z-index:2;left:50%;bottom:clamp(28px,6svh,64px);transform:translateX(-50%);margin:0;justify-content:center}
+  /* Right-hand cards just off the island's right edge, left-hand ones off its left, at staggered heights. */
+  .ht-card.is-right{left:calc(78% - 40px)}
+  .ht-card.is-left{left:calc(22% - 240px)}
+  .ht-card:nth-child(1){top:22%}.ht-card:nth-child(2){top:36%}.ht-card:nth-child(3){top:52%}.ht-card:nth-child(4){top:62%}
+  .ht-work .ht-copy>p.ht-more{position:absolute;z-index:2;left:50%;bottom:clamp(28px,6svh,64px);transform:translate(-50%,16px);margin:0;justify-content:center}
+  .ht-work .ht-copy>p.ht-more.is-shown{transform:translate(-50%,0)}
 }
 /* Below the pile: the rest of the work, and the Lab. */
-.ht-copy>p.ht-more{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 0}
+.ht-copy>p.ht-more{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 0;opacity:0;pointer-events:none;transform:translateY(16px);transition:opacity .4s ease-out,transform .4s ease-out}
+.ht-copy>p.ht-more.is-shown{opacity:1;pointer-events:auto;transform:none}
+@media(max-width:1199px){.ht-card{width:240px}}
 .ht-more a{padding:6px 16px;border-radius:999px;border:1px solid #7c5cdb;color:#7c5cdb;font-size:.8rem;font-weight:600;transition:background .3s,color .3s}
 .ht-more a:hover{background:#7c5cdb;color:#fff}
 /* Skills: a plain list beside the diorama; the entry for the wagon's stop lights up. */
@@ -262,14 +259,11 @@ html.ht-locked{overflow:hidden}
   .ht-list li.is-here,.ht-list:not(:has(.is-here)) li:first-child{display:block;transform:none}
   .ht-list b{font-size:16px}
   .ht-work.ht-pinned .ht-copy{justify-content:flex-end;padding:0 0 84px}
-  .ht-deck{height:236px;margin-top:14px;width:min(300px,100%);perspective:none}
-  .ht-deck li{transform:translateY(calc(var(--k) * 10px)) scale(calc(1 - var(--k) * .04))}
-  .ht-deck li.is-dealt{transform:translateX(-120%) translateY(40px) rotate(-14deg)}
-  .ht-deck a,.ht-deck li.is-here a:hover{transform:none;box-shadow:0 8px 24px rgba(0,0,0,.22)}
-  .ht-deck a:before{display:none}
-  .ht-deck a{padding:8px 8px 0}
-  .ht-deck-media{aspect-ratio:16/8}
-  .ht-deck-text{padding:6px 2px 8px}
+  /* Phones: one centred spot under the island; each new card rises into it from below, on top of the last. */
+  .ht-cards{position:relative;width:min(280px,100%);height:200px;margin:14px auto 0}
+  .ht-card,.ht-card.is-left{left:0;top:0;width:100%;transform:translateY(40px) rotate(var(--r))}
+  .ht-card.is-placed{transform:rotate(var(--r))}
+  .ht-card-media{aspect-ratio:16/8}
   .ht-copy>p.ht-more{margin-top:12px}
   .ht-about .ht-copy>p:not(.ht-drive){padding:14px 16px;border-radius:16px;background:rgba(20,14,44,.42);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
   .ht-portrait{width:88px;height:88px;margin:0 auto 14px}
@@ -298,5 +292,5 @@ html.ht-locked{overflow:hidden}
 .ht.is-entered .ht-intro>:nth-child(4){animation-delay:1.85s}
 @media(prefers-reduced-motion:reduce){.ht-finish:after{animation:none}.ht-canvas{transition:none}
   .ht-reveal .ht-word,.ht-reveal .ht-dot{clip-path:none;transform:none;transition:none}
-  .ht-deck li,.ht-deck a{transition:none}
+  .ht-card,.ht-card a,.ht-copy>p.ht-more{transition:none}
   .ht.is-entered .ht-home .ht-canvas,.ht.is-entered .ht-name,.ht.is-entered .ht-intro>*{animation:ht-show .4s ease both;animation-delay:0s!important}}

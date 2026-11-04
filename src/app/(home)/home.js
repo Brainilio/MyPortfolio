@@ -13,6 +13,8 @@ const CoastScene = dynamic(() => import("./coast-scene"), { ssr: false });
 import { MODEL_CREDITS } from "./model-credits";
 import { SKILLS } from "./content";
 const work = allProjects.filter(project => project.slug && project.previewImage).slice(0, 4);
+// The Work cards are placed one by one as the section's scroll passes each of these points (then the links), and stay.
+const PLACE_AT = [.15, .35, .55, .75, .85], TILTS = [1.5, -2, .8, -1.2];
 
 // Every model the homepage loads (fetched up front by the loading screen).
 const MODELS = ["kit", "stag", "deer", "fox", "bear", "eagle", "bison", "prairiedog", "wagon", "moose", "orca", "shark", "sealion", "kayak"].map(name => `/models/island/${name}.glb`);
@@ -106,7 +108,7 @@ export default function Home() {
   const [where, setWhere] = useState({ section: 0, stop: 0 }), [menu, setMenu] = useState(false);
   // Shared with the 3D scenes (read every frame): which sections are on screen and how far through each one we are.
   const scene = useRef({ section: 0, live: [0], progress: [0, 0, 0, 0, 0], shift: [0, 0, 0, 0, 0], tilt: [0, 0, 0, 0, 0] });
-  const [spotted, setSpotted] = useState([]), [still, setStill] = useState(false);
+  const [spotted, setSpotted] = useState([]), [still, setStill] = useState(false), [placed, setPlaced] = useState(0);
   // Reduced motion, and phones: the Work postcard shows its still image instead of playing its preview.
   useEffect(() => {
     const queries = [matchMedia("(prefers-reduced-motion: reduce)"), matchMedia("(max-width: 760px)")], sync = () => setStill(queries.some(q => q.matches));
@@ -185,6 +187,7 @@ export default function Home() {
       let k = 0; while (k < marks.length - 2 && p > marks[k + 1]) k++;
       const blend = clamp((p - marks[k]) / Math.max(1e-6, marks[k + 1] - marks[k])), colors = SKY[k].map((c, n) => mix(c, SKY[k + 1][n], blend));
       if (sky.current) sky.current.style.background = `linear-gradient(180deg,${colors.map((c, n) => `rgb(${c}) ${[0, 30, 55, 80, 100][n]}%`).join(",")})`;
+      { const q = scene.current.progress[WORK], n = PLACE_AT.filter(t => q >= t).length; if (n) setPlaced(was => Math.max(was, n)); }
       scene.current.live = live;scene.current.section = dominant;
       pill.current?.style.setProperty("--progress", scene.current.progress[dominant].toFixed(4));
       bar.current?.style.setProperty("--progress", clamp(y / Math.max(1, document.documentElement.scrollHeight - vh)).toFixed(4));
@@ -264,9 +267,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Work: the bison mesa in the middle, its heading above it, and the projects as a pile of cards floating in the air
-          off its right edge, angled in 3D like objects in the world. Each step of the scroll tosses the top card down onto
-          the prairie and the next one springs up into its place. */}
+      {/* Work: Monument Valley in the middle, its heading above it, and the projects placed round it as polaroids, one
+          per step of the scroll, alternating right and left, building up a little constellation that stays. */}
       <section className="ht-zone ht-work ht-pinned" id="work" data-side="left" style={{ "--steps": work.length, "--step": "50svh" }} ref={el => (zones.current[WORK] = el)} aria-labelledby="ht-work-title">
         <div className="ht-stage">{built[WORK] && <WorkScene state={scene} slot={WORK} side="center" onReady={onReady(WORK)} />}</div>
         <div className="ht-copy" ref={el => (copies.current[WORK] = el)}>
@@ -274,24 +276,24 @@ export default function Home() {
             <RevealHeading id="ht-work-title" text="Things I’ve built" arrive={50} />
             <p className="ht-drive">Click the basket to feed the herd</p>
           </div>
-          <ol className="ht-deck">
+          <ol className="ht-cards">
             {work.map((project, i) => {
-              const at = section === WORK ? stop : 0, here = at === i, depth = i - at;
+              const shown = i < placed;
               return (
-                <li key={project.slug} style={{ "--k": Math.max(0, depth), zIndex: work.length - i }} className={here ? "is-here" : depth < 0 ? "is-dealt" : depth > 3 ? "is-far" : undefined} aria-current={here ? "true" : undefined}>
-                  <a href={`/project/${project.slug}/`} tabIndex={depth < 0 ? -1 : undefined} onFocus={() => scrollToSection(WORK, i / Math.max(1, work.length - 1))}>
-                    <span className="ht-deck-media" aria-hidden="true">
-                      {here && section === WORK && !still && project.previewVideo
+                <li key={project.slug} className={`ht-card ${i % 2 ? "is-left" : "is-right"}${shown ? " is-placed" : ""}`} style={{ "--r": `${TILTS[i % TILTS.length]}deg`, zIndex: i + 1 }}>
+                  <a href={`/project/${project.slug}/`} tabIndex={shown ? undefined : -1}>
+                    <span className="ht-card-media" aria-hidden="true">
+                      {shown && section === WORK && !still && project.previewVideo
                         ? <video src={project.previewVideo} poster={project.previewImage} autoPlay muted loop playsInline />
                         : <img src={project.previewImage} alt="" loading="lazy" decoding="async" />}
                     </span>
-                    <span className="ht-deck-text"><small>{String(i + 1).padStart(2, "0")} · {project.category}</small><b>{project.name} <i aria-hidden="true">→</i></b></span>
+                    <span className="ht-card-text">{String(i + 1).padStart(2, "0")} · {project.name}<i aria-hidden="true">→</i></span>
                   </a>
                 </li>
               );
             })}
           </ol>
-          <p className="ht-more">
+          <p className={`ht-more${placed > work.length ? " is-shown" : ""}`}>
             <a href="/projects/">All projects <span aria-hidden="true">→</span></a>
             <a href="/journey/">Lab experiments <span aria-hidden="true">→</span></a>
           </p>

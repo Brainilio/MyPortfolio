@@ -4,7 +4,8 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
-import { random, createIsland, createBearMaterial, createSpin, tilted } from "./island-parts";
+import { random, createIsland, createBearMaterial, createSpin, tilted, createSwayingInstances, createFoliageMaterial, createBird } from "./island-parts";
+import { paintGeometry } from "./forest-parts";
 import { createButte, createBasket } from "./park-parts";
 
 // Work as the prairie in miniature, the island's golden-hour cousin: rolling prairie climbing to a mesa shelf at the
@@ -28,13 +29,14 @@ function heightAt(x,z) {
 const noRiver=()=>({d:99,t:0});
 // Bison gaits: leg swing (rad), stride rate, bob (fraction of height), knee fold, foot lift (fraction), nod.
 const GAITS={Graze:[0,1.1,.003,0,0,.04],Walk:[.36,3.4,.006,.6,.035,.09],Run:[.62,7.5,.02,.95,.06,.14]};
-// Buttes: two up on the shelf at the back, one mid-left; the right and the front stay open for the herd. Swells (x, z, radius, height); the prairie dogs' mounds and the feed basket near the front.
-// Sized against the island's ~10.8 diameter (x, z, height, top width, turn): A the tallest at the back left, B a little
-// shorter at the back right and a step forward, C a low wide mesa stub mid-left, in front of both.
-const BUTTES=[[-1.3,-2.55,4.1,2.4,.3],[1.9,-2.3,3,1.95,-.4],[-3,.3,1.7,2.15,.9]];
-const footOf=([,,,top])=>top/2/.6*1.08;
+// Monument Valley against the island's ~10.8 diameter (x, z, height, cap width, turn, thumb): the West Mitten, tallest
+// (55%), at the back left with its thumb; the East Mitten (38%) at the back right, sky between them; and a low wide
+// mesa stub (18%, cap 1.6 times as wide as it's tall) mid-left in front. The right and the front stay open for the
+// herd. Swells (x, z, radius, height); the prairie dogs' mounds and the feed basket near the front.
+const BUTTES=[[-1.6,-2.2,5.94,null,.3,true],[2.2,-2,4.1,null,-.5,false],[-3,.9,1.94,3.1,.9,false]];
+const footOf=([,,h,w])=>(w?w/2:.18*h)+.27*h;
 const SWELLS=[[-1.4,.5,1.7,.13],[1.9,.6,1.6,.11],[.1,2.9,1.4,.08]];
-const MOUNDS=[[2.4,1.3],[-1.9,2.5],[-.6,3.1]],BASKET=new THREE.Vector3(1.1,0,2);
+const MOUNDS=[[2.4,1.3],[0,2.5],[-.6,3.15]],BASKET=new THREE.Vector3(1.1,0,2);
 const blocked=(x,z,pad)=>BUTTES.some(b=>Math.hypot(x-b[0],z-b[1])<footOf(b)+pad)||Math.hypot(x-BASKET.x,z-BASKET.z)<pad+.3;
 
 export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
@@ -61,23 +63,28 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     const world=new THREE.Group();scene.add(world);
     const island=createIsland(13,{outline,heightAt,riverDistance:noRiver,depth:.85,hub:new THREE.Vector2(-1.1,-3.3),scatter:.8,grass:["#b89a52","#c4a65a","#a98d4c"],edge:"#9a7c46"});world.add(island.group);
     const on=(x,z,lift=0)=>new THREE.Vector3(x,heightAt(x,z)+lift,z);
-    // Each butte sits on the lowest ground under its footprint, so no edge floats on the slope.
-    BUTTES.forEach(b=>{const [x,z,h,top,turn]=b,foot=footOf(b),butte=createButte(rng,h,top);let low=heightAt(x,z);
-      for(let k=0;k<12;k++){const a=k/12*Math.PI*2;low=Math.min(low,heightAt(x+Math.cos(a)*foot,z+Math.sin(a)*foot));}
-      butte.position.set(x,low-.05,z);butte.rotation.y=turn;world.add(butte);});
-    // Rounded sandstone boulders tumbled at the buttes' feet, on the sides facing out.
-    {const base=new THREE.Color("#9e5226"),spots=[];
-      BUTTES.forEach((b,i)=>[.9,2.2].forEach(a=>{const r=footOf(b)+.15+rng()*.2,angle=a+i*.7;spots.push([b[0]+Math.cos(angle)*r,b[1]+Math.sin(angle)*r,.13+rng()*.12]);}));
+    // Each butte sits on the lowest ground under its talus, so no edge floats on the slope.
+    BUTTES.forEach(b=>{const [x,z,h,width,turn,thumb]=b,foot=footOf(b),butte=createButte(rng,h,{width,thumb});let low=heightAt(x,z);
+      for(let k=0;k<12;k++){const a=k/12*Math.PI*2;low=Math.min(low,heightAt(x+Math.cos(a)*foot*.9,z+Math.sin(a)*foot*.9));}
+      butte.position.set(x,low-.06,z);butte.rotation.y=turn;world.add(butte);});
+    // Loose boulders tumbled off the talus, in the buttes' colours.
+    {const tints=["#b5602e","#8b3a1a","#a5532a","#c46f3c"].map(c=>new THREE.Color(c)),spots=[];
+      [[0,.7],[0,2.3],[1,1],[1,2.6],[2,.4],[2,2],[0,-.6]].forEach(([k,a])=>{const b=BUTTES[k],r=footOf(b)*(.92+rng()*.15);spots.push([b[0]+Math.cos(a)*r,b[1]+Math.sin(a)*r,(.3+rng()*.33)*(k===2?.7:1)]);});
       const rocks=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1,1),new THREE.MeshLambertMaterial({flatShading:true}),spots.length),d=new THREE.Object3D();
-      spots.forEach(([x,z,s],i)=>{d.position.copy(on(x,z,s*.3));d.rotation.set(rng()*.4,rng()*6,rng()*.4);d.scale.set(s*(1.1+rng()*.3),s*.72,s*(.9+rng()*.2));d.updateMatrix();rocks.setMatrixAt(i,d.matrix);
-        rocks.setColorAt(i,base.clone().offsetHSL((rng()-.5)*.02,(rng()-.5)*.1,(rng()-.5)*.08));});
+      spots.forEach(([x,z,s],i)=>{d.position.copy(on(x,z,s*.25));d.rotation.set(rng()*.4,rng()*6,rng()*.4);d.scale.set(s*(1.05+rng()*.3),s*.7,s*(.85+rng()*.25));d.updateMatrix();rocks.setMatrixAt(i,d.matrix);rocks.setColorAt(i,tints[i%4]);});
       world.add(rocks);}
-    // Sage bushes dotted over the grass.
-    {const tints=["#8a9a5c","#7a8b52","#94a066"].map(c=>new THREE.Color(c)),count=34,bushes=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1,0).scale(1,.6,1),new THREE.MeshStandardMaterial({flatShading:true,roughness:1}),count),d=new THREE.Object3D();let n=0;
-      for(let tries=0;n<count&&tries<400;tries++){const a=rng()*Math.PI*2,r=Math.sqrt(rng())*outline(a)*.88,x=Math.cos(a)*r,z=Math.sin(a)*r;
+    // Sage bushes dotted over the grass; they sway in the breeze and stir when the cursor brushes past, like the trees.
+    const shared={uTime:{value:0},uBreeze:{value:.03},uGust:{value:.05}},foliage=createFoliageMaterial(shared),bushes=[];
+    {const tints=["#8a9a5c","#7a8b52","#94a066"],spots=tints.map(()=>[]);let n=0;
+      for(let tries=0;n<34&&tries<400;tries++){const a=rng()*Math.PI*2,r=Math.sqrt(rng())*outline(a)*.88,x=Math.cos(a)*r,z=Math.sin(a)*r;
         if(blocked(x,z,.3)||MOUNDS.some(([mx,mz])=>Math.hypot(x-mx,z-mz)<.6))continue;
-        const s=.1+rng()*.14;d.position.copy(on(x,z,s*.2));d.rotation.y=rng()*6;d.scale.setScalar(s);d.updateMatrix();bushes.setMatrixAt(n,d.matrix);bushes.setColorAt(n,tints[n%3]);n++;}
-      bushes.count=n;world.add(bushes);}
+        spots[n%3].push({position:on(x,z),rotation:rng()*6,scale:(.1+rng()*.14)/3});n++;}
+      // Built three times taller than it's placed, so the sway (which grows with height) shows on something this low.
+      tints.forEach((tint,k)=>{const geometry=paintGeometry(new THREE.IcosahedronGeometry(3,0).scale(1,.6,1).translate(0,1.2,0),tint),set=createSwayingInstances(geometry,spots[k],foliage);bushes.push(set);world.add(set.mesh);});}
+    // A few birds wheeling high over the Mittens.
+    const birdMaterial=new THREE.MeshStandardMaterial({color:"#3b2b33",flatShading:true,roughness:1,side:THREE.DoubleSide});
+    const birds=Array.from({length:5},(_,i)=>{const bird=createBird(birdMaterial);bird.scale.setScalar(.9);Object.assign(bird.userData,{a:i/5*Math.PI*2,r:2.2+(i%3)*.7,h:6.4+(i%2)*.8,speed:.28+(i%4)*.05,flap:i*1.7});world.add(bird);return bird;});
+    const ahead=new THREE.Vector3();
 
     // The feed basket, its hay, and the pellets that pour into it.
     const basket=createBasket();basket.position.copy(on(BASKET.x,BASKET.z));basket.scale.setScalar(.34);basket.rotation.y=.4;world.add(basket);
@@ -205,14 +212,25 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
         if(dog){dog.state="down";dog.timer=3+rng()*3;needsRender=true;}
       }});
     canvas.addEventListener("pointerleave",()=>{onBasket=false;});
+    // Hover (a mouse only): the sage near the cursor stirs, the faster the cursor the more. Passive under the drag.
+    const hover=new THREE.Vector3();let hoverX=0,hoverY=0,hoverAt=0;
+    function onHover(event){
+      if(event.pointerType!=="mouse"||event.buttons||preference.matches)return;
+      const now=performance.now(),speed=Math.hypot(event.clientX-hoverX,event.clientY-hoverY)/Math.max(16,now-hoverAt);hoverX=event.clientX;hoverY=event.clientY;hoverAt=now;
+      const hit=pick(event,[island.surface]),kick=Math.min(1,speed*.9);if(!hit||kick<.03)return;
+      world.worldToLocal(hover.copy(hit.point));
+      for(const set of bushes)set.mesh.userData.placements.forEach((p,i)=>{const d=Math.hypot(p.position.x-hover.x,p.position.z-hover.z);if(d<1.4)set.sway[i]=Math.min(.22,set.sway[i]+(1-d/1.4)*kick*.09);});
+      needsRender=true;
+    }
+    canvas.addEventListener("pointermove",onHover);
 
     // Framing: the mesa to one side (the words scroll past on the other), further off when tall.
     let tall=false,attitude=0;const VIEW=new THREE.Vector3(0,.34,1).normalize(),focus=new THREE.Vector3(0,.9,0),viewDir=new THREE.Vector3();
     // The camera sits on an orbit round the mesa; only its attitude (steeper arriving, lower leaving) changes.
-    function placeCamera(){camera.position.copy(tilted(VIEW,attitude,viewDir)).multiplyScalar(tall?54:24).add(focus);camera.lookAt(focus);}
+    function placeCamera(){camera.position.copy(tilted(VIEW,attitude,viewDir)).multiplyScalar(tall?60:27).add(focus);camera.lookAt(focus);}
     function frame(){
       const w=mount.clientWidth,h=mount.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;tall=camera.aspect<.85;
-      if(tall)camera.setViewOffset(w,h,0,h*.2,w,h);else camera.setViewOffset(w,h,side==="center"?0:(side==="left"?.17:-.17)*w,side==="center"?-h*.06:h*.07,w,h);
+      if(tall)camera.setViewOffset(w,h,0,h*.2,w,h);else camera.setViewOffset(w,h,side==="center"?0:(side==="left"?.17:-.17)*w,side==="center"?-h*.13:h*.07,w,h);
       camera.updateProjectionMatrix();placeCamera();needsRender=true;
     }
     const resize=new ResizeObserver(frame);resize.observe(mount);
@@ -229,8 +247,13 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       const goal=reduced?0:state.current.tilt[slot];attitude+=(goal-attitude)*(1-Math.exp(-dt*6));placeCamera();
       herd.forEach(b=>updateBison(b,step,time));dogs.forEach(d=>updateDog(d,step));
       world.position.y=Math.sin(time*.45)*.1;
+      shared.uTime.value=time;shared.uBreeze.value=reduced?0:.03;shared.uGust.value=reduced?0:.05;
+      for(const set of bushes){for(let i=0;i<set.sway.length;i++)set.sway[i]*=Math.exp(-dt*2.2);set.update();}
+      birds.forEach(bird=>{const u=bird.userData;u.a+=step*u.speed;const x=-.2+Math.cos(u.a)*u.r,z=-2+Math.sin(u.a)*u.r,y=u.h+Math.sin(time*.8+u.flap)*.25;
+        bird.position.set(x,y,z);bird.lookAt(world.localToWorld(ahead.set(-.2+Math.cos(u.a+.2)*u.r,y,-2+Math.sin(u.a+.2)*u.r)));
+        const flap=Math.sin(time*8+u.flap)*.7;u.wings[0].rotation.z=flap;u.wings[1].rotation.z=-flap;});
       renderer.render(scene,camera);needsRender=false;
-      return falling||onBasket||spin.busy||herd.some(b=>b.feeding&&b.state==="move")||Math.abs(goal-attitude)>.05;
+      return falling||onBasket||spin.busy||herd.some(b=>b.feeding&&b.state==="move")||Math.abs(goal-attitude)>.05||bushes.some(set=>set.sway.some(v=>v>.003));
     }
     // Full rate while feed falls, the herd runs to it or the basket is hovered, 30 fps for the grazing in between.
     let busy=true;const clock=new THREE.Clock();
@@ -248,7 +271,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
 
     return()=>{
       clearTimeout(readyTimer);delete window.__work;disposed=true;cancelAnimationFrame(raf);resize.disconnect();observer.disconnect();
-      spin.dispose();
+      spin.dispose();canvas.removeEventListener("pointermove",onHover);
       scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat())m?.dispose();});
       renderer.dispose();canvas.remove();
     };
