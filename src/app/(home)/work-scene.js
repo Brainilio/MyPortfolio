@@ -271,10 +271,9 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
         const h=calf?SIZES[0]*.55:SIZES[i];model.scale.setScalar(h/size.y);model.position.y=-box.min.y*h/size.y;root.add(model);
         root.position.copy(on(x,z));world.add(root);
         // Each with its own random seed: its stride starts at a random point, its timers are offset, its pace ±8%.
-        const seed=random(40+i*7),anim=createBisonAnimator(rig,{calf,seed});
         // One adult starts the scene lying down.
-        const resting=i===2;
-        herd.push({root,anim,calf,height:h,length:h*size.z/size.y,radius:h*.5,yaw:seed()*6,state:resting?"rest":"graze",timer:1+seed()*5,gait:"walk",
+        const resting=i===2,seed=random(40+i*7),anim=createBisonAnimator(rig,{calf,seed,resting});
+        herd.push({root,anim,calf,height:h,length:h*size.z/size.y,radius:h*size.z/size.y*.4,yaw:seed()*6,state:resting?"rest":"graze",timer:1+seed()*5,gait:"walk",
           target:new THREE.Vector2(x,z),feeding:false,drink:false,face:null,eatUntil:0,resting,restUntil:resting?40+seed()*40:0,startAt:0,alarmUntil:0});
       });
       // The calf stays within a body length and a half (of its mother's) of her.
@@ -290,7 +289,9 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
         b.startAt=now+.8+(b.calf?.3:0);b.alarmUntil=b.startAt;});
     }
     function tapBison(b){if(b.resting)return;b.alarmUntil=time+1.6;if(b.state==="move"&&!b.feeding){b.state="graze";b.timer=1.8;}}
-    function wander(b,from,min,max){for(let tries=0;tries<14;tries++){const a=b.anim.state.phase*7+tries*2.4+Math.random(),r=min+Math.random()*(max-min),x=from.x+Math.cos(a)*r,z=from.z+Math.sin(a)*r;if(inside(x,z,b.radius+.15)){b.target.set(x,z);return true;}}return false;}
+    // A spot is free if it's on open ground and clear of every other bison (where it stands, and where it's headed).
+    const free=(b,x,z)=>inside(x,z,b.radius+.15)&&herd.every(o=>o===b||(Math.hypot(x-o.root.position.x,z-o.root.position.z)>b.radius+o.radius+.3&&(o.state!=="move"||Math.hypot(x-o.target.x,z-o.target.y)>b.radius+o.radius+.3)));
+    function wander(b,from,min,max){for(let tries=0;tries<20;tries++){const a=Math.random()*Math.PI*2,r=min+Math.random()*(max-min),x=from.x+Math.cos(a)*r,z=from.z+Math.sin(a)*r;if(free(b,x,z)){b.target.set(x,z);return true;}}return false;}
     function updateBison(b,dt,now){
       const p=b.root.position,mother=herd[0];b.timer-=dt;
       if(b.state==="eat"){if(now>b.eatUntil){b.state="graze";b.feeding=false;b.drink=false;b.face=null;b.timer=1+Math.random()*2;}}
@@ -306,20 +307,30 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
           const a=Math.atan2(p.z-POND.z,p.x-POND.x),d=POND.r+b.length*.42;b.target.set(POND.x+Math.cos(a)*d,POND.z+Math.sin(a)*d);
           b.drink=true;b.state="move";b.gait="walk";
         }
-        else if(b.calf&&r<.35){if(wander(b,mother.root.position,leash*.5,leash*.95)){b.state="move";b.gait="trot";}else b.timer=1;}
+        // The calf's play: a gallop off round its mother and back.
+        else if(b.calf&&r<.45){if(wander(b,mother.root.position,leash*.55,leash*.95)){b.state="move";b.gait="gallop";}else b.timer=1;}
         else if(wander(b,b.calf?mother.root.position:p,b.calf?leash*.3:.8,b.calf?leash*.7:2.2)){b.state="move";b.gait="walk";}
         else b.timer=1;
       } else if(b.state==="move"&&now>=b.startAt){
         const dx=b.target.x-p.x,dz=b.target.y-p.z,dist=Math.hypot(dx,dz);
-        if(dist<.05){
+        // Someone already standing on the spot: stop short of them.
+        const taken=herd.some(o=>o!==b&&o.state!=="move"&&Math.hypot(b.target.x-o.root.position.x,b.target.y-o.root.position.z)<b.radius+o.radius&&Math.hypot(p.x-o.root.position.x,p.z-o.root.position.z)<(b.radius+o.radius)*1.3);
+        if(dist<.08||taken){
           if(b.feeding){b.state="eat";b.eatUntil=now+6;b.face=Math.atan2(BASKET.x-p.x,BASKET.z-p.z);}
           else if(b.drink){b.state="eat";b.eatUntil=now+5+Math.random()*3;b.face=Math.atan2(POND.x-p.x,POND.z-p.z);}
           else{b.state="graze";b.timer=b.calf?1.5+Math.random()*2:4+Math.random()*7;}
         } else {
-          // It turns toward where it's going, slowing into the turn, at the pace its stride sets (hooves don't slide).
-          let turn=Math.atan2(dx,dz)-b.yaw;turn=Math.atan2(Math.sin(turn),Math.cos(turn));b.yaw+=turn*(1-Math.exp(-dt*3));
-          const pace=b.anim.speed(b.gait,b.height*.55)*(.5+.5*Math.cos(Math.min(Math.abs(turn),1.5)));
-          const step=Math.min(dist,pace*dt);p.x+=dx/dist*step;p.z+=dz/dist*step;
+          // Steering: head for the target, bending the path round any bison in the way ahead (passing on whichever
+          // side it's already on), then walk where it's facing, slowing into turns, at the pace its stride sets.
+          const ux=dx/dist,uz=dz/dist,px=-uz,pz=ux;let wx=ux,wz=uz;
+          for(const o of herd){if(o===b)continue;const rx=o.root.position.x-p.x,rz=o.root.position.z-p.z,d=Math.hypot(rx,rz),reach=(b.radius+o.radius)*2.4;
+            if(d>reach||d>dist+o.radius)continue;const ahead=(rx*ux+rz*uz)/Math.max(d,1e-3);if(ahead<=0)continue;
+            // Push the heading sideways, away from the side the other is on.
+            const side=rx*px+rz*pz>0?1:-1,k=(1-d/reach)*ahead*1.8;wx-=px*side*k;wz-=pz*side*k;}
+          const head=Math.atan2(wx,wz);let turn=head-b.yaw;turn=Math.atan2(Math.sin(turn),Math.cos(turn));
+          b.yaw+=turn*(1-Math.exp(-dt*(dist<.4?6:3)));
+          const pace=b.anim.speed(b.gait,b.height*.55)*(.35+.65*Math.max(0,Math.cos(Math.min(Math.abs(turn),1.5))));
+          const step=Math.min(dist,pace*dt);p.x+=Math.sin(b.yaw)*step;p.z+=Math.cos(b.yaw)*step;
         }
       }
       // The calf follows its mother: if she's more than a body length and a half away it goes after her (trotting if
@@ -328,11 +339,12 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
         if(away>leash&&(b.state!=="move"||Math.hypot(b.target.x-m.x,b.target.y-m.z)>leash*.8)){
           const a=Math.atan2(p.z-m.z,p.x-m.x);b.target.set(m.x+Math.cos(a)*leash*.5,m.z+Math.sin(a)*leash*.5);
           const off=Math.hypot(b.target.x-POND.x,b.target.y-POND.z);if(off<POND.r+b.radius){const k=(POND.r+b.radius+.05)/Math.max(off,1e-3);b.target.set(POND.x+(b.target.x-POND.x)*k,POND.z+(b.target.y-POND.z)*k);}
-          if(b.state!=="move")b.startAt=now+.3;b.state="move";b.gait=away>leash*1.3?"trot":"walk";}}
+          if(b.state!=="move")b.startAt=now+.3;b.state="move";b.gait=away>leash*1.6?"gallop":away>leash*1.25?"trot":"walk";}}
       if(b.face!==null){let turn=b.face-b.yaw;turn=Math.atan2(Math.sin(turn),Math.cos(turn));b.yaw+=turn*(1-Math.exp(-dt*3));}
-      // Big bodies don't overlap: nudge apart from any neighbour that's too close.
-      for(const o of herd){if(o===b)continue;const dx=p.x-o.root.position.x,dz=p.z-o.root.position.z,d=Math.hypot(dx,dz),min=(b.radius+o.radius)*.95;
-        if(d<min&&d>1e-4){const push=(min-d)*.5*Math.min(1,dt*6);p.x+=dx/d*push;p.z+=dz/d*push;}}
+      // Big bodies never overlap: pushed apart from any neighbour that's too close (all the way if the other is lying
+      // down and won't budge, halfway otherwise; the other takes the other half on its turn).
+      for(const o of herd){if(o===b)continue;const dx=p.x-o.root.position.x,dz=p.z-o.root.position.z,d=Math.hypot(dx,dz),min=b.radius+o.radius;
+        if(d<min&&d>1e-4&&!b.resting){const push=(min-d)*(o.resting?1:.5)*Math.min(1,dt*10);p.x+=dx/d*push;p.z+=dz/d*push;}}
       b.anim.update(dt,{moving:b.state==="move"&&now>=b.startAt&&b.anim.state.rest<.05,gait:b.gait,eating:b.state==="eat",resting:b.resting,alarmed:now<b.alarmUntil,wallow:!!b.wallowing});
       if(b.anim.state.dust>.05)emitDust(b,b.anim.state.dust,dt);
       p.y=heightAt(p.x,p.z);b.root.rotation.y=b.yaw;
