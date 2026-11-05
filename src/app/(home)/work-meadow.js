@@ -80,7 +80,11 @@ export function createMeadow({outline,foliage,loader,onLoad}){
   group.add(island.group);
   // The river: full the whole way, opening out into a mouth where it meets the lake, and fading only in its last
   // stretch, under the lake's surface, so the two run together.
-  const water=createWater(PATH,outline,{width:.82,fade:.3,level:LEVEL,volume:.3,head:.04,pour:false,shape:k=>(.92+.08*Math.sin(k*18))*(1+.55*smooth(.72,1,k))});
+  // Where it reaches the lake's shore (as a share of its length): from there its rounded body settles flat to the
+  // lake's level, and it fades out over the open water, so nothing stands proud of the lake or ends in a line.
+  const shore=PATH.findIndex(p=>lakeE(p.x,p.z)<1.05)/(PATH.length-1),riverLength=PATH.reduce((sum,p,i)=>i?sum+p.distanceTo(PATH[i-1]):0,0);
+  const water=createWater(PATH,outline,{width:.82,fade:(1-shore)*riverLength/4+.02,level:LEVEL,volume:.3,head:.04,pour:false,
+    swell:k=>smooth(shore,shore-.18,k),shape:k=>(.92+.08*Math.sin(k*18))*(1+.55*smooth(shore-.08,1,k))});
   water.uniforms.uShallow.value.set("#7ec8e3");water.uniforms.uDeep.value.set("#4d93b8");group.add(water.group);
   // The lake: a sheet at the river's level, its rim bumped, with a slow swell (3 s, ±0.02). Shaded like the river, in
   // the river's own blues (deep in the middle, shallow toward the shore, a broken line of foam at the rim), so where
@@ -104,10 +108,10 @@ export function createMeadow({outline,foliage,loader,onLoad}){
         float d=distance(vP,uMouth),f=fract(d/.42-uTime*.38);
         color+=smoothstep(0.,.08,f)*smoothstep(.24,.1,f)*(1.-smoothstep(.1,1.5,d))*.2;
         // At the mouth, the river's own shallow blue, blending into the lake's.
-        color=mix(color,uShallow,(1.-smoothstep(0.,.5,d))*.5);
+        color=mix(color,uShallow+.07,(1.-smoothstep(.05,1.,d))*.8);
         for(int i=0;i<3;i++){float r=uRise[i].z*.32,k=1.-smoothstep(0.,1.6,uRise[i].z);color+=smoothstep(.022,0.,abs(distance(vP,uRise[i].xy)-r))*k*.45;}
         float foam=smoothstep(.86,.99,e+.035*sin(a*13.+uTime*1.3));
-        color=mix(color,vec3(1.),foam*.6);
+        color=mix(color,vec3(1.),foam*.6*smoothstep(.35,.8,d));
         gl_FragColor=vec4(color,.94*smoothstep(1.06,1.,e));
         #include <colorspace_fragment>
       }`}));

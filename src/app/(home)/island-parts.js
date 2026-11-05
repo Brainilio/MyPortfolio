@@ -101,7 +101,7 @@ export function createIsland(seed=7,{outline:edgeAt=outline,heightAt:groundAt=he
 // units, fading out over the lower part of the drop (and in over `head` at the start). `volume` rounds the ribbon's cross-section (a fraction of its
 // width): the river swells up in the middle and the waterfall bows outward, so it reads as a body of water.
 // pour: false ends it on the land (into a lake, say) with no waterfall; shape(k) then scales its width along it (0 → 1).
-export function createWater(path=riverPoints,edgeAt=outline,{width=1,fall=8,fade=Math.max(.6,fall*.19),level=-.2,volume=0,head=.25,pour=true,shape=null}={}) {
+export function createWater(path=riverPoints,edgeAt=outline,{width=1,fall=8,fade=Math.max(.6,fall*.19),level=-.2,volume=0,head=.25,pour=true,shape=null,swell=null}={}) {
   const uniforms={uTime:{value:0},uFlow:{value:0},uSurge:{value:0},uLength:{value:1},uFade:{value:fade},uHead:{value:head},uShallow:{value:new THREE.Color(PALETTE.water)},uDeep:{value:new THREE.Color(PALETTE.waterDeep)}};
   const material=new THREE.ShaderMaterial({uniforms,transparent:true,depthWrite:false,side:THREE.DoubleSide,
     vertexShader:`varying vec2 vUv;uniform float uSurge,uTime;void main(){vUv=uv;vec3 p=position;p.y+=uSurge*.07*(1.+sin(uv.y*9.-uTime*8.));gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}`,
@@ -130,7 +130,7 @@ export function createWater(path=riverPoints,edgeAt=outline,{width=1,fall=8,fade
         return;
       }
       // A middle row lifted off the sheet (up while it flows, outward once it falls) gives it a rounded body.
-      along.subVectors(points[Math.min(i+1,points.length-1)],points[Math.max(i-1,0)]).normalize();bow.crossVectors(side,along).normalize().multiplyScalar(w*volume);
+      along.subVectors(points[Math.min(i+1,points.length-1)],points[Math.max(i-1,0)]).normalize();bow.crossVectors(side,along).normalize().multiplyScalar(w*volume*(swell?swell(k):1));
       positions.push(p.x-side.x*w,p.y,p.z-side.z*w,p.x+bow.x,p.y+bow.y,p.z+bow.z,p.x+side.x*w,p.y,p.z+side.z*w);uvs.push(0,v,.5,v,1,v);
       if(i){const a=(i-1)*rows,b=i*rows;index.push(a,a+1,b,a+1,b+1,b,a+1,a+2,b+1,a+2,b+2,b+1);}
     });
