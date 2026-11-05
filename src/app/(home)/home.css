@@ -329,7 +329,9 @@ html.ht-locked{overflow:hidden}
 
 .wl-a-name{position:absolute;z-index:2;left:0;right:0;top:52%;transform:translateY(-50%);display:flex;justify-content:center;color:var(--ink);text-decoration:none}
 .wl-a-word{display:flex;overflow:hidden;padding:.16em .12em .22em;margin:-.1em -.1em -.1em;font-family:var(--font-display),'Inter',sans-serif;font-size:clamp(64px,12.5vw,220px);font-weight:900;letter-spacing:-.055em;line-height:.9;white-space:nowrap}
-.wl-a-char{display:inline-block;will-change:transform,filter;color:transparent;-webkit-background-clip:text;background-clip:text;
+.wl-a-char{display:inline-block;will-change:transform,filter;color:transparent;
+  /* (Room round each letter for its gradient to paint into: heavy glyphs this tightly set spill past their own box.) */
+  padding:.06em .14em;margin:-.06em -.14em;-webkit-background-clip:text;background-clip:text;
   /* The sunrise on the letters: deep plum at the top warming to ember at the foot, and a band of low sunlight sweeping
      across the whole word (each letter shows its own slice of it). */
   background-image:linear-gradient(100deg,rgba(255,190,110,0) calc(var(--sun,50%) - 14%),rgba(255,196,120,.95) var(--sun,50%),rgba(255,190,110,0) calc(var(--sun,50%) + 14%)),linear-gradient(180deg,#2a1636 28%,#5a2a58 64%,#b9553f 100%);
