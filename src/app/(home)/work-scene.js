@@ -9,6 +9,7 @@ import { random, createSpin, tilted, createFoliageMaterial, createBird, createCl
 import { createBasket } from "./park-parts";
 import { createBisonRig, createBisonAnimator } from "./bison-rig";
 import { createMeadow, BASKET_SPOT } from "./work-meadow";
+import { createCardRing } from "./work-ring";
 
 // Work: a Yellowstone meadow at golden hour (work-meadow.js: the island, its peaks, river and lake, trees, geysers,
 // ducks, deer and eagle), with a bison herd and a feed basket: click it and the herd comes running. The project cards
@@ -18,7 +19,7 @@ const smooth=t=>{t=THREE.MathUtils.clamp(t,0,1);return t*t*(3-2*t);};
 const outline=a=>5.4*(1+.06*Math.sin(2*a+.9)+.05*Math.sin(5*a+1.7)+.03*Math.sin(9*a));
 const BASKET=new THREE.Vector3(BASKET_SPOT[0],0,BASKET_SPOT[1]);
 
-export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
+export default function WorkScene({ state, slot = 2, side = "left", projects = [], onReady }) {
   const ready=useRef(onReady);ready.current=onReady;
   const host=useRef(null);
   useEffect(()=>{
@@ -44,6 +45,8 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     const GROW=1.3;meadow.group.scale.setScalar(GROW);world.add(meadow.group);
     const land=meadow.group,bushes=meadow.swaying,height=meadow.height;
     const on=(x,z)=>new THREE.Vector3(x,height(x,z),z);
+    // The orbit card layout (work-ring.js): the project cards on a ring round the island, shown while it's chosen.
+    const ring=createCardRing({projects,onLoad:()=>{needsRender=true;}});ring.group.visible=false;scene.add(ring.group);let ringMoving=false;
     // A few birds wheeling high over the peaks.
     const birdMaterial=new THREE.MeshStandardMaterial({color:"#3b2b33",flatShading:true,roughness:1,side:THREE.DoubleSide});
     const birds=Array.from({length:5},(_,i)=>{const bird=createBird(birdMaterial);bird.scale.setScalar(.9);Object.assign(bird.userData,{a:i/5*Math.PI*2,r:2.2+(i%3)*.7,h:6.4+(i%2)*.8,speed:.28+(i%4)*.05,flap:i*1.7});world.add(bird);return bird;});
@@ -205,15 +208,19 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     const raycaster=new THREE.Raycaster(),ndc=new THREE.Vector2();let onBasket=false;
     const pick=(event,objects)=>{const rect=canvas.getBoundingClientRect();ndc.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(ndc,camera);return raycaster.intersectObjects(objects,true)[0];};
     const spin=createSpin(canvas,{rest:0,
-      over:event=>(onBasket=!!pick(event,[basket,hay]))||!!pick(event,herd.map(b=>b.root))||!!pick(event,meadow.geysers),
+      over:event=>{
+        // A card under the cursor lifts (and holds the ring); otherwise the basket, the herd and the geysers are tappable.
+        const card=ring.group.visible?pick(event,ring.meshes):null;ring.hover(card?ring.indexOf(card.object):-1);if(card){needsRender=true;return true;}
+        return (onBasket=!!pick(event,[basket,hay]))||!!pick(event,herd.map(b=>b.root))||!!pick(event,meadow.geysers);},
       onTap:event=>{
+        const card=ring.group.visible&&pick(event,ring.meshes);if(card){const p=ring.project(ring.indexOf(card.object));if(p)window.location.href=`/project/${p.slug}/`;return;}
         if(pick(event,[basket,hay])){pour();return;}
         const vent=pick(event,meadow.geysers);if(vent){meadow.erupt(vent.object);needsRender=true;return;}
         const owner=(hit,list)=>list.find(x=>{let o=hit.object;while(o&&o!==x.root)o=o.parent;return o===x.root;});
         // Tap a bison and it startles: head up, tail up, a brace.
         const struck=pick(event,herd.map(b=>b.root));if(struck){const b=owner(struck,herd);if(b){tapBison(b);needsRender=true;}}
       }});
-    canvas.addEventListener("pointerleave",()=>{onBasket=false;});
+    canvas.addEventListener("pointerleave",()=>{onBasket=false;ring.hover(-1);});
     // Hover (a mouse only): the pines near the cursor stir, the faster the cursor the more. Passive under the drag.
     const ground=land.children[0].children[0],hover=new THREE.Vector3();let hoverX=0,hoverY=0,hoverAt=0;
     function onHover(event){
@@ -231,14 +238,14 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     let tall=false,attitude=0;const VIEW=new THREE.Vector3(0,.34,1).normalize(),focus=new THREE.Vector3(0,.9,0),viewDir=new THREE.Vector3();
     let closeUp=null;// (?debug only: { from, at } to inspect something up close)
     function placeCamera(){if(closeUp){camera.position.copy(closeUp.from);camera.lookAt(closeUp.at);return;}camera.position.copy(tilted(VIEW,attitude,viewDir)).multiplyScalar(distance).add(focus);camera.lookAt(focus);}
-    // How far back the camera sits, from the screen's shape: the island spans about 65% of the width on a desktop
-    // screen (90% on a phone), whatever its proportions. (Measured: at 27 units back and 4:3, the unscaled island
+    // How far back the camera sits, from the screen's shape: the island spans about half the width on a desktop
+    // screen (80% on a phone), whatever its proportions. (Measured: at 27 units back and 4:3, the unscaled island
     // spans 59% of the width, so its width on screen is ~21.2 / (distance × aspect).)
     let distance=27;
-    const fit=aspect=>THREE.MathUtils.clamp(21.2*GROW/((aspect<.85?.9:.65)*aspect),24,80);
+    const fit=aspect=>THREE.MathUtils.clamp(21.2*GROW/((aspect<.85?.8:.5)*aspect),24,90);
     function frame(){
       const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;tall=camera.aspect<.85;distance=fit(camera.aspect);scene.fog.near=distance+12;scene.fog.far=distance*2.4+20;
-      if(tall)camera.setViewOffset(w,h,0,h*.2,w,h);else camera.setViewOffset(w,h,side==="center"?0:(side==="left"?.17:-.17)*w,side==="center"?-h*.13:h*.07,w,h);
+      if(tall)camera.setViewOffset(w,h,0,h*.2,w,h);else camera.setViewOffset(w,h,side==="center"?0:(side==="left"?.17:-.17)*w,side==="center"?-h*.01:h*.07,w,h);
       camera.updateProjectionMatrix();placeCamera();needsRender=true;
     }
     const resize=new ResizeObserver(frame);resize.observe(mount);
@@ -256,6 +263,9 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       herd.forEach(b=>updateBison(b,step,time));
       const dusty=updateDust(step);
       world.position.y=Math.sin(time*.45)*.1;meadow.update(time,step);
+      // The card ring: turned by the scroll through the section (25° per 100px).
+      ring.group.visible=state.current.cardLayout==="A";
+      if(ring.group.visible){const run=Math.max(1,(mount.closest("section")?.offsetHeight??innerHeight)-innerHeight);ringMoving=ring.update(dt,-state.current.progress[slot]*run/100*25,reduced);}else ringMoving=false;
       // The sun's climb follows the scroll through the section (reduced motion: already up).
       const rise=reduced?1:smooth(state.current.progress[slot]/.75);
       if(Math.abs(rise-risen)>1e-3){risen=rise;sunDisc.position.set(-15+rise*2,-6+rise*9,-40);sunDisc.material.color.copy(LOW).lerp(HIGH,rise);}
@@ -266,7 +276,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
         bird.position.set(x,y,z);bird.lookAt(world.localToWorld(ahead.set(-.2+Math.cos(u.a+.2)*u.r,y,-2+Math.sin(u.a+.2)*u.r)));
         const flap=Math.sin(time*8+u.flap)*.7;u.wings[0].rotation.z=flap;u.wings[1].rotation.z=-flap;});
       needsRender=false;
-      return falling||dusty||onBasket||spin.busy||meadow.erupting()||herd.some(b=>(b.feeding&&b.state==="move")||b.alarmUntil>time)||Math.abs(goal-attitude)>.05||bushes.some(set=>set.sway.some(v=>v>.003));
+      return ringMoving||falling||dusty||onBasket||spin.busy||meadow.erupting()||herd.some(b=>(b.feeding&&b.state==="move")||b.alarmUntil>time)||Math.abs(goal-attitude)>.05||bushes.some(set=>set.sway.some(v=>v>.003));
     }
     // Full rate while feed falls, the herd runs to it or the basket is hovered, 30 fps for the grazing in between.
     let busy=true;
@@ -279,18 +289,16 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       busy=tick(Math.min(since,.1));since=0;return true;
     }
     frame();tick(0);mount.dataset.ready="true";
-    // On wide screens it fades out toward the words beside it.
     const entry={mount,scene,camera,draw,exposure:1.05,fade:null},unregister=shared_.register(entry);
-    const wide=matchMedia("(min-width: 761px)"),syncFade=()=>{entry.fade=wide.matches?{side:"right",from:.75}:null;shared_.invalidate();};
-    syncFade();wide.addEventListener("change",syncFade);
+    // (No fade toward an edge: the island sits in the middle, the cards round it.)
     const readyTimer=setTimeout(()=>ready.current?.(),0);
-    if(new URLSearchParams(window.location.search).has("debug"))window.__work={camera,herd,world,scene,renderer,pour,THREE,meadow,closeUp:v=>{closeUp=v;}};
+    if(new URLSearchParams(window.location.search).has("debug"))window.__work={camera,herd,world,scene,renderer,pour,THREE,meadow,ring,closeUp:v=>{closeUp=v;}};
 
     return()=>{
-      clearTimeout(readyTimer);delete window.__work;disposed=true;unregister();wide.removeEventListener("change",syncFade);resize.disconnect();observer.disconnect();
+      clearTimeout(readyTimer);delete window.__work;disposed=true;unregister();resize.disconnect();observer.disconnect();
       spin.dispose();canvas.removeEventListener("pointermove",onHover);
       scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat())m?.dispose();});
-      sunTexture.dispose();meadow.dispose();
+      sunTexture.dispose();meadow.dispose();ring.dispose();
     };
   },[state,slot]);
   return <div className="ht-canvas" ref={host} aria-hidden="true" />;

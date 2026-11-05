@@ -51,7 +51,7 @@ const ARRIVE = 14, DEPART = 10;
 const ABOUT = 1, WORK = 2, SKILLS_AT = 3, CONTACT = 4;
 const clamp = v => Math.min(1, Math.max(0, v));
 // The Work section's card-layout tester (work-cards.js).
-const CARD_LAYOUTS = { A: "Orbital ring", B: "Ticker", C: "Staggered stack", D: "Focused" };
+const CARD_LAYOUTS = { A: "Orbit", B: "Original", C: "Stacked deck", D: "Focus" };
 
 // The contact form posts to Formspree with fetch, so the card stays put and thanks you in place.
 // Replace REPLACE_WITH_ID with your Formspree form ID from formspree.io; until then the form says to email instead.
@@ -110,6 +110,7 @@ export default function Home() {
   const scene = useRef({ section: 0, live: [0], progress: [0, 0, 0, 0, 0], tilt: [0, 0, 0, 0, 0] });
   const [spotted, setSpotted] = useState([]), [still, setStill] = useState(false);
   const [cardLayout, setCardLayout] = useState("A");
+  useEffect(() => { scene.current.cardLayout = cardLayout; }, [cardLayout]);
   // Reduced motion, and phones: the Work postcard shows its still image instead of playing its preview.
   useEffect(() => {
     const queries = [matchMedia("(prefers-reduced-motion: reduce)"), matchMedia("(max-width: 760px)")], sync = () => setStill(queries.some(q => q.matches));
@@ -262,10 +263,10 @@ export default function Home() {
       {/* Work: Monument Valley held in the middle (its stage is sticky), its heading above it, and the projects as a plain
           column of cards scrolling past over it, alternating left and right, each sliding in from its side. */}
       <section className="ht-zone ht-work" id="work" data-side="left" ref={el => (zones.current[WORK] = el)} aria-labelledby="ht-work-title">
-        <div className="ht-stage">{built[WORK] && <WorkScene state={scene} slot={WORK} side="center" onReady={onReady(WORK)} />}</div>
+        <div className="ht-work-title"><RevealHeading id="ht-work-title" text="Things I’ve built" arrive={50} /></div>
+        <div className="ht-stage">{built[WORK] && <WorkScene state={scene} slot={WORK} side="center" projects={work} onReady={onReady(WORK)} />}</div>
         <div className="ht-copy">
           <div className="ht-work-head">
-            <RevealHeading id="ht-work-title" text="Things I’ve built" arrive={50} />
             <p className="ht-drive">Click the basket to feed the herd</p>
             <p className="ht-more is-shown">
               <a href="/projects/">All projects <span aria-hidden="true">→</span></a>
