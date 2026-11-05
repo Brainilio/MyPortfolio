@@ -30,8 +30,17 @@ const SHEET_VERTEX = `uniform float uBend,uWave,uTime;varying vec2 vUv;varying f
   p.z+=uBend*(x*x*2.2+.5*y*y)+uWave*sin(ph);
   vSlope=uBend*4.4*x+uWave*5.*cos(ph);
   gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}`;
-const SHEET_FRAGMENT = `uniform sampler2D uMap;uniform float uAlpha,uSunSide,uSun;varying vec2 vUv;varying float vSlope;void main(){
-  vec3 c=texture2D(uMap,vUv).rgb;
+const SHEET_FRAGMENT = `uniform sampler2D uMap,uNext;uniform float uAlpha,uSunSide,uSun,uMix,uRatio,uRatioA,uRatioB;varying vec2 vUv;varying float vSlope;
+// A picture filling the sheet (the sheet's shape eases from one picture's to the next's while they change over, so each
+// is fitted by cropping only as much as that takes; at rest the sheet is exactly its picture's shape).
+vec2 fill(vec2 uv,float r){vec2 k=r>uRatio?vec2(uRatio/r,1.):vec2(1.,r/uRatio);return (uv-.5)*k+.5;}
+void main(){
+  // Changing over: the next picture is revealed by a band of warm light sweeping across from the upper left, its edge
+  // softened with a little grain, then the light passes on.
+  float edge=vUv.x*.62+(1.-vUv.y)*.38+(fract(sin(dot(floor(vUv*90.),vec2(12.9898,78.233)))*43758.5453)-.5)*.035,front=uMix*1.3-.15;
+  float m=smoothstep(edge-.09,edge+.01,front);
+  vec3 c=mix(texture2D(uMap,fill(vUv,uRatioA)).rgb,texture2D(uNext,fill(vUv,uRatioB)).rgb,m);
+  c+=vec3(1.,.82,.58)*exp(-pow((front-edge)/.035,2.))*.55*step(.001,uMix)*step(uMix,.999);
   // Lit on the side that turns toward the sun, a warm sheen where it catches it, shade where it turns away.
   float lit=clamp(.5+.5*vSlope*uSunSide*1.6,0.,1.);
   c*=.84+.26*lit;c+=vec3(1.,.78,.52)*pow(lit,5.)*.22*uSun;
@@ -99,15 +108,15 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
     const shadowTexture = glow([[0, "rgba(255,255,255,.9)"], [.55, "rgba(255,255,255,.35)"], [1, "rgba(255,255,255,0)"]], 64);
     const sheetGeometry = new THREE.PlaneGeometry(1, 1, 40, 24), shadowGeometry = new THREE.PlaneGeometry(1, 1);
     const sheets = SHEETS.map((spot, k) => {
-      const uniforms = { uMap: { value: null }, uBend: { value: .16 }, uWave: { value: 0 }, uTime: { value: 0 }, uAlpha: { value: 0 }, uSunSide: { value: 0 }, uSun: { value: 1 } };
+      const uniforms = { uMap: { value: null }, uNext: { value: null }, uMix: { value: 0 }, uRatio: { value: 1.6 }, uRatioA: { value: 1.6 }, uRatioB: { value: 1.6 }, uBend: { value: .16 }, uWave: { value: 0 }, uTime: { value: 0 }, uAlpha: { value: 0 }, uSunSide: { value: 0 }, uSun: { value: 1 } };
       const mesh = new THREE.Mesh(sheetGeometry, new THREE.ShaderMaterial({ uniforms, transparent: true, side: THREE.DoubleSide, vertexShader: SHEET_VERTEX, fragmentShader: SHEET_FRAGMENT }));
       const shadow = new THREE.Mesh(shadowGeometry, new THREE.MeshBasicMaterial({ map: shadowTexture, color: "#3a1638", transparent: true, depthWrite: false, opacity: 0 }));
       const group = new THREE.Group(); group.add(shadow, mesh); skyScene.add(group);
-      return { spot, k, group, mesh, shadow, uniforms, ratio: 16 / 10, src: null, want: null, href: null, wantHref: null, hide: 1, wait: 0 };
+      return { spot, k, group, mesh, shadow, uniforms, ratio: 16 / 10, nextRatio: 16 / 10, src: null, next: null, want: null, href: null, wantHref: null, appear: 0, mix: 0, wait: 0 };
     });
     const showProject = (project, first) => {
       const pics = [project.previewImage, ...(project.fullImages ?? [])];
-      sheets.forEach(sheet => { sheet.want = pics[sheet.spot.pick % pics.length]; sheet.wantHref = `/project/${project.slug}/`; sheet.wait = first ? .3 + sheet.k * .12 : sheet.k * .09; });
+      sheets.forEach(sheet => { sheet.want = pics[sheet.spot.pick % pics.length]; sheet.wantHref = `/project/${project.slug}/`; sheet.wait = first ? .25 + sheet.k * .14 : sheet.k * .12; });
     };
     // (Clicking a sheet opens its project; the pointer turns to a hand over one.)
     const raycaster = new THREE.Raycaster(), ndc = new THREE.Vector2();
@@ -190,23 +199,37 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       }
       // The sheets: each swaps its picture by curling away and back (one after another), hangs at its spot at its own
       // shape, sways a little with the pointer, and bends and ripples more the faster you scroll.
+      // The sheets: the first time, each fades in, rising a touch and settling; after that a new project's picture is
+      // revealed on the same sheet by a sweep of light (one sheet after another) while the sheet eases to its shape
+      // and breathes, curling a little as the light passes. They sway with the pointer, and bend and ripple more the
+      // faster you scroll.
+      const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
       for (const sheet of sheets) {
         const { spot, uniforms } = sheet;
-        if (sheet.want && sheet.want !== sheet.src) {
-          if (sheet.wait > 0) sheet.wait -= dt;
-          else if ((sheet.hide = Math.min(1, sheet.hide + dt / .35)) >= 1) {
-            sheet.src = sheet.want; sheet.href = sheet.wantHref; uniforms.uMap.value = textureOf(sheet.src);
-            const src = sheet.src; getImageRatio(src).then(r => { if (r && sheet.src === src) sheet.ratio = r; });
-          }
-        } else if (sheet.src) sheet.hide = Math.max(0, sheet.hide - dt / (still ? .01 : .7));
-        const e = sheet.hide * sheet.hide * (3 - 2 * sheet.hide), halfH = tanHalf * (9 - spot.z), halfW = halfH * camera.aspect;
-        const w = spot.w * 2 * halfW * fitWidth(1, sheet.ratio, { min: .65, max: 1.3 }), h = w / sheet.ratio;
-        sheet.mesh.scale.set(w, h, 1); sheet.shadow.scale.set(w * 1.3, h * 1.4, 1); sheet.shadow.position.set(w * .07, -h * .1, -.2);
-        sheet.group.position.set((spot.fx * 2 - 1) * halfW - smoothMouse.x * .2, (1 - 2 * spot.fy) * halfH + .2 - e * .9 + (still ? 0 : Math.sin(time * .6 + sheet.k * 2) * .05) - smoothMouse.y * .12, spot.z);
-        sheet.group.rotation.set(e * 1.1 + smoothMouse.y * .08, spot.ry + smoothMouse.x * .14, spot.rz + e * .35);
-        sheet.group.scale.setScalar(1 - e * .2);
-        uniforms.uAlpha.value = 1 - e; sheet.shadow.material.opacity = .4 * (1 - e);
-        uniforms.uBend.value = .14 + e * .9 + Math.min(.45, Math.abs(vel) * .14); uniforms.uWave.value = still ? 0 : .012 + Math.min(.1, Math.abs(vel) * .04);
+        if (sheet.wait > 0) sheet.wait -= dt;
+        else if (!sheet.src && sheet.want) {
+          sheet.src = sheet.want; sheet.href = sheet.wantHref; uniforms.uMap.value = textureOf(sheet.src);
+          const src = sheet.src; getImageRatio(src).then(r => { if (r && sheet.src === src && !sheet.next) sheet.ratio = r; });
+        } else if (sheet.src && !sheet.next && sheet.want !== sheet.src) {
+          sheet.next = sheet.want; sheet.href = sheet.wantHref; sheet.mix = 0; uniforms.uNext.value = textureOf(sheet.next); sheet.nextRatio = sheet.ratio;
+          const next = sheet.next; getImageRatio(next).then(r => { if (r && sheet.next === next) sheet.nextRatio = r; });
+        }
+        if (sheet.src) sheet.appear = Math.min(1, sheet.appear + dt / (still ? .01 : 1.1));
+        if (sheet.next) {
+          sheet.mix = Math.min(1, sheet.mix + dt / (still ? .01 : 1.15));
+          if (sheet.mix >= 1) { sheet.src = sheet.next; sheet.ratio = sheet.nextRatio; uniforms.uMap.value = uniforms.uNext.value; sheet.next = null; sheet.mix = 0; }
+        }
+        const a = ease(sheet.appear), m = sheet.next ? ease(sheet.mix) : 0, breath = Math.sin(Math.PI * m);
+        const ratio = sheet.next ? sheet.ratio + (sheet.nextRatio - sheet.ratio) * m : sheet.ratio;
+        uniforms.uMix.value = m; uniforms.uRatio.value = ratio; uniforms.uRatioA.value = sheet.ratio; uniforms.uRatioB.value = sheet.nextRatio;
+        const halfH = tanHalf * (9 - spot.z), halfW = halfH * camera.aspect;
+        const w = spot.w * 2 * halfW * fitWidth(1, ratio, { min: .65, max: 1.3 }), h = w / ratio;
+        sheet.mesh.scale.set(w, h, 1); sheet.shadow.scale.set(w * 1.3, h * 1.4, 1); sheet.shadow.position.set(w * (.07 + breath * .03), -h * (.1 + breath * .04), -.2);
+        sheet.group.position.set((spot.fx * 2 - 1) * halfW - smoothMouse.x * .2, (1 - 2 * spot.fy) * halfH + .2 - (1 - a) * .18 + (still ? 0 : Math.sin(time * .6 + sheet.k * 2) * .05) - smoothMouse.y * .12, spot.z + breath * .12);
+        sheet.group.rotation.set(smoothMouse.y * .08, spot.ry + smoothMouse.x * .14 + breath * .06, spot.rz);
+        sheet.group.scale.setScalar(.96 + .04 * a);
+        uniforms.uAlpha.value = a; sheet.shadow.material.opacity = .4 * a;
+        uniforms.uBend.value = .14 + (1 - a) * .2 + breath * .12 + Math.min(.45, Math.abs(vel) * .14); uniforms.uWave.value = still ? 0 : .012 + Math.min(.1, Math.abs(vel) * .04);
         uniforms.uTime.value = time; uniforms.uSunSide.value = Math.max(-1, Math.min(1, (sunSprite.position.x * (9 - spot.z) / (9 - sunDepth) - sheet.group.position.x) / 3));
         uniforms.uSun.value = .5 + .5 * sunAt;
       }
