@@ -4,7 +4,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 // One palette for everything on the island, so downloaded props and procedural pieces read as one world.
 export const PALETTE={
   grass:['#6aa66b','#78b56d','#5f9a63'],sand:'#e6c99c',edge:'#4f8a5c',dirt:'#8a5a44',
-  rock:['#6d5f80','#5d506f','#4a405c','#3c344b'],water:'#5cc6d4',waterDeep:'#3a8db2',
+  rock:['#6d5f80','#5d506f','#4a405c','#3c344b'],water:'#34d3bf',waterDeep:'#1a6fd0',
   pine:['#2f7d5b','#3b9068'],trunk:'#6b4a3a',cloud:'#fbf6ff',bird:'#2a2140',
 };
 // Kit materials remapped onto the palette (by source material name).
@@ -96,61 +96,128 @@ export function createIsland(seed=7,{outline:edgeAt=outline,heightAt:groundAt=he
   return {group,surface,material};
 }
 
-// River and waterfall: ribbons with a flowing, banded water shader. The river follows `path` (the island's unless
-// another is passed) at height `level` until it leaves the land at `edgeAt`, then pours off the edge and drops `fall`
-// units, fading out over the lower part of the drop (and in over `head` at the start). `volume` rounds the ribbon's cross-section (a fraction of its
-// width): the river swells up in the middle and the waterfall bows outward, so it reads as a body of water.
+// River and waterfall: low-poly faceted water. The river follows `path` (the island's unless another is passed) at
+// height `level` until it leaves the land at `edgeAt`, then pours off the edge and drops `fall` units, fading out over
+// the lower part of the drop (and in over `head` at the start). It's a mesh six facets across, domed in the
+// middle by `volume` (a fraction of its width; never quite flat) so it reads as a body of water, its edges pinned to
+// the banks. Small waves roll down it in the vertex shader and every facet is lit flat on its own, vivid blue in the
+// channel to turquoise-green in the shallows and on the raised facets, with foam on the crests, along the banks and
+// down the fall. Under the clear surface is a second, deeper faceted layer (inside the dome while it flows, behind the
+// sheet once it falls), joined to the surface by walls at the edges, so it has depth: you look down into it, and the
+// fall is a thick sheet of water rather than a skin.
+// (It isn't lit by the scene: a night scene sets uniforms.uBright below 1 and darker uShallow / uDeep.)
 // pour: false ends it on the land (into a lake, say) with no waterfall; shape(k) then scales its width along it (0 → 1).
 export function createWater(path=riverPoints,edgeAt=outline,{width=1,fall=8,fade=Math.max(.6,fall*.19),level=-.2,volume=0,head=.25,pour=true,shape=null,swell=null}={}) {
-  const uniforms={uTime:{value:0},uFlow:{value:0},uSurge:{value:0},uLength:{value:1},uFade:{value:fade},uHead:{value:head},uShallow:{value:new THREE.Color(PALETTE.water)},uDeep:{value:new THREE.Color(PALETTE.waterDeep)}};
-  const material=new THREE.ShaderMaterial({uniforms,transparent:true,depthWrite:false,side:THREE.DoubleSide,
-    vertexShader:`varying vec2 vUv;uniform float uSurge,uTime;void main(){vUv=uv;vec3 p=position;p.y+=uSurge*.07*(1.+sin(uv.y*9.-uTime*8.));gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}`,
-    fragmentShader:`varying vec2 vUv;uniform float uTime,uFlow,uSurge,uLength,uFade,uHead;uniform vec3 uShallow,uDeep;
+  const uniforms={uTime:{value:0},uFlow:{value:0},uSurge:{value:0},uLength:{value:1},uFade:{value:fade},uHead:{value:head},uLip:{value:1e9},uAmp:{value:width*.06},uBright:{value:1},
+    uShallow:{value:new THREE.Color(PALETTE.water)},uDeep:{value:new THREE.Color(PALETTE.waterDeep)}};
+  const shader={uniforms,transparent:true,depthWrite:false,side:THREE.DoubleSide,
+    vertexShader:`attribute vec3 aLift;attribute float aMid;varying vec2 vUv;varying vec3 vWorld;varying float vH;uniform float uSurge,uTime,uFlow,uAmp,uLip;
       void main(){
-        float across=abs(vUv.x-.5)*2.,flow=fract(vUv.y*1.6-uFlow*.5+sin(vUv.x*9.+vUv.y*5.)*.06);
-        float band=smoothstep(.0,.08,flow)*smoothstep(.22,.1,flow)*(1.-across*.7);
-        float foam=smoothstep(.72,.95,across+sin(vUv.y*16.-uTime*3.)*.04);
-        vec3 color=mix(uDeep,uShallow,across*.7+.15)+band*(.3+uSurge*.5)+foam*(.55+uSurge*.4)+uSurge*.12;
+        vUv=uv;vec3 p=position;
+        // Waves rolling downstream (uv.y runs a quarter-unit per unit of length), pinned at the banks.
+        float h=.55*sin(uv.y*22.-uFlow*7.+uv.x*2.6)+.3*sin(uv.y*37.+uv.x*8.-uFlow*10.)+.15*sin(uv.y*9.-uTime*1.7);
+        h*=aMid;
+        #ifdef INNER
+        // (The deep layer stirs more slowly, a little out of step with the surface.)
+        h=(.6*sin(uv.y*14.-uFlow*4.+uv.x*3.)+.4*sin(uv.y*25.+uv.x*6.-uFlow*6.5))*aMid*.6;
+        #endif
+        vH=h;
+        // (Lifted only, never pushed down: the troughs sit at the old flat surface, so no wave dips into the bed.)
+        p+=aLift*(h*.5+.5)*uAmp*(1.+uSurge*1.6)*(1.+1.4*smoothstep(uLip,uLip+.12,uv.y));p.y+=uSurge*.05*(1.+sin(uv.y*9.-uTime*8.))*aMid;
+        vec4 w=modelMatrix*vec4(p,1.);vWorld=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}`,
+    fragmentShader:`varying vec2 vUv;varying vec3 vWorld;varying float vH;uniform float uTime,uFlow,uSurge,uLength,uFade,uHead,uLip,uBright;uniform vec3 uShallow,uDeep;
+      void main(){
+        // Each facet's own normal, lit by a high sun.
+        vec3 n=normalize(cross(dFdx(vWorld),dFdy(vWorld)));if(n.y<0.)n=-n;
+        float lit=clamp(dot(n,normalize(vec3(.45,.8,.4))),0.,1.),across=abs(vUv.x-.5)*2.;
+        float falling=smoothstep(uLip,uLip+.12,vUv.y);
+        vec3 color=mix(uDeep,uShallow,clamp(.15+across*.75+vH*.35,0.,1.));
+        color*=.42+.8*lit;color+=pow(lit,12.)*.3;
+        // Foam: on the crests, along the banks, and down the fall, whitest on the facets the water is tumbling over.
+        float foam=smoothstep(.55,.9,vH)*.4*(1.-falling*.5)+smoothstep(.84,1.,across)*.32*(1.-falling)+falling*(.05+.38*smoothstep(.25,.8,vH));
+        #ifdef INNER
+        // The depths: deeper and darker, lit the same way, with a little white where the fall churns.
+        color=mix(uDeep*.62,uDeep,clamp(.3+vH*.5,0.,1.))*(.5+.65*lit);
+        foam=falling*.3*smoothstep(.1,.7,vH);
+        #endif
+        color=(mix(color,vec3(.93,.99,1.),clamp(foam,0.,1.)*.75)+uSurge*.12)*uBright;
         float fade=smoothstep(0.,uHead,vUv.y)*(1.-smoothstep(uLength-uFade,uLength,vUv.y));
+        #ifdef INNER
         gl_FragColor=vec4(color,.92*fade);
+        #else
+        // (Clear enough to see the depths through.)
+        gl_FragColor=vec4(color,mix(.8,.9,falling)*fade);
+        #endif
         #include <colorspace_fragment>
-      }`});
-  const ribbon=(points,widthAt)=>{
-    const positions=[],uvs=[],index=[],side=new THREE.Vector3(1,0,0),flat=new THREE.Vector3(),up=new THREE.Vector3(0,1,0),along=new THREE.Vector3(),bow=new THREE.Vector3(),rows=volume?3:2;
+      }`};
+  const material=new THREE.ShaderMaterial(shader),depthMaterial=new THREE.ShaderMaterial({...shader,defines:{INNER:1}});
+  // Even rows along the path (so the facets come out a regular size), each a domed cross-section.
+  const COLS=6,body=Math.max(volume,.2);
+  const resample=(points,step)=>{
+    const out=[points[0].clone()];let carry=0;
+    for(let i=1;i<points.length;i++){const a=points[i-1],b=points[i],d=a.distanceTo(b);let t=step-carry;
+      while(t<=d){out.push(a.clone().lerp(b,t/d));t+=step;}carry=d-(t-step);}
+    if(out.at(-1).distanceTo(points.at(-1))>step*.3)out.push(points.at(-1).clone());
+    return out;
+  };
+  const ribbon=(points,widthAt,lipV)=>{
+    const positions=[],uvs=[],lifts=[],mids=[],index=[],deep={positions:[],uvs:[],lifts:[],mids:[],index:[]},side=new THREE.Vector3(1,0,0),flat=new THREE.Vector3(),up=new THREE.Vector3(0,1,0),along=new THREE.Vector3(),lift=new THREE.Vector3(),rows=COLS+1,jitter=random(17);
     const lengths=[0];for(let i=1;i<points.length;i++)lengths.push(lengths[i-1]+points[i].distanceTo(points[i-1]));
     const total=lengths.at(-1);
     points.forEach((p,i)=>{
       // Side stays horizontal: from the flow direction while it runs flat, frozen once it pours straight down.
       flat.subVectors(points[Math.min(i+1,points.length-1)],points[Math.max(i-1,0)]).setY(0);
       if(flat.lengthSq()>.02)side.crossVectors(flat.normalize(),up).normalize();
-      const k=lengths[i]/total,w=widthAt(k),v=lengths[i]/4;
-      if(!volume){
-        positions.push(p.x-side.x*w,p.y,p.z-side.z*w,p.x+side.x*w,p.y,p.z+side.z*w);uvs.push(0,v,1,v);
-        if(i)index.push(i*2-2,i*2-1,i*2,i*2-1,i*2+1,i*2);
-        return;
+      // Lift: up while it flows, outward once it falls.
+      along.subVectors(points[Math.min(i+1,points.length-1)],points[Math.max(i-1,0)]).normalize();lift.crossVectors(side,along).normalize();
+      const k=lengths[i]/total,w=widthAt(k),v=lengths[i]/4,dome=w*body*(swell?swell(k):1);
+      // The depths: a quarter of the way up the dome while it flows, a third of its width behind the sheet once it falls.
+      const f=lipV<1e8?Math.min(1,Math.max(0,(v-lipV+.04)/.14)):0,sink=-w*.32*f;
+      for(let c=0;c<=COLS;c++){
+        const x=c/COLS*2-1,mid=1-x*x,inner=c&&c<COLS,s=x*w+(inner?(jitter()-.5)*w*.12:0),u=v+(inner?(jitter()-.5)*.012:0);
+        positions.push(p.x+side.x*s+lift.x*dome*mid,p.y+side.y*s+lift.y*dome*mid,p.z+side.z*s+lift.z*dome*mid);
+        uvs.push(c/COLS,u);lifts.push(lift.x,lift.y,lift.z);mids.push(mid);
+        const depth=dome*mid*.25*(1-f)+sink,ds=s*(.84+.16*(1-mid));
+        deep.positions.push(p.x+side.x*ds+lift.x*depth,p.y+side.y*ds+lift.y*depth,p.z+side.z*ds+lift.z*depth);
+        deep.uvs.push(c/COLS,u);deep.lifts.push(lift.x,lift.y,lift.z);deep.mids.push(mid);
       }
-      // A middle row lifted off the sheet (up while it flows, outward once it falls) gives it a rounded body.
-      along.subVectors(points[Math.min(i+1,points.length-1)],points[Math.max(i-1,0)]).normalize();bow.crossVectors(side,along).normalize().multiplyScalar(w*volume*(swell?swell(k):1));
-      positions.push(p.x-side.x*w,p.y,p.z-side.z*w,p.x+bow.x,p.y+bow.y,p.z+bow.z,p.x+side.x*w,p.y,p.z+side.z*w);uvs.push(0,v,.5,v,1,v);
-      if(i){const a=(i-1)*rows,b=i*rows;index.push(a,a+1,b,a+1,b+1,b,a+1,a+2,b+1,a+2,b+2,b+1);}
+      if(i){const a=(i-1)*rows,b=i*rows;for(let c=0;c<COLS;c++){index.push(a+c,a+c+1,b+c,a+c+1,b+c+1,b+c);deep.index.push(a+c,a+c+1,b+c,a+c+1,b+c+1,b+c);}}
     });
-    const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));g.setIndex(index);
-    return g;
+    // The walls: from each edge of the surface down to the edge of the depths, the length of the water.
+    const n=points.length;
+    for(const c of [0,COLS]){
+      const start=deep.positions.length/3;
+      for(let i=0;i<n;i++){
+        const t=i*rows+c;
+        deep.positions.push(positions[t*3],positions[t*3+1],positions[t*3+2]);deep.uvs.push(c/COLS,uvs[t*2+1]);deep.lifts.push(lifts[t*3],lifts[t*3+1],lifts[t*3+2]);deep.mids.push(0);
+        deep.positions.push(deep.positions[t*3],deep.positions[t*3+1],deep.positions[t*3+2]);deep.uvs.push(c/COLS,uvs[t*2+1]);deep.lifts.push(lifts[t*3],lifts[t*3+1],lifts[t*3+2]);deep.mids.push(0);
+        if(i){const a=start+(i-1)*2,b=start+i*2;deep.index.push(a,a+1,b,a+1,b+1,b);}
+      }
+    }
+    const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));
+    g.setAttribute('aLift',new THREE.Float32BufferAttribute(lifts,3));g.setAttribute('aMid',new THREE.Float32BufferAttribute(mids,1));g.setIndex(index);
+    const d=new THREE.BufferGeometry();d.setAttribute('position',new THREE.Float32BufferAttribute(deep.positions,3));d.setAttribute('uv',new THREE.Float32BufferAttribute(deep.uvs,2));
+    d.setAttribute('aLift',new THREE.Float32BufferAttribute(deep.lifts,3));d.setAttribute('aMid',new THREE.Float32BufferAttribute(deep.mids,1));d.setIndex(deep.index);
+    return {surface:g,depths:d};
   };
   // The river runs until it leaves the island, then pours off the edge.
   const flowing=[];
   for(const p of path){const inside=Math.hypot(p.x,p.z)<edgeAt(Math.atan2(p.z,p.x))-.05;flowing.push(new THREE.Vector3(p.x,level,p.z));if(!inside)break;}
   // One continuous sheet: the river curls over the lip and pours straight down.
-  const lip=flowing.at(-1),out=new THREE.Vector3(lip.x,0,lip.z).normalize(),stream=[...flowing];
+  const lip=flowing.at(-1),out=new THREE.Vector3(lip.x,0,lip.z).normalize(),raw=[...flowing];
   const drop=level+.2;
   if(pour){
-    [[.22,-.24],[.42,-.36],[.56,-.62],[.62,-1]].forEach(([o,y])=>stream.push(new THREE.Vector3(lip.x+out.x*o,y+drop,lip.z+out.z*o)));
-    for(let i=1;i<=20;i++){const t=i/20;stream.push(new THREE.Vector3(lip.x+out.x*(.62+t*t*1.3),-1+drop-t*fall,lip.z+out.z*(.62+t*t*1.3)));}
+    [[.22,-.24],[.42,-.36],[.56,-.62],[.62,-1]].forEach(([o,y])=>raw.push(new THREE.Vector3(lip.x+out.x*o,y+drop,lip.z+out.z*o)));
+    for(let i=1;i<=20;i++){const t=i/20;raw.push(new THREE.Vector3(lip.x+out.x*(.62+t*t*1.3),-1+drop-t*fall,lip.z+out.z*(.62+t*t*1.3)));}
   }
-  const span=list=>list.reduce((sum,p,i)=>i?sum+p.distanceTo(list[i-1]):0,0),riverShare=span(flowing)/span(stream);
-  const geometry=ribbon(stream,shape?k=>width*shape(k):k=>width*(k<riverShare?.62+.3*(k/riverShare)+.08*Math.sin(k*20):.92-(k-riverShare)*.45));
-  uniforms.uLength.value=geometry.attributes.uv.array.at(-1);
-  const group=new THREE.Group();group.add(new THREE.Mesh(geometry,material));
+  const span=list=>list.reduce((sum,p,i)=>i?sum+p.distanceTo(list[i-1]):0,0),riverShare=span(flowing)/span(raw);
+  const stream=resample(raw,Math.max(.16,width*.34));
+  const lipV=pour?span(flowing)/4:1e9;
+  const {surface:geometry,depths}=ribbon(stream,shape?k=>width*shape(k):k=>width*(k<riverShare?.62+.3*(k/riverShare)+.08*Math.sin(k*20):.92-(k-riverShare)*.45),lipV);
+  uniforms.uLength.value=span(stream)/4;if(pour)uniforms.uLip.value=lipV;
+  // The depths draw first, the clear surface over them.
+  const group=new THREE.Group(),under=new THREE.Mesh(depths,depthMaterial),top=new THREE.Mesh(geometry,material);
+  under.renderOrder=1;top.renderOrder=2;group.add(under,top);
   return {group,uniforms,lip,path:flowing};
 }
 

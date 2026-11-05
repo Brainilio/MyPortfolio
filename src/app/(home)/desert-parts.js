@@ -80,7 +80,7 @@ export function createPine(rng, height) {
 
 // Scrub: a low, wide lump of brush.
 export function createScrub(rng, size) {
-  return paintGeometry(new THREE.IcosahedronGeometry(size, 0).scale(1.3, .5, .9).translate(0, size * .2, 0).toNonIndexed(), rng() < .5 ? "#6A7A30" : "#7a8638");
+  return paintGeometry(new THREE.IcosahedronGeometry(size, 0).scale(1.3, .5, .9).translate(0, size * .2, 0), rng() < .5 ? "#6A7A30" : "#7a8638");
 }
 
 // The split-rail fence along the road: posts every `step`, two rails per span (at 35% and 65% of the post's height).

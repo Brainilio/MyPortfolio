@@ -56,7 +56,9 @@ export default function AboutScene({ state, slot = 1, side = "right", onReady })
 
     const world=new THREE.Group();scene.add(world);
     const island=createIsland(5,{outline,heightAt,riverDistance,depth:.62,sand:.7});world.add(island.group);
-    const water=createWater(riverPoints,outline,{width:.72,fall:1.5,fade:.7,level:-.13,volume:.32,head:.04});world.add(water.group);
+    const water=createWater(riverPoints,outline,{width:.72,fall:1.5,fade:.7,level:-.13,volume:.2,head:.04});world.add(water.group);
+    // By night: moonlit blues, dimmed to the scene.
+    water.uniforms.uShallow.value.set("#1f9fa0");water.uniforms.uDeep.value.set("#14489a");water.uniforms.uBright.value=.62;
     const shared={uTime:{value:0},uBreeze:{value:.025},uGust:{value:.04}};
     const on=(x,z,lift=0)=>new THREE.Vector3(x,heightAt(x,z)+lift,z);
 

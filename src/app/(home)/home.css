@@ -217,8 +217,31 @@ body:has(.ht){background:#1b1335}
 .ht-beam-hint{position:absolute;z-index:4;right:var(--gutter);bottom:104px;max-width:calc(100vw - var(--gutter) * 2 - 454px);text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px;font-size:12px;color:#f4f6f8;text-shadow:0 1px 8px rgba(0,0,0,.35);pointer-events:none}
 .ht-beam-hint b{font-weight:600;letter-spacing:.04em}
 .ht-credits{position:absolute;z-index:4;left:var(--gutter);right:calc(var(--gutter) + 210px);bottom:16px;font-size:10px;line-height:1.5;color:rgba(244,246,248,.7)}
+.ht-credits{text-shadow:0 1px 6px rgba(10,20,30,.55)}
 .ht-credits a{color:inherit;text-decoration:underline;text-decoration-color:rgba(244,246,248,.3)}
 @media(max-height:820px) and (min-width:761px){.ht-form textarea{height:calc(3lh + 22px)}.ht-contact-card{top:clamp(96px,15svh,170px);padding:24px 28px}}
+/* Short screens: the Skills list tightens (each stop's tools shown only at the stop you're at) and its words shrink a
+   little, so the heading, the list and the story all fit. */
+@media(max-height:760px) and (min-width:761px){
+  .ht-skills .ht-copy h2{font-size:clamp(28px,3.2vw,44px)}
+  .ht-skills .ht-list{margin-top:14px;gap:6px}
+  .ht-skills .ht-list li{padding:9px 16px}
+  .ht-skills .ht-list li>span:not(.ht-sr){display:none}
+  .ht-skills .ht-list li.is-here>span:not(.ht-sr){display:block}
+  .ht-skill-lead{font-size:clamp(26px,2.8vw,40px)}
+  .ht-skill-blurb{font-size:15px;margin-top:10px}
+}
+/* Very short screens: a tighter card, the credits moved to the right-hand column above the section menu, the beam
+   hint to the top right, so nothing overlaps. */
+@media(max-height:640px) and (min-width:761px){
+  .ht-contact-card{top:78px;padding:18px 24px;max-height:calc(100svh - 96px)}
+  .ht-contact-card h2{font-size:clamp(28px,3.4vw,44px)}
+  .ht-contact-card p{margin-top:10px;font-size:14px}
+  .ht-form{margin-top:12px;gap:8px}.ht-form textarea{height:calc(2lh + 22px)}.ht-form button{padding:11px 20px}
+  .ht-contact-card p.ht-contact-or{margin-top:10px}.ht-contact-links{margin-top:12px}
+  .ht-credits{left:auto;right:var(--gutter);bottom:96px;width:min(320px,calc(100vw - 454px - var(--gutter) * 3))}
+  .ht-beam-hint{top:84px;bottom:auto}
+}
 
 /* Loading screen: the hero's dusk, a sun rising behind two ridges, the name, a progress line. */
 html.ht-locked{overflow:hidden}
@@ -369,11 +392,13 @@ html.ht-locked{overflow:hidden}
 .wl-phone,.wl-phone-head{display:none}
 @media (max-width:760px){
   .wl{height:auto}
-  .wl-pin{margin-bottom:-100svh}
+  /* (The pin keeps its full height and the list is pulled up over it, so the pin lets go as the list ends: with a
+     negative margin instead it took no room and stayed stuck a whole screen longer, over the Skills section.) */
+  .wl-pin{margin-bottom:0}
   .wl-a-name,.wl-a-meta{display:none}
   .wl-head{display:none}
   .wl-front{z-index:2}
-  .wl-phone-head{position:relative;z-index:3;display:block;padding:96px var(--gutter) 0}
+  .wl-phone-head{position:relative;z-index:3;display:block;margin-top:-100svh;padding:96px var(--gutter) 0}
   .wl-phone{position:relative;z-index:3;display:grid;gap:18px;margin:0;padding:32px var(--gutter) 60px;list-style:none}
   .wl-phone a{display:grid;gap:6px;padding:10px 10px 14px;border-radius:6px;color:var(--ink);text-decoration:none;background:rgba(251,247,255,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
   .wl-phone img{width:100%;height:auto;border-radius:4px}

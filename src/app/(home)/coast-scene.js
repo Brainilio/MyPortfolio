@@ -118,12 +118,12 @@ export default function CoastScene({ state, onSpot, onReady, slot = 4, lite: lig
           // Low-poly facets: the normal of each displaced triangle, so every facet catches the sun on its own.
           vec2 p=vWorld.xz;vec3 n=normalize(cross(dFdx(vWorld),dFdy(vWorld)));if(n.y<0.)n=-n;
           float d=vWorld.x-shoreX(vWorld.z);
-          // Colour by wave height: deep teal and navy in the troughs to cyan and aquamarine on the peaks; turquoise
-          // in the shallows.
+          // Colour by wave height: vivid blue in the troughs, clear ocean blue through the body, turquoise-green on
+          // the peaks; bright aquamarine in the shallows (the rivers' palette, so all the water on the page matches).
           float hgt=swell(p,uTime);
-          vec3 trough=vec3(.01,.12,.26),body=vec3(.02,.32,.48),crestC=vec3(.2,.72,.74);
+          vec3 trough=vec3(.01,.2,.5),body=vec3(.02,.42,.7),crestC=vec3(.14,.82,.72);
           vec3 c=mix(trough,body,smoothstep(-1.,.1,hgt));c=mix(c,crestC,smoothstep(.15,1.2,hgt));
-          c=mix(vec3(.16,.7,.66),c,smoothstep(1.,7.,d));
+          c=mix(vec3(.18,.84,.72),c,smoothstep(1.,7.,d));
           float diffuse=.42+.85*max(dot(n,uSun),0.);c*=diffuse;
           vec3 v=normalize(cameraPosition-vWorld);float fres=pow(1.-max(dot(n,v),0.),4.);
           c=mix(c,vec3(.7,.8,.88),fres*.15);
