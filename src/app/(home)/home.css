@@ -392,8 +392,13 @@ html.ht-locked{overflow:hidden}
 .wl-a-char{display:inline-block;will-change:transform,filter}
 .wl-a-meta{position:absolute;z-index:4;left:0;right:0;bottom:clamp(36px,8svh,80px);display:flex;flex-direction:column;align-items:center;gap:12px;font-size:15px;color:rgba(255,255,255,.85)}
 .wl-a-meta .wl-tags{justify-content:center}
-.wl-a-card{position:absolute;z-index:4;right:var(--gutter);bottom:clamp(110px,16svh,170px);width:min(300px,21vw);aspect-ratio:16/10;border-radius:18px;overflow:hidden;box-shadow:0 30px 60px rgba(10,0,30,.45)}
-.wl-a-card img{display:block;width:100%;height:100%;object-fit:cover}
+.wl-a-scatter{position:absolute;inset:0;z-index:1;pointer-events:none}
+@media (max-width:760px){.wl-a-scatter{display:none}}
+.wl-a-spot{position:absolute;translate:calc(-50% + var(--mx,0) * var(--d) * -28px) calc(-50% + var(--my,0) * var(--d) * 22px + var(--vel,0) * var(--d) * -26px);animation:wl-bob var(--bob) ease-in-out infinite alternate}
+.wl-a-pic{display:block;aspect-ratio:16/10;border-radius:12px;overflow:hidden;pointer-events:auto;box-shadow:0 24px 50px rgba(10,0,30,.45);outline:1px solid rgba(255,255,255,.12);outline-offset:-1px}
+.wl-a-pic img{display:block;width:100%;height:100%;object-fit:cover}
+@keyframes wl-bob{to{transform:translateY(-10px)}}
+@media (prefers-reduced-motion:reduce){.wl-a-spot{animation:none}}
 
 .wl-b-list{position:absolute;z-index:3;left:var(--gutter);top:56%;transform:translateY(-50%);width:min(760px,54vw);margin:0;padding:0;list-style:none}
 .wl-b-list li{border-top:1px solid rgba(255,255,255,.14);transition:opacity .35s ease}
@@ -431,3 +436,4 @@ html.ht-locked{overflow:hidden}
 .wl-switch{position:fixed;z-index:60;left:50%;bottom:16px;transform:translateX(-50%);display:flex;gap:4px;padding:4px;border-radius:999px;background:rgba(20,14,34,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 10px 30px rgba(0,0,0,.25)}
 .wl-switch button{min-width:36px;height:32px;padding:0 12px;border:0;border-radius:999px;background:transparent;color:rgba(255,255,255,.7);font-family:inherit;font-size:13px;font-weight:600;line-height:1;cursor:pointer}
 .wl-switch button[aria-pressed="true"]{background:#fff;color:#1a1426}
+.wl-switch-sep{width:1px;margin:6px 4px;background:rgba(255,255,255,.2)}

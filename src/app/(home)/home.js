@@ -18,7 +18,7 @@ import { SKILLS } from "./content";
 const work = allProjects.filter(project => project.slug && project.previewImage).slice(0, 4);
 
 // Every model the homepage loads (fetched up front by the loading screen).
-const MODELS = ["kit", "stag", "deer", "fox", "bear", "eagle", "bison", "prairiedog", "wagon", "duck", "moose", "orca", "shark", "sealion", "kayak"].map(name => `/models/island/${name}.glb`);
+const MODELS = ["kit", "stag", "deer", "fox", "bear", "eagle", "bison", "prairiedog", "wagon", "duck", "moose", "orca", "shark", "sealion", "kayak", "eagle-flying", "hat"].map(name => `/models/island/${name}.glb`);
 const LOADING_LINES = ["Raising the island", "Stoking the campfire", "Rounding up the bison", "Packing the wagon", "Lighting the lighthouse"];
 
 // One long page. Each section is a floating diorama that holds still (sticky) while its words scroll past on the other
@@ -122,9 +122,16 @@ export default function Home() {
   // built, or after a few seconds regardless (the rest then finish in the background).
   const [built, setBuilt] = useState(() => SECTIONS.map((_, i) => i === 0));
   // The Work section's A/B/C test (and the island, to compare): from ?work=, kept in the address as you switch.
-  const [workView, setWorkView] = useState("a");
-  useEffect(() => { const v = new URLSearchParams(window.location.search).get("work"); if (["a", "b", "c", "island"].includes(v)) setWorkView(v); }, []);
-  const pickWork = v => { setWorkView(v); const url = new URL(window.location.href); url.searchParams.set("work", v); window.history.replaceState(null, "", url); };
+  // (A's centrepiece likewise, from ?piece=.)
+  const [workView, setWorkView] = useState("a"), [workPiece, setWorkPiece] = useState("eagle");
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search), v = q.get("work"), p = q.get("piece");
+    if (["a", "b", "c", "island"].includes(v)) setWorkView(v);
+    if (["eagle", "hat", "tree"].includes(p)) setWorkPiece(p);
+  }, []);
+  const remember = (key, value) => { const url = new URL(window.location.href); url.searchParams.set(key, value); window.history.replaceState(null, "", url); };
+  const pickWork = v => { setWorkView(v); remember("work", v); };
+  const pickPiece = p => { setWorkPiece(p); remember("piece", p); };
   const [loading, setLoading] = useState({ fetched: 0, ready: 0, done: false });
   const onReady = useCallback(i => () => {
     setLoading(was => ({ ...was, ready: Math.max(was.ready, i + 1) }));
@@ -285,12 +292,14 @@ export default function Home() {
             </div>
           </>
         ) : (
-          built[WORK] && <WorkLab key={workView} variant={workView} work={work} scene={scene} slot={WORK} onReady={onReady(WORK)} />
+          built[WORK] && <WorkLab key={`${workView}-${workPiece}`} variant={workView} piece={workPiece} work={work} scene={scene} slot={WORK} onReady={onReady(WORK)} />
         )}
       </section>
 
       <div className="wl-switch" role="group" aria-label="Work section option">
         {["a", "b", "c", "island"].map(v => <button key={v} type="button" aria-pressed={workView === v} onClick={() => pickWork(v)}>{v === "island" ? "Island" : v.toUpperCase()}</button>)}
+        {workView === "a" && <span className="wl-switch-sep" aria-hidden="true" />}
+        {workView === "a" && ["eagle", "hat", "tree"].map(p => <button key={p} type="button" aria-pressed={workPiece === p} onClick={() => pickPiece(p)}>{p[0].toUpperCase() + p.slice(1)}</button>)}
       </div>
 
       {/* Skills: the park road on the right; the wagon drives sign to sign as the list scrolls past. */}

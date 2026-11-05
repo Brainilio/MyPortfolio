@@ -10,4 +10,6 @@ export const MODEL_CREDITS = [
   { author: "Leigh Garland", works: [["Desert boulder", "dJvxGOx16m0"]] },
   { author: "Sherkiz", works: [["Hawk Lp Rigged", "RkN6MEbP6g"]] },
   { author: "Eric Wilson", works: [["Loaded Wagon", "2fwnYnnxB9d"]] },
+  { author: "Robert Mirabelle", works: [["Eagle", "1Z5L1v0bfu7"]] },
+  { author: "J-Toastie", works: [["Cowboy Hat", "jcXfae4GiZ"]] },
 ];

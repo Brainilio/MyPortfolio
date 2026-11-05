@@ -88,12 +88,18 @@ const BACKGROUNDS = {
     }`,
 };
 
+// Where A's pictures sit round the name (% of the screen; width in vw; tilt; depth for the parallax), clear of the
+// title at the top left, the name across the middle and the details at the bottom.
+const SCATTER = [
+  { x: 47, y: 19, w: 10, r: 4, d: .9 }, { x: 68, y: 17, w: 14, r: -5, d: .6 }, { x: 87, y: 33, w: 11, r: 6, d: 1.2 },
+  { x: 80, y: 74, w: 15, r: -3, d: .8 }, { x: 27, y: 77, w: 12, r: 7, d: 1.1 }, { x: 9, y: 58, w: 10, r: -8, d: .5 },
+];
 // What a recruiter wants at a glance: its year and kind of work, and the first few tools (all from the project data).
 // (Dates written in capitals in the data are shown in sentence case.)
 const tidy = text => text && text === text.toUpperCase() ? text.charAt(0) + text.slice(1).toLowerCase() : text;
 const metaOf = p => [tidy(p.dateCreated), p.category].filter(Boolean).join(" · ");
 
-export default function WorkLab({ variant, work, scene, slot, onReady }) {
+export default function WorkLab({ variant, piece: pieceKind = "eagle", work, scene, slot, onReady }) {
   const root = useRef(null), canvas = useRef(null), front = useRef(null), stack = useRef(null);
   const ready = useRef(onReady); ready.current = onReady;
   const [active, setActive] = useState(0);
@@ -126,15 +132,24 @@ export default function WorkLab({ variant, work, scene, slot, onReady }) {
       fragmentShader: BACKGROUNDS[variant] }));
     background.frustumCulled = false; backScene.add(background);
 
-    // The tree on its rock (A in the middle, C on the left), lit warm from the upper left.
-    const piece = new THREE.Group(), spinner = new THREE.Group(); piece.add(spinner);
-    let pieceGeometries = [];
+    // The centrepiece, lit warm from the upper left: in A the bald eagle (flying a slow circle, wings beating), the
+    // cowboy hat or the tree on its rock (spinning), chosen with ?piece=; in C always the tree, on the left.
+    const kind = variant === "c" ? "tree" : pieceKind;
+    const piece = new THREE.Group(), tilt = new THREE.Group(), spinner = new THREE.Group(); piece.add(tilt); tilt.add(spinner);
+    const flap = { value: 0 };
+    let pieceGeometries = [], pieceMaterials = [];
+    const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+    // Fits a model so its largest side is `size`, centred on the group's origin.
+    const fit = (object, size) => {
+      const box = new THREE.Box3().setFromObject(object), dims = box.getSize(new THREE.Vector3()), k = size / Math.max(dims.x, dims.y, dims.z), c = box.getCenter(new THREE.Vector3());
+      object.scale.multiplyScalar(k); object.position.sub(c.multiplyScalar(k));
+    };
     if (variant !== "b") {
       scene3.add(new THREE.HemisphereLight("#ffe2c4", "#3a2a4a", 1.4));
       const sun = new THREE.DirectionalLight("#ffd2a0", 2.4); sun.position.set(-4, 6, 5); scene3.add(sun);
       const rim = new THREE.DirectionalLight("#b48cff", 1.2); rim.position.set(4, 2, -4); scene3.add(rim);
       scene3.add(piece);
-      new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).load("/models/island/kit.glb", gltf => {
+      if (kind === "tree") loader.load("/models/island/kit.glb", gltf => {
         if (disposed) return;
         const find = name => { let found = null; gltf.scene.traverse(o => { if (!found && o.name.startsWith(name)) found = o; }); return found; };
         const treeNode = find("CommonTree_Autumn"), rockNode = find("Rock");
@@ -148,10 +163,33 @@ export default function WorkLab({ variant, work, scene, slot, onReady }) {
         rock.computeBoundingBox(); const rb = rock.boundingBox, rw = Math.max(rb.max.x - rb.min.x, rb.max.z - rb.min.z), rs = 1.5 / rw, rc = rb.getCenter(new THREE.Vector3());
         rock.translate(-rc.x, -rb.max.y, -rc.z).scale(rs, rs * 1.1, rs);
         rock.translate(0, .08, 0);
-        pieceGeometries = [tree, rock];
+        pieceGeometries = [tree, rock]; pieceMaterials = [material];
         spinner.add(new THREE.Mesh(tree, material), new THREE.Mesh(rock, material));
         spinner.position.y = -1.05;
-        dirty = true;
+      }, undefined, () => {});
+      // The cowboy hat (J-Toastie, CC BY 3.0): tipped toward you so you see into the crown as it turns.
+      if (kind === "hat") loader.load("/models/island/hat.glb", gltf => {
+        if (disposed) return;
+        const model = gltf.scene;
+        model.traverse(o => { if (o.isMesh) { const m = new THREE.MeshStandardMaterial({ color: o.material.color, roughness: .85, flatShading: true }); o.material = m; pieceMaterials.push(m); } });
+        fit(model, 2.7); spinner.add(model); tilt.rotation.x = .42;
+      }, undefined, () => {});
+      // The bald eagle in flight (Robert Mirabelle, CC BY 3.0): its wings (along x, the beak toward -z) beat in the
+      // vertex shader, bending more toward the tips, the tips a little behind.
+      if (kind === "eagle") loader.load("/models/island/eagle-flying.glb", gltf => {
+        if (disposed) return;
+        const model = gltf.scene;
+        model.traverse(o => {
+          if (!o.isMesh) return;
+          const m = new THREE.MeshLambertMaterial({ vertexColors: true, flatShading: true });
+          m.onBeforeCompile = shader => {
+            shader.uniforms.uFlap = flap;
+            shader.vertexShader = "uniform float uFlap;\n" + shader.vertexShader.replace("#include <begin_vertex>",
+              "#include <begin_vertex>\nfloat span=abs(transformed.x),bend=max(0.,span-.1);transformed.y+=sin(uFlap-span*1.3)*pow(bend,1.3)*.38;");
+          };
+          o.material = m; o.frustumCulled = false; pieceMaterials.push(m);
+        });
+        fit(model, 2.5); model.rotation.y = Math.PI; spinner.add(model);
       }, undefined, () => {});
     }
 
@@ -187,7 +225,17 @@ export default function WorkLab({ variant, work, scene, slot, onReady }) {
       speed += (target - speed) * Math.min(1, dt * 2.5);
       if (!still) { time += dt; spin += speed * dt; flow += dt * (.25 + Math.min(4, Math.abs(vel) * 2.5)); }
       index += (progress * (n - 1) - index) * Math.min(1, dt * 4);
-      spinner.rotation.y = spin; piece.position.y = still ? 0 : Math.sin(time * 1.1) * .06; piece.rotation.z = Math.max(-.12, Math.min(.12, -vel * .05));
+      if (kind === "eagle") {
+        // A slow circle round the middle (wider than deep), facing along it, banked into the turn; the wings beat
+        // faster the faster you scroll.
+        const a = spin * .55, bank = .32 + Math.min(.3, Math.abs(vel) * .1);
+        spinner.position.set(Math.cos(a) * 1.1, (still ? 0 : Math.sin(time * 1.3) * .12) + .3, Math.sin(a) * .6 - .3);
+        spinner.rotation.set(0, -a, bank, "YXZ");
+        if (!still) flap.value += dt * (5.5 + Math.min(10, Math.abs(vel) * 7));
+      } else { spinner.rotation.y = spin; }
+      piece.position.y = still || kind === "eagle" ? 0 : Math.sin(time * 1.1) * .06; piece.rotation.z = Math.max(-.12, Math.min(.12, -vel * .05));
+      // The scattered pictures' parallax (A), from the pointer and the scroll.
+      host.style.setProperty("--mx", smoothMouse.x.toFixed(3)); host.style.setProperty("--my", smoothMouse.y.toFixed(3)); host.style.setProperty("--vel", Math.max(-3, Math.min(3, vel)).toFixed(3));
       smoothMouse.lerp(new THREE.Vector2(mouse.current.x, mouse.current.y), Math.min(1, dt * 5));
       hoverAmount.v += ((mouse.current.inside ? 1 : 0) - hoverAmount.v) * Math.min(1, dt * 4);
       uniforms.uTime.value = time; uniforms.uFlow.value = flow; uniforms.uIndex.value = index; uniforms.uVel.value = vel;
@@ -216,10 +264,10 @@ export default function WorkLab({ variant, work, scene, slot, onReady }) {
     ready.current?.();
     return () => {
       disposed = true; cancelAnimationFrame(frame); observer.disconnect(); seen.disconnect();
-      background.geometry.dispose(); background.material.dispose(); pieceGeometries.forEach(g => g.dispose());
+      background.geometry.dispose(); background.material.dispose(); pieceGeometries.forEach(g => g.dispose()); pieceMaterials.forEach(m => m.dispose());
       spinner.children.forEach(m => m.material?.dispose?.()); renderer.dispose(); treeRenderer?.dispose();
     };
-  }, [variant, scene, slot, n]);
+  }, [variant, pieceKind, scene, slot, n]);
 
   // Pointer, relative to the pinned screen (-1..1, y up).
   const onMove = e => {
@@ -276,14 +324,25 @@ export default function WorkLab({ variant, work, scene, slot, onReady }) {
                 <span className="wl-tags">{project.tags?.slice(0, 3).map(t => <em key={t}>{t}</em>)}</span>
               </motion.div>
             </AnimatePresence>
-            <AnimatePresence mode="popLayout" initial={false}>
-              <motion.a key={project.slug} className="wl-a-card" href={`/project/${project.slug}/`} tabIndex={-1} aria-hidden="true"
-                initial={{ clipPath: "inset(100% 0% 0% 0% round 18px)", rotate: 4, y: 40 }}
-                animate={{ clipPath: "inset(0% 0% 0% 0% round 18px)", rotate: -3, y: 0, transition: { duration: .8, ease: [.16, 1, .3, 1] } }}
-                exit={{ clipPath: "inset(0% 0% 100% 0% round 18px)", y: -40, transition: { duration: .45, ease: [.7, 0, .84, 0] } }}>
-                <img src={project.previewImage} alt="" decoding="async" />
-              </motion.a>
-            </AnimatePresence>
+            {/* The project's pictures, scattered round its name at different depths, drifting with the pointer and the
+                scroll; each flies in after the last when the project changes. */}
+            <div className="wl-a-scatter">
+              {SCATTER.map((spot, k) => {
+                const pics = [project.previewImage, ...(project.fullImages ?? [])], src = pics[k % pics.length];
+                return (
+                  <div key={k} className="wl-a-spot" style={{ left: `${spot.x}%`, top: `${spot.y}%`, width: `${spot.w}vw`, "--d": spot.d, "--bob": `${5 + k * 1.3}s` }}>
+                    <AnimatePresence mode="popLayout" initial={false}>
+                      <motion.a key={`${project.slug}-${k}`} className="wl-a-pic" href={`/project/${project.slug}/`} tabIndex={-1} aria-hidden="true"
+                        initial={{ opacity: 0, scale: .55, rotate: spot.r - 14, y: 70, filter: "blur(14px)" }}
+                        animate={{ opacity: 1, scale: 1, rotate: spot.r, y: 0, filter: "blur(0px)", transition: { delay: .08 + k * .07, type: "spring", stiffness: 140, damping: 18 } }}
+                        exit={{ opacity: 0, scale: .8, rotate: spot.r + 8, y: -50, filter: "blur(10px)", transition: { delay: k * .03, duration: .35, ease: [.7, 0, .84, 0] } }}>
+                        <img src={src} alt="" decoding="async" />
+                      </motion.a>
+                    </AnimatePresence>
+                  </div>
+                );
+              })}
+            </div>
           </>
         )}
 
