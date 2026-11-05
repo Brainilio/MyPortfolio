@@ -79,3 +79,8 @@ body:has(.journey){background:#04050d;overflow:hidden}
   .lab-nav{left:16px;right:16px;bottom:70px;gap:20px;font-size:14px}
   .sound-toggle{right:16px;bottom:16px}
 }
+
+/* The meadow's full-screen stage (its island draws on the shared canvas, into this rectangle) and its golden-hour sky. */
+.lab-stage{position:fixed;inset:0;z-index:1}
+.lab-stage-frame{position:absolute;inset:0}
+.ht-meadow-sky{position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,#5f5d8c 0%,#b57796 30%,#f5a389 60%,#f9c195 82%,#f2b98f 100%)}

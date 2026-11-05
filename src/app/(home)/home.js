@@ -6,10 +6,8 @@ import "lenis/dist/lenis.css";
 import allProjects from "../../lib/projects";
 import "./home.css";
 import { getStage } from "./stage";
-import WorkProjects from "./work-cards";
 const IslandScene = dynamic(() => import("./island-scene"), { ssr: false });
 const AboutScene = dynamic(() => import("./about-scene"), { ssr: false });
-const WorkScene = dynamic(() => import("./work-scene"), { ssr: false });
 const WorkLab = dynamic(() => import("./work-lab"), { ssr: false });
 const SkillsScene = dynamic(() => import("./skills-scene"), { ssr: false });
 const CoastScene = dynamic(() => import("./coast-scene"), { ssr: false });
@@ -18,7 +16,7 @@ import { SKILLS } from "./content";
 const work = allProjects.filter(project => project.slug && project.previewImage).slice(0, 4);
 
 // Every model the homepage loads (fetched up front by the loading screen).
-const MODELS = ["kit", "stag", "deer", "fox", "bear", "eagle", "bison", "prairiedog", "wagon", "duck", "moose", "orca", "shark", "sealion", "kayak", "eagle-flying", "hat"].map(name => `/models/island/${name}.glb`);
+const MODELS = ["kit", "stag", "deer", "fox", "bear", "eagle", "prairiedog", "wagon", "moose", "orca", "shark", "sealion", "kayak", "eagle-flying"].map(name => `/models/island/${name}.glb`);
 const LOADING_LINES = ["Raising the island", "Stoking the campfire", "Rounding up the bison", "Packing the wagon", "Lighting the lighthouse"];
 
 // One long page. Each section is a floating diorama that holds still (sticky) while its words scroll past on the other
@@ -121,17 +119,10 @@ export default function Home() {
   // behind the loading screen, each as soon as the previous one reports it's ready. The screen lifts when all are
   // built, or after a few seconds regardless (the rest then finish in the background).
   const [built, setBuilt] = useState(() => SECTIONS.map((_, i) => i === 0));
-  // The Work section's A/B/C test (and the island, to compare): from ?work=, kept in the address as you switch.
-  // (A's centrepiece likewise, from ?piece=.)
-  const [workView, setWorkView] = useState("a"), [workPiece, setWorkPiece] = useState("eagle");
-  useEffect(() => {
-    const q = new URLSearchParams(window.location.search), v = q.get("work"), p = q.get("piece");
-    if (["a", "b", "c", "island"].includes(v)) setWorkView(v);
-    if (["eagle", "hat", "tree"].includes(p)) setWorkPiece(p);
-  }, []);
-  const remember = (key, value) => { const url = new URL(window.location.href); url.searchParams.set(key, value); window.history.replaceState(null, "", url); };
-  const pickWork = v => { setWorkView(v); remember("work", v); };
-  const pickPiece = p => { setWorkPiece(p); remember("piece", p); };
+  // The Work section's A/B/C test: from ?work=, kept in the address as you switch.
+  const [workView, setWorkView] = useState("a");
+  useEffect(() => { const v = new URLSearchParams(window.location.search).get("work"); if (["a", "b", "c"].includes(v)) setWorkView(v); }, []);
+  const pickWork = v => { setWorkView(v); const url = new URL(window.location.href); url.searchParams.set("work", v); url.searchParams.delete("piece"); window.history.replaceState(null, "", url); };
   const [loading, setLoading] = useState({ fetched: 0, ready: 0, done: false });
   const onReady = useCallback(i => () => {
     setLoading(was => ({ ...was, ready: Math.max(was.ready, i + 1) }));
@@ -268,38 +259,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Work: the Yellowstone meadow, smaller, on the left, with the title and links above it; on the right one project
-          at a time, the next taking its place as the section scrolls. The title sits in a layer under the island's canvas
-          and the rest in the stage over it; both are pinned full screens, so everything holds and leaves together. */}
+      {/* Work: no diorama; one pinned screen, the scroll picking the project (work-lab.js, options A/B/C). The bison
+          meadow that used to be here is now a Lab experiment (/journey/meadow/). */}
       <section className="ht-zone ht-work" id="work" data-side="left" ref={el => (zones.current[WORK] = el)} aria-labelledby="ht-work-title">
-        {workView === "island" ? (
-          <>
-            <div className="ht-work-back">
-              <div className="ht-work-title"><RevealHeading id="ht-work-title" text="Things I’ve built" arrive={50} /></div>
-            </div>
-            <div className="ht-stage">
-              {built[WORK] && <WorkScene state={scene} slot={WORK} side="left-island" onReady={onReady(WORK)} />}
-              <div className="ht-work-head">
-                <p className="ht-work-intro">A few things I’ve built, from Compassion International’s sponsor portal to an interactive map of NewCold’s facilities worldwide. Scroll through them, or open one to see how it came together.</p>
-                <p className="ht-more is-shown">
-                  <a href="/projects/">All projects <span aria-hidden="true">→</span></a>
-                  <a href="/journey/">Lab experiments <span aria-hidden="true">→</span></a>
-                </p>
-              </div>
-            </div>
-            <div className="ht-copy">
-              <WorkProjects work={work} scene={scene} slot={WORK} playing={section === WORK && !still} />
-            </div>
-          </>
-        ) : (
-          built[WORK] && <WorkLab key={`${workView}-${workPiece}`} variant={workView} piece={workPiece} work={work} scene={scene} slot={WORK} onReady={onReady(WORK)} />
-        )}
+        {built[WORK] && <WorkLab key={workView} variant={workView} work={work} scene={scene} slot={WORK} onReady={onReady(WORK)} />}
       </section>
 
       <div className="wl-switch" role="group" aria-label="Work section option">
-        {["a", "b", "c", "island"].map(v => <button key={v} type="button" aria-pressed={workView === v} onClick={() => pickWork(v)}>{v === "island" ? "Island" : v.toUpperCase()}</button>)}
-        {workView === "a" && <span className="wl-switch-sep" aria-hidden="true" />}
-        {workView === "a" && ["eagle", "hat", "tree"].map(p => <button key={p} type="button" aria-pressed={workPiece === p} onClick={() => pickPiece(p)}>{p[0].toUpperCase() + p.slice(1)}</button>)}
+        {["a", "b", "c"].map(v => <button key={v} type="button" aria-pressed={workView === v} onClick={() => pickWork(v)}>{v.toUpperCase()}</button>)}
       </div>
 
       {/* Skills: the park road on the right; the wagon drives sign to sign as the list scrolls past. */}

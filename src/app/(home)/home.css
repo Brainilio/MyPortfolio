@@ -109,22 +109,6 @@ body:has(.ht){background:#1b1335}
 .ht-work .ht-copy h2 .ht-dot,.ht-skills .ht-copy h2 .ht-dot{color:#7c5cdb}
 .ht-work .ht-copy p.ht-drive,.ht-skills .ht-copy p.ht-drive{color:rgba(42,22,54,.6)}
 .ht-copy p.ht-drive{margin:14px 0 0;font-size:14px;color:rgba(251,247,255,.62)}
-/* Work: the island held in the middle (sticky stage) with its heading above, and the projects in normal flow as a
-   column of cards scrolling past over it, alternating left and right with the island showing through the gaps. Each
-   card slides in from its own side the first time a fifth of it is on screen. */
-.ht-zone.ht-work[data-side] .ht-copy{width:auto;margin:-100svh 0 0;padding:0 0 24svh;display:block;pointer-events:none}
-/* The heading stays put above the island while the cards scroll past (over it). */
-.ht-work-back{position:sticky;top:0;z-index:3;height:100svh;pointer-events:none}
-.ht-work .ht-stage{z-index:3;margin-top:-100svh}
-.ht-work-head{position:absolute;z-index:4;left:var(--gutter);top:calc(clamp(100px,13svh,140px) + clamp(38px,4vw,60px) * .95 + 6px);pointer-events:none}
-/* Under the title: a couple of lines about the work, then the two pill buttons. */
-.ht-work-head{width:min(440px,36vw)}
-.ht-work-head p.ht-work-intro{margin:16px 0 0;font-size:16px;line-height:1.55;color:rgba(42,22,54,.72)}
-/* The title and the links sit top left, above the island (on its left) and over the canvas; the title's layer and the
-   stage are both pinned full screens, so everything holds and leaves together. */
-.ht-work-title{position:absolute;z-index:1;left:var(--gutter);top:clamp(100px,13svh,140px);pointer-events:none;color:var(--ink)}
-.ht-work-title h2{margin:0;font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:clamp(38px,4vw,60px);line-height:.95;letter-spacing:-.05em}
-.ht-work-title h2 .ht-dot{color:#7c5cdb}
 .ht-cards{position:relative;z-index:1}
 .ht-cards{margin:calc(62svh + 320px) 0 0;padding:0 5vw;list-style:none;display:flex;flex-direction:column;gap:12vh}
 .ht-cards li{display:flex}
@@ -148,13 +132,8 @@ body:has(.ht){background:#1b1335}
 .ht-shine-pill{position:absolute;z-index:2;left:14px;bottom:14px;padding:7px 14px;border-radius:999px;background:rgba(0,0,0,.5);
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:.8rem;font-weight:500;line-height:1.2}
 /* The links sit right under the title (and stay with it). */
-.ht-work-head p.ht-more{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 0;pointer-events:auto}
 /* They arrive with the title: once its words have written in, the hint and then each button rise into place, one after
    the other; they leave with it when you scroll back above the section. */
-.ht-work:has(.ht-work-title h2.ht-reveal) .ht-work-head p.ht-work-intro,.ht-work:has(.ht-work-title h2.ht-reveal) .ht-work-head p.ht-more a{opacity:0}
-.ht-work:has(.ht-work-title h2.is-revealed) .ht-work-head p.ht-work-intro{opacity:1;animation:ht-head-rise .6s cubic-bezier(.16,1,.3,1) .45s backwards}
-.ht-work:has(.ht-work-title h2.is-revealed) .ht-work-head p.ht-more a{opacity:1;animation:ht-pop .7s cubic-bezier(.34,1.56,.64,1) .6s backwards}
-.ht-work:has(.ht-work-title h2.is-revealed) .ht-work-head p.ht-more a:last-child{animation-delay:.72s}
 @keyframes ht-head-rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @keyframes ht-pop{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:none}}
 /* Below the pile: the rest of the work, and the Lab. */
@@ -287,9 +266,6 @@ html.ht-locked{overflow:hidden}
   .ht-list li.is-here,.ht-list:not(:has(.is-here)) li:first-child{display:block;transform:none}
   .ht-list b{font-size:16px}
   /* Phones: full-width cards, one under another, each rising in from below. */
-  .ht-zone.ht-work[data-side] .ht-copy{padding:88px 0 20svh}
-  .ht-work-title{top:84px}
-  .ht-work-head{top:calc(84px + 38px * .95 + 6px)}
   .ht-cards{margin-top:58svh;padding:0}
   .ht-shine,.ht-shine.is-right{width:100%;transform:translateY(40px)}
   .ht-shine.is-in{transform:none}
@@ -330,48 +306,10 @@ html.ht-locked{overflow:hidden}
 .ht.is-entered .ht-intro>:nth-child(4){animation-delay:1.85s}
 @media(prefers-reduced-motion:reduce){.ht-finish:after{animation:none}
   .ht-reveal .ht-word,.ht-reveal .ht-dot{clip-path:none;transform:none;transition:none}
-  .ht-work-head p.ht-work-intro,.ht-work-head p.ht-more a{opacity:1!important;animation:none!important}
   .ht-shine,.ht-copy>p.ht-more{transition:none}.ht-shine,.ht-shine.is-right{transform:none}
   .ht.is-entered .ht-home .ht-canvas,.ht.is-entered .ht-intro>*{animation:ht-show .4s ease both;animation-delay:0s!important}
   .ht.is-entered .ht-name-window,.ht.is-entered .ht-name{animation:none}
   .ht.is-entered .ht-name-window>span{animation:ht-show .4s ease both!important}}
-
-/* Work's projects (work-cards.js): one at a time on the right of the island, pinned while the section scrolls. All
-   four share one spot (a one-cell grid); the current one's parts rise in one after another, the outgoing one lifts
-   away (or drops, scrolling back). */
-.ht-wp{position:relative;z-index:1;height:340svh}
-.ht-wp-pin{position:sticky;top:0;height:100svh;pointer-events:none}
-.ht-wp-stack{position:absolute;right:var(--gutter);top:50%;width:min(740px,48vw,(100svh - 200px) * 1.6);display:grid;transform:translateY(-46%)}
-.ht-wp-item{grid-area:1/1;visibility:hidden;pointer-events:none;transition:visibility 0s .45s}
-.ht-wp-item.is-current{visibility:visible;pointer-events:auto;transition:visibility 0s}
-.ht-wp-item>*{opacity:0;transform:translateY(22px);transition:opacity .3s ease,transform .45s ease}
-.ht-wp-item.is-before>*{transform:translateY(-22px)}
-.ht-wp-item.is-current>*{opacity:1;transform:none;transition:opacity .7s cubic-bezier(.16,1,.3,1) .12s,transform .8s cubic-bezier(.16,1,.3,1) .12s}
-.ht-wp-item.is-current>:nth-child(2){transition-delay:.2s}
-.ht-wp-item.is-current>:nth-child(3){transition-delay:.26s}
-.ht-wp-item.is-current>:nth-child(4){transition-delay:.32s}
-.ht-wp-item.is-current>:nth-child(5){transition-delay:.38s}
-.ht-wp-item.is-current>:nth-child(6){transition-delay:.44s}
-.ht-wp-media{display:block;color:inherit;text-decoration:none}
-.ht-wp-media:focus-visible{outline:2px solid var(--violet);outline-offset:8px;border-radius:8px}
-.ht-wp .ht-shine,.ht-wp .ht-shine.is-right{width:100%;margin:0;opacity:1;transform:none}
-.ht-wp .ht-shine-pill{display:none}
-/* The card turned a little toward the island, as if propped up beside it; it squares up to you under the cursor. */
-.ht-wp .ht-wp-media{perspective:1400px}
-.ht-wp .ht-wp-media .ht-shine,.ht-wp .ht-wp-media .ht-shine.is-right{transform:rotateY(-11deg) rotateX(3deg) rotate(-1.2deg);transform-origin:30% 50%;transition:transform .5s cubic-bezier(.34,1.56,.64,1)}
-.ht-wp .ht-wp-media:hover .ht-shine,.ht-wp .ht-wp-media:hover .ht-shine.is-in{transform:rotateY(0) translateY(-6px) scale(1.015)}
-@media(max-width:760px){
-  .ht-wp{height:auto;margin-top:62svh}
-  .ht-wp-pin{position:static;height:auto}
-  .ht-wp-stack{position:static;width:auto;transform:none;display:flex;flex-direction:column;gap:56px}
-  /* (A frosted panel each, so they read as they scroll up over the island.) */
-  .ht-wp-item{padding:14px 14px 18px;border-radius:18px;background:rgba(251,247,255,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 20px 50px rgba(42,22,54,.18);visibility:visible;pointer-events:auto;opacity:0;transform:translateY(40px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
-  .ht-wp-item.is-seen{opacity:1;transform:none}
-  .ht-wp-item>*,.ht-wp-item.is-before>*{opacity:1;transform:none;transition:none}
-}
-@media(prefers-reduced-motion:reduce){
-  .ht-wp-item,.ht-wp-item>*,.ht-wp-item.is-current>*{transform:none!important;transition:none!important}
-}
 
 /* The Work section's options without a diorama (work-lab.js; A/B/C test). */
 .wl{position:relative;z-index:1;height:calc(var(--n) * 100svh + 60svh)}
@@ -395,7 +333,7 @@ html.ht-locked{overflow:hidden}
 .wl-a-scatter{position:absolute;inset:0;z-index:1;pointer-events:none}
 @media (max-width:760px){.wl-a-scatter{display:none}}
 .wl-a-spot{position:absolute;translate:calc(-50% + var(--mx,0) * var(--d) * -28px) calc(-50% + var(--my,0) * var(--d) * 22px + var(--vel,0) * var(--d) * -26px);animation:wl-bob var(--bob) ease-in-out infinite alternate}
-.wl-a-pic{display:block;aspect-ratio:16/10;border-radius:12px;overflow:hidden;pointer-events:auto;box-shadow:0 24px 50px rgba(10,0,30,.45);outline:1px solid rgba(255,255,255,.12);outline-offset:-1px}
+.wl-a-pic{display:block;aspect-ratio:16/10;border-radius:5px;overflow:hidden;pointer-events:auto;box-shadow:0 24px 50px rgba(10,0,30,.45);outline:1px solid rgba(255,255,255,.12);outline-offset:-1px}
 .wl-a-pic img{display:block;width:100%;height:100%;object-fit:cover}
 @keyframes wl-bob{to{transform:translateY(-10px)}}
 @media (prefers-reduced-motion:reduce){.wl-a-spot{animation:none}}
@@ -409,11 +347,11 @@ html.ht-locked{overflow:hidden}
 .wl-b-name{white-space:nowrap;font-size:clamp(34px,4.3vw,76px);font-weight:800;letter-spacing:-.045em;line-height:1.02;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.5);transition:color .45s ease,-webkit-text-stroke-color .45s ease,transform .55s cubic-bezier(.16,1,.3,1)}
 .wl-b-list li.is-active .wl-b-name,.wl-b-list a:hover .wl-b-name,.wl-b-list a:focus-visible .wl-b-name{color:#fff;-webkit-text-stroke-color:transparent;transform:translateX(14px)}
 .wl-b-meta{font-size:14px;color:rgba(255,255,255,.6);white-space:nowrap}
-.wl-b-preview{position:absolute;z-index:2;left:0;top:0;width:min(440px,28vw);aspect-ratio:16/11;translate:-50% -50%;border-radius:16px;overflow:hidden;pointer-events:none;box-shadow:0 40px 80px rgba(0,0,0,.45)}
+.wl-b-preview{position:absolute;z-index:2;left:0;top:0;width:min(440px,28vw);aspect-ratio:16/11;translate:-50% -50%;border-radius:6px;overflow:hidden;pointer-events:none;box-shadow:0 40px 80px rgba(0,0,0,.45)}
 .wl-b-preview img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 
 .wl-c-stack{position:absolute;z-index:4;right:var(--gutter);top:54%;width:min(560px,36vw);aspect-ratio:4/3.3;translate:0 -50%}
-.wl-c-card{position:absolute;inset:0;display:flex;flex-direction:column;border-radius:22px;overflow:hidden;background:#1a1426;color:#fff;text-decoration:none;box-shadow:0 30px 70px rgba(0,0,0,.5);transform-origin:50% 100%;will-change:transform}
+.wl-c-card{position:absolute;inset:0;display:flex;flex-direction:column;border-radius:6px;overflow:hidden;background:#1a1426;color:#fff;text-decoration:none;box-shadow:0 30px 70px rgba(0,0,0,.5);transform-origin:50% 100%;will-change:transform}
 .wl-c-card img{flex:1;min-height:0;width:100%;object-fit:cover}
 .wl-c-info{display:grid;gap:6px;padding:16px 20px 18px;background:rgba(20,14,34,.94)}
 .wl-c-info strong{font-size:22px;letter-spacing:-.02em}
@@ -436,4 +374,12 @@ html.ht-locked{overflow:hidden}
 .wl-switch{position:fixed;z-index:60;left:50%;bottom:16px;transform:translateX(-50%);display:flex;gap:4px;padding:4px;border-radius:999px;background:rgba(20,14,34,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 10px 30px rgba(0,0,0,.25)}
 .wl-switch button{min-width:36px;height:32px;padding:0 12px;border:0;border-radius:999px;background:transparent;color:rgba(255,255,255,.7);font-family:inherit;font-size:13px;font-weight:600;line-height:1;cursor:pointer}
 .wl-switch button[aria-pressed="true"]{background:#fff;color:#1a1426}
-.wl-switch-sep{width:1px;margin:6px 4px;background:rgba(255,255,255,.2)}
+
+/* A sits on the page's own sunrise sky, so its words are the site's dark ink. */
+.wl-a .wl-title{font-family:var(--font-display),'Inter',sans-serif;font-weight:900;letter-spacing:-.05em;line-height:.95;color:var(--ink)}
+.wl-a .wl-pills a:last-child{background:#fbf7ff;border-color:transparent;color:var(--ink);box-shadow:0 10px 24px rgba(42,22,54,.16);backdrop-filter:none}
+.wl-a .wl-a-name{color:var(--ink);text-shadow:none}
+.wl-a .wl-a-word{font-family:var(--font-display),'Inter',sans-serif;font-weight:900}
+.wl-a .wl-a-meta{color:rgba(42,22,54,.78)}
+.wl-a .wl-tags em{background:rgba(255,255,255,.5);border-color:rgba(42,22,54,.1);color:var(--ink)}
+.wl-a .wl-canvas:not(.wl-front){-webkit-mask-image:none;mask-image:none}

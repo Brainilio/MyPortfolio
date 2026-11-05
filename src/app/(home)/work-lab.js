@@ -4,13 +4,13 @@ import { motion, AnimatePresence, useMotionValue, useSpring } from "motion/react
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
-import { bakeProp } from "./island-parts";
+import { bakeProp, createCloud } from "./island-parts";
 
 // The Work section without a diorama: three options to compare (A/B/C), each a pinned screen over a live shader
 // background, scroll picking the project (in step with the section pill's counter).
-// A: a single autumn tree on a rock (the hero's kit, Quaternius, CC0) spins in the middle, idly, faster the faster you
-//    scroll through the projects; the project's name, huge, runs across it in difference blending; a silk shader
-//    flows behind, faster with the scroll and turning with each project.
+// A: a bald eagle flies a slow circle in the middle, faster (and beating its wings faster) the faster you scroll through
+//    the projects, in front of the project's name, huge, and its pictures scattered round it; behind, the page's own
+//    sunrise sky with low-poly clouds drifting across it, faster with the scroll.
 // B: an index: the four names, big, over a topographic-map shader whose contours swell round the pointer; hovering a
 //    name brings its picture along under the pointer on a spring, otherwise it rests on the right for the project the
 //    scroll is on.
@@ -99,7 +99,7 @@ const SCATTER = [
 const tidy = text => text && text === text.toUpperCase() ? text.charAt(0) + text.slice(1).toLowerCase() : text;
 const metaOf = p => [tidy(p.dateCreated), p.category].filter(Boolean).join(" · ");
 
-export default function WorkLab({ variant, piece: pieceKind = "eagle", work, scene, slot, onReady }) {
+export default function WorkLab({ variant, work, scene, slot, onReady }) {
   const root = useRef(null), canvas = useRef(null), front = useRef(null), stack = useRef(null);
   const ready = useRef(onReady); ready.current = onReady;
   const [active, setActive] = useState(0);
@@ -113,10 +113,13 @@ export default function WorkLab({ variant, piece: pieceKind = "eagle", work, sce
   useEffect(() => {
     const host = root.current, el = canvas.current, fg = front.current;
     if (!host || !el) return;
-    // Two canvases: the shader background, and over it (and over A's name) the tree, on a transparent one.
+    // Two canvases: the background (a shader; in A the clouds, over the page's sky), and over it (and over A's name)
+    // the centrepiece, on a transparent one.
+    const sky = variant === "a";
     let renderer, treeRenderer = null;
     try {
-      renderer = new THREE.WebGLRenderer({ canvas: el, antialias: false, powerPreference: "high-performance" });
+      renderer = new THREE.WebGLRenderer({ canvas: el, antialias: sky, alpha: sky, powerPreference: "high-performance" });
+      if (sky) { renderer.setClearColor(0, 0); renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05; }
       if (fg) { treeRenderer = new THREE.WebGLRenderer({ canvas: fg, antialias: true, alpha: true }); treeRenderer.setClearColor(0, 0); }
     } catch { ready.current?.(); return; }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
@@ -130,11 +133,33 @@ export default function WorkLab({ variant, piece: pieceKind = "eagle", work, sce
       uniforms, depthTest: false, depthWrite: false, toneMapped: false,
       vertexShader: "varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,.999,1.);}",
       fragmentShader: BACKGROUNDS[variant] }));
-    background.frustumCulled = false; backScene.add(background);
+    background.frustumCulled = false; if (!sky) backScene.add(background);
+    // A: low-poly clouds (the islands' own, tinted for the sunrise) at a few depths, drifting left to right, wrapping
+    // round; x, y, depth, size, phase.
+    const cloudScene = new THREE.Scene(), clouds = [], starUniforms = { uTime: { value: 0 }, uPixel: { value: 1 }, uFade: { value: 1 } };
+    let stars = null;
+    if (sky) {
+      cloudScene.add(new THREE.HemisphereLight("#fff1e0", "#6a4a7a", 1.3));
+      const light = new THREE.DirectionalLight("#ffd9b0", 1.8); light.position.set(-4, 6, 5); cloudScene.add(light);
+      [[-6, -1, -8, .3, 0], [6.5, 1.6, -10, .36, 1.7], [9, -1.9, -7, .26, 3.1], [-9, 1.9, -12, .34, 4.4], [2.5, -2.3, -9, .28, 2.6], [12, .2, -14, .4, .8]].forEach(([x, y, z, k, p], i) => {
+        const cloud = createCloud(90 + i); cloud.material.color.set("#fff1e6"); cloud.material.emissive.set("#b4604a"); cloud.material.emissiveIntensity = .22;
+        cloud.scale.setScalar(k); cloud.userData = { x, y, z, p, depth: 1 / (9 - z) * 9 }; cloudScene.add(cloud); clouds.push(cloud);
+      });
+      // The last of the night: the About section's stars carried on into the top of this one, twinkling, fading out as
+      // you scroll in, as the sky behind turns to sunrise.
+      const STARS = 140, pos = new Float32Array(STARS * 3), seeds = new Float32Array(STARS);
+      for (let i = 0; i < STARS; i++) { pos.set([(Math.random() - .5) * 60, -2 + Math.pow(Math.random(), .6) * 14, -30], i * 3); seeds[i] = Math.random(); }
+      const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setAttribute("aSeed", new THREE.BufferAttribute(seeds, 1));
+      stars = new THREE.Points(g, new THREE.ShaderMaterial({ uniforms: starUniforms, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false,
+        vertexShader: `attribute float aSeed;uniform float uTime,uPixel,uFade;varying float vAlpha;void main(){
+          vAlpha=uFade*(.35+.65*aSeed)*(.6+.4*sin(uTime*(1.+aSeed*2.)+aSeed*40.))*smoothstep(-2.,4.,position.y);gl_PointSize=(1.2+aSeed*2.3)*uPixel;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+        fragmentShader: `varying float vAlpha;void main(){float d=length(gl_PointCoord-.5)*2.;gl_FragColor=vec4(1.,.97,.9,vAlpha*smoothstep(1.,0.,d));}` }));
+      stars.frustumCulled = false; cloudScene.add(stars);
+    }
 
-    // The centrepiece, lit warm from the upper left: in A the bald eagle (flying a slow circle, wings beating), the
-    // cowboy hat or the tree on its rock (spinning), chosen with ?piece=; in C always the tree, on the left.
-    const kind = variant === "c" ? "tree" : pieceKind;
+    // The centrepiece, lit warm from the upper left: in A the bald eagle (flying a slow circle, wings beating); in C the
+    // tree on its rock (spinning), on the left.
+    const kind = variant === "c" ? "tree" : "eagle";
     const piece = new THREE.Group(), tilt = new THREE.Group(), spinner = new THREE.Group(); piece.add(tilt); tilt.add(spinner);
     const flap = { value: 0 };
     let pieceGeometries = [], pieceMaterials = [];
@@ -166,13 +191,6 @@ export default function WorkLab({ variant, piece: pieceKind = "eagle", work, sce
         pieceGeometries = [tree, rock]; pieceMaterials = [material];
         spinner.add(new THREE.Mesh(tree, material), new THREE.Mesh(rock, material));
         spinner.position.y = -1.05;
-      }, undefined, () => {});
-      // The cowboy hat (J-Toastie, CC BY 3.0): tipped toward you so you see into the crown as it turns.
-      if (kind === "hat") loader.load("/models/island/hat.glb", gltf => {
-        if (disposed) return;
-        const model = gltf.scene;
-        model.traverse(o => { if (o.isMesh) { const m = new THREE.MeshStandardMaterial({ color: o.material.color, roughness: .85, flatShading: true }); o.material = m; pieceMaterials.push(m); } });
-        fit(model, 2.7); spinner.add(model); tilt.rotation.x = .42;
       }, undefined, () => {});
       // The bald eagle in flight (Robert Mirabelle, CC BY 3.0): its wings (along x, the beak toward -z) beat in the
       // vertex shader, bending more toward the tips, the tips a little behind.
@@ -257,7 +275,20 @@ export default function WorkLab({ variant, piece: pieceKind = "eagle", work, sce
           card.style.filter = d > 0 ? `brightness(${1 - Math.min(.45, d * .18)})` : "none";
         });
       }
-      renderer.render(backScene, flat); treeRenderer?.render(scene3, camera); dirty = false;
+      if (sky) {
+        const span = Math.tan(THREE.MathUtils.degToRad(15)) * camera.aspect;
+        for (const cloud of clouds) {
+          const u = cloud.userData, w = span * (9 - u.z) + 3, x = u.x + flow * .35 * u.depth;
+          cloud.position.set(((x + w) % (2 * w) + 2 * w) % (2 * w) - w - smoothMouse.x * .5 * u.depth, u.y + Math.sin(time * .2 + u.p) * .2 + smoothMouse.y * .25 * u.depth, u.z);
+          cloud.rotation.y = Math.sin(time * .05 + u.p) * .2;
+        }
+        // Stars: full while the section comes up the screen, gone a third of the way through it.
+        const arriving = Math.max(0, Math.min(1, host.getBoundingClientRect().top / height));
+        starUniforms.uFade.value = Math.max(0, 1 - progress / .3) * (.55 + .45 * arriving) * (still ? 1 : 1);
+        starUniforms.uTime.value = time; starUniforms.uPixel.value = renderer.getPixelRatio();
+        renderer.render(cloudScene, camera);
+      } else renderer.render(backScene, flat);
+      treeRenderer?.render(scene3, camera); dirty = false;
     }
     frame = requestAnimationFrame(loop);
     // (The loading screen waits on each section; this one is ready as soon as its canvas is.)
@@ -265,9 +296,9 @@ export default function WorkLab({ variant, piece: pieceKind = "eagle", work, sce
     return () => {
       disposed = true; cancelAnimationFrame(frame); observer.disconnect(); seen.disconnect();
       background.geometry.dispose(); background.material.dispose(); pieceGeometries.forEach(g => g.dispose()); pieceMaterials.forEach(m => m.dispose());
-      spinner.children.forEach(m => m.material?.dispose?.()); renderer.dispose(); treeRenderer?.dispose();
+      spinner.children.forEach(m => m.material?.dispose?.()); clouds.forEach(c => { c.geometry.dispose(); c.material.dispose(); }); if (stars) { stars.geometry.dispose(); stars.material.dispose(); } renderer.dispose(); treeRenderer?.dispose();
     };
-  }, [variant, pieceKind, scene, slot, n]);
+  }, [variant, scene, slot, n]);
 
   // Pointer, relative to the pinned screen (-1..1, y up).
   const onMove = e => {

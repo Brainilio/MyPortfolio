@@ -11,6 +11,7 @@ export const EXPERIMENTS = [
   { slug: "black-hole", title: "Black hole", kind: "3D", chapter: "contact", note: "Dive in and fall through to the other side." },
   // Worlds that started as homepage sections, at full size (see world.js).
   { slug: "prairie", title: "Prairie", kind: "3D", world: "prairie", note: "Golden hour among the bison. Scroll turns the ring of cards; fill the basket and they come running." },
+  { slug: "meadow", title: "Meadow", kind: "3D", world: "meadow", note: "Yellowstone at golden hour: a bison herd, a river into the lake, a prismatic hot spring and two geysers. Fill the basket and the herd comes running." },
   { slug: "road-trip", title: "Road trip", kind: "3D", world: "road-trip", note: "Drive the wagon through the park, sign by sign, to the geyser." },
   { slug: "the-hike", title: "The hike", kind: "3D", world: "hike", note: "The ranger bear climbs the switchbacks to the summit, in his own time." },
   { slug: "lighthouse", title: "Lighthouse", kind: "3D", world: "lighthouse", note: "Big Sur in the fog. Steer the beam and see what turns up." },
