@@ -149,6 +149,13 @@ body:has(.ht){background:#1b1335}
 /* Skills: a plain list beside the diorama; the entry for the wagon's stop lights up. */
 .ht-list{margin:30px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
 .ht-list li{padding:16px 20px;border-radius:16px;background:rgba(255,255,255,.38);border:1px solid rgba(255,255,255,.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:background .5s,transform .5s,box-shadow .5s}
+/* Skills: the sign you're at, spelled out in the open sky to the right of the list, plain and large. */
+.ht-skill-story{position:absolute;left:calc(100% + clamp(48px,9vw,160px));top:clamp(104px,15svh,160px);width:min(560px,calc(100vw - 100% - var(--gutter) * 2 - clamp(48px,9vw,160px)));color:var(--ink);
+  /* (A faint warm glow round the letters, so a cloud or the eagle drifting behind never costs them their contrast.) */
+  text-shadow:0 0 18px rgba(255,236,214,.75),0 0 4px rgba(255,236,214,.5)}
+.ht-skill-kicker{display:block;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(42,22,54,.62)}
+.ht-skill-lead{margin:14px 0 0;font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:clamp(30px,3.3vw,52px);line-height:1.04;letter-spacing:-.04em;text-wrap:balance}
+.ht-skill-blurb{margin:16px 0 0;max-width:44ch;font-size:clamp(16px,1.25vw,19px);line-height:1.55;color:rgba(42,22,54,.8);text-wrap:pretty}
 .ht-list li.is-here{background:rgba(255,255,255,.78);transform:translateX(6px);box-shadow:0 12px 30px rgba(42,22,54,.14)}
 .ht-list a,.ht-list li>b{display:block}
 .ht-list a span,.ht-list li>span{display:block;font-size:13px;color:rgba(42,22,54,.6)}
@@ -263,6 +270,10 @@ html.ht-locked{overflow:hidden}
   .ht-zone.ht-about .ht-copy{justify-content:flex-end;padding:0 0 84px}
   .ht-copy>p{font-size:14px;margin-top:10px}
   .ht-zone.ht-pinned .ht-copy{justify-content:flex-end;padding:0 0 84px}
+  .ht-skill-story{left:0;right:0;top:76px;width:auto}
+  .ht-skill-lead{font-size:24px;margin-top:8px}
+  .ht-skill-blurb{font-size:14px;margin-top:8px}
+  .ht-skill-kicker{font-size:11px}
   .ht-copy h2{font-size:32px}
   .ht-list{margin-top:16px;gap:6px}
   .ht-list li{display:none;padding:12px 16px}

@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import { motion, AnimatePresence, MotionConfig } from "motion/react";
 import Lenis from "lenis";
 import "lenis/dist/lenis.css";
 import allProjects from "../../lib/projects";
@@ -16,7 +17,7 @@ import { SKILLS } from "./content";
 const work = allProjects.filter(project => project.slug && project.previewImage).slice(0, 4);
 
 // Every model the homepage loads (fetched up front by the loading screen).
-const MODELS = ["kit", "stag", "deer", "fox", "bear", "eagle", "prairiedog", "wagon", "moose", "orca", "shark", "sealion", "kayak", "eagle-flying"].map(name => `/models/island/${name}.glb`);
+const MODELS = ["kit", "stag", "deer", "fox", "bear", "eagle", "prairiedog", "wagon", "moose", "orca", "shark", "sealion", "kayak", "eagle-flying", "bison"].map(name => `/models/island/${name}.glb`);
 const LOADING_LINES = ["Raising the island", "Stoking the campfire", "Rounding up the bison", "Packing the wagon", "Lighting the lighthouse"];
 
 // One long page. Each section is a floating diorama that holds still (sticky) while its words scroll past on the other
@@ -48,6 +49,12 @@ const mix = (a, b, t) => a.map((c, k) => Math.round(c + (b[k] - c) * t));
 const ARRIVE = 14, DEPART = 10;
 // Which slot each scene reads in the shared scroll state.
 const ABOUT = 1, WORK = 2, SKILLS_AT = 3, CONTACT = 4;
+// Each line of the Skills story: rising in out of a soft blur, lifting away (quicker) for the next.
+const STORY_LINE = {
+  hidden: { opacity: 0, y: 18, filter: "blur(6px)" },
+  shown: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: .7, ease: [.2, .8, .2, 1] } },
+  gone: { opacity: 0, y: -12, filter: "blur(4px)", transition: { duration: .28, ease: [.6, 0, .9, .4] } },
+};
 const clamp = v => Math.min(1, Math.max(0, v));
 
 // The contact form posts to Formspree with fetch, so the card stays put and thanks you in place.
@@ -271,9 +278,26 @@ export default function Home() {
             {SKILLS.map((skill, i) => (
               <li key={skill.title} className={section === SKILLS_AT && stop === i ? "is-here" : undefined}>
                 <b>{skill.title}</b><span>{skill.items.join(" · ")}</span>
+                <span className="ht-sr">{skill.lead} {skill.blurb}</span>
               </li>
             ))}
           </ol>
+          {/* Pulling up at a sign, it's spelled out in big plain text in the open sky beside the road. (Read once on the
+              list above, so it's hidden from screen readers here.) */}
+          <div className="ht-skill-story" aria-hidden="true">
+            <MotionConfig reducedMotion="user">
+              <AnimatePresence mode="wait">
+                {section === SKILLS_AT && SKILLS[stop] && (
+                  <motion.div key={stop} initial="hidden" animate="shown" exit="gone"
+                    variants={{ shown: { transition: { delayChildren: .2, staggerChildren: .09 } }, gone: { transition: { staggerChildren: .04 } } }}>
+                    <motion.span className="ht-skill-kicker" variants={STORY_LINE}>Stop {stop + 1} of {SKILLS.length} · {SKILLS[stop].title}</motion.span>
+                    <motion.p className="ht-skill-lead" variants={STORY_LINE}>{SKILLS[stop].lead}</motion.p>
+                    <motion.p className="ht-skill-blurb" variants={STORY_LINE}>{SKILLS[stop].blurb}</motion.p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </MotionConfig>
+          </div>
         </div>
       </section>
 
