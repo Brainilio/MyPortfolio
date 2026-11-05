@@ -185,7 +185,10 @@ body:has(.ht){background:#1b1335}
 .ht-contact-card p{margin:16px 0 0;font-size:15px;line-height:1.55;color:rgba(244,246,248,.8)}
 .ht-contact-card{max-height:85svh;overflow-y:auto;scrollbar-width:none}
 /* The form: three quiet glass fields and a violet send button; it fades out for the thank-you. */
-.ht-form{display:flex;flex-direction:column;gap:10px;margin-top:20px}
+.ht-form{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+/* (Name and email side by side, so the card stays clear of the credits below it on shorter screens.) */
+.ht-form>:not(input){grid-column:1/-1}
+.ht-form input{min-width:0}
 .ht-form input,.ht-form textarea{width:100%;padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-size:15px;transition:border-color .3s,box-shadow .3s}
 .ht-form textarea{resize:none;height:calc(4lh + 22px)}
 .ht-form input::placeholder,.ht-form textarea::placeholder{color:rgba(255,255,255,.4)}
@@ -204,10 +207,11 @@ body:has(.ht){background:#1b1335}
 .ht-contact-links{display:flex;gap:22px;margin:20px 0 0;padding:0;list-style:none;font-size:13px}
 .ht-contact-links a{color:rgba(244,246,248,.85);border-bottom:1px solid rgba(244,246,248,.3)}
 .ht-contact-links a:hover{border-color:currentColor}
-.ht-beam-hint{position:absolute;z-index:4;right:calc(var(--gutter) + 210px);bottom:78px;display:flex;flex-direction:column;align-items:flex-end;gap:4px;font-size:12px;color:#f4f6f8;text-shadow:0 1px 8px rgba(0,0,0,.35);pointer-events:none}
+.ht-beam-hint{position:absolute;z-index:4;right:var(--gutter);bottom:104px;max-width:calc(100vw - var(--gutter) * 2 - 454px);text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px;font-size:12px;color:#f4f6f8;text-shadow:0 1px 8px rgba(0,0,0,.35);pointer-events:none}
 .ht-beam-hint b{font-weight:600;letter-spacing:.04em}
 .ht-credits{position:absolute;z-index:4;left:var(--gutter);right:calc(var(--gutter) + 210px);bottom:16px;font-size:10px;line-height:1.5;color:rgba(244,246,248,.7)}
 .ht-credits a{color:inherit;text-decoration:underline;text-decoration-color:rgba(244,246,248,.3)}
+@media(max-height:820px) and (min-width:761px){.ht-form textarea{height:calc(3lh + 22px)}.ht-contact-card{top:clamp(96px,15svh,170px);padding:24px 28px}}
 
 /* Loading screen: the hero's dusk, a sun rising behind two ridges, the name, a progress line. */
 html.ht-locked{overflow:hidden}
@@ -275,10 +279,11 @@ html.ht-locked{overflow:hidden}
   .ht-about h2{text-align:center}
   /* Phones: the card sits at the foot of the screen above the pill; the hint and credits move up over the sky. */
   .ht-contact-card{left:16px;right:16px;top:auto;bottom:76px;max-width:none;max-height:calc(100svh - 170px);padding:20px}
+  .ht-form{grid-template-columns:1fr}
   .ht-contact-card h2{font-size:32px}
   .ht-form{margin-top:14px;gap:8px}
   .ht-form textarea{height:calc(3lh + 22px)}
-  .ht-beam-hint{right:16px;top:78px;bottom:auto}
+  .ht-beam-hint{right:16px;top:78px;bottom:auto;max-width:none}
   .ht-credits{left:16px;right:16px;top:118px;bottom:auto;font-size:9px}
   }
 /* The entrance, once the loading screen lifts: the island rises and lands (0.3–1.4 s), the name drops in (0.8–1.6 s),
@@ -318,7 +323,16 @@ html.ht-locked{overflow:hidden}
 .wl-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
 .wl-front{z-index:3}
 .wl-head{position:absolute;z-index:4;left:var(--gutter);top:clamp(96px,12svh,130px)}
-.wl-title{margin:0;font-family:var(--font-display),'Inter',sans-serif;font-size:clamp(38px,4vw,60px);font-weight:900;line-height:.95;letter-spacing:-.05em;color:var(--ink)}
+/* The heading's ink follows the sun (work-showcase.js sets --warm and --rise, 0 → 1): white warming to pale peach,
+   then turning to plum once the sky behind it has brightened. Top to foot it warms, as the project name does. */
+/* (Room round the words for the gradient to paint into: it only fills the box, and with this tight line-height the
+   descenders, the g in "Things", hang below it.) */
+.wl-title{margin:-.12em -.12em -.26em;padding:.12em .12em .26em;font-family:var(--font-display),'Inter',sans-serif;font-size:clamp(38px,4vw,60px);font-weight:900;line-height:.95;letter-spacing:-.05em;
+  color:transparent;--ink-top:color-mix(in oklab,color-mix(in oklab,#fff,#ffe3cf calc(var(--warm,0) * 100%)),#2a1636 calc(var(--rise,0) * 100%));
+  --ink-foot:color-mix(in oklab,color-mix(in oklab,#ffe9da,#ffbd92 calc(var(--warm,0) * 100%)),#5a2a58 calc(var(--rise,0) * 100%));
+  background:linear-gradient(180deg,var(--ink-top) 30%,var(--ink-foot) 100%);-webkit-background-clip:text;background-clip:text;
+  /* A soft dusky halo behind the light ink, fading as it turns dark. */
+  filter:drop-shadow(0 2px 16px rgb(42 22 54 / calc(.4 * (1 - var(--rise,0)))))}
 .wl-pills{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 0}
 .wl-pills a{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:999px;font-size:.9rem;font-weight:600;text-decoration:none;transition:transform .25s ease,box-shadow .25s ease}
 .wl-pills a:first-child{background:#7c3aed;color:#fff;box-shadow:0 10px 24px rgba(124,58,237,.35)}
@@ -328,10 +342,13 @@ html.ht-locked{overflow:hidden}
 .wl-tags em{font-style:normal;font-size:12px;padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.5);border:1px solid rgba(42,22,54,.1);color:var(--ink)}
 
 .wl-a-name{position:absolute;z-index:2;left:0;right:0;top:52%;transform:translateY(-50%);display:flex;justify-content:center;color:var(--ink);text-decoration:none}
-.wl-a-word{display:flex;overflow:hidden;padding:.16em .12em .22em;margin:-.1em -.1em -.1em;font-family:var(--font-display),'Inter',sans-serif;font-size:clamp(64px,12.5vw,220px);font-weight:900;letter-spacing:-.055em;line-height:.9;white-space:nowrap}
+/* Sized to fit: the screen's width, but smaller for long names (about .62em a letter at the widest), so no name runs
+   off the edges. Its padding is at least each letter's, so the letters' gradient isn't clipped at the ends. */
+.wl-a-word{display:flex;overflow:hidden;padding:.16em .16em .22em;margin:-.1em -.14em -.1em;font-family:var(--font-display),'Inter',sans-serif;font-size:clamp(40px,min(12.5vw,calc(86vw / (var(--n) * .62))),220px);font-weight:900;letter-spacing:-.055em;line-height:.9;white-space:nowrap}
 .wl-a-char{display:inline-block;will-change:transform,filter;color:transparent;
-  /* (Room round each letter for its gradient to paint into: heavy glyphs this tightly set spill past their own box.) */
-  padding:.06em .14em;margin:-.06em -.14em;-webkit-background-clip:text;background-clip:text;
+  /* (Room round each letter for its gradient to paint into: heavy glyphs this tightly set spill past their own box, and
+     descenders, the y in "MyCompassion", hang well below it.) */
+  padding:.06em .14em .2em;margin:-.06em -.14em -.2em;-webkit-background-clip:text;background-clip:text;
   /* The sunrise on the letters: deep plum at the top warming to ember at the foot, and a band of low sunlight sweeping
      across the whole word (each letter shows its own slice of it). */
   background-image:linear-gradient(100deg,rgba(255,190,110,0) calc(var(--sun,50%) - 14%),rgba(255,196,120,.95) var(--sun,50%),rgba(255,190,110,0) calc(var(--sun,50%) + 14%)),linear-gradient(180deg,#2a1636 28%,#5a2a58 64%,#b9553f 100%);

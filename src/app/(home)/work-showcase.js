@@ -44,8 +44,6 @@ void main(){
   // Lit on the side that turns toward the sun, a warm sheen where it catches it, shade where it turns away.
   float lit=clamp(.5+.5*vSlope*uSunSide*1.6,0.,1.);
   c*=.84+.26*lit;c+=vec3(1.,.78,.52)*pow(lit,5.)*.22*uSun;
-  // A hairline paper edge.
-  float e=min(min(vUv.x,1.-vUv.x),min(vUv.y,1.-vUv.y)),w=fwidth(e);c=mix(vec3(1.,.96,.9),c,smoothstep(w*.8,w*1.8,e)*.7+.3*step(w*1.8,e));
   gl_FragColor=vec4(c,uAlpha);
   #include <colorspace_fragment>
 }`;
@@ -189,6 +187,11 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       smoothMouse.lerp(aim.set(mouse.current.x, mouse.current.y), Math.min(1, dt * 5));
       // The sun: from low on the left up toward the right as the projects go by (eased, so it settles when you stop).
       sunAt += (progress - sunAt) * Math.min(1, dt * 3);
+      // The heading follows the sun up: white on the night sky you arrive under, warming slowly to a pale peach while
+      // the sky is still dark, then (once the sky behind it is light enough) turning to plum over a short stretch, so it
+      // only briefly passes through the sky's own mauve.
+      const step = (a, b) => { const t = Math.min(1, Math.max(0, (sunAt - a) / (b - a))); return (t * t * (3 - 2 * t)).toFixed(3); };
+      host.style.setProperty("--warm", step(0, .7)); host.style.setProperty("--rise", step(.68, .9));
       const tanHalf = Math.tan(THREE.MathUtils.degToRad(15)), sunDepth = -30, sunH = tanHalf * (9 - sunDepth), sunW = sunH * camera.aspect;
       sunSprite.position.set((-.55 + 1.1 * sunAt) * sunW, (-.5 + .55 * sunAt) * sunH + .2, sunDepth);
       // Its light on the letters: a warm band across the word where the sun stands behind it.
