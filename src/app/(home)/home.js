@@ -8,7 +8,7 @@ import "./home.css";
 import { getStage } from "./stage";
 const IslandScene = dynamic(() => import("./island-scene"), { ssr: false });
 const AboutScene = dynamic(() => import("./about-scene"), { ssr: false });
-const WorkLab = dynamic(() => import("./work-lab"), { ssr: false });
+const WorkShowcase = dynamic(() => import("./work-showcase"), { ssr: false });
 const SkillsScene = dynamic(() => import("./skills-scene"), { ssr: false });
 const CoastScene = dynamic(() => import("./coast-scene"), { ssr: false });
 import { MODEL_CREDITS } from "./model-credits";
@@ -119,10 +119,6 @@ export default function Home() {
   // behind the loading screen, each as soon as the previous one reports it's ready. The screen lifts when all are
   // built, or after a few seconds regardless (the rest then finish in the background).
   const [built, setBuilt] = useState(() => SECTIONS.map((_, i) => i === 0));
-  // The Work section's A/B/C test: from ?work=, kept in the address as you switch.
-  const [workView, setWorkView] = useState("a");
-  useEffect(() => { const v = new URLSearchParams(window.location.search).get("work"); if (["a", "b", "c"].includes(v)) setWorkView(v); }, []);
-  const pickWork = v => { setWorkView(v); const url = new URL(window.location.href); url.searchParams.set("work", v); url.searchParams.delete("piece"); window.history.replaceState(null, "", url); };
   const [loading, setLoading] = useState({ fetched: 0, ready: 0, done: false });
   const onReady = useCallback(i => () => {
     setLoading(was => ({ ...was, ready: Math.max(was.ready, i + 1) }));
@@ -259,15 +255,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Work: no diorama; one pinned screen, the scroll picking the project (work-lab.js, options A/B/C). The bison
-          meadow that used to be here is now a Lab experiment (/journey/meadow/). */}
+      {/* Work: no diorama; one pinned screen, the scroll picking the project, a bald eagle circling in front of its
+          name (work-showcase.js). The bison meadow that used to be here is now a Lab experiment (/journey/meadow/). */}
       <section className="ht-zone ht-work" id="work" data-side="left" ref={el => (zones.current[WORK] = el)} aria-labelledby="ht-work-title">
-        {built[WORK] && <WorkLab key={workView} variant={workView} work={work} scene={scene} slot={WORK} onReady={onReady(WORK)} />}
+        {built[WORK] && <WorkShowcase work={work} scene={scene} slot={WORK} onReady={onReady(WORK)} />}
       </section>
-
-      <div className="wl-switch" role="group" aria-label="Work section option">
-        {["a", "b", "c"].map(v => <button key={v} type="button" aria-pressed={workView === v} onClick={() => pickWork(v)}>{v.toUpperCase()}</button>)}
-      </div>
 
       {/* Skills: the park road on the right; the wagon drives sign to sign as the list scrolls past. */}
       <section className="ht-zone ht-skills ht-pinned" id="skills" data-side="right" style={{ "--steps": SKILLS.length }} ref={el => (zones.current[SKILLS_AT] = el)} aria-labelledby="ht-skills-title">
