@@ -10,7 +10,8 @@ import * as THREE from "three";
 //
 // An island registers { mount, scene, camera, draw(dt), exposure, fade?, overscan? }: mount is its stage element, draw
 // advances its animation (it decides how often) and returns true when anything changed, exposure its tone-mapping
-// exposure, and fade ({ side: left, right or top, from }) fades it out toward that edge.
+// exposure, and fade ({ side: left, right, top or bottom, from }) fades it out toward that edge (from: 1 is no fade; it's read every
+// frame, so a scene can change it as it goes).
 let stage = null;
 const OVERSCAN = .5, saved = new THREE.Matrix4(), squeeze = new THREE.Matrix4();
 
@@ -78,15 +79,16 @@ function createStage() {
         // match, so it lands exactly where it would but anything reaching past the stage's edge (the underside of an
         // island as it travels) isn't cut off.
         // (A scene that fills its frame edge to edge, like the coast, sets overscan: 0 and stays inside its rectangle.)
-        const over = entry.overscan ?? OVERSCAN, grow = 1 + over * 2, projection = entry.camera.projectionMatrix;
-        renderer.setViewport(r.left, height - r.bottom - r.height * over, r.width, r.height * grow);
-        saved.copy(projection); projection.premultiply(squeeze.makeScale(1, 1 / grow, 1));
+        // (overscan may also be { top, bottom }, to reach past one edge and not the other.)
+        const over = entry.overscan ?? OVERSCAN, above = over.top ?? over, below = over.bottom ?? over, grow = 1 + above + below, projection = entry.camera.projectionMatrix;
+        renderer.setViewport(r.left, height - r.bottom - r.height * below, r.width, r.height * grow);
+        saved.copy(projection); projection.premultiply(squeeze.set(1, 0, 0, 0, 0, 1 / grow, 0, (2 * below + 1) / grow - 1, 0, 0, 1, 0, 0, 0, 0, 1));
         renderer.render(entry.scene, entry.camera);
         projection.copy(saved);
         renderer.setViewport(r.left, height - r.bottom, r.width, r.height);
       }
-      if (entry.fade) {
-        veilUniforms.uFrom.value = entry.fade.from; veilUniforms.uDir.value = entry.fade.side === "left" ? -1 : 1; veilUniforms.uAxis.value = entry.fade.side === "top" ? 1 : 0;
+      if (entry.fade && entry.fade.from < .999) {
+        veilUniforms.uFrom.value = entry.fade.from; veilUniforms.uDir.value = entry.fade.side === "left" || entry.fade.side === "bottom" ? -1 : 1; veilUniforms.uAxis.value = entry.fade.side === "top" || entry.fade.side === "bottom" ? 1 : 0;
         renderer.render(veilScene, flat);
       }
     }

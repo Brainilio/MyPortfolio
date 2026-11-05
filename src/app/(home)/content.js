@@ -22,6 +22,15 @@ export const SKILLS = [
 ];
 
 // Career, newest first. PLACEHOLDER entries: replace each with the real role, company, dates and a line on the work.
+// Each tool's icon (Tabler, via Iconbuddy; see iconbuddy.json), file name without ".svg". Tools with no fitting
+// icon show their name alone.
+export const TOOL_ICONS = {
+  "React": "brand-react", "Redux": "brand-redux", "Next.js": "brand-nextjs", "Node": "brand-nodejs", "MongoDB": "brand-mongodb",
+  "Laravel": "brand-laravel", "Three.js": "brand-threejs", "WebGL": "3d-cube-sphere", "Shaders": "color-filter",
+  "TypeScript": "brand-typescript", "JavaScript": "brand-javascript", "PHP": "brand-php", "Java": "coffee", "Python": "brand-python",
+  "UX/UI": "layout", "User research": "users", "Pitching": "presentation", "Stakeholder communication": "messages", "Agile": "refresh",
+};
+
 export const EXPERIENCE = [
   { years: "20XX — Now", role: "Current role", org: "Company", summary: "Placeholder: one line on what you build there and the difference it makes.", tags: ["React", "Node"] },
   { years: "20XX — 20XX", role: "Previous role", org: "Company", summary: "Placeholder: the product, your part in it, one result worth naming.", tags: ["TypeScript", "Three.js"] },

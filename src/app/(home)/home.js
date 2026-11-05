@@ -13,7 +13,7 @@ const WorkShowcase = dynamic(() => import("./work-showcase"), { ssr: false });
 const SkillsScene = dynamic(() => import("./skills-scene"), { ssr: false });
 const CoastScene = dynamic(() => import("./coast-scene"), { ssr: false });
 import { MODEL_CREDITS } from "./model-credits";
-import { SKILLS } from "./content";
+import { SKILLS, TOOL_ICONS } from "./content";
 const work = allProjects.filter(project => project.slug && project.previewImage).slice(0, 4);
 
 // Every model the homepage loads (fetched up front by the loading screen).
@@ -274,16 +274,14 @@ export default function Home() {
         <div className="ht-copy">
           <RevealHeading id="ht-skills-title" text="What I bring along" />
           <p className="ht-drive">Scroll or click the wagon to drive on</p>
-          <ol className="ht-list">
-            {SKILLS.map((skill, i) => (
-              <li key={skill.title} className={section === SKILLS_AT && stop === i ? "is-here" : undefined}>
-                <b>{skill.title}</b><span>{skill.items.join(" · ")}</span>
-                <span className="ht-sr">{skill.lead} {skill.blurb}</span>
-              </li>
+          {/* The whole list, for screen readers; on screen each stop is spelled out on its own as the wagon pulls up. */}
+          <ol className="ht-sr">
+            {SKILLS.map(skill => (
+              <li key={skill.title}>{skill.title}: {skill.items.join(", ")}. {skill.lead} {skill.blurb}</li>
             ))}
           </ol>
-          {/* Pulling up at a sign, it's spelled out in big plain text in the open sky beside the road. (Read once on the
-              list above, so it's hidden from screen readers here.) */}
+          {/* Pulling up at a sign, it's spelled out in big plain text in the open sky on the right, level with the
+              heading, its tools beneath it. (Read once in the list above, so it's hidden from screen readers here.) */}
           <div className="ht-skill-story" aria-hidden="true">
             <MotionConfig reducedMotion="user">
               <AnimatePresence mode="wait">
@@ -293,6 +291,13 @@ export default function Home() {
                     <motion.span className="ht-skill-kicker" variants={STORY_LINE}>Stop {stop + 1} of {SKILLS.length} · {SKILLS[stop].title}</motion.span>
                     <motion.p className="ht-skill-lead" variants={STORY_LINE}>{SKILLS[stop].lead}</motion.p>
                     <motion.p className="ht-skill-blurb" variants={STORY_LINE}>{SKILLS[stop].blurb}</motion.p>
+                    <motion.ul className="ht-skill-tools" variants={{ shown: { transition: { staggerChildren: .05 } } }}>
+                      {SKILLS[stop].items.map(tool => (
+                        <motion.li key={tool} variants={STORY_LINE}>
+                          {TOOL_ICONS[tool] && <i style={{ "--icon": `url(/icons/iconbuddy/${TOOL_ICONS[tool]}.svg)` }} />}{tool}
+                        </motion.li>
+                      ))}
+                    </motion.ul>
                   </motion.div>
                 )}
               </AnimatePresence>

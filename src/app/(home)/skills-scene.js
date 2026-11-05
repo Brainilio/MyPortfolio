@@ -9,7 +9,7 @@ import { random, createCloud } from "./island-parts";
 import { createSign } from "./park-parts";
 import { loadWagon } from "./wagon";
 import { createBisonRig, createBisonAnimator } from "./bison-rig";
-import { createButte, createRange, createSaguaro, createPine, createScrub, createFence, createGround } from "./desert-parts";
+import { createMonument, createRidge, createSaguaro, createJoshua, createJuniper, createCottonwood, createPricklyPear, createScrub, createFence, createGround, rolling, createCabin, createHat, createTumbleweed, createPond, blurredPlant } from "./desert-parts";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { mergeFlat } from "./forest-parts";
 
@@ -24,7 +24,7 @@ import { mergeFlat } from "./forest-parts";
 const STEP = 12, WAGON_X = -.6, SIGN_AHEAD = 2.4;
 // The layers behind the road: each slides at this fraction of the road's speed. (Everything standing on the near
 // ground, the fence, the bison, the road, the signs and the wagon, moves with it, so nothing slides along the ground.)
-const SPEED = { far: .08, rocks: .18, plants: .35, near: 1 };
+const SPEED = { far: .08, rocks: .18, plants: .35, near: 1, front: 2.2 };
 const smooth = t => { t = Math.min(1, Math.max(0, t)); return t * t * (3 - 2 * t); };
 const glow = (stops, size = 128) => {
   const c = document.createElement("canvas"); c.width = c.height = size;
@@ -42,7 +42,7 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, onReady })
     // Drawn on the page's one shared canvas (stage.js), into this stage's rectangle; the stage is the hit area.
     const shared = getStage(); if (!shared) { ready.current?.(); return; }
     const preference = matchMedia("(prefers-reduced-motion: reduce)");
-    const scene = new THREE.Scene(); scene.fog = new THREE.Fog("#efc49a", 34, 110);
+    const scene = new THREE.Scene(); scene.fog = new THREE.Fog("#efc49a", 40, 160);
     const camera = new THREE.PerspectiveCamera(30, 1, .5, 220);
     const rng = random(53), textures = [];
     const material = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: .95, metalness: 0, side: THREE.DoubleSide });
@@ -55,40 +55,75 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, onReady })
     const layers = Object.fromEntries(Object.keys(SPEED).map(k => { const g = new THREE.Group(); scene.add(g); return [k, g]; }));
     const add = (layer, geometry, mat = material) => { const m = new THREE.Mesh(geometry, mat); layers[layer].add(m); return m; };
 
-    // Far: the hazy range on its own stretch of plain.
-    add("far", createGround(rng, { from: -70, to: 90, front: -14, back: -80, near: "#c58d5e", far: "#b59486", lump: .5, step: 6 }));
-    add("far", createRange(rng, -40, 44, 10).translate(0, 0, -24));
-    // Rocks: the buttes, with a band of dust haze along their feet.
-    add("rocks", createGround(rng, { from: -45, to: 60, front: -8, back: -14, near: "#cf9150", far: "#c58d5e", lump: .25, step: 3 }));
-    add("rocks", mergeGeometries([[-14, 4.5, 3.4], [-3, 3.4, 4.6], [8, 5.6, 3], [17, 3, 2.4], [26, 4.8, 4.2]].map(([x, w, h]) => createButte(rng, w, h).translate(x, 0, -11 - rng()))));
+    // Far: two rugged ranges, the back one in blue haze, on a rolling plain.
+    add("far", createGround(rng, { from: -70, to: 90, front: -20, back: -80, near: "#c58d5e", far: "#b59486", lump: .4, step: 6, heightAt: rolling(2.2, 1) }));
+    add("far", createRidge(rng, -60, 70, { height: 12, depth: 8, color: "#7a88a6", rough: .6, steps: 6 }).translate(0, 0, -52));
+    add("far", createRidge(rng, -50, 60, { height: 6.5, depth: 6, color: "#a8705a", rough: .62, steps: 6 }).translate(0, 0, -38));
+    // Rocks: Monument Valley buttes (no two alike) on a low red ridge, with a band of dust haze along their feet.
+    const rocksAt = rolling(1, 2);
+    add("rocks", createGround(rng, { from: -45, to: 60, front: -12, back: -20, near: "#cf9150", far: "#c58d5e", lump: .2, step: 2.5, heightAt: rocksAt }));
+    add("rocks", createRidge(rng, -40, 55, { height: 2.6, depth: 3, color: "#a95a34", rough: .65, steps: 5 }).translate(0, 0, -24));
+    add("rocks", mergeGeometries([[-13, 5.2, 4.2], [-3.5, 3, 5.4], [7.5, 6.4, 3.6], [15.5, 1.6, 4.4], [22.5, 5, 4.8], [31, 3.6, 3.2]].map(([x, w, h], i) =>
+      createMonument(random(300 + i * 7), w, h).translate(x, rocksAt(x, -16.5) - .25, -16 - rng()))));
     {
       // Dense at the ground, thinning upward.
       const c = document.createElement("canvas"); c.width = 4; c.height = 64; const g = c.getContext("2d"), grad = g.createLinearGradient(0, 64, 0, 0);
       grad.addColorStop(0, "rgba(216,160,96,.6)"); grad.addColorStop(1, "rgba(216,160,96,0)"); g.fillStyle = grad; g.fillRect(0, 0, 4, 64);
       const haze = new THREE.CanvasTexture(c); haze.colorSpace = THREE.SRGBColorSpace; textures.push(haze);
-      const band = new THREE.Mesh(new THREE.PlaneGeometry(120, 2.2), new THREE.MeshBasicMaterial({ map: haze, transparent: true, depthWrite: false, fog: false }));
-      band.position.set(10, 1.05, -8.6); layers.rocks.add(band);
+      const band = new THREE.Mesh(new THREE.PlaneGeometry(120, 2.6), new THREE.MeshBasicMaterial({ map: haze, transparent: true, depthWrite: false, fog: false }));
+      band.position.set(10, 1.2, -12.6); layers.rocks.add(band);
     }
-    // Plants: pines in twos and threes, saguaros on their own, scrub everywhere.
-    add("plants", createGround(rng, { from: -30, to: 50, front: -4, back: -8, near: "#d39a52", far: "#cf9150", lump: .12, step: 2 }));
+    // Plants: Joshua trees, junipers and saguaros scattered unevenly (clumps and open stretches), prickly pear and scrub.
+    const plantsAt = rolling(.6, 3);
+    add("plants", createGround(rng, { from: -30, to: 50, front: -7, back: -12, near: "#d39a52", far: "#cf9150", lump: .1, step: 2, heightAt: plantsAt }));
     {
-      const parts = [];
-      for (const x of [-11, -2.5, 6.5, 15, 24]) for (let k = 0; k < 2 + (rng() < .5 ? 1 : 0); k++) {
-        const h = 1.5 + rng() * 1.5; parts.push(createPine(rng, h).translate(x + k * .9 + rng() * .4, 0, -5.5 - rng() * 1.8));
-      }
-      for (const x of [-7, 2, 10.5, 19.5, 28, 33]) parts.push(createSaguaro(rng, 1 + rng() * 1.5).rotateY(rng() * 6).translate(x + rng(), 0, -4.8 - rng() * 2.4));
-      for (let i = 0; i < 18; i++) parts.push(createScrub(rng, .22 + rng() * .25).translate(-14 + i * 2.6 + rng() * 1.6, 0, -4.4 - rng() * 3.3));
+      const parts = [], put = (g, x, z) => parts.push(g.translate(x, plantsAt(x, z) - .08, z));
+      for (const [x, h] of [[-11, 2.6], [-9.6, 1.8], [1.5, 2.2], [12.8, 2.9], [13.9, 2], [25, 2.4]]) put(createJoshua(rng, h).rotateY(rng() * 6), x, -9 - rng() * 2);
+      for (const x of [-6.5, -5.4, 4.8, 9, 19.5, 20.6, 28]) put(createJuniper(rng, .9 + rng() * .7).rotateY(rng() * 6), x, -8 - rng() * 2.6);
+      for (const x of [-2.5, 7, 17, 23.5]) put(createSaguaro(rng, 1.3 + rng() * 1.4).rotateY(rng() * 6), x, -8.5 - rng() * 2);
+      for (let i = 0; i < 14; i++) { const x = -14 + i * 3.2 + rng() * 2; put(createScrub(rng, .2 + rng() * .25), x, -7.6 - rng() * 3.6); }
       add("plants", mergeFlat(parts));
     }
-    // Near: the ground from the camera back to the fence, the road, its dashes, the fence.
-    add("near", createGround(rng, { from: -20, to: 90, front: 14, back: -4, near: "#d6a050", far: "#C8903A", step: 3 }));
+    // Near: the ground from the camera back past the fence (flat along the road, rolling in front of it and behind the
+    // herd), the road and its dashes, the fence (in runs, some ending broken), and what stands by the road.
+    const POND = { x: 7.4, z: -5.6, rx: 2.5, rz: 1.3 };
+    const nearAt = (x, z) => {
+      const behind = smooth((-3.7 - z) / 2.5), front = smooth((z - 1.8) / 4), pond = smooth(Math.hypot((x - POND.x) / (POND.rx * 1.25), (z - POND.z) / (POND.rz * 1.6)) - 1);
+      return rolling(.7, 4)(x, z) * behind * pond + rolling(.3, 5)(x, z) * front;
+    };
+    add("near", createGround(rng, { from: -20, to: 90, front: 26, back: -8, near: "#d6a050", far: "#C8903A", step: 1.6, heightAt: nearAt }));
     {
       const road = new THREE.Mesh(new THREE.PlaneGeometry(110, 1.8).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: "#3A2E1E", roughness: 1, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
       road.position.set(35, .02, 0); layers.near.add(road);
       const dashes = []; for (let x = -18; x < 88; x += 2) dashes.push(new THREE.BoxGeometry(.4, .02, .06).translate(x, .03, 0));
       layers.near.add(new THREE.Mesh(mergeGeometries(dashes), new THREE.MeshBasicMaterial({ color: "#ffffff", transparent: true, opacity: .4 })));
     }
-    add("near", createFence(-18, 88).translate(0, 0, -2.4));
+    add("near", mergeFlat([
+      createFence(-15, 3, { broken: ["end"], seed: 3 }), createFence(7.5, 22.5, { broken: ["start"], seed: 4 }),
+      createFence(30, 40.5, { broken: ["start", "end"], seed: 5 }), createFence(46.5, 64.5, { broken: ["start"], seed: 6 }),
+    ]).translate(0, 0, -2.4));
+    {
+      const parts = [], put = (g, x, z, sink = .06) => parts.push(g.translate(x, nearAt(x, z) - sink, z));
+      // The pond the herd drinks at, cottonwoods by it.
+      const pond = createPond(rng, POND.rx, POND.rz); parts.push(pond.banks.translate(POND.x, 0, POND.z));
+      const water = new THREE.Mesh(pond.water.translate(POND.x, 0, POND.z), new THREE.MeshStandardMaterial({ color: "#3f93c4", roughness: .12, metalness: .15, emissive: "#2a6e9e", emissiveIntensity: .35 }));
+      layers.near.add(water);
+      put(createCottonwood(rng, 2.6), 5.2, -7.5); put(createCottonwood(rng, 2.1), 10.2, -7.7); put(createJuniper(rng, .8), 9, -7.9);
+      // The abandoned homestead, alone in the field.
+      put(createCabin(random(77)).rotateY(.28), 42, -5.9, .1);
+      // By the road: a Joshua tree, saguaros, prickly pear, scrub, unevenly spaced.
+      put(createJoshua(rng, 2.4), -4.6, -4.4); put(createSaguaro(rng, 1.9), 1.6, -5); put(createSaguaro(rng, 1.3), 44, -4.5); put(createJoshua(rng, 1.9), 52.5, -5.6);
+      for (const [x, z] of [[-3, 1.9], [9.6, 2.5], [27.8, 1.6], [33, 2.8], [47.2, 2]]) put(createPricklyPear(rng, .3 + rng() * .15).rotateY(rng() * 6), x, z);
+      for (let i = 0; i < 22; i++) { const x = -12 + i * 3.1 + rng() * 2.4, z = rng() < .5 ? 1.6 + rng() * 3 : -3 - rng() * 1.5; put(createScrub(rng, .18 + rng() * .2), x, z); }
+      add("near", mergeFlat(parts));
+    }
+    // Front: soft-focus plants right in front of the lens, like a camera focused on the road beyond them; they sweep
+    // past faster than anything else, at the edge of the frame at some stops and none at others.
+    const front = [["saguaro", -2.6, 2.2, 4.6], ["saguaro", 39, 2, 4.2], ["agave", 55.4, 2.6, 2.6], ["grass", 82, 3.2, 1.9], ["agave", 103.4, 2.4, 2.4]].map(([kind, x, w, h], i) => {
+      const map = blurredPlant(kind, { blur: 12 + (i % 2) * 4 }); textures.push(map);
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map, transparent: true, depthWrite: false, fog: false, opacity: .94 }));
+      m.position.set(x, h / 2 - .1, 11.6); m.renderOrder = 10; layers.front.add(m); return m;
+    });
 
     // The sky: the sun low on the right (it doesn't parallax), clouds drifting slowly at a few depths.
     const sunTexture = glow([[0, "rgba(255,246,214,1)"], [.14, "rgba(255,240,160,1)"], [.2, "rgba(255,214,140,.7)"], [.45, "rgba(255,180,110,.22)"], [1, "rgba(255,160,100,0)"]]); textures.push(sunTexture);
@@ -127,7 +162,11 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, onReady })
       sign.scale.setScalar(.4); sign.traverse(o => { if (o.isMesh) o.castShadow = o.receiveShadow = false; });
       const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: haloTexture, transparent: true, depthWrite: false, opacity: 0, fog: false }));
       halo.position.set(0, .94, -.25); halo.scale.set(3, 2, 1);
-      holder.add(halo, sign); holder.position.set(i * STEP + WAGON_X + SIGN_AHEAD, 0, -1.4); holder.rotation.y = -.09;
+      holder.add(halo, sign); holder.position.set(i * STEP + WAGON_X + SIGN_AHEAD, 0, -1.4);
+      // Turned a little toward the wagon as it comes up the road, so the boards read with some depth.
+      holder.rotation.y = -.34;
+      // A cowboy hat left hanging on one sign's post.
+      if (i === 2) { const hat = new THREE.Mesh(createHat(), material); hat.scale.setScalar(.85); hat.position.set(.74, 1.4, .04); hat.rotation.set(.3, .3, -.55); holder.add(hat); }
       layers.near.add(holder); textures.push(sign.userData.texture);
       return { holder, sign, halo, on: 0 };
     });
@@ -138,16 +177,37 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, onReady })
     loader.load("/models/island/bison.glb", gltf => {
       if (disposed) return;
       const box = new THREE.Box3().setFromObject(gltf.scene), size = box.getSize(new THREE.Vector3());
-      [[-5.5, -3.2, 1], [7.8, -3.4, -1], [19.5, -3.1, 1], [26, -3.6, -1], [32.2, -3.2, -1], [43.6, -3.3, 1], [55.4, -3.2, -1]].forEach(([x, z, face], i) => {
+      // Not everywhere: three at the pond (two drinking), one lying down a way off, then a lone bull much further on.
+      [[5.4, -3.4, 1, "graze"], [7, -4.5, 1, "drink"], [9.3, -4.4, -1, "drink"], [11.2, -6.6, -1, "rest"], [51, -3.4, -1, "graze"]].forEach(([x, z, face, mood], i) => {
         const model = i ? gltf.scene.clone() : gltf.scene, root = new THREE.Group(); let rig = null;
         model.traverse(o => { if (!o.isMesh) return; rig ??= createBisonRig(o.geometry); o.material = rig.material; o.frustumCulled = false; });
         const h = 1.12 + (i % 3) * .06; model.scale.setScalar(h / size.y); model.position.y = -box.min.y * h / size.y; root.add(model);
         // Side-on, turned a little toward the road so you see a bit of the face.
         root.position.set(x, 0, z); root.rotation.y = face * (Math.PI / 2 - .3); layers.near.add(root);
-        herd.push({ root, anim: createBisonAnimator(rig, { seed: random(70 + i * 5) }), alarmUntil: -1 });
+        herd.push({ root, mood, anim: createBisonAnimator(rig, { seed: random(70 + i * 5), resting: mood === "rest" }), alarmUntil: -1 });
       });
       needsRender = true;
     }, undefined, () => {});
+
+    // A horse (Quaternius, CC0) loose by the gap in the fence, grazing, now and then lifting its head to look about.
+    let horseMixer = null, horseClips = null, horseClock = 6;
+    loader.load("/models/island/horse.glb", gltf => {
+      if (disposed) return;
+      const model = gltf.scene; model.updateMatrixWorld(true);
+      model.traverse(o => { if (o.isMesh) { o.frustumCulled = false; o.material.color?.multiplyScalar(1.7); o.material.flatShading = true; o.material.needsUpdate = true; } });
+      const box = new THREE.Box3().setFromObject(model), k = 1.55 / Math.max(.001, box.max.y - box.min.y);
+      model.scale.multiplyScalar(k); model.position.y = -box.min.y * k;
+      const root = new THREE.Group(); root.add(model); root.position.set(28.6, 0, -3.7); root.rotation.y = -Math.PI / 2 + .35; layers.near.add(root);
+      horseMixer = new THREE.AnimationMixer(model);
+      horseClips = Object.fromEntries(gltf.animations.map(c => [c.name, horseMixer.clipAction(c)]));
+      horseClips.Eating?.play(); needsRender = true;
+    }, undefined, () => {});
+
+    // Tumbleweeds: now and then one rolls across in the wind, bouncing, from the left to the right.
+    const weeds = [0, 1].map(i => {
+      const r = .26 + i * .08, m = new THREE.Mesh(createTumbleweed(random(90 + i), r), material);
+      m.visible = false; m.userData = { r, wait: 2 + i * 7, x: 0, z: 0, v: 0, hop: 0 }; layers.near.add(m); return m;
+    });
 
     // The wagon on the near lane, facing the way it drives, with a blob shadow and a little dust off the back wheels.
     const car = new THREE.Group(), body = new THREE.Group(); car.add(body); car.rotation.y = Math.PI / 2; car.position.z = .38; layers.near.add(car);
@@ -186,7 +246,8 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, onReady })
     const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; }); observer.observe(mount);
 
     // Driving: the world eases (slowly, cinematically) to where the scroll says; the wagon's wheels turn with it.
-    let drive = 0, time = 0, since = 0, needsRender = true, snap = true, wasLive = false, speed = 0, arrive = 1;
+    let drive = 0, time = 0, since = 0, needsRender = true, snap = true, wasLive = false, speed = 0, arrive = 1, leave = 0;
+    const fade = { side: "bottom", from: 1 };
     function tick(dt) {
       const reduced = preference.matches, step = reduced ? 0 : dt; time += step;
       const goal = state.current.progress[slot] * (skills.length - 1) * STEP;
@@ -223,7 +284,27 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, onReady })
       // Bison graze; the one the wagon is passing looks up for a moment.
       for (const b of herd) {
         if (Math.abs(b.root.position.x - wagonX) < 4 && Math.abs(speed) > .5) b.alarmUntil = time + 2.2;
-        b.anim.update(step, { moving: false, gait: "walk", eating: false, resting: false, alarmed: time < b.alarmUntil });
+        b.anim.update(step, { moving: false, gait: "walk", eating: b.mood === "drink", resting: b.mood === "rest", alarmed: b.mood !== "rest" && time < b.alarmUntil });
+      }
+
+      // The horse grazes, every so often lifting its head for a look round.
+      if (horseMixer) {
+        horseClock -= step;
+        if (horseClock < 0 && horseClips.Idle_Headlow && horseClips.Eating) {
+          const eating = horseClips.Eating.isRunning(), next = eating ? horseClips.Idle_Headlow : horseClips.Eating;
+          next.reset().play(); (eating ? horseClips.Eating : horseClips.Idle_Headlow).crossFadeTo(next, .8, false);
+          horseClock = eating ? 3.3 : 8 + rng() * 6;
+        }
+        horseMixer.update(step);
+      }
+
+      // Tumbleweeds roll through on the wind (they keep their own pace whether you drive or not).
+      for (const w of weeds) {
+        const u = w.userData;
+        if (!w.visible) { u.wait -= step; if (u.wait > 0 || reduced) continue; w.visible = true; u.x = -13 - layers.near.position.x; u.z = rng() < .5 ? -1.6 + rng() * .6 : 1.4 + rng() * 1.6; u.v = 1.4 + rng() * .9; u.hop = rng() * 6; }
+        u.x += u.v * step; u.hop += step * (2.4 + u.v);
+        w.position.set(u.x, u.r + Math.abs(Math.sin(u.hop)) * .32 + nearAt(u.x, u.z), u.z); w.rotation.z -= u.v * step / u.r; w.rotation.x += step * .7;
+        if (u.x + layers.near.position.x > 14) { w.visible = false; u.wait = 6 + rng() * 10; }
       }
 
       // Clouds drift, a touch of parallax as you drive.
@@ -231,19 +312,29 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, onReady })
 
       // The eagle: a slow wide circle high over the road, banked into the turn.
       if (!reduced) flap.value += dt * 5.5;
-      // (Over the gap between the heading and the sign's words on wide screens, so it never crosses the text.)
-      const a = time * .22, cx = tall ? .8 : -3.3;
-      flight.position.set(cx + Math.cos(a) * (tall ? 2.2 : 1.7), (tall ? 6.2 : 7.5) + Math.sin(time * .9) * .2, -6 + Math.sin(a) * 2);
-      flight.rotation.set(0, -a + Math.PI, -.35, "YXZ");
+      // (Top centre, in the open sky between the heading and the stop's words, so it never crosses the text.)
+      const a = time * .22, cx = tall ? .8 : -1.4;
+      // Arriving from Work, it's the same eagle: it comes down from above the frame (where it dived out of the Work
+      // sky) and swings into its circle as the camera settles.
+      const entry = reduced ? 0 : smooth((arrive - .2) / .62);
+      // (Out of sight until the Work eagle has dived out of its own sky, so there's only ever one.)
+      flight.visible = entry < .96;
+      flight.position.set(cx + Math.cos(a) * (tall ? 2.2 : 1) + entry * 2.5, (tall ? 6.2 : 5.9) + Math.sin(time * .9) * .2 + entry * entry * 10, -6 + Math.sin(a) * 2 * (1 - entry));
+      flight.rotation.set(-entry * .5, -a + Math.PI, -.35 - entry * .3, "YXZ");
 
       // Arriving, the camera starts up in the sky with the eagle and the clouds, then pulls back and settles on the
       // road as the section comes up the screen.
-      const top = mount.getBoundingClientRect().top / Math.max(1, window.innerHeight);
+      const box = mount.getBoundingClientRect(), top = box.top / Math.max(1, window.innerHeight);
       arrive = reduced ? 0 : smooth(top * 1.15);
-      camera.position.lerpVectors(restPos, skyPos, arrive); aim.lerpVectors(restAim, skyAim, arrive); camera.lookAt(aim);
-      const fov = restFov + (skyFov - restFov) * arrive; if (camera.fov !== fov) { camera.fov = fov; camera.updateProjectionMatrix(); }
+      // Leaving for the coast: the camera lifts back toward the sky and the land fades out from the bottom up into the
+      // sky behind, so the coast rises into open sky rather than meeting a hard edge of desert.
+      leave = smooth(1 - box.bottom / Math.max(1, window.innerHeight));
+      const lift = Math.max(arrive, reduced ? 0 : leave * .55);
+      camera.position.lerpVectors(restPos, skyPos, lift); aim.lerpVectors(restAim, skyAim, lift); camera.lookAt(aim);
+      fade.from = 1 - .8 * smooth(leave * 1.6);
+      const fov = restFov + (skyFov - restFov) * lift; if (camera.fov !== fov) { camera.fov = fov; camera.updateProjectionMatrix(); }
       needsRender = false;
-      return Math.abs(goal - drive) > .002 || (arrive > 0 && arrive < 1) || dust.some(d => d.visible);
+      return Math.abs(goal - drive) > .002 || (arrive > 0 && arrive < 1) || (leave > 0 && leave < 1) || dust.some(d => d.visible) || weeds.some(w => w.visible);
     }
 
     // Full rate while driving or arriving, 30 fps when it's just the bison and the eagle.
@@ -260,7 +351,8 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, onReady })
       busy = tick(Math.min(since, .1)); since = 0; return true;
     }
     frame(); tick(0); mount.dataset.ready = "true";
-    const unregister = shared.register({ mount, scene, camera, draw, exposure: 1.05 });
+    // (Drawn past its top edge, for the eagle and the clouds coming in from the sky, but not past its bottom, where the coast comes up.)
+    const unregister = shared.register({ mount, scene, camera, draw, exposure: 1.05, fade, overscan: { top: .5, bottom: 0 } });
     const readyTimer = setTimeout(() => ready.current?.(), 0);
     if (new URLSearchParams(window.location.search).has("debug")) window.__skills = { camera, car, layers, scene, herd, signs, THREE };
 

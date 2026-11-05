@@ -220,17 +220,26 @@ body:has(.ht){background:#1b1335}
 .ht-credits{text-shadow:0 1px 6px rgba(10,20,30,.55)}
 .ht-credits a{color:inherit;text-decoration:underline;text-decoration-color:rgba(244,246,248,.3)}
 @media(max-height:820px) and (min-width:761px){.ht-form textarea{height:calc(3lh + 22px)}.ht-contact-card{top:clamp(96px,15svh,170px);padding:24px 28px}}
-/* Short screens: the Skills list tightens (each stop's tools shown only at the stop you're at) and its words shrink a
-   little, so the heading, the list and the story all fit. */
+/* Skills, on wider screens: the heading top left and the stop you're at spelled out top right, both at the same height
+   across the content width, with the road trip open beneath them. */
+@media(min-width:761px){
+  .ht-skills{--skills-top:clamp(104px,15svh,160px)}
+  .ht-zone.ht-skills .ht-copy{width:auto;margin:-100svh var(--gutter) 0;justify-content:flex-start;padding:var(--skills-top) 0 0}
+  .ht-skills .ht-copy h2{max-width:36%}
+  .ht-skill-story{left:auto;right:0;top:var(--skills-top);width:min(520px,46%)}
+}
+/* Short screens: the story's words shrink a little so it clears the road. */
 @media(max-height:760px) and (min-width:761px){
+  .ht-skills{--skills-top:96px}
   .ht-skills .ht-copy h2{font-size:clamp(28px,3.2vw,44px)}
-  .ht-skills .ht-list{margin-top:14px;gap:6px}
-  .ht-skills .ht-list li{padding:9px 16px}
-  .ht-skills .ht-list li>span:not(.ht-sr){display:none}
-  .ht-skills .ht-list li.is-here>span:not(.ht-sr){display:block}
   .ht-skill-lead{font-size:clamp(26px,2.8vw,40px)}
   .ht-skill-blurb{font-size:15px;margin-top:10px}
 }
+/* The stop's tools, each with its mark. */
+.ht-skill-tools{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 0;padding:0;list-style:none}
+.ht-skill-tools li{display:inline-flex;align-items:center;gap:7px;padding:7px 13px 7px 11px;border-radius:999px;font-size:13px;font-weight:600;line-height:1;color:var(--ink);text-shadow:none;
+  background:rgba(255,248,238,.62);border:1px solid rgba(42,22,54,.1);box-shadow:0 6px 18px rgba(120,60,20,.12)}
+.ht-skill-tools i{flex:none;width:17px;height:17px;background:#7c5cdb;-webkit-mask:var(--icon) center/contain no-repeat;mask:var(--icon) center/contain no-repeat}
 /* Very short screens: a tighter card, the credits moved to the right-hand column above the section menu, the beam
    hint to the top right, so nothing overlaps. */
 @media(max-height:640px) and (min-width:761px){

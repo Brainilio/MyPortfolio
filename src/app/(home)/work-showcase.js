@@ -180,10 +180,15 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       if (!still) { time += dt; circle += speed * dt; drift += dt * (.25 + Math.min(4, Math.abs(vel) * 2.5)); flap.value += dt * (5.5 + Math.min(10, Math.abs(vel) * 7)); }
       // The eagle: a slow circle round the middle (wider than deep), facing along it, banked into the turn.
       const a = circle * .55, bank = .32 + Math.min(.3, Math.abs(vel) * .1);
-      flight.position.set(Math.cos(a) * 1.25 * flight.scale.x, (still ? 0 : Math.sin(time * 1.3) * .12) + .3, Math.sin(a) * 1.1 - .1);
-      flight.rotation.set(0, -a, bank, "YXZ");
-      // Behind the name on the far half of the circle, in front on the near half.
-      if ((Math.sin(a) < -.1) !== behind) { behind = !behind; (behind ? skyScene : eagleScene).add(rig); }
+      // Leaving for the road trip, it breaks off its circle and dives out through the bottom of the sky, toward the
+      // Skills section below (where the same eagle comes back down into the desert sky).
+      const pin = skyCanvas.getBoundingClientRect(), leaving = still ? 0 : Math.min(1, Math.max(0, 1 - pin.bottom / window.innerHeight));
+      const d = Math.min(1, leaving * 2.2), dive = d * d * (3 - 2 * d), swoop = Math.min(1, dive * 1.4);
+      const yaw = -a - Math.PI * 2 * Math.round(-a / (Math.PI * 2));
+      flight.position.set(Math.cos(a) * 1.25 * flight.scale.x * (1 - swoop) - swoop * .9, ((still ? 0 : Math.sin(time * 1.3) * .12) + .3) * (1 - swoop) - dive * 5, (Math.sin(a) * 1.1 - .1) * (1 - swoop) + swoop * 1.2);
+      flight.rotation.set(swoop * .75, yaw * (1 - swoop), bank * (1 - swoop), "YXZ");
+      // Behind the name on the far half of the circle, in front on the near half (and in front while it dives).
+      if ((Math.sin(a) < -.1 && swoop < .2) !== behind) { behind = !behind; (behind ? skyScene : eagleScene).add(rig); }
       smoothMouse.lerp(aim.set(mouse.current.x, mouse.current.y), Math.min(1, dt * 5));
       // The sun: from low on the left up toward the right as the projects go by (eased, so it settles when you stop).
       sunAt += (progress - sunAt) * Math.min(1, dt * 3);
@@ -195,7 +200,7 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       const tanHalf = Math.tan(THREE.MathUtils.degToRad(15)), sunDepth = -30, sunH = tanHalf * (9 - sunDepth), sunW = sunH * camera.aspect;
       sunSprite.position.set((-.55 + 1.1 * sunAt) * sunW, (-.5 + .55 * sunAt) * sunH + .2, sunDepth);
       // Its light on the letters: a warm band across the word where the sun stands behind it.
-      const word = host.querySelector(".wl-a-word"), pin = skyCanvas.getBoundingClientRect();
+      const word = host.querySelector(".wl-a-word");
       if (word) {
         const sunScreen = sunSprite.position.clone().project(camera), r = word.getBoundingClientRect();
         host.style.setProperty("--sun", `${((pin.left + (sunScreen.x + 1) / 2 * width - r.left) / r.width * 100).toFixed(1)}%`);

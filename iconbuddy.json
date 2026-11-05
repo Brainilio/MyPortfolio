@@ -2,7 +2,7 @@
   "version": 1,
   "provider": "Iconbuddy",
   "collection": "tabler",
-  "author": "Pawe\u0142 Kuna",
+  "author": "Paweł Kuna",
   "license": "MIT",
   "style": {
     "color": "currentColor",
@@ -20,6 +20,82 @@
     "arrow-up-right": {
       "source": "https://files.svgcdn.io/tabler/arrow-up-right.svg",
       "path": "public/icons/iconbuddy/arrow-up-right.svg"
+    },
+    "react": {
+      "source": "https://files.svgcdn.io/tabler/brand-react.svg",
+      "path": "public/icons/iconbuddy/brand-react.svg"
+    },
+    "redux": {
+      "source": "https://files.svgcdn.io/tabler/brand-redux.svg",
+      "path": "public/icons/iconbuddy/brand-redux.svg"
+    },
+    "nextjs": {
+      "source": "https://files.svgcdn.io/tabler/brand-nextjs.svg",
+      "path": "public/icons/iconbuddy/brand-nextjs.svg"
+    },
+    "javascript": {
+      "source": "https://files.svgcdn.io/tabler/brand-javascript.svg",
+      "path": "public/icons/iconbuddy/brand-javascript.svg"
+    },
+    "typescript": {
+      "source": "https://files.svgcdn.io/tabler/brand-typescript.svg",
+      "path": "public/icons/iconbuddy/brand-typescript.svg"
+    },
+    "nodejs": {
+      "source": "https://files.svgcdn.io/tabler/brand-nodejs.svg",
+      "path": "public/icons/iconbuddy/brand-nodejs.svg"
+    },
+    "mongodb": {
+      "source": "https://files.svgcdn.io/tabler/brand-mongodb.svg",
+      "path": "public/icons/iconbuddy/brand-mongodb.svg"
+    },
+    "laravel": {
+      "source": "https://files.svgcdn.io/tabler/brand-laravel.svg",
+      "path": "public/icons/iconbuddy/brand-laravel.svg"
+    },
+    "threejs": {
+      "source": "https://files.svgcdn.io/tabler/brand-threejs.svg",
+      "path": "public/icons/iconbuddy/brand-threejs.svg"
+    },
+    "php": {
+      "source": "https://files.svgcdn.io/tabler/brand-php.svg",
+      "path": "public/icons/iconbuddy/brand-php.svg"
+    },
+    "python": {
+      "source": "https://files.svgcdn.io/tabler/brand-python.svg",
+      "path": "public/icons/iconbuddy/brand-python.svg"
+    },
+    "java": {
+      "source": "https://files.svgcdn.io/tabler/coffee.svg",
+      "path": "public/icons/iconbuddy/coffee.svg"
+    },
+    "user-research": {
+      "source": "https://files.svgcdn.io/tabler/users.svg",
+      "path": "public/icons/iconbuddy/users.svg"
+    },
+    "pitching": {
+      "source": "https://files.svgcdn.io/tabler/presentation.svg",
+      "path": "public/icons/iconbuddy/presentation.svg"
+    },
+    "stakeholder-communication": {
+      "source": "https://files.svgcdn.io/tabler/messages.svg",
+      "path": "public/icons/iconbuddy/messages.svg"
+    },
+    "ux-ui": {
+      "source": "https://files.svgcdn.io/tabler/layout.svg",
+      "path": "public/icons/iconbuddy/layout.svg"
+    },
+    "webgl": {
+      "source": "https://files.svgcdn.io/tabler/3d-cube-sphere.svg",
+      "path": "public/icons/iconbuddy/3d-cube-sphere.svg"
+    },
+    "shaders": {
+      "source": "https://files.svgcdn.io/tabler/color-filter.svg",
+      "path": "public/icons/iconbuddy/color-filter.svg"
+    },
+    "agile": {
+      "source": "https://files.svgcdn.io/tabler/refresh.svg",
+      "path": "public/icons/iconbuddy/refresh.svg"
     }
   }
 }
