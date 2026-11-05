@@ -6,7 +6,7 @@ import "lenis/dist/lenis.css";
 import allProjects from "../../lib/projects";
 import "./home.css";
 import { getStage } from "./stage";
-import WorkCards from "./work-cards";
+import WorkCards, { OrbitCards } from "./work-cards";
 const IslandScene = dynamic(() => import("./island-scene"), { ssr: false });
 const AboutScene = dynamic(() => import("./about-scene"), { ssr: false });
 const WorkScene = dynamic(() => import("./work-scene"), { ssr: false });
@@ -260,11 +260,17 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Work: the Yellowstone meadow held in the middle (its stage is sticky), its title behind the peaks and its links
-          under the title, all three in the one pinned stage so they hold and leave together; the project cards over it. */}
+      {/* Work: the Yellowstone meadow held in the middle (its stage is sticky). Two pinned full-screen layers move as one:
+          the back one, under the island's canvas, holds the title and the orbit's far cards (so the peaks pass in front
+          of them); the stage, over the canvas, holds the island's hit area, the links and the orbit's near cards. The
+          other card layouts scroll past over it all. */}
       <section className="ht-zone ht-work" id="work" data-side="left" ref={el => (zones.current[WORK] = el)} aria-labelledby="ht-work-title">
-        <div className="ht-stage">
+        <div className="ht-work-back">
           <div className="ht-work-title"><RevealHeading id="ht-work-title" text="Things I’ve built" arrive={50} /></div>
+          {cardLayout === "A" && <OrbitCards layer="back" work={work} scene={scene} />}
+        </div>
+        <div className="ht-stage">
+          {cardLayout === "A" && <OrbitCards layer="front" work={work} scene={scene} />}
           {built[WORK] && <WorkScene state={scene} slot={WORK} side="center" projects={work} onReady={onReady(WORK)} />}
           <div className="ht-work-head">
             <p className="ht-drive">Click the basket to feed the herd</p>

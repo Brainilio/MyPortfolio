@@ -9,7 +9,7 @@ import { random, createSpin, tilted, createFoliageMaterial, createBird, createCl
 import { createBasket } from "./park-parts";
 import { createBisonRig, createBisonAnimator } from "./bison-rig";
 import { createMeadow, BASKET_SPOT } from "./work-meadow";
-import { createCardRing } from "./work-ring";
+import { createRingAnchors } from "./work-ring";
 
 // Work: a Yellowstone meadow at golden hour (work-meadow.js: the island, its peaks, river and lake, trees, geysers,
 // ducks, deer and eagle), with a bison herd and a feed basket: click it and the herd comes running. The project cards
@@ -45,8 +45,9 @@ export default function WorkScene({ state, slot = 2, side = "left", projects = [
     const GROW=1.3;meadow.group.scale.setScalar(GROW);world.add(meadow.group);
     const land=meadow.group,bushes=meadow.swaying,height=meadow.height;
     const on=(x,z)=>new THREE.Vector3(x,height(x,z),z);
-    // The orbit card layout (work-ring.js): the project cards on a ring round the island, shown while it's chosen.
-    const ring=createCardRing({projects,onLoad:()=>{needsRender=true;}});ring.group.visible=false;scene.add(ring.group);let ringMoving=false;
+    // The orbit card layout: the project cards (HTML, work-cards.js) on a ring round the island; this places them
+    // (work-ring.js), sharing where each lands through the page's scene state.
+    const ring=createRingAnchors({count:projects.length});let ringMoving=false;
     // A few birds wheeling high over the peaks.
     const birdMaterial=new THREE.MeshStandardMaterial({color:"#3b2b33",flatShading:true,roughness:1,side:THREE.DoubleSide});
     const birds=Array.from({length:5},(_,i)=>{const bird=createBird(birdMaterial);bird.scale.setScalar(.9);Object.assign(bird.userData,{a:i/5*Math.PI*2,r:2.2+(i%3)*.7,h:6.4+(i%2)*.8,speed:.28+(i%4)*.05,flap:i*1.7});world.add(bird);return bird;});
@@ -208,19 +209,15 @@ export default function WorkScene({ state, slot = 2, side = "left", projects = [
     const raycaster=new THREE.Raycaster(),ndc=new THREE.Vector2();let onBasket=false;
     const pick=(event,objects)=>{const rect=canvas.getBoundingClientRect();ndc.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(ndc,camera);return raycaster.intersectObjects(objects,true)[0];};
     const spin=createSpin(canvas,{rest:0,
-      over:event=>{
-        // A card under the cursor lifts (and holds the ring); otherwise the basket, the herd and the geysers are tappable.
-        const card=ring.group.visible?pick(event,ring.meshes):null;ring.hover(card?ring.indexOf(card.object):-1);if(card){needsRender=true;return true;}
-        return (onBasket=!!pick(event,[basket,hay]))||!!pick(event,herd.map(b=>b.root))||!!pick(event,meadow.geysers);},
+      over:event=>(onBasket=!!pick(event,[basket,hay]))||!!pick(event,herd.map(b=>b.root))||!!pick(event,meadow.geysers),
       onTap:event=>{
-        const card=ring.group.visible&&pick(event,ring.meshes);if(card){const p=ring.project(ring.indexOf(card.object));if(p)window.location.href=`/project/${p.slug}/`;return;}
         if(pick(event,[basket,hay])){pour();return;}
         const vent=pick(event,meadow.geysers);if(vent){meadow.erupt(vent.object);needsRender=true;return;}
         const owner=(hit,list)=>list.find(x=>{let o=hit.object;while(o&&o!==x.root)o=o.parent;return o===x.root;});
         // Tap a bison and it startles: head up, tail up, a brace.
         const struck=pick(event,herd.map(b=>b.root));if(struck){const b=owner(struck,herd);if(b){tapBison(b);needsRender=true;}}
       }});
-    canvas.addEventListener("pointerleave",()=>{onBasket=false;ring.hover(-1);});
+    canvas.addEventListener("pointerleave",()=>{onBasket=false;});
     // Hover (a mouse only): the pines near the cursor stir, the faster the cursor the more. Passive under the drag.
     const ground=land.children[0].children[0],hover=new THREE.Vector3();let hoverX=0,hoverY=0,hoverAt=0;
     function onHover(event){
@@ -264,8 +261,9 @@ export default function WorkScene({ state, slot = 2, side = "left", projects = [
       const dusty=updateDust(step);
       world.position.y=Math.sin(time*.45)*.1;meadow.update(time,step);
       // The card ring: turned by the scroll through the section (25° per 100px).
-      ring.group.visible=state.current.cardLayout==="A";
-      if(ring.group.visible){const run=Math.max(1,(mount.closest("section")?.offsetHeight??innerHeight)-innerHeight);ringMoving=ring.update(dt,-state.current.progress[slot]*run/100*25,reduced);}else ringMoving=false;
+      if(state.current.cardLayout==="A"){const run=Math.max(1,(mount.closest("section")?.offsetHeight??innerHeight)-innerHeight);
+        ringMoving=ring.update(dt,-state.current.progress[slot]*run/100*25,reduced,state.current.ringHold>=0,camera,mount.clientWidth,mount.clientHeight);state.current.ring=ring.anchors;}
+      else ringMoving=false;
       // The sun's climb follows the scroll through the section (reduced motion: already up).
       const rise=reduced?1:smooth(state.current.progress[slot]/.75);
       if(Math.abs(rise-risen)>1e-3){risen=rise;sunDisc.position.set(-15+rise*2,-6+rise*9,-40);sunDisc.material.color.copy(LOW).lerp(HIGH,rise);}
@@ -298,7 +296,7 @@ export default function WorkScene({ state, slot = 2, side = "left", projects = [
       clearTimeout(readyTimer);delete window.__work;disposed=true;unregister();resize.disconnect();observer.disconnect();
       spin.dispose();canvas.removeEventListener("pointermove",onHover);
       scene.traverse(o=>{o.geometry?.dispose();for(const m of [o.material].flat())m?.dispose();});
-      sunTexture.dispose();meadow.dispose();ring.dispose();
+      sunTexture.dispose();meadow.dispose();
     };
   },[state,slot]);
   return <div className="ht-canvas" ref={host} aria-hidden="true" />;

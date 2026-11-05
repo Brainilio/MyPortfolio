@@ -5,8 +5,9 @@ import ShineCard from "./shine-card";
 // The Work section's card layouts (A·B·C·D, picked by the "Cards" pill in home.js). Every layout shows the same four
 // project cards in the same design (the shader card from shine-card.js); only where they sit, how they arrive and how
 // they answer the cursor change. Scroll-driven motion reads the shared scene state every frame (no React updates):
-//   A: Orbit. The cards ride a ring round the island inside the 3D scene (work-ring.js), turning as you scroll; here
-//      only the scroll length and, for keyboards and screen readers, the links themselves (visually hidden).
+//   A: Orbit. The cards ride a ring round the island, passing behind the peaks (OrbitCards, below, placed by the
+//      island's scene), turning as you scroll; here only the scroll length and, for keyboards and screen readers, the
+//      links themselves (visually hidden).
 //   B: Original. The cards scroll up past the island in one column, alternating left and right, each sliding in from
 //      its own side and bending with the speed of the scroll.
 //   C: Stacked deck. Each card pins on the right as it arrives and the next slides up over it; the ones underneath
@@ -82,6 +83,58 @@ export default function WorkCards({ variant, work, scene, slot, playing }) {
           <span className="ht-wc-d-dots" aria-hidden="true">{work.map(project => <i key={project.slug} className="ht-wc-d-dot" />)}</span>
         </div>
       )}
+    </div>
+  );
+}
+
+// A: the orbit's cards, drawn twice: once in a layer under the island's canvas and once over it. Each frame every card
+// is placed at its anchor on the ring (worked out by the island's scene, work-ring.js), sized to how near it is,
+// turned to follow the ring, and shown in whichever layer it belongs to right now: going round the back it's in the lower
+// layer, so the peaks pass in front of it, darkened, its face turned toward the island; round the front, in the
+// upper one, where the cursor can reach it (hover lifts it and holds the ring; click opens the project). Decorative
+// copies: the accessible links are the visually hidden list in WorkCards.
+export function OrbitCards({ layer, work, scene }) {
+  const root = useRef(null);
+  useEffect(() => {
+    const el = root.current;
+    if (!el) return;
+    const cards = [...el.children], front = layer === "front";
+    let frame = 0;
+    const enter = i => () => { scene.current.ringHold = i; }, leave = () => { scene.current.ringHold = -1; };
+    const handlers = cards.map((card, i) => { const on = enter(i); card.addEventListener("pointerenter", on); card.addEventListener("pointerleave", leave); return on; });
+    function loop() {
+      frame = requestAnimationFrame(loop);
+      const anchors = scene.current.ring;
+      if (!anchors) return;
+      cards.forEach((card, i) => {
+        const a = anchors[i];
+        if (!a) return;
+        // In front of the island's middle (with a little overlap at the sides): the upper layer.
+        const mine = (a.facing > -.12) === front;
+        card.style.visibility = mine ? "visible" : "hidden";
+        if (!mine) return;
+        card.style.width = `${(a.h * 1.6).toFixed(1)}px`;
+        card.style.zIndex = String(Math.round(10 + a.facing * 10));
+        // (Turned away, it shows its face to the island instead of a mirror image, like the back row of a carousel.)
+        const turn = a.facing < 0 ? a.deg - Math.sign(a.deg) * 180 : a.deg;
+        card.style.transform = `translate(${a.x.toFixed(1)}px,${a.y.toFixed(1)}px) translate(-50%,-50%) perspective(${(a.h * 6).toFixed(0)}px) rotateY(${turn.toFixed(2)}deg)`;
+        card.style.setProperty("--dim", (.6 * Math.max(0, -a.facing)).toFixed(3));
+      });
+    }
+    frame = requestAnimationFrame(loop);
+    return () => { cancelAnimationFrame(frame); cards.forEach((card, i) => { card.removeEventListener("pointerenter", handlers[i]); card.removeEventListener("pointerleave", leave); }); if (front) scene.current.ringHold = -1; };
+  }, [layer, scene]);
+  return (
+    <div className={`ht-orbit ht-orbit-${layer}`} ref={root} aria-hidden="true">
+      {work.map((project, i) => (
+        <a key={project.slug} className="ht-orbit-card" href={`/project/${project.slug}/`} tabIndex={-1}>
+          <span className="ht-orbit-lift">
+            {layer === "front"
+              ? <ShineCard index={i} tag="span" name={project.name}><img src={project.previewImage} alt="" decoding="async" /></ShineCard>
+              : <span className="ht-orbit-plain"><img src={project.previewImage} alt="" decoding="async" /><span className="ht-shine-pill">{String(i + 1).padStart(2, "0")} · {project.name} →</span></span>}
+          </span>
+        </a>
+      ))}
     </div>
   );
 }
