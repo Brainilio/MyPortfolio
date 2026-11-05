@@ -5,22 +5,41 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { createCloud } from "./island-parts";
-import { useImageRatio, fitWidth } from "../../lib/image-ratio";
+import { useImageRatio, getImageRatio, fitWidth } from "../../lib/image-ratio";
 
 // The Work section: one pinned screen, the scroll picking the project (in step with the section pill's counter). The
-// project's name runs huge across the middle, its pictures scattered round it; a bald eagle flies a slow circle in
-// front, faster (and beating its wings faster) the faster you scroll through the projects. Behind, the page's own sky
-// turns to sunrise as you go, with low-poly clouds drifting across it and the last of the About section's stars fading.
+// project's name runs huge across the middle, lit by a sun that rises behind it as you scroll; three of its pictures
+// hang round it as thin sheets, bent and warping (more the faster you scroll), sheened by that sun; a bald eagle flies
+// a slow circle, behind the name and in front of it, faster (and beating its wings faster) the faster you scroll.
+// Behind, the page's own sky turns to sunrise as you go, with low-poly clouds drifting across it and the last of the
+// About section's stars fading.
 // Two canvases of its own (the page's shared one sits above the words' layer, and the eagle has to pass in front of the
 // name while the clouds stay behind it): drawn only while on screen and the tab is visible; reduced motion stops the
 // flight and the drift. Phones get the sky and a plain list.
 
-// Where the pictures sit round the name (% of the screen; width in vw; tilt; depth for the parallax), clear of the
-// title at the top left, the name across the middle and the details at the bottom.
-const SCATTER = [
-  { x: 47, y: 19, w: 10, r: 4, d: .9 }, { x: 68, y: 17, w: 14, r: -5, d: .6 }, { x: 87, y: 33, w: 11, r: 6, d: 1.2 },
-  { x: 80, y: 74, w: 15, r: -3, d: .8 }, { x: 27, y: 77, w: 12, r: 7, d: 1.1 }, { x: 9, y: 58, w: 10, r: -8, d: .5 },
+// The three sheets: where they hang (fraction of the screen), how wide (fraction of the screen's width, before their
+// own shape adjusts it), which of the project's pictures, their turn and tilt, and depth.
+const SHEETS = [
+  { fx: .64, fy: .21, w: .17, pick: 1, ry: -.32, rz: .05, z: -1.6 },
+  { fx: .85, fy: .63, w: .15, pick: 3, ry: -.5, rz: -.07, z: -1.1 },
+  { fx: .19, fy: .72, w: .16, pick: 0, ry: .45, rz: .04, z: -1.3 },
 ];
+const SHEET_VERTEX = `uniform float uBend,uWave,uTime;varying vec2 vUv;varying float vSlope;void main(){
+  vUv=uv;vec3 p=position;float x=uv.x-.5,y=uv.y-.5,ph=uv.x*5.+uv.y*3.+uTime*2.4;
+  // A sheet: curled toward you at the sides (more at the top than the foot), rippling as it moves.
+  p.z+=uBend*(x*x*2.2+.5*y*y)+uWave*sin(ph);
+  vSlope=uBend*4.4*x+uWave*5.*cos(ph);
+  gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}`;
+const SHEET_FRAGMENT = `uniform sampler2D uMap;uniform float uAlpha,uSunSide,uSun;varying vec2 vUv;varying float vSlope;void main(){
+  vec3 c=texture2D(uMap,vUv).rgb;
+  // Lit on the side that turns toward the sun, a warm sheen where it catches it, shade where it turns away.
+  float lit=clamp(.5+.5*vSlope*uSunSide*1.6,0.,1.);
+  c*=.84+.26*lit;c+=vec3(1.,.78,.52)*pow(lit,5.)*.22*uSun;
+  // A hairline paper edge.
+  float e=min(min(vUv.x,1.-vUv.x),min(vUv.y,1.-vUv.y)),w=fwidth(e);c=mix(vec3(1.,.96,.9),c,smoothstep(w*.8,w*1.8,e)*.7+.3*step(w*1.8,e));
+  gl_FragColor=vec4(c,uAlpha);
+  #include <colorspace_fragment>
+}`;
 // The clouds: x, y, depth, size, phase.
 const CLOUDS = [[-6, -1, -8, .3, 0], [6.5, 1.6, -10, .36, 1.7], [9, -1.9, -7, .26, 3.1], [-9, 1.9, -12, .34, 4.4], [2.5, -2.3, -9, .28, 2.6], [12, .2, -14, .4, .8]];
 // What a recruiter wants at a glance: its year and kind of work, and the first few tools (all from the project data).
@@ -32,7 +51,7 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
   const root = useRef(null), back = useRef(null), front = useRef(null);
   const ready = useRef(onReady); ready.current = onReady;
   const [active, setActive] = useState(0);
-  const mouse = useRef({ x: 0, y: 0 });
+  const mouse = useRef({ x: 0, y: 0 }), picker = useRef(null);
   const n = work.length;
 
   useEffect(() => {
@@ -67,6 +86,33 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       fragmentShader: `varying float vAlpha;void main(){float d=length(gl_PointCoord-.5)*2.;gl_FragColor=vec4(1.,.97,.9,vAlpha*smoothstep(1.,0.,d));}` }));
     stars.frustumCulled = false; skyScene.add(stars);
 
+    // The sun, low behind everything, rising up and across as you scroll through the projects; it lights the letters
+    // (see the loop) and the sheets.
+    const glow = (stops, size = 128) => { const c = document.createElement("canvas"); c.width = c.height = size; const g = c.getContext("2d"), r = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2); stops.forEach(([k, col]) => r.addColorStop(k, col)); g.fillStyle = r; g.fillRect(0, 0, size, size); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; };
+    const sunTexture = glow([[0, "rgba(255,246,222,1)"], [.12, "rgba(255,232,190,1)"], [.16, "rgba(255,196,140,.75)"], [.4, "rgba(255,160,110,.25)"], [1, "rgba(255,140,100,0)"]]);
+    const sunSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: sunTexture, transparent: true, depthWrite: false, toneMapped: false }));
+    sunSprite.scale.setScalar(16); skyScene.add(sunSprite);
+
+    // The sheets: the project's pictures on thin bent planes (a soft shadow behind each), shown whole at their own shape.
+    const textureLoader = new THREE.TextureLoader(), textures = new Map();
+    const textureOf = src => { if (!textures.has(src)) { const t = textureLoader.load(src); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; textures.set(src, t); } return textures.get(src); };
+    const shadowTexture = glow([[0, "rgba(255,255,255,.9)"], [.55, "rgba(255,255,255,.35)"], [1, "rgba(255,255,255,0)"]], 64);
+    const sheetGeometry = new THREE.PlaneGeometry(1, 1, 40, 24), shadowGeometry = new THREE.PlaneGeometry(1, 1);
+    const sheets = SHEETS.map((spot, k) => {
+      const uniforms = { uMap: { value: null }, uBend: { value: .16 }, uWave: { value: 0 }, uTime: { value: 0 }, uAlpha: { value: 0 }, uSunSide: { value: 0 }, uSun: { value: 1 } };
+      const mesh = new THREE.Mesh(sheetGeometry, new THREE.ShaderMaterial({ uniforms, transparent: true, side: THREE.DoubleSide, vertexShader: SHEET_VERTEX, fragmentShader: SHEET_FRAGMENT }));
+      const shadow = new THREE.Mesh(shadowGeometry, new THREE.MeshBasicMaterial({ map: shadowTexture, color: "#3a1638", transparent: true, depthWrite: false, opacity: 0 }));
+      const group = new THREE.Group(); group.add(shadow, mesh); skyScene.add(group);
+      return { spot, k, group, mesh, shadow, uniforms, ratio: 16 / 10, src: null, want: null, href: null, wantHref: null, hide: 1, wait: 0 };
+    });
+    const showProject = (project, first) => {
+      const pics = [project.previewImage, ...(project.fullImages ?? [])];
+      sheets.forEach(sheet => { sheet.want = pics[sheet.spot.pick % pics.length]; sheet.wantHref = `/project/${project.slug}/`; sheet.wait = first ? .3 + sheet.k * .12 : sheet.k * .09; });
+    };
+    // (Clicking a sheet opens its project; the pointer turns to a hand over one.)
+    const raycaster = new THREE.Raycaster(), ndc = new THREE.Vector2();
+    picker.current = (x, y) => { ndc.set(x, y); raycaster.setFromCamera(ndc, camera); const hit = raycaster.intersectObjects(sheets.filter(s => s.uniforms.uAlpha.value > .5).map(s => s.mesh))[0]; return hit ? sheets.find(s => s.mesh === hit.object).href : null; };
+
     // In front of the name: the bald eagle in flight (Robert Mirabelle, CC BY 3.0), lit warm from the upper left. Its
     // wings (along x, the beak toward -z) beat in the vertex shader, bending more toward the tips, the tips a little
     // behind.
@@ -99,7 +145,7 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
     }, undefined, () => {});
 
     let width = 0, height = 0, visible = true, frame = 0, last = performance.now();
-    let drift = 0, time = 0, circle = 0, speed = .35, vel = 0, prevProgress = scene.current.progress[slot] ?? 0, shown = -1;
+    let drift = 0, time = 0, circle = 0, speed = .35, vel = 0, sunAt = scene.current.progress[slot] ?? 0, prevProgress = scene.current.progress[slot] ?? 0, shown = -1;
     const smoothMouse = new THREE.Vector2(), aim = new THREE.Vector2();
     const resize = () => {
       width = skyCanvas.clientWidth; height = skyCanvas.clientHeight; if (!width || !height) return;
@@ -118,7 +164,7 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       const rate = dt > 0 ? (progress - prevProgress) / dt * (n - 1) : 0; prevProgress = progress;
       vel += (rate - vel) * Math.min(1, dt * 6);
       const at = Math.min(n - 1, Math.max(0, Math.round(progress * (n - 1))));
-      if (at !== shown) { if (shown >= 0) speed += 2.2; shown = at; setActive(at); }
+      if (at !== shown) { if (shown >= 0) speed += 2.2; showProject(work[at], shown < 0); shown = at; setActive(at); }
       if (!visible || document.hidden) return;
       const still = reduce.matches;
       // Its pace: idle, plus however fast you're scrolling, easing back down when you stop.
@@ -131,11 +177,39 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       flight.rotation.set(0, -a, bank, "YXZ");
       // Behind the name on the far half of the circle, in front on the near half.
       if ((Math.sin(a) < -.1) !== behind) { behind = !behind; (behind ? skyScene : eagleScene).add(rig); }
-      // The sunlight sweeping across the letters, slowly, shifted along by the scroll.
-      host.style.setProperty("--sun", `${(50 + 48 * Math.sin(time * .22 + progress * 4)).toFixed(1)}%`);
       smoothMouse.lerp(aim.set(mouse.current.x, mouse.current.y), Math.min(1, dt * 5));
-      // The pictures' parallax, from the pointer and the scroll (CSS variables, no React work per frame).
-      host.style.setProperty("--mx", smoothMouse.x.toFixed(3)); host.style.setProperty("--my", smoothMouse.y.toFixed(3)); host.style.setProperty("--vel", Math.max(-3, Math.min(3, vel)).toFixed(3));
+      // The sun: from low on the left up toward the right as the projects go by (eased, so it settles when you stop).
+      sunAt += (progress - sunAt) * Math.min(1, dt * 3);
+      const tanHalf = Math.tan(THREE.MathUtils.degToRad(15)), sunDepth = -30, sunH = tanHalf * (9 - sunDepth), sunW = sunH * camera.aspect;
+      sunSprite.position.set((-.55 + 1.1 * sunAt) * sunW, (-.5 + .55 * sunAt) * sunH + .2, sunDepth);
+      // Its light on the letters: a warm band across the word where the sun stands behind it.
+      const word = host.querySelector(".wl-a-word"), pin = skyCanvas.getBoundingClientRect();
+      if (word) {
+        const sunScreen = sunSprite.position.clone().project(camera), r = word.getBoundingClientRect();
+        host.style.setProperty("--sun", `${((pin.left + (sunScreen.x + 1) / 2 * width - r.left) / r.width * 100).toFixed(1)}%`);
+      }
+      // The sheets: each swaps its picture by curling away and back (one after another), hangs at its spot at its own
+      // shape, sways a little with the pointer, and bends and ripples more the faster you scroll.
+      for (const sheet of sheets) {
+        const { spot, uniforms } = sheet;
+        if (sheet.want && sheet.want !== sheet.src) {
+          if (sheet.wait > 0) sheet.wait -= dt;
+          else if ((sheet.hide = Math.min(1, sheet.hide + dt / .35)) >= 1) {
+            sheet.src = sheet.want; sheet.href = sheet.wantHref; uniforms.uMap.value = textureOf(sheet.src);
+            const src = sheet.src; getImageRatio(src).then(r => { if (r && sheet.src === src) sheet.ratio = r; });
+          }
+        } else if (sheet.src) sheet.hide = Math.max(0, sheet.hide - dt / (still ? .01 : .7));
+        const e = sheet.hide * sheet.hide * (3 - 2 * sheet.hide), halfH = tanHalf * (9 - spot.z), halfW = halfH * camera.aspect;
+        const w = spot.w * 2 * halfW * fitWidth(1, sheet.ratio, { min: .65, max: 1.3 }), h = w / sheet.ratio;
+        sheet.mesh.scale.set(w, h, 1); sheet.shadow.scale.set(w * 1.3, h * 1.4, 1); sheet.shadow.position.set(w * .07, -h * .1, -.2);
+        sheet.group.position.set((spot.fx * 2 - 1) * halfW - smoothMouse.x * .2, (1 - 2 * spot.fy) * halfH + .2 - e * .9 + (still ? 0 : Math.sin(time * .6 + sheet.k * 2) * .05) - smoothMouse.y * .12, spot.z);
+        sheet.group.rotation.set(e * 1.1 + smoothMouse.y * .08, spot.ry + smoothMouse.x * .14, spot.rz + e * .35);
+        sheet.group.scale.setScalar(1 - e * .2);
+        uniforms.uAlpha.value = 1 - e; sheet.shadow.material.opacity = .4 * (1 - e);
+        uniforms.uBend.value = .14 + e * .9 + Math.min(.45, Math.abs(vel) * .14); uniforms.uWave.value = still ? 0 : .012 + Math.min(.1, Math.abs(vel) * .04);
+        uniforms.uTime.value = time; uniforms.uSunSide.value = Math.max(-1, Math.min(1, (sunSprite.position.x * (9 - spot.z) / (9 - sunDepth) - sheet.group.position.x) / 3));
+        uniforms.uSun.value = .5 + .5 * sunAt;
+      }
       const span = Math.tan(THREE.MathUtils.degToRad(15)) * camera.aspect;
       for (const cloud of clouds) {
         const u = cloud.userData, w = span * (9 - u.z) + 3, x = u.x + drift * .35 * u.depth;
@@ -154,21 +228,30 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
     return () => {
       disposed = true; cancelAnimationFrame(frame); observer.disconnect(); seen.disconnect();
       clouds.forEach(c => { c.geometry.dispose(); c.material.dispose(); }); starGeometry.dispose(); stars.material.dispose();
+      picker.current = null; sunTexture.dispose(); sunSprite.material.dispose(); shadowTexture.dispose(); sheetGeometry.dispose(); shadowGeometry.dispose();
+      sheets.forEach(s => { s.mesh.material.dispose(); s.shadow.material.dispose(); }); textures.forEach(t => t.dispose());
       rig.traverse(o => o.geometry?.dispose()); eagleMaterials.forEach(m => m.dispose());
       skyRenderer.dispose(); eagleRenderer.dispose();
     };
-  }, [scene, slot, n]);
+  }, [scene, slot, n, work]);
 
   // Pointer, relative to the pinned screen (-1..1, y up).
   const onMove = e => {
     const r = e.currentTarget.getBoundingClientRect();
     mouse.current = { x: ((e.clientX - r.left) / r.width) * 2 - 1, y: -(((e.clientY - r.top) / r.height) * 2 - 1) };
+    e.currentTarget.style.cursor = !e.target.closest("a") && picker.current?.(mouse.current.x, mouse.current.y) ? "pointer" : "";
+  };
+  // A click on a sheet (not on a link or button over it) opens its project.
+  const onClick = e => {
+    if (e.target.closest("a, button")) return;
+    const r = e.currentTarget.getBoundingClientRect(), href = picker.current?.(((e.clientX - r.left) / r.width) * 2 - 1, -(((e.clientY - r.top) / r.height) * 2 - 1));
+    if (href) window.location.href = href;
   };
   const project = work[active] ?? work[0];
 
   return (
     <div className="wl" ref={root} style={{ "--n": n }}>
-      <div className="wl-pin" onPointerMove={onMove} onPointerLeave={() => { mouse.current = { x: 0, y: 0 }; }}>
+      <div className="wl-pin" onPointerMove={onMove} onClick={onClick} onPointerLeave={() => { mouse.current = { x: 0, y: 0 }; }}>
         <canvas className="wl-canvas" ref={back} aria-hidden="true" />
         <canvas className="wl-canvas wl-front" ref={front} aria-hidden="true" />
         <div className="wl-head">
@@ -188,7 +271,7 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
                   initial={{ y: "110%", opacity: 0, filter: "blur(10px)" }}
                   animate={{ y: "0%", opacity: 1, filter: "blur(0px)", transition: { delay: i * .028, type: "spring", stiffness: 260, damping: 24 } }}
                   exit={{ y: "-110%", opacity: 0, filter: "blur(10px)", transition: { delay: i * .015, duration: .28, ease: [.6, 0, .9, .4] } }}>
-                  {ch === " " ? " " : ch}
+                  {ch === " " ? "\u00A0" : ch}
                 </motion.span>
               ))}
             </motion.span>
@@ -201,20 +284,6 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
             <span className="wl-tags">{project.tags?.slice(0, 3).map(t => <em key={t}>{t}</em>)}</span>
           </motion.div>
         </AnimatePresence>
-        {/* The project's pictures, scattered round its name at different depths, drifting with the pointer and the
-            scroll; each flies in after the last when the project changes. */}
-        <div className="wl-a-scatter">
-          {SCATTER.map((spot, k) => {
-            const pics = [project.previewImage, ...(project.fullImages ?? [])], src = pics[k % pics.length];
-            return (
-              <div key={k} className="wl-a-spot" style={{ left: `${spot.x}%`, top: `${spot.y}%`, "--d": spot.d, "--bob": `${5 + k * 1.3}s` }}>
-                <AnimatePresence mode="popLayout" initial={false}>
-                  <ScatterPicture key={`${project.slug}-${k}`} spot={spot} k={k} src={src} href={`/project/${project.slug}/`} />
-                </AnimatePresence>
-              </div>
-            );
-          })}
-        </div>
       </div>
 
       {/* Phones: the heading and the projects as a plain list, scrolling over the sky (the eagle behind them). */}
@@ -237,19 +306,6 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
         ))}
       </ul>
     </div>
-  );
-}
-
-// One scattered picture, at its own shape (measured first; see image-ratio.js), sized to sit with the rest, whole.
-function ScatterPicture({ spot, k, src, href }) {
-  const ratio = useImageRatio(src);
-  return (
-    <motion.a className="wl-a-pic" href={href} tabIndex={-1} aria-hidden="true" style={{ width: `${fitWidth(spot.w, ratio)}vw`, aspectRatio: ratio }}
-      initial={{ opacity: 0, scale: .55, rotate: spot.r - 14, y: 70, filter: "blur(14px)" }}
-      animate={{ opacity: 1, scale: 1, rotate: spot.r, y: 0, filter: "blur(0px)", transition: { delay: .08 + k * .07, type: "spring", stiffness: 140, damping: 18 } }}
-      exit={{ opacity: 0, scale: .8, rotate: spot.r + 8, y: -50, filter: "blur(10px)", transition: { delay: k * .03, duration: .35, ease: [.7, 0, .84, 0] } }}>
-      <img src={src} alt="" decoding="async" />
-    </motion.a>
   );
 }
 
