@@ -40,7 +40,7 @@ export function createMeadow({outline,foliage,loader,onLoad}){
     h+=.55*smooth(-2.2,-3.7,z);
     h-=.28*smooth(.8,1,edge);
     // The river's channel and the lake's basin: flat beds below the water, so it never runs underground.
-    const cut=Math.max(smooth(1.05,.42,riverAt(x,z).d),smooth(1.25,.92,lakeE(x,z)));
+    const cut=Math.max(smooth(1.2,.55,riverAt(x,z).d),smooth(1.25,.92,lakeE(x,z)));
     return h*(1-cut)-.36*cut;
   }
   const on=(x,z)=>new THREE.Vector3(x,height(x,z),z);
@@ -70,8 +70,9 @@ export function createMeadow({outline,foliage,loader,onLoad}){
   };
   const island=createIsland(13,{outline,heightAt:height,riverDistance:riverAt,depth:.85,sand:.75,hub:new THREE.Vector2(1.4,2),scatter:.8,grass:["#c4a84a"],edge:"#7f8a4c",paint});
   group.add(island.group);
-  // The river: narrowing as it nears the lake and fading out under its surface, so the two run together.
-  const water=createWater(PATH,outline,{width:.62,fade:.9,level:LEVEL,volume:.3,head:.04,pour:false,shape:k=>(.75+.1*Math.sin(k*18))*(1-.5*smooth(.7,1,k))});
+  // The river: full the whole way, opening out into a mouth where it meets the lake, and fading only in its last
+  // stretch, under the lake's surface, so the two run together.
+  const water=createWater(PATH,outline,{width:.82,fade:.3,level:LEVEL,volume:.3,head:.04,pour:false,shape:k=>(.92+.08*Math.sin(k*18))*(1+.55*smooth(.72,1,k))});
   water.uniforms.uShallow.value.set("#7ec8e3");water.uniforms.uDeep.value.set("#4d93b8");group.add(water.group);
   // The lake: a flat sheet at the river's level, its rim bumped, with a slow shimmer (a 3 s swell, ±0.02) and a soft
   // reflection of a golden sky.

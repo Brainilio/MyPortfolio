@@ -62,6 +62,11 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     const clouds=[[7.5,2.6,.8,0],[8.5,3.6,.65,1.7],[9,1.6,.7,3.4],[8,4.4,.55,4.8]].map(([r,y,k,a],i)=>{
       const cloud=createCloud(70+i);cloud.material.color.set("#fff1e6");cloud.material.emissive.set("#b4604a");cloud.material.emissiveIntensity=.22;
       cloud.scale.setScalar(k);cloud.userData={r,y,a,speed:.012+(i%2)*.006};scene.add(cloud);return cloud;});
+    // And a few more out on the right, behind the project cards (the island sits on the left): drifting slowly to and
+    // fro, further back and a little hazier.
+    const farClouds=[[15,6.5,-6,1.1,0],[22,3.2,-10,1.3,2.1],[18,9.5,-14,.9,4.2],[26,7.5,-4,.8,1.3]].map(([x,y,z,k,p],i)=>{
+      const cloud=createCloud(80+i);cloud.material.color.set("#fff1e6");cloud.material.emissive.set("#b4604a");cloud.material.emissiveIntensity=.22;
+      cloud.scale.setScalar(k);cloud.userData={x,y,z,p};cloud.position.set(x,y,z);cloud.visible=side==="left-island";scene.add(cloud);return cloud;});
 
     // The feed basket, its hay, and the pellets that pour into it.
     const basket=createBasket();basket.position.copy(on(BASKET.x,BASKET.z));basket.scale.setScalar(.34);basket.rotation.y=.4;land.add(basket);
@@ -235,13 +240,13 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
     // screen when it sits to the left of the projects (half when centred; 80% on a phone), whatever its proportions. (Measured: at 27 units back and 4:3, the unscaled island
     // spans 59% of the width, so its width on screen is ~21.2 / (distance × aspect).)
     let distance=27;
-    const fit=aspect=>THREE.MathUtils.clamp(21.2*GROW/((aspect<.85?.8:side==="left-island"?.34:.5)*aspect),24,110);
+    const fit=aspect=>THREE.MathUtils.clamp(21.2*GROW/((aspect<.85?.8:side==="left-island"?.3:.5)*aspect),24,110);
     function frame(){
       const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;tall=camera.aspect<.85;distance=fit(camera.aspect);scene.fog.near=distance+12;scene.fog.far=distance*2.4+20;
       // ("left-island": shifted to sit in the left third, a little below the middle, clear of the title.)
       // (On a phone, centred and lower, clear of the title and links.)
       if(tall)camera.setViewOffset(w,h,0,side==="left-island"?-h*.06:h*.2,w,h);
-      else if(side==="left-island")camera.setViewOffset(w,h,.22*w,-.06*h,w,h);
+      else if(side==="left-island")camera.setViewOffset(w,h,.22*w,-.15*h,w,h);
       else camera.setViewOffset(w,h,side==="center"?0:(side==="left"?.17:-.17)*w,side==="center"?-h*.01:h*.07,w,h);
       camera.updateProjectionMatrix();placeCamera();needsRender=true;
     }
@@ -264,6 +269,7 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
       const rise=reduced?1:smooth(state.current.progress[slot]/.75);
       if(Math.abs(rise-risen)>1e-3){risen=rise;sunDisc.position.set(-15+rise*2,-6+rise*9,-40);sunDisc.material.color.copy(LOW).lerp(HIGH,rise);}
       clouds.forEach(cloud=>{const u=cloud.userData;u.a+=step*u.speed;cloud.position.set(Math.cos(u.a)*u.r,u.y+Math.sin(time*.2+u.r)*.2,-Math.abs(Math.sin(u.a))*u.r-1.5);});
+      farClouds.forEach(cloud=>{const u=cloud.userData;cloud.position.set(u.x+Math.sin(time*.05+u.p)*2.2,u.y+Math.sin(time*.18+u.p)*.25,u.z);});
       shared.uTime.value=time;shared.uBreeze.value=reduced?0:.3;shared.uGust.value=reduced?0:.3;
       for(const set of bushes){for(let i=0;i<set.sway.length;i++)set.sway[i]*=Math.exp(-dt*2.2);set.update();}
       birds.forEach(bird=>{const u=bird.userData;u.a+=step*u.speed;const x=-.2+Math.cos(u.a)*u.r,z=-2+Math.sin(u.a)*u.r,y=u.h+Math.sin(time*.8+u.flap)*.25;

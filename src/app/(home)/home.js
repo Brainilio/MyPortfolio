@@ -266,6 +266,7 @@ export default function Home() {
         <div className="ht-stage">
           {built[WORK] && <WorkScene state={scene} slot={WORK} side="left-island" onReady={onReady(WORK)} />}
           <div className="ht-work-head">
+            <p className="ht-work-intro">A few things I’ve built, from Compassion International’s sponsor portal to an interactive map of NewCold’s facilities worldwide. Scroll through them, or open one to see how it came together.</p>
             <p className="ht-more is-shown">
               <a href="/projects/">All projects <span aria-hidden="true">→</span></a>
               <a href="/journey/">Lab experiments <span aria-hidden="true">→</span></a>
