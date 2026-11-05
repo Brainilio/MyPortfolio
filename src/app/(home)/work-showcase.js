@@ -5,6 +5,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { createCloud } from "./island-parts";
+import { useImageRatio, fitWidth } from "../../lib/image-ratio";
 
 // The Work section: one pinned screen, the scroll picking the project (in step with the section pill's counter). The
 // project's name runs huge across the middle, its pictures scattered round it; a bald eagle flies a slow circle in
@@ -69,11 +70,14 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
     // In front of the name: the bald eagle in flight (Robert Mirabelle, CC BY 3.0), lit warm from the upper left. Its
     // wings (along x, the beak toward -z) beat in the vertex shader, bending more toward the tips, the tips a little
     // behind.
-    const eagleScene = new THREE.Scene(), flight = new THREE.Group(), flap = { value: 0 }, eagleMaterials = [];
-    eagleScene.add(new THREE.HemisphereLight("#ffe2c4", "#3a2a4a", 1.4));
-    const sun = new THREE.DirectionalLight("#ffd2a0", 2.4); sun.position.set(-4, 6, 5); eagleScene.add(sun);
-    const rim = new THREE.DirectionalLight("#b48cff", 1.2); rim.position.set(4, 2, -4); eagleScene.add(rim);
-    eagleScene.add(flight);
+    // (It and its lights are one rig, moved into the clouds' scene for the far half of its circle, so it passes behind
+    // the name there and in front of it on the near half.)
+    const eagleScene = new THREE.Scene(), rig = new THREE.Group(), flight = new THREE.Group(), flap = { value: 0 }, eagleMaterials = [];
+    rig.add(new THREE.HemisphereLight("#ffe2c4", "#3a2a4a", 1.4));
+    const sun = new THREE.DirectionalLight("#ffd2a0", 2.4); sun.position.set(-4, 6, 5); rig.add(sun, sun.target);
+    const rim = new THREE.DirectionalLight("#b48cff", 1.2); rim.position.set(4, 2, -4); rig.add(rim, rim.target);
+    rig.add(flight); eagleScene.add(rig);
+    let behind = false;
     let disposed = false;
     new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).load("/models/island/eagle-flying.glb", gltf => {
       if (disposed) return;
@@ -123,8 +127,12 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       if (!still) { time += dt; circle += speed * dt; drift += dt * (.25 + Math.min(4, Math.abs(vel) * 2.5)); flap.value += dt * (5.5 + Math.min(10, Math.abs(vel) * 7)); }
       // The eagle: a slow circle round the middle (wider than deep), facing along it, banked into the turn.
       const a = circle * .55, bank = .32 + Math.min(.3, Math.abs(vel) * .1);
-      flight.position.set(Math.cos(a) * 1.1 * flight.scale.x, (still ? 0 : Math.sin(time * 1.3) * .12) + .3, Math.sin(a) * .6 - .3);
+      flight.position.set(Math.cos(a) * 1.25 * flight.scale.x, (still ? 0 : Math.sin(time * 1.3) * .12) + .3, Math.sin(a) * 1.1 - .1);
       flight.rotation.set(0, -a, bank, "YXZ");
+      // Behind the name on the far half of the circle, in front on the near half.
+      if ((Math.sin(a) < -.1) !== behind) { behind = !behind; (behind ? skyScene : eagleScene).add(rig); }
+      // The sunlight sweeping across the letters, slowly, shifted along by the scroll.
+      host.style.setProperty("--sun", `${(50 + 48 * Math.sin(time * .22 + progress * 4)).toFixed(1)}%`);
       smoothMouse.lerp(aim.set(mouse.current.x, mouse.current.y), Math.min(1, dt * 5));
       // The pictures' parallax, from the pointer and the scroll (CSS variables, no React work per frame).
       host.style.setProperty("--mx", smoothMouse.x.toFixed(3)); host.style.setProperty("--my", smoothMouse.y.toFixed(3)); host.style.setProperty("--vel", Math.max(-3, Math.min(3, vel)).toFixed(3));
@@ -146,7 +154,7 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
     return () => {
       disposed = true; cancelAnimationFrame(frame); observer.disconnect(); seen.disconnect();
       clouds.forEach(c => { c.geometry.dispose(); c.material.dispose(); }); starGeometry.dispose(); stars.material.dispose();
-      flight.traverse(o => o.geometry?.dispose()); eagleMaterials.forEach(m => m.dispose());
+      rig.traverse(o => o.geometry?.dispose()); eagleMaterials.forEach(m => m.dispose());
       skyRenderer.dispose(); eagleRenderer.dispose();
     };
   }, [scene, slot, n]);
@@ -174,9 +182,9 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
         {/* The name, its letters rising in one after another (and lifting away for the next). */}
         <a className="wl-a-name" href={`/project/${project.slug}/`} aria-label={`${project.name}: view the project`}>
           <AnimatePresence mode="popLayout" initial={false}>
-            <motion.span key={project.slug} className="wl-a-word" aria-hidden="true">
+            <motion.span key={project.slug} className="wl-a-word" aria-hidden="true" style={{ "--n": [...project.name].length }}>
               {[...project.name].map((ch, i) => (
-                <motion.span key={i} className="wl-a-char"
+                <motion.span key={i} className="wl-a-char" style={{ "--i": i }}
                   initial={{ y: "110%", opacity: 0, filter: "blur(10px)" }}
                   animate={{ y: "0%", opacity: 1, filter: "blur(0px)", transition: { delay: i * .028, type: "spring", stiffness: 260, damping: 24 } }}
                   exit={{ y: "-110%", opacity: 0, filter: "blur(10px)", transition: { delay: i * .015, duration: .28, ease: [.6, 0, .9, .4] } }}>
@@ -199,14 +207,9 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
           {SCATTER.map((spot, k) => {
             const pics = [project.previewImage, ...(project.fullImages ?? [])], src = pics[k % pics.length];
             return (
-              <div key={k} className="wl-a-spot" style={{ left: `${spot.x}%`, top: `${spot.y}%`, width: `${spot.w}vw`, "--d": spot.d, "--bob": `${5 + k * 1.3}s` }}>
+              <div key={k} className="wl-a-spot" style={{ left: `${spot.x}%`, top: `${spot.y}%`, "--d": spot.d, "--bob": `${5 + k * 1.3}s` }}>
                 <AnimatePresence mode="popLayout" initial={false}>
-                  <motion.a key={`${project.slug}-${k}`} className="wl-a-pic" href={`/project/${project.slug}/`} tabIndex={-1} aria-hidden="true"
-                    initial={{ opacity: 0, scale: .55, rotate: spot.r - 14, y: 70, filter: "blur(14px)" }}
-                    animate={{ opacity: 1, scale: 1, rotate: spot.r, y: 0, filter: "blur(0px)", transition: { delay: .08 + k * .07, type: "spring", stiffness: 140, damping: 18 } }}
-                    exit={{ opacity: 0, scale: .8, rotate: spot.r + 8, y: -50, filter: "blur(10px)", transition: { delay: k * .03, duration: .35, ease: [.7, 0, .84, 0] } }}>
-                    <img src={src} alt="" decoding="async" />
-                  </motion.a>
+                  <ScatterPicture key={`${project.slug}-${k}`} spot={spot} k={k} src={src} href={`/project/${project.slug}/`} />
                 </AnimatePresence>
               </div>
             );
@@ -226,7 +229,7 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
         {work.map(p => (
           <li key={p.slug}>
             <a href={`/project/${p.slug}/`}>
-              <img src={p.previewImage} alt="" decoding="async" />
+              <WholePicture src={p.previewImage} />
               <strong>{p.name}</strong>
               <span>{metaOf(p)}</span>
             </a>
@@ -235,4 +238,23 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       </ul>
     </div>
   );
+}
+
+// One scattered picture, at its own shape (measured first; see image-ratio.js), sized to sit with the rest, whole.
+function ScatterPicture({ spot, k, src, href }) {
+  const ratio = useImageRatio(src);
+  return (
+    <motion.a className="wl-a-pic" href={href} tabIndex={-1} aria-hidden="true" style={{ width: `${fitWidth(spot.w, ratio)}vw`, aspectRatio: ratio }}
+      initial={{ opacity: 0, scale: .55, rotate: spot.r - 14, y: 70, filter: "blur(14px)" }}
+      animate={{ opacity: 1, scale: 1, rotate: spot.r, y: 0, filter: "blur(0px)", transition: { delay: .08 + k * .07, type: "spring", stiffness: 140, damping: 18 } }}
+      exit={{ opacity: 0, scale: .8, rotate: spot.r + 8, y: -50, filter: "blur(10px)", transition: { delay: k * .03, duration: .35, ease: [.7, 0, .84, 0] } }}>
+      <img src={src} alt="" decoding="async" />
+    </motion.a>
+  );
+}
+
+// A picture shown whole at its own shape.
+function WholePicture({ src }) {
+  const ratio = useImageRatio(src);
+  return <img src={src} alt="" decoding="async" style={{ aspectRatio: ratio }} />;
 }
