@@ -7,10 +7,10 @@ import { createEagle } from "./island-parts";
 //   to dabble (head under, tail up, back again over 1.5 s);
 // - two deer (the Home island's Quaternius deer) by the pines at the back, grazing, looking about, now and then
 //   taking a step or two;
-// - the bald eagle (the Home island's, Poly by Google) perched on the tallest peak, now and then opening its wings
+// - the bald eagle (the Home island's, Poly by Google) perched on the tallest peak or pine, now and then opening its wings
 //   in a stretch and folding them away again.
 const rand=Math.random;
-export function createWildlife({group,height,lake,level,loader,perch,deerSpots,dry}){
+export function createWildlife({group,height,lake,level,loader,perch,perchSize=.42,deerSpots,dry}){
   const ducks=[],deer=[],eagle={root:new THREE.Group(),wings:[],next:6+rand()*6,t:-1};
   let swim=0;
   loader.load("/models/island/duck.glb",gltf=>{
@@ -38,12 +38,12 @@ export function createWildlife({group,height,lake,level,loader,perch,deerSpots,d
   function play(d,name,fade=.4){if(d.current===name||!d.actions[name])return;d.actions[name].reset().fadeIn(fade).play();d.actions[d.current]?.fadeOut(fade);d.current=name;}
   // The eagle, with a pair of the soaring eagle's wings folded away at its shoulders for the stretch.
   loader.load("/models/island/eagle.glb",gltf=>{
-    const model=gltf.scene,box=new THREE.Box3().setFromObject(model),size=box.getSize(new THREE.Vector3()),k=.42/size.y;
+    const model=gltf.scene,box=new THREE.Box3().setFromObject(model),size=box.getSize(new THREE.Vector3()),k=perchSize/size.y;
     model.traverse(o=>{if(o.isMesh)o.material=new THREE.MeshStandardMaterial({vertexColors:true,flatShading:true,roughness:.95});});
     model.scale.setScalar(k);model.position.y=-box.min.y*k;eagle.root.add(model);
     const spare=createEagle();eagle.wings=spare.userData.wings;
     // (Stood upright, so they open broad side on, just behind the body.)
-    eagle.wings.forEach(w=>{w.position.set(0,.27,-.03);w.children[0].rotation.x=-Math.PI/2;w.scale.setScalar(.001);eagle.root.add(w);});
+    eagle.wings.forEach(w=>{w.position.set(0,.27*perchSize/.42,-.03*perchSize/.42);w.children[0].rotation.x=-Math.PI/2;w.scale.setScalar(.001);eagle.root.add(w);});
     eagle.root.visible=false;group.add(eagle.root);
   },undefined,()=>{});
   const ahead=new THREE.Vector2();
@@ -77,7 +77,7 @@ export function createWildlife({group,height,lake,level,loader,perch,deerSpots,d
     if(eagle.t<0){eagle.next-=dt;if(eagle.next<=0)eagle.t=0;}
     else{eagle.t+=dt;if(eagle.t>2.2){eagle.t=-1;eagle.next=8+rand()*6;}}
     const s=eagle.t<0?0:Math.sin(Math.PI*Math.min(1,eagle.t/2.2)),beat=eagle.t<0?0:.35*Math.sin(eagle.t*5);
-    eagle.wings.forEach((w,i)=>{w.scale.setScalar(Math.max(.001,.4*s));w.rotation.z=(i?-1:1)*(.55+beat);});
+    eagle.wings.forEach((w,i)=>{w.scale.setScalar(Math.max(.001,.4*s*perchSize/.42));w.rotation.z=(i?-1:1)*(.55+beat);});
   }
   return {update,eagle};
 }
