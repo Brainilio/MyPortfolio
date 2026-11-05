@@ -110,17 +110,19 @@ body:has(.ht){background:#1b1335}
 /* Work: the island held in the middle (sticky stage) with its heading above, and the projects in normal flow as a
    column of cards scrolling past over it, alternating left and right with the island showing through the gaps. Each
    card slides in from its own side the first time a fifth of it is on screen. */
-.ht-zone.ht-work[data-side] .ht-copy{width:auto;margin:-100svh 0 0;padding:clamp(92px,12svh,128px) 0 24svh;display:block;pointer-events:none}
+.ht-zone.ht-work[data-side] .ht-copy{width:auto;margin:-100svh 0 0;padding:0 0 24svh;display:block;pointer-events:none}
 /* The heading stays put above the island while the cards scroll past (over it). */
-.ht-work-head{position:sticky;top:calc(clamp(92px,12svh,128px) + clamp(34px,4.2vw,68px) * .95);z-index:0;width:min(480px,90vw);margin:0 auto;text-align:center}
-/* The title sits behind the island's canvas (like the hero's name), so the peaks rise in front of it; it holds above
-   the island for the whole section. */
-.ht-work-title{position:sticky;top:clamp(92px,12svh,128px);z-index:1;height:0;text-align:center;pointer-events:none;color:var(--ink)}
+.ht-work .ht-stage{z-index:auto}
+.ht-work-head{position:absolute;z-index:4;left:50%;top:calc(clamp(92px,12svh,128px) + clamp(34px,4.2vw,68px) * .95);width:min(480px,90vw);transform:translateX(-50%);text-align:center;pointer-events:none}
+/* The title sits behind the island's canvas (like the hero's name), so the peaks rise in front of it. It and the links under it live in
+   the island's pinned stage (which makes no stacking layer of its own, so the title can sit under the canvas and the
+   links over it): all three hold together and leave together as the next section arrives. */
+.ht-work-title{position:absolute;z-index:1;left:0;right:0;top:clamp(92px,12svh,128px);text-align:center;pointer-events:none;color:var(--ink)}
 .ht-work-title h2{margin:0;font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:clamp(34px,4.2vw,68px);line-height:.95;letter-spacing:-.05em}
 .ht-work-title h2 .ht-dot{color:#7c5cdb}
 .ht-cards{position:relative;z-index:1}
-.ht-work-head p.ht-drive{margin-top:10px}
-.ht-cards{margin:62svh 0 0;padding:0 5vw;list-style:none;display:flex;flex-direction:column;gap:12vh}
+.ht-work-head p.ht-drive{margin:10px 0 0;font-size:14px;color:rgba(42,22,54,.6)}
+.ht-cards{margin:calc(62svh + 320px) 0 0;padding:0 5vw;list-style:none;display:flex;flex-direction:column;gap:12vh}
 .ht-cards li{display:flex}
 .ht-shine{position:relative;display:block;width:min(32vw,520px);aspect-ratio:16/10;overflow:hidden;border-radius:6px;pointer-events:auto;
   background:linear-gradient(135deg,var(--violet),#f4a089);box-shadow:0 16px 48px rgba(0,0,0,.18);
@@ -323,7 +325,7 @@ html.ht-locked{overflow:hidden}
 .ht.is-entered .ht-intro>:nth-child(4){animation-delay:1.85s}
 @media(prefers-reduced-motion:reduce){.ht-finish:after{animation:none}
   .ht-reveal .ht-word,.ht-reveal .ht-dot{clip-path:none;transform:none;transition:none}
-  .ht-work-head h2.ht-reveal~p.ht-drive,.ht-work-head h2.ht-reveal~p.ht-more a{opacity:1;animation:none!important}
+  .ht-work-head p.ht-drive,.ht-work-head p.ht-more a{opacity:1!important;animation:none!important}
   .ht-shine,.ht-copy>p.ht-more{transition:none}.ht-shine,.ht-shine.is-right{transform:none}
   .ht.is-entered .ht-home .ht-canvas,.ht.is-entered .ht-intro>*{animation:ht-show .4s ease both;animation-delay:0s!important}
   .ht.is-entered .ht-name-window,.ht.is-entered .ht-name{animation:none}
@@ -345,17 +347,17 @@ html.ht-locked{overflow:hidden}
 .ht-wc-card:focus-visible{outline:2px solid var(--violet);outline-offset:6px}
 .ht-wc .ht-shine,.ht-wc .ht-shine.is-right{width:100%;margin:0}
 /* A: the ring is in the 3D scene; this is just the scroll it turns over. */
-.ht-wc-a{height:300svh;margin-top:-300px}
+.ht-wc-a{height:300svh}
 /* C: the stacked deck. Each card pins a little lower than the one before; the ones underneath shrink back and dim
    as more slide over them (--depth, from the script). */
-.ht-wc-c{margin-top:30svh;padding-bottom:40svh}
+.ht-wc-c{margin-top:calc(30svh + 300px);padding-bottom:40svh}
 .ht-wc-c-card{position:sticky;top:calc(34svh + var(--i) * 22px);width:min(34vw,540px);margin:0 6vw 50svh auto;--depth:0;
   transform:scale(calc(1 - var(--depth) * .05));transform-origin:50% 0;filter:brightness(calc(1 - var(--depth) * .14));transition:filter .2s linear}
 .ht-wc-c-card:last-child{margin-bottom:0}
 .ht-wc-c-card .ht-shine{opacity:1;transform:none}
 .ht-wc-c-card:hover .ht-shine.is-in{transform:translateY(-6px) scale(1.015)}
 /* D: one large card at a time, breathing gently; the outgoing card slides off right, the next comes in from the left. */
-.ht-wc-d{height:300svh;margin-top:-300px}
+.ht-wc-d{height:300svh}
 .ht-wc-pin{position:sticky;top:0;height:100svh;overflow:hidden;pointer-events:none}
 .ht-wc-d-card{position:absolute;left:75%;top:62%;width:34vw;opacity:0;pointer-events:none;transform:translate(-50%,-50%) translateX(-60px) rotate(-3deg)}
 .ht-wc-d-card.is-current{opacity:1;pointer-events:auto;transform:translate(-50%,-50%);transition:opacity .6s ease-out .6s,transform .6s ease-out .6s}

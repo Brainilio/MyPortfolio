@@ -260,12 +260,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Work: Monument Valley held in the middle (its stage is sticky), its heading above it, and the projects as a plain
-          column of cards scrolling past over it, alternating left and right, each sliding in from its side. */}
+      {/* Work: the Yellowstone meadow held in the middle (its stage is sticky), its title behind the peaks and its links
+          under the title, all three in the one pinned stage so they hold and leave together; the project cards over it. */}
       <section className="ht-zone ht-work" id="work" data-side="left" ref={el => (zones.current[WORK] = el)} aria-labelledby="ht-work-title">
-        <div className="ht-work-title"><RevealHeading id="ht-work-title" text="Things I’ve built" arrive={50} /></div>
-        <div className="ht-stage">{built[WORK] && <WorkScene state={scene} slot={WORK} side="center" projects={work} onReady={onReady(WORK)} />}</div>
-        <div className="ht-copy">
+        <div className="ht-stage">
+          <div className="ht-work-title"><RevealHeading id="ht-work-title" text="Things I’ve built" arrive={50} /></div>
+          {built[WORK] && <WorkScene state={scene} slot={WORK} side="center" projects={work} onReady={onReady(WORK)} />}
           <div className="ht-work-head">
             <p className="ht-drive">Click the basket to feed the herd</p>
             <p className="ht-more is-shown">
@@ -273,6 +273,8 @@ export default function Home() {
               <a href="/journey/">Lab experiments <span aria-hidden="true">→</span></a>
             </p>
           </div>
+        </div>
+        <div className="ht-copy">
           <WorkCards variant={cardLayout} work={work} scene={scene} slot={WORK} playing={section === WORK && !still} />
         </div>
       </section>
