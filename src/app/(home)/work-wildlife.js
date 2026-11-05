@@ -25,7 +25,7 @@ export function createWildlife({group,height,lake,level,loader,perch,deerSpots,d
       ducks.push({root,tilt,ox,oz,phase:rand()*6,dip:-1,next:3+rand()*6});
     });
   },undefined,()=>{});
-  loader.load("/models/island/deer.glb",gltf=>{
+  if(deerSpots.length)loader.load("/models/island/deer.glb",gltf=>{
     const box=new THREE.Box3().setFromObject(gltf.scene),size=box.getSize(new THREE.Vector3()),k=.82/size.y;
     deerSpots.forEach(([x,z],i)=>{
       const model=i?cloneSkinned(gltf.scene):gltf.scene,root=new THREE.Group();

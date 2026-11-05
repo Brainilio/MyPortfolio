@@ -25,7 +25,8 @@ const FALL=[[-2.6,-.5],[-3.05,.45],[-1.75,-.15],[3.0,2.35],[2.25,3.15],[3.65,1.4
 const FALL_COLORS=["#e8742a","#d4a020","#c45820","#8b2020","#e8a030"];
 export const GEYSERS=[[2.65,-1.55],[3.45,.55]];
 // The deer, by the pines at the back; and the feed basket, out front where the herd can gather round it.
-const DEER=[[-1.15,-2.2],[-2.35,-1.55]];
+// (None for now: the island is kept to its strongest few elements.)
+const DEER=[];
 export const BASKET_SPOT=[.3,2.75];
 // The range: (x, z, height, turn). The tallest is ~45% of the island's diameter.
 const PEAKS=[[-1.2,-2.75,4.9,.35],[1.7,-2.9,3.6,2.2],[3.05,-2.0,2.5,1.1]];
@@ -108,19 +109,6 @@ export function createMeadow({outline,foliage,loader,onLoad}){
       leaf.position.copy(l.pos);leaf.rotation.set(l.spin+l.age*3,l.age*2,Math.sin(l.age*6)*.8);leaf.scale.setScalar(s);leaf.updateMatrix();leafMesh.setMatrixAt(i,leaf.matrix);});
     leafMesh.instanceMatrix.needsUpdate=true;
   }
-  // Reeds and cattails in clumps of two or three on the lake's rim, swaying ±3° over 2.5 s, each a beat apart.
-  const reeds=[];
-  [[.5,3],[2.3,2],[3.6,3],[5.3,2]].forEach(([a,n])=>{for(let k=0;k<n;k++){const b=a+(k-(n-1)/2)*.09,r=1.02+rng()*.05,k2=bump(b),x=LAKE.x+Math.cos(b)*LAKE.rx*k2*r,z=LAKE.z+Math.sin(b)*LAKE.rz*k2*r;
-    reeds.push({x,z,y:Math.max(LEVEL,height(x,z)),tall:.32+rng()*.14,lean:rng()*6,phase:reeds.length*.7});}});
-  const reedColor=new THREE.Color("#8b7340"),stalks=new THREE.InstancedMesh(new THREE.CylinderGeometry(.008,.012,1,4).translate(0,.5,0),new THREE.MeshLambertMaterial({color:reedColor,flatShading:true}),reeds.length);
-  const heads=new THREE.InstancedMesh(new THREE.SphereGeometry(1,6,4).scale(.022,.065,.022),new THREE.MeshLambertMaterial({color:reedColor.clone().multiplyScalar(.7),flatShading:true}),reeds.length);
-  group.add(stalks,heads);const reedAt=new THREE.Object3D(),tip=new THREE.Vector3();
-  function updateReeds(time){
-    reeds.forEach((r,i)=>{const sway=3*Math.PI/180*Math.sin(time*Math.PI*2/2.5+r.phase);
-      reedAt.position.set(r.x,r.y,r.z);reedAt.rotation.set(sway*Math.cos(r.lean),0,sway*Math.sin(r.lean));reedAt.scale.set(1,r.tall,1);reedAt.updateMatrix();stalks.setMatrixAt(i,reedAt.matrix);
-      tip.set(0,r.tall,0).applyEuler(reedAt.rotation);reedAt.position.add(tip);reedAt.scale.setScalar(1);reedAt.updateMatrix();heads.setMatrixAt(i,reedAt.matrix);});
-    stalks.instanceMatrix.needsUpdate=heads.instanceMatrix.needsUpdate=true;
-  }
   // The peaks, loaded from the hero's kit (already in the cache): faces recoloured grey-blue, the snow left white.
   loader.load("/models/island/kit.glb",gltf=>{
     let node=null;gltf.scene.traverse(o=>{if(!node&&o.name.startsWith("Mountain"))node=o;});if(!node)return;
@@ -149,7 +137,6 @@ export function createMeadow({outline,foliage,loader,onLoad}){
   },undefined,()=>{});
   const wildlife=createWildlife({group,height,lake:LAKE,level:LEVEL,loader,perch:()=>perch,deerSpots:DEER,dry:(x,z)=>riverAt(x,z).d>1.1&&lakeE(x,z)>1.25&&z>-2.6});
   const blocked=(x,z,pad)=>DEER.some(([dx,dz])=>Math.hypot(x-dx,z-dz)<.4+pad)||riverAt(x,z).d<.95+pad||lakeE(x,z)<1.15+pad/LAKE.rz||z<-2.2+pad*.5||trees.some(t=>Math.hypot(x-t.position.x,z-t.position.z)<.3+pad)||FALL.some(([fx,fz])=>Math.hypot(x-fx,z-fz)<.3+pad)||GEYSERS.some(([gx,gz])=>Math.hypot(x-gx,z-gz)<.5+pad);
-  updateReeds(0);
   // Two geysers (the Skills island's, at 60%): each goes off on its own every 12–20 s for 3–4 s, then steams harder
   // for 6–8 s. Their eruptions start at least 4 s apart, so they never blow together; a click sets one off at once
   // (or as soon as that allows).
@@ -174,7 +161,7 @@ export function createMeadow({outline,foliage,loader,onLoad}){
     erupt(cone){const g=geysers.find(x=>x.cone===cone);if(g){g.wait=0;goOff(g);}},
     erupting:()=>geysers.some(g=>g.t>=0),
     update(time,dt=0){
-      updateLeaves(dt);updateReeds(time);updateGeysers(time,dt);wildlife.update(dt,time);
+      updateLeaves(dt);updateGeysers(time,dt);wildlife.update(dt,time);
       water.uniforms.uTime.value=time;water.uniforms.uFlow.value=time*.7;
       const p=lakeShape.attributes.position;for(let i=0;i<p.count;i++)p.setY(i,rest[i*3+1]+.02*Math.sin(time*Math.PI*2/3+rest[i*3]*2.4+rest[i*3+2]*1.7));p.needsUpdate=true;
     },

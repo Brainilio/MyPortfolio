@@ -6,7 +6,7 @@ import "lenis/dist/lenis.css";
 import allProjects from "../../lib/projects";
 import "./home.css";
 import { getStage } from "./stage";
-import WorkCards, { OrbitCards } from "./work-cards";
+import WorkProjects from "./work-cards";
 const IslandScene = dynamic(() => import("./island-scene"), { ssr: false });
 const AboutScene = dynamic(() => import("./about-scene"), { ssr: false });
 const WorkScene = dynamic(() => import("./work-scene"), { ssr: false });
@@ -50,8 +50,6 @@ const ARRIVE = 14, DEPART = 10;
 // Which slot each scene reads in the shared scroll state.
 const ABOUT = 1, WORK = 2, SKILLS_AT = 3, CONTACT = 4;
 const clamp = v => Math.min(1, Math.max(0, v));
-// The Work section's card-layout tester (work-cards.js).
-const CARD_LAYOUTS = { A: "Orbit", B: "Original", C: "Stacked deck", D: "Focus" };
 
 // The contact form posts to Formspree with fetch, so the card stays put and thanks you in place.
 // Replace REPLACE_WITH_ID with your Formspree form ID from formspree.io; until then the form says to email instead.
@@ -109,8 +107,6 @@ export default function Home() {
   // Shared with the 3D scenes (read every frame): which sections are on screen and how far through each one we are.
   const scene = useRef({ section: 0, live: [0], progress: [0, 0, 0, 0, 0], tilt: [0, 0, 0, 0, 0] });
   const [spotted, setSpotted] = useState([]), [still, setStill] = useState(false);
-  const [cardLayout, setCardLayout] = useState("A");
-  useEffect(() => { scene.current.cardLayout = cardLayout; }, [cardLayout]);
   // Reduced motion, and phones: the Work postcard shows its still image instead of playing its preview.
   useEffect(() => {
     const queries = [matchMedia("(prefers-reduced-motion: reduce)"), matchMedia("(max-width: 760px)")], sync = () => setStill(queries.some(q => q.matches));
@@ -260,20 +256,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Work: the Yellowstone meadow held in the middle (its stage is sticky). Two pinned full-screen layers move as one:
-          the back one, under the island's canvas, holds the title and the orbit's far cards (so the peaks pass in front
-          of them); the stage, over the canvas, holds the island's hit area, the links and the orbit's near cards. The
-          other card layouts scroll past over it all. */}
+      {/* Work: the Yellowstone meadow, smaller, on the left, with the title and links above it; on the right one project
+          at a time, the next taking its place as the section scrolls. The title sits in a layer under the island's canvas
+          and the rest in the stage over it; both are pinned full screens, so everything holds and leaves together. */}
       <section className="ht-zone ht-work" id="work" data-side="left" ref={el => (zones.current[WORK] = el)} aria-labelledby="ht-work-title">
         <div className="ht-work-back">
           <div className="ht-work-title"><RevealHeading id="ht-work-title" text="Things I’ve built" arrive={50} /></div>
-          {cardLayout === "A" && <OrbitCards layer="back" work={work} scene={scene} />}
         </div>
         <div className="ht-stage">
-          {cardLayout === "A" && <OrbitCards layer="front" work={work} scene={scene} />}
-          {built[WORK] && <WorkScene state={scene} slot={WORK} side="center" projects={work} onReady={onReady(WORK)} />}
+          {built[WORK] && <WorkScene state={scene} slot={WORK} side="left-island" onReady={onReady(WORK)} />}
           <div className="ht-work-head">
-            <p className="ht-drive">Click the basket to feed the herd</p>
             <p className="ht-more is-shown">
               <a href="/projects/">All projects <span aria-hidden="true">→</span></a>
               <a href="/journey/">Lab experiments <span aria-hidden="true">→</span></a>
@@ -281,7 +273,7 @@ export default function Home() {
           </div>
         </div>
         <div className="ht-copy">
-          <WorkCards variant={cardLayout} work={work} scene={scene} slot={WORK} playing={section === WORK && !still} />
+          <WorkProjects work={work} scene={scene} slot={WORK} playing={section === WORK && !still} />
         </div>
       </section>
 
@@ -339,16 +331,6 @@ export default function Home() {
       </div>
 
       <div className="ht-progress" ref={bar} aria-hidden="true" />
-      {/* The Work card-layout tester, on the other side: shown only while Work is the section on screen. */}
-      {section === WORK && (
-        <div className="ht-tester ht-tester-cards">
-          <div className="ht-tester-pill" role="group" aria-label="Card layout">
-            <span className="ht-tester-name" aria-hidden="true">Cards:</span>
-            {Object.keys(CARD_LAYOUTS).map(key => <button key={key} type="button" aria-pressed={cardLayout === key} aria-label={`Cards ${key}: ${CARD_LAYOUTS[key]}`} title={CARD_LAYOUTS[key]} onClick={() => setCardLayout(key)}>{key}</button>)}
-          </div>
-          <span className="ht-tester-label">{CARD_LAYOUTS[cardLayout]}</span>
-        </div>
-      )}
       {/* Where you are, and a way to jump anywhere. */}
       <nav className="ht-pill" aria-label="Sections" ref={pill}>
         <button type="button" aria-expanded={menu} onClick={() => setMenu(open => !open)}>
