@@ -89,14 +89,36 @@ const nc = n => `/projects/newcold/${n}.jpg`
 const projects = [
 	{
 		name: "MyCompassion",
-		// PLACEHOLDER copy: replace with your role, the team and what you built.
+        highlight: "Connecting the supporter experience, from frontend components to GraphQL services and caching.",
+        company: "Compassion International",
+        role: "Full-stack development",
+        responsibilities: [
+            "Integrating GraphQL through AWS AppSync and connecting React Query to frontend components.",
+            "Building frontend features and backend Lambda functions.",
+            "Designing Redis caching and implementing caching behavior.",
+            "Connecting authentication to the portal and contributing to infrastructure work."
+        ],
+        media: [
+            { type: "image", src: mc(1), alt: "MyCompassion supporter portal overview", caption: "The supporter portal. Personal information in these screens has been replaced or obscured." },
+            { type: "video", src: "/projects/my-compassion/preview.mp4", poster: mc("poster"), alt: "MyCompassion interface preview", caption: "A short visual tour. Play to explore the interface." },
+            { type: "image", src: mc(2), alt: "MyCompassion interface, screen 2", layout: "half" },
+            { type: "image", src: mc(3), alt: "MyCompassion interface, screen 3", layout: "half" },
+            { type: "image", src: mc(4), alt: "MyCompassion interface in a stylized tablet frame", presentation: "tablet", tone: "#d1d7ce", caption: "An interface study, presented in a tablet frame." },
+            { type: "image", src: mc(5), alt: "MyCompassion interface, screen 5", layout: "half" },
+            { type: "image", src: mc(6), alt: "MyCompassion interface, screen 6", layout: "half" },
+            { type: "image", src: mc(7), alt: "MyCompassion interface, screen 7" },
+            { type: "image", src: mc(8), alt: "MyCompassion interface, screen 8", layout: "half" },
+            { type: "image", src: mc(9), alt: "MyCompassion interface, screen 9", layout: "half" }
+        ],
+		// Contribution details supplied by the portfolio owner.
 		shortDescription:
 			"MyCompassion is Compassion International's sponsor portal, where supporters keep up with the children they sponsor, give gifts, manage payments and update their account.",
-		previewImage: mc("poster"),
+		previewImage: "/projects/my-compassion/thumbnail.svg",
+        thumbnailVideo: "/projects/my-compassion/thumbnail-motion.mp4",
 		previewVideo: "/projects/my-compassion/preview.mp4",
 		livePreview: "https://my.compassion.com/",
 		gitHub: null,
-		tags: ["Next.js", "Storybook", "GraphQL", "Zustand", "AWS Cognito", "AWS DynamoDB", "AWS ElastiCache", "AWS Lambda", "Agentic AI workflows", "Architecture"],
+		tags: ["Next.js", "NX", "GraphQL / AppSync", "React Query", "AWS Lambda", "Redis", "SST", "Cognito"],
 		category: "Development",
 		description:
 			"MyCompassion is Compassion International's sponsor portal, where supporters keep up with the children they sponsor, give gifts, manage payments and update their account. Screens shown include the dashboard, sponsorships, giving, payments and billing (with its commitment and payment dialogs) and settings.",
@@ -111,10 +133,30 @@ const projects = [
 	},
 	{
 		name: "NewCold",
-		// PLACEHOLDER copy: replace with your role, the team and what you built.
+        highlight: "Building the interactive map at the heart of NewCold’s global locations experience.",
+        company: "DPDK",
+        role: "Frontend development",
+        responsibilities: ["Developing the interactive map feature on the homepage."],
+        media: [
+            { type: "image", src: "/projects/newcold/desktop-home.jpg", alt: "NewCold homepage", caption: "The NewCold website. My contribution focused on the interactive map." },
+            { type: "image", src: "/projects/newcold/map-burley.jpg", alt: "NewCold North America map with the Burley facility panel", caption: "The map and facility detail panel." },
+            { type: "image", src: "/projects/newcold/map-tacoma.jpg", alt: "NewCold North America map with the Tacoma facility panel", layout: "half" },
+            { type: "image", src: "/projects/newcold/mobile-home.jpg", alt: "NewCold homepage on a narrow screen", layout: "portrait", presentation: "phone", tone: "#d8e0e7" },
+            { type: "video", src: "/projects/newcold/preview.mp4", poster: nc("poster"), alt: "NewCold website and map preview", caption: "A closer look at the website and its locations experience." },
+            { type: "image", src: nc(2), alt: "NewCold website, screen 2", layout: "half" },
+            { type: "image", src: nc(3), alt: "NewCold website, screen 3", layout: "half" },
+            { type: "image", src: nc(4), alt: "NewCold website in a stylized tablet frame", presentation: "tablet", tone: "#c8d3dc", caption: "A screen study in a tablet frame." },
+            { type: "image", src: nc(5), alt: "NewCold website, screen 5", layout: "half" },
+            { type: "image", src: nc(6), alt: "NewCold website, screen 6", layout: "half" },
+            { type: "image", src: nc(7), alt: "NewCold mobile website, screen 7", layout: "portrait", presentation: "phone", tone: "#d8e0e7" },
+            { type: "image", src: nc(8), alt: "NewCold mobile website, screen 8", layout: "portrait", presentation: "phone", tone: "#d8e0e7" },
+            { type: "image", src: nc(9), alt: "NewCold mobile website, screen 9", layout: "portrait", presentation: "phone", tone: "#d8e0e7" }
+        ],
+		// Contribution details supplied by the portfolio owner.
 		shortDescription:
 			"NewCold's website, built as a front-end developer, with an interactive map of the company's facilities and offices worldwide.",
-		previewImage: nc("poster"),
+		previewImage: "/projects/newcold/thumbnail.svg",
+        thumbnailVideo: "/projects/newcold/thumbnail-header.mp4",
 		previewVideo: "/projects/newcold/preview.mp4",
 		livePreview: "https://newcold.com/",
 		gitHub: null,
@@ -162,6 +204,7 @@ const projects = [
 		additionalLinks: [],
 		dateCreated: "OCTOBER, 2020",
 		fullImages: [n1, n2, n3, n4, n5, n6, n7],
+		earlyWork: true,
 		slug: "natours",
 	},
 	{
@@ -186,6 +229,7 @@ const projects = [
 		additionalLinks: [],
 		dateCreated: "MARCH, 2021",
 		fullImages: [or, or1, or3, or5, or6],
+		earlyWork: true,
 		slug: "oracui",
 	},
 	{
@@ -217,6 +261,7 @@ const projects = [
 		additionalLinks: [],
 		dateCreated: "JANUARY, 2021",
 		fullImages: [bv1, bv2, bv3, bv4],
+		earlyWork: true,
 		slug: "bayvinemedia",
 	},
 	{
@@ -266,6 +311,7 @@ const projects = [
 		],
 		dateCreated: "JULY, 2020",
 		fullImages: [s1, s2, s3, s4, s5, s6, s7, s8],
+		earlyWork: true,
 		slug: "salvame",
 	},
 
@@ -286,6 +332,7 @@ const projects = [
 		additionalLinks: [],
 		dateCreated: "JULY, 2020",
 		fullImages: [],
+		earlyWork: true,
 		slug: "oldportfolio",
 	},
 
@@ -318,6 +365,7 @@ const projects = [
 		additionalLinks: [],
 		dateCreated: "AUGUST, 2020",
 		fullImages: [bb1, bb2, bb3],
+		earlyWork: true,
 		slug: "burger-builder",
 	},
 
@@ -348,6 +396,7 @@ const projects = [
 		],
 		dateCreated: "AUGUST, 2020",
 		fullImages: [lol1, lol2, lol3, lol4, lol5],
+		earlyWork: true,
 		slug: "lol-my-fav-champ",
 	},
 
@@ -378,6 +427,7 @@ const projects = [
 		],
 		dateCreated: "JULY, 2018",
 		fullImages: [t1, t2, t3, t4],
+		earlyWork: true,
 		slug: "thanos-runner",
 	},
 	{
@@ -402,6 +452,7 @@ const projects = [
 		additionalLinks: [],
 		dateCreated: "JULY, 2020",
 		fullImages: [p1, p2],
+		earlyWork: true,
 		slug: "paper-invaders",
 	},
 	{
@@ -426,6 +477,7 @@ const projects = [
 		additionalLinks: [],
 		dateCreated: "MAY 2020",
 		fullImages: [pd1, pd2, pd3],
+		earlyWork: true,
 		slug: "my-pokedex",
 	},
 	{
@@ -450,6 +502,7 @@ const projects = [
 		additionalLinks: [],
 		dateCreated: "OCTOBER 2018",
 		fullImages: [lm1, lm2, lm3, lm4, lm5, lm6],
+		earlyWork: true,
 		slug: "leidsman-begeleiding",
 	},
 	{
@@ -473,6 +526,7 @@ const projects = [
 		additionalLinks: [],
 		dateCreated: "DEC 2017",
 		fullImages: [mb1, mb2, mb3, mb4, mb5, mb6],
+		earlyWork: true,
 		slug: "maria-beauty-salon",
 	},
 	{
@@ -497,6 +551,7 @@ const projects = [
 		additionalLinks: [],
 		dateCreated: "MARCH 2020",
 		fullImages: [ml1, ml2, ml3, ml4],
+		earlyWork: true,
 		slug: "machine-learning-basics",
 	},
 ]

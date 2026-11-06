@@ -50,9 +50,11 @@ export default function AboutScene({ state, slot = 1, side = "right", onReady })
     const rng=random(11);
 
     // Blue hour: a dim violet sky light, a cool moon from behind, and the fire doing most of the work up close.
-    scene.add(new THREE.HemisphereLight("#8f86d6","#2a1d3c",1.1));
-    const moon=new THREE.DirectionalLight("#b9c4ff",1.1);moon.position.set(-6,9,-10);scene.add(moon);
-    const rim=new THREE.DirectionalLight("#ff9fb8",.45);rim.position.set(10,4,-4);scene.add(rim);
+    scene.add(new THREE.HemisphereLight("#a8b8e8","#362434",.65));
+    const moon=new THREE.DirectionalLight("#c3d5ff",1.5);moon.position.set(-6,9,-10);scene.add(moon);
+    const rim=new THREE.DirectionalLight("#e2b5d1",.35);rim.position.set(10,4,-4);scene.add(rim);
+    // Soft sky bounce keeps the bear readable opposite the local firelight.
+    const skyFill=new THREE.DirectionalLight("#a5b9ed",.3);skyFill.position.set(2,5,10);scene.add(skyFill);
 
     const world=new THREE.Group();scene.add(world);
     const island=createIsland(5,{outline,heightAt,riverDistance,depth:.62,sand:.7});world.add(island.group);

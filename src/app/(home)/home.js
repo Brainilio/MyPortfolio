@@ -14,7 +14,7 @@ const SkillsScene = dynamic(() => import("./skills-scene"), { ssr: false });
 const CoastScene = dynamic(() => import("./coast-scene"), { ssr: false });
 import { MODEL_CREDITS } from "./model-credits";
 import { SKILLS, TOOL_ICONS } from "./content";
-const work = allProjects.filter(project => project.slug && project.previewImage).slice(0, 4);
+const work = allProjects.filter(project => project.slug && project.previewImage && !project.earlyWork).slice(0, 4);
 
 // Every model the homepage loads (fetched up front by the loading screen).
 const MODELS = ["kit", "stag", "deer", "fox", "bear", "eagle", "prairiedog", "wagon", "moose", "orca", "shark", "sealion", "kayak", "eagle-flying", "bison"].map(name => `/models/island/${name}.glb`);
@@ -286,9 +286,8 @@ export default function Home() {
             <MotionConfig reducedMotion="user">
               <AnimatePresence mode="wait">
                 {section === SKILLS_AT && SKILLS[stop] && (
-                  <motion.div key={stop} initial="hidden" animate="shown" exit="gone"
+                  <motion.div className="ht-skill-panel" key={stop} initial="hidden" animate="shown" exit="gone"
                     variants={{ shown: { transition: { delayChildren: .2, staggerChildren: .09 } }, gone: { transition: { staggerChildren: .04 } } }}>
-                    <motion.span className="ht-skill-kicker" variants={STORY_LINE}>Stop {stop + 1} of {SKILLS.length} · {SKILLS[stop].title}</motion.span>
                     <motion.p className="ht-skill-lead" variants={STORY_LINE}>{SKILLS[stop].lead}</motion.p>
                     <motion.p className="ht-skill-blurb" variants={STORY_LINE}>{SKILLS[stop].blurb}</motion.p>
                     <motion.ul className="ht-skill-tools" variants={{ shown: { transition: { staggerChildren: .05 } } }}>

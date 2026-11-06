@@ -205,3 +205,13 @@ body:has(.space-story){background:#080b18;color:#f0eff8}
 
 /* Opening beat: approach the mountains before rising into the atmosphere. */
 .launch-runway .hero .landscape{transform-origin:50% 72%}
+
+/* Give early work its own context while preserving every existing project route. */
+.archive-group + .archive-group{margin-top:96px;padding-top:48px;border-top:1px solid rgba(251,247,255,.2)}
+.archive-group h2{font-size:clamp(26px,3vw,40px);line-height:1.2;margin:0 0 24px}
+.archive-context{max-width:64ch;font-size:16px;line-height:1.6;margin:0 0 36px;color:#c9c3d2}
+.project-era{display:inline-block;max-width:100%;padding:10px 16px;border:1px solid #a78bfa66;border-radius:16px;background:#a78bfa1a;color:#e2d6ff;font-size:14px;line-height:1.5}
+@media(max-width:760px){.archive-group + .archive-group{margin-top:64px;padding-top:32px}}
+
+.archive-card-context{display:block;color:#d4c5e8;font-size:12px;line-height:1.6;margin:0 0 14px}
+.archive-tech{display:flex;flex-wrap:wrap;gap:6px;padding:0;margin:0;list-style:none}.archive-tech li{border:1px solid #b89ae845;border-radius:100px;padding:5px 9px;color:#dcd4e6;font-size:11px;line-height:1.4}

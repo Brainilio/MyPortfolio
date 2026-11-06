@@ -45,10 +45,11 @@ export default function RoadTripScene({ state, skills, onCar, onReady, slot = 2 
     // Golden hour: a low warm sun from the side of the valley, so the pines lay long soft shadows across the road
     // with sunlit gaps between them. The shadow map only covers the stretch around the car and moves with it (smaller on phones).
     const lite=matchMedia("(pointer: coarse)").matches;
-    scene.add(new THREE.HemisphereLight("#ffe6cf","#6b5d4c",1.6));
-    const SUN=new THREE.Vector3(-1,.85,-.45).normalize(),sun=new THREE.DirectionalLight("#ffc890",3.2);
+    scene.add(new THREE.HemisphereLight("#dce8ff","#70604d",.95));
+    const SUN=new THREE.Vector3(-1,.85,-.45).normalize(),sun=new THREE.DirectionalLight("#ffdab0",2.8);
     sun.castShadow=true;sun.shadow.mapSize.setScalar(lite?1024:2048);sun.shadow.bias=-.0006;sun.shadow.normalBias=.04;sun.shadow.radius=4;
     Object.assign(sun.shadow.camera,{left:-38,right:38,top:38,bottom:-38,near:1,far:180});sun.shadow.camera.updateProjectionMatrix();scene.add(sun,sun.target);
+    const valleyFill=new THREE.DirectionalLight("#bdd4f2",.4);valleyFill.position.set(35,18,25);scene.add(valleyFill);
 
     // The valley: one smooth landscape. Flat along the road, rising into rounded granite mountains on both sides and at
     // the far end, with the Merced-style river carved into the floor beside the road.

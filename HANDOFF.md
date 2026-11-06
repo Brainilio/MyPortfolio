@@ -221,3 +221,10 @@ foreground), heading and stop text across the top with tool logos, eagle hands o
 - Rotation conventions: the eagle model faces +z; with rotation order "YXZ", positive x-rotation pitches it nose-down.
 - Gradient headings: the Work title and project names need generous padding (`.12em .12em .26em` and similar) so g/y
   descenders aren't cut.
+
+
+## Project content update — 2026-11-05
+
+See [docs/PROJECT-CONTENT-BRIEF.md](docs/PROJECT-CONTENT-BRIEF.md) for the owner-supplied current project inventory, contribution boundaries, image/motion direction, Compassion app stack context, and missing assets. Early projects belong in “Early projects & learning” and should not lead the homepage. The owner will provide newer images later; Crapp reference is getcrapp.app.
+
+The reusable project showcase pattern is now implemented: contribution highlights on cards, pinned facts/responsibilities beside mixed-ratio media, optional tablet/atmosphere framing, controlled video playback, and a lazy procedural woodland contact footer. See the implementation section in the content brief for fields and source paths. MyCompassion and NewCold are the populated examples.

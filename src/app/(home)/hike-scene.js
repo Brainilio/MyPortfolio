@@ -47,9 +47,9 @@ export default function HikeScene({ state, altitude, onReady, slot = 3 }) {
     const rng=random(31),swayTime={value:0};
 
     // Morning light: a warm sun low over the shoulder of the mountain, a soft green-blue fill.
-    scene.add(new THREE.HemisphereLight("#f1f3ff","#5d6a44",1.35));
-    const fill=new THREE.DirectionalLight("#b3c0ff",.75);fill.position.set(40,25,-30);scene.add(fill);
-    const SUN=new THREE.Vector3(-.7,.75,.35).normalize(),sun=new THREE.DirectionalLight("#ffd9a0",3.6);
+    scene.add(new THREE.HemisphereLight("#d9e7ff","#687354",.85));
+    const fill=new THREE.DirectionalLight("#c2d9ff",.45);fill.position.set(40,25,-30);scene.add(fill);
+    const SUN=new THREE.Vector3(-.7,.75,.35).normalize(),sun=new THREE.DirectionalLight("#ffe0b6",2.9);
     sun.castShadow=true;sun.shadow.mapSize.setScalar(lite?1024:2048);sun.shadow.bias=-.0006;sun.shadow.normalBias=.04;sun.shadow.radius=4;
     Object.assign(sun.shadow.camera,{left:-30,right:30,top:30,bottom:-30,near:1,far:160});sun.shadow.camera.updateProjectionMatrix();scene.add(sun,sun.target);
 

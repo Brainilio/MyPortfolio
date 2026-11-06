@@ -48,8 +48,10 @@ export default function CoastScene({ state, onSpot, onReady, slot = 4, lite: lig
     const rng=random(77),time={value:0};
 
     // Late afternoon sun over the sea (from the west and a little south), a clear blue sky.
-    scene.add(new THREE.HemisphereLight("#cfe6ff","#6a5a40",1.15));
-    const SUN=new THREE.Vector3(.75,.55,-.35).normalize(),sun=new THREE.DirectionalLight("#ffe3b8",2.7);sun.position.copy(SUN).multiplyScalar(100);scene.add(sun);
+    scene.add(new THREE.HemisphereLight("#c5e1ff","#726451",.85));
+    const SUN=new THREE.Vector3(.75,.55,-.35).normalize(),sun=new THREE.DirectionalLight("#ffe4c2",2.5);sun.position.copy(SUN).multiplyScalar(100);scene.add(sun);
+    // Ocean bounce opens the shaded cliff faces without flattening the sunlit ridges.
+    const seaFill=new THREE.DirectionalLight("#b8d9ef",.45);seaFill.position.set(-60,25,70);scene.add(seaFill);
 
     // The land: dark cliffs straight out of the sea, dry golden grass and chaparral on top, rising to the Santa Lucia
     // ridges; a canyon cuts down to a little cove with a beach.

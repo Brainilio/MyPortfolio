@@ -34,8 +34,9 @@ export default function WorkScene({ state, slot = 2, side = "left", onReady }) {
 
     // Golden hour: the sun low on the left (where it hangs in the sky) and little ambient, so the peaks' lit and
     // shadowed sides stand apart; a warm golden sky light with earth-coloured bounce from below.
-    scene.add(new THREE.AmbientLight("#ffe8c0",.35),new THREE.HemisphereLight("#ffd4a0","#8b7340",.4));
-    const sun=new THREE.DirectionalLight("#ffd580",2.2);sun.position.set(-8,12,6);scene.add(sun);
+    scene.add(new THREE.HemisphereLight("#dfe7ff","#8b734f",.8));
+    const skyFill=new THREE.DirectionalLight("#bed4f5",.35);skyFill.position.set(9,5,-8);scene.add(skyFill);
+    const sun=new THREE.DirectionalLight("#ffdbab",2.4);sun.position.set(-8,12,6);scene.add(sun);
 
     // The island, spun by dragging (world), scaled up as a whole (its root group); the camera's distance suits it.
     const world=new THREE.Group();scene.add(world);

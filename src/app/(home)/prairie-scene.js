@@ -91,9 +91,9 @@ export default function PrairieScene({ state, projects, onReady, slot = 1 }) {
     const camera=new THREE.PerspectiveCamera(35,1,.5,400);
     const rng=random(5);
 
-    scene.add(new THREE.HemisphereLight("#ffe6c4","#5b3048",1.3));
-    const sun=new THREE.DirectionalLight("#ffc27a",3);sun.position.set(-25,14,-30);scene.add(sun);
-    const fill=new THREE.DirectionalLight("#b8a2ff",.6);fill.position.set(10,8,20);scene.add(fill);
+    scene.add(new THREE.HemisphereLight("#dce1ff","#654451",.85));
+    const sun=new THREE.DirectionalLight("#ffd09b",2.7);sun.position.set(-25,14,-30);scene.add(sun);
+    const fill=new THREE.DirectionalLight("#bdcfff",.5);fill.position.set(10,8,20);scene.add(fill);
 
     // Rolling grassland: golds drifting into sage, smooth shaded.
     {

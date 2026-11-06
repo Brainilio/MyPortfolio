@@ -30,9 +30,9 @@ export default function IslandScene({ onEvent, active, onReady } = {}) {
     const camera=new THREE.PerspectiveCamera(32,1,.3,200);
 
     // Dusk light: a low warm sun behind and to the right (rim light), a cool violet fill from the front.
-    scene.add(new THREE.HemisphereLight("#e2d4ff","#4a2f5c",1.35));
-    const sun=new THREE.DirectionalLight("#ffb98a",3.2);sun.position.set(14,9,-8);scene.add(sun);
-    const fill=new THREE.DirectionalLight("#9d8cff",.7);fill.position.set(-9,6,12);scene.add(fill);
+    scene.add(new THREE.HemisphereLight("#d9ddff","#49324b",.9));
+    const sun=new THREE.DirectionalLight("#ffd0a5",2.8);sun.position.set(14,9,-8);scene.add(sun);
+    const fill=new THREE.DirectionalLight("#bdcaff",.65);fill.position.set(-9,6,12);scene.add(fill);
     // The glare: a soft sun just behind the island.
     const glareCanvas=document.createElement("canvas");glareCanvas.width=glareCanvas.height=128;
     const g2=glareCanvas.getContext("2d"),grad=g2.createRadialGradient(64,64,0,64,64,64);

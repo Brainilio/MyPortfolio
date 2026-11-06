@@ -56,10 +56,11 @@ export default function JourneyScene({ controls, flashRef, hudRef, scoreRef, onP
     const scene=new THREE.Scene();scene.background=new THREE.Color();scene.fog=new THREE.FogExp2(0x9cc4ea,.0045);
     const camera=new THREE.PerspectiveCamera(50,1,.1,7000);
     const sun=new THREE.DirectionalLight(0xfff1e0,2.6);sun.position.set(-70,80,50);scene.add(sun);
-    scene.add(new THREE.HemisphereLight(0xbcd3ff,0x2a2440,1.4));
+    // Atmospheric sky bounce falls away with altitude; the sun remains directional in space.
+    const skyAmbient=new THREE.HemisphereLight(0xc8ddff,0x393044,.95);scene.add(skyAmbient);
     const resources=[];
     const pmrem=new THREE.PMREMGenerator(renderer),room=new RoomEnvironment(),environment=pmrem.fromScene(room,.04);
-    scene.environment=environment.texture;scene.environmentIntensity=.6;room.dispose();pmrem.dispose();resources.push(environment);
+    scene.environment=environment.texture;scene.environmentIntensity=.35;room.dispose();pmrem.dispose();resources.push(environment);
     // Bloom on capable screens; the glitch pass only while a section cut plays (low tier renders directly otherwise).
     const composer=new EffectComposer(renderer);composer.addPass(new RenderPass(scene,camera));
     let bloom;if(!low){bloom=new UnrealBloomPass(new THREE.Vector2(256,256),.85,.55,1);composer.addPass(bloom);}
@@ -398,7 +399,10 @@ export default function JourneyScene({ controls, flashRef, hudRef, scoreRef, onP
       stars.update(time,galaxyMode?1:smooth((y-70)/90),camera);milkyWay.update(galaxyMode?.6:smooth((y-100)/90),camera);
       // Glow belongs to space: no bloom against the bright daytime sky and snow.
       // Softer key light once we're in space, so white suits and hulls don't clip into bloom.
-      sun.intensity=THREE.MathUtils.lerp(2.6,1.7,smooth((y-110)/70));
+      const spaceLight=smooth((y-110)/70);
+      sun.intensity=THREE.MathUtils.lerp(2.6,1.7,spaceLight);
+      skyAmbient.intensity=THREE.MathUtils.lerp(.95,.3,spaceLight);
+      scene.environmentIntensity=THREE.MathUtils.lerp(.35,.22,spaceLight);
       // The close-up fills the frame with white suit, so bloom is mostly off there.
       if(bloom)bloom.strength=galaxyMode?1.1:.85*smooth((y-110)/70)*(closeUp?.2:aliensStage?.55:1);
 

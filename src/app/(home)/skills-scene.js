@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { getStage } from "./stage";
+import { eagleHandoff } from "./eagle-handoff";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { random, createCloud } from "./island-parts";
@@ -48,8 +49,10 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, onReady })
     const material = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: .95, metalness: 0, side: THREE.DoubleSide });
 
     // Golden hour: the sun low on the right, warm sky light from above and a warm bounce off the red earth.
-    scene.add(new THREE.HemisphereLight("#ffe4b8", "#8B5A20", 1.15));
-    const sunLight = new THREE.DirectionalLight("#FFD080", 2.2); sunLight.position.set(8, 10, 5); scene.add(sunLight);
+    scene.add(new THREE.HemisphereLight("#d8e5ff", "#946246", .85));
+    const sunLight = new THREE.DirectionalLight("#ffdbab", 2.5); sunLight.position.set(8, 10, 5); scene.add(sunLight);
+    // Cool open-sky fill separates cactus and wagon facets from the warm earth.
+    const skyFill = new THREE.DirectionalLight("#bed8ff", .4); skyFill.position.set(-12, 6, -8); scene.add(skyFill);
 
     // The layers, each a group slid left as you drive.
     const layers = Object.fromEntries(Object.keys(SPEED).map(k => { const g = new THREE.Group(); scene.add(g); return [k, g]; }));
@@ -136,6 +139,8 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, onReady })
 
     // The bald eagle (Robert Mirabelle, CC BY 3.0), the same bird as over the Work section, circling high over the
     // road; its wings beat in the vertex shader, bending more toward the tips.
+    const handoffPoint = new THREE.Vector3(), handoffView = new THREE.Vector3(), handoffRotation = new THREE.Quaternion();
+    const handoff = { top: 0, x: 0, y: 0, depth: 1, fov: 30, rotation: handoffRotation };
     const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder), flap = { value: 0 }, flight = new THREE.Group(); scene.add(flight);
     loader.load("/models/island/eagle-flying.glb", gltf => {
       if (disposed) return;
@@ -310,22 +315,21 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, onReady })
       // Clouds drift, a touch of parallax as you drive.
       clouds.forEach((c, i) => { const u = c.userData; c.position.set(u.x + time * .12 * (1 + i % 3 * .3) - drive * .04, u.y + Math.sin(time * .2 + i) * .15, u.z); });
 
+      // Read this frame's scroll position before positioning the arriving bird.
+      const box = mount.getBoundingClientRect(), top = box.top / Math.max(1, window.innerHeight);
+      arrive = reduced ? 0 : smooth(top * 1.15);
       // The eagle: a slow wide circle high over the road, banked into the turn.
       if (!reduced) flap.value += dt * 5.5;
       // (Top centre, in the open sky between the heading and the stop's words, so it never crosses the text.)
       const a = time * .22, cx = tall ? .8 : -1.4;
-      // Arriving from Work, it's the same eagle: it comes down from above the frame (where it dived out of the Work
-      // sky) and swings into its circle as the camera settles.
-      const entry = reduced ? 0 : smooth((arrive - .2) / .62);
-      // (Out of sight until the Work eagle has dived out of its own sky, so there's only ever one.)
-      flight.visible = entry < .96;
-      flight.position.set(cx + Math.cos(a) * (tall ? 2.2 : 1) + entry * 2.5, (tall ? 6.2 : 5.9) + Math.sin(time * .9) * .2 + entry * entry * 10, -6 + Math.sin(a) * 2 * (1 - entry));
-      flight.rotation.set(-entry * .5, -a + Math.PI, -.35 - entry * .3, "YXZ");
+      // Keep the desert orbit intact. Work carries its bird directly to this projected pose.
+      flight.visible = reduced || top <= 0;
+      if (top > 0 && eagleHandoff.flap !== null) flap.value = eagleHandoff.flap;
+      flight.position.set(cx + Math.cos(a) * (tall ? 2.2 : 1), (tall ? 6.2 : 5.9) + Math.sin(time * .9) * .2, -6 + Math.sin(a) * 2);
+      flight.rotation.set(0, -a + Math.PI, -.35, "YXZ");
 
       // Arriving, the camera starts up in the sky with the eagle and the clouds, then pulls back and settles on the
       // road as the section comes up the screen.
-      const box = mount.getBoundingClientRect(), top = box.top / Math.max(1, window.innerHeight);
-      arrive = reduced ? 0 : smooth(top * 1.15);
       // Leaving for the coast: the camera lifts back toward the sky and the land fades out from the bottom up into the
       // sky behind, so the coast rises into open sky rather than meeting a hard edge of desert.
       leave = smooth(1 - box.bottom / Math.max(1, window.innerHeight));
@@ -333,6 +337,16 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, onReady })
       camera.position.lerpVectors(restPos, skyPos, lift); aim.lerpVectors(restAim, skyAim, lift); camera.lookAt(aim);
       fade.from = 1 - .8 * smooth(leave * 1.6);
       const fov = restFov + (skyFov - restFov) * lift; if (camera.fov !== fov) { camera.fov = fov; camera.updateProjectionMatrix(); }
+      camera.updateMatrixWorld();
+      handoffPoint.copy(flight.position).project(camera);
+      handoffView.copy(flight.position).applyMatrix4(camera.matrixWorldInverse);
+      handoff.top = box.top;
+      handoff.x = handoffPoint.x;
+      handoff.y = 1 - 2 * (box.top + (1 - handoffPoint.y) * box.height / 2) / window.innerHeight;
+      handoff.depth = -handoffView.z;
+      handoff.fov = camera.fov;
+      handoffRotation.copy(camera.quaternion).invert().multiply(flight.quaternion);
+      eagleHandoff.target = handoff;
       needsRender = false;
       return Math.abs(goal - drive) > .002 || (arrive > 0 && arrive < 1) || (leave > 0 && leave < 1) || dust.some(d => d.visible) || weeds.some(w => w.visible);
     }
@@ -357,6 +371,7 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, onReady })
     if (new URLSearchParams(window.location.search).has("debug")) window.__skills = { camera, car, layers, scene, herd, signs, THREE };
 
     return () => {
+      if (eagleHandoff.target === handoff) eagleHandoff.target = null;
       clearTimeout(readyTimer); delete window.__skills; disposed = true; unregister(); resize.disconnect(); observer.disconnect();
       mount.removeEventListener("pointermove", onMove); mount.removeEventListener("click", onClick);
       scene.traverse(o => { o.geometry?.dispose(); for (const m of [o.material].flat()) if (m) { m.map?.dispose(); m.dispose(); } });

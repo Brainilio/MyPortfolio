@@ -1,11 +1,13 @@
 "use client";
+import { eagleHandoff } from "./eagle-handoff";
+import ProjectThumbnail from "../project/project-thumbnail";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { createCloud } from "./island-parts";
-import { useImageRatio, getImageRatio, fitWidth } from "../../lib/image-ratio";
+import { getImageRatio, fitWidth } from "../../lib/image-ratio";
 
 // The Work section: one pinned screen, the scroll picking the project (in step with the section pill's counter). The
 // project's name runs huge across the middle, lit by a sun that rises behind it as you scroll; three of its pictures
@@ -52,12 +54,14 @@ const CLOUDS = [[-6, -1, -8, .3, 0], [6.5, 1.6, -10, .36, 1.7], [9, -1.9, -7, .2
 // What a recruiter wants at a glance: its year and kind of work, and the first few tools (all from the project data).
 // (Dates written in capitals in the data are shown in sentence case.)
 const tidy = text => text && text === text.toUpperCase() ? text.charAt(0) + text.slice(1).toLowerCase() : text;
-const metaOf = p => [tidy(p.dateCreated), p.category].filter(Boolean).join(" · ");
+const metaOf = p => [tidy(p.dateCreated), p.role || p.category].filter(Boolean).join(" · ");
 
 export default function WorkShowcase({ work, scene, slot, onReady }) {
   const root = useRef(null), back = useRef(null), front = useRef(null);
   const ready = useRef(onReady); ready.current = onReady;
   const [active, setActive] = useState(0);
+  const [previewsPaused, setPreviewsPaused] = useState(false), previewPause = useRef(false);
+  previewPause.current = previewsPaused;
   const mouse = useRef({ x: 0, y: 0 }), picker = useRef(null);
   const n = work.length;
 
@@ -78,7 +82,7 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
     // and wrapping round; and the About section's stars carried on into the top of this one, twinkling, fading out as
     // you scroll in.
     const skyScene = new THREE.Scene(), clouds = [], starUniforms = { uTime: { value: 0 }, uPixel: { value: 1 }, uFade: { value: 1 } };
-    skyScene.add(new THREE.HemisphereLight("#fff1e0", "#6a4a7a", 1.3));
+    skyScene.add(new THREE.HemisphereLight("#e1e7ff", "#75516a", .9));
     const skyLight = new THREE.DirectionalLight("#ffd9b0", 1.8); skyLight.position.set(-4, 6, 5); skyScene.add(skyLight);
     CLOUDS.forEach(([x, y, z, k, p], i) => {
       const cloud = createCloud(90 + i); cloud.material.color.set("#fff1e6"); cloud.material.emissive.set("#b4604a"); cloud.material.emissiveIntensity = .22;
@@ -101,8 +105,35 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
     sunSprite.scale.setScalar(16); skyScene.add(sunSprite);
 
     // The sheets: the project's pictures on thin bent planes (a soft shadow behind each), shown whole at their own shape.
-    const textureLoader = new THREE.TextureLoader(), textures = new Map();
-    const textureOf = src => { if (!textures.has(src)) { const t = textureLoader.load(src); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; textures.set(src, t); } return textures.get(src); };
+    const textureLoader = new THREE.TextureLoader(), textures = new Map(), movies = new Map();
+    const textureOf = src => {
+      if (!textures.has(src)) {
+        const poster = textureLoader.load(src); poster.colorSpace = THREE.SRGBColorSpace; poster.anisotropy = 4; textures.set(src, poster);
+        const project = work.find(project => project.previewImage === src && project.thumbnailVideo);
+        if (project) {
+          const video = document.createElement("video");
+          Object.assign(video, { muted:true, loop:true, playsInline:true, preload:"none" });
+          const texture = new THREE.VideoTexture(video); texture.colorSpace = THREE.SRGBColorSpace;
+          movies.set(src, { video, texture, url:project.thumbnailVideo, pending:false, blocked:false });
+        }
+      }
+      const movie = movies.get(src);
+      return !reduce.matches && window.innerWidth > 760 && movie?.video.readyState >= 2 ? movie.texture : textures.get(src);
+    };
+    const syncMovies = enabled => {
+      for (const [src, movie] of movies) {
+        const active = enabled && !previewPause.current && !reduce.matches && window.innerWidth > 760 && sheets.some(sheet => sheet.src === src || sheet.next === src);
+        if (!active) { movie.video.pause(); continue; }
+        if (!movie.video.getAttribute("src")) movie.video.src = movie.url;
+        if (movie.video.paused && !movie.pending && !movie.blocked) {
+          movie.pending = true;
+          movie.video.play().catch(() => { movie.blocked = true; }).finally(() => { movie.pending = false; });
+        }
+      }
+    };
+    const pauseHiddenMovies = () => { if (document.hidden || reduce.matches) syncMovies(false); };
+    document.addEventListener("visibilitychange", pauseHiddenMovies);
+    reduce.addEventListener("change", pauseHiddenMovies);
     const shadowTexture = glow([[0, "rgba(255,255,255,.9)"], [.55, "rgba(255,255,255,.35)"], [1, "rgba(255,255,255,0)"]], 64);
     const sheetGeometry = new THREE.PlaneGeometry(1, 1, 40, 24), shadowGeometry = new THREE.PlaneGeometry(1, 1);
     const sheets = SHEETS.map((spot, k) => {
@@ -126,9 +157,9 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
     // (It and its lights are one rig, moved into the clouds' scene for the far half of its circle, so it passes behind
     // the name there and in front of it on the near half.)
     const eagleScene = new THREE.Scene(), rig = new THREE.Group(), flight = new THREE.Group(), flap = { value: 0 }, eagleMaterials = [];
-    rig.add(new THREE.HemisphereLight("#ffe2c4", "#3a2a4a", 1.4));
-    const sun = new THREE.DirectionalLight("#ffd2a0", 2.4); sun.position.set(-4, 6, 5); rig.add(sun, sun.target);
-    const rim = new THREE.DirectionalLight("#b48cff", 1.2); rim.position.set(4, 2, -4); rig.add(rim, rim.target);
+    rig.add(new THREE.HemisphereLight("#dce7ff", "#493448", .85));
+    const sun = new THREE.DirectionalLight("#ffddb5", 2.2); sun.position.set(-4, 6, 5); rig.add(sun, sun.target);
+    const rim = new THREE.DirectionalLight("#b7caff", .65); rim.position.set(4, 2, -4); rig.add(rim, rim.target);
     rig.add(flight); eagleScene.add(rig);
     let behind = false;
     let disposed = false;
@@ -154,6 +185,13 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
     let width = 0, height = 0, visible = true, frame = 0, last = performance.now();
     let drift = 0, time = 0, circle = 0, speed = .35, vel = 0, sunAt = scene.current.progress[slot] ?? 0, prevProgress = scene.current.progress[slot] ?? 0, shown = -1;
     const smoothMouse = new THREE.Vector2(), aim = new THREE.Vector2();
+    // A fixed foreground canvas follows one bird across both sections, then hands over at an identical pose.
+    const orbitRotation = new THREE.Quaternion(), exitRotation = new THREE.Quaternion(), pose = new THREE.Euler(0,0,0,"YXZ");
+    const screenPoint = new THREE.Vector3(), viewPoint = new THREE.Vector3();
+    const easeFlight = (value, from, to) => {
+      const t = THREE.MathUtils.clamp((value - from) / (to - from), 0, 1);
+      return t * t * t * (t * (t * 6 - 15) + 10);
+    };
     const resize = () => {
       width = skyCanvas.clientWidth; height = skyCanvas.clientHeight; if (!width || !height) return;
       skyRenderer.setSize(width, height, false); eagleRenderer.setSize(width, height, false);
@@ -172,23 +210,51 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       vel += (rate - vel) * Math.min(1, dt * 6);
       const at = Math.min(n - 1, Math.max(0, Math.round(progress * (n - 1))));
       if (at !== shown) { if (shown >= 0) speed += 2.2; showProject(work[at], shown < 0); shown = at; setActive(at); }
-      if (!visible || document.hidden) return;
+      const destination = eagleHandoff.target;
+      const crossing = !reduce.matches && destination && destination.top > 0 && destination.top < window.innerHeight;
+      if (document.hidden) { syncMovies(false); return; }
+      if (!visible && !crossing) { syncMovies(false); eagleRenderer.clear(); return; }
       const still = reduce.matches;
       // Its pace: idle, plus however fast you're scrolling, easing back down when you stop.
       const target = still ? 0 : .35 + Math.min(7, Math.abs(vel) * 5);
       speed += (target - speed) * Math.min(1, dt * 2.5);
       if (!still) { time += dt; circle += speed * dt; drift += dt * (.25 + Math.min(4, Math.abs(vel) * 2.5)); flap.value += dt * (5.5 + Math.min(10, Math.abs(vel) * 7)); }
-      // The eagle: a slow circle round the middle (wider than deep), facing along it, banked into the turn.
+      const pin = skyCanvas.getBoundingClientRect();
+      // Arrival is measured against Skills itself, including its gap and the taller phone project list.
+      const travel = still || !destination ? 0 : THREE.MathUtils.clamp(1 - destination.top / height, 0, 1);
+      const blend = easeFlight(travel, 0, 1);
       const a = circle * .55, bank = .32 + Math.min(.3, Math.abs(vel) * .1);
-      // Leaving for the road trip, it breaks off its circle and dives out through the bottom of the sky, toward the
-      // Skills section below (where the same eagle comes back down into the desert sky).
-      const pin = skyCanvas.getBoundingClientRect(), leaving = still ? 0 : Math.min(1, Math.max(0, 1 - pin.bottom / window.innerHeight));
-      const d = Math.min(1, leaving * 2.2), dive = d * d * (3 - 2 * d), swoop = Math.min(1, dive * 1.4);
-      const yaw = -a - Math.PI * 2 * Math.round(-a / (Math.PI * 2));
-      flight.position.set(Math.cos(a) * 1.25 * flight.scale.x * (1 - swoop) - swoop * .9, ((still ? 0 : Math.sin(time * 1.3) * .12) + .3) * (1 - swoop) - dive * 5, (Math.sin(a) * 1.1 - .1) * (1 - swoop) + swoop * 1.2);
-      flight.rotation.set(swoop * .75, yaw * (1 - swoop), bank * (1 - swoop), "YXZ");
-      // Behind the name on the far half of the circle, in front on the near half (and in front while it dives).
-      if ((Math.sin(a) < -.1 && swoop < .2) !== behind) { behind = !behind; (behind ? skyScene : eagleScene).add(rig); }
+      const baseScale = Math.min(1, camera.aspect / 1.2);
+      flight.position.set(Math.cos(a) * 1.25 * baseScale, (still ? 0 : Math.sin(time * 1.3) * .12) + .3, Math.sin(a) * 1.1 - .1);
+      orbitRotation.setFromEuler(pose.set(0, -a, bank, "YXZ"));
+      flight.quaternion.copy(orbitRotation);
+      flight.scale.setScalar(baseScale);
+      flight.visible = pin.bottom > 0 || crossing;
+      const nextBehind = Math.sin(a) < -.1 && travel === 0;
+      if (nextBehind !== behind) { behind = nextBehind; (behind ? skyScene : eagleScene).add(rig); }
+      if (!behind) {
+        camera.updateMatrixWorld();
+        screenPoint.copy(flight.position).project(camera);
+        viewPoint.copy(flight.position).applyMatrix4(camera.matrixWorldInverse);
+        const depth = -viewPoint.z;
+        // The Work orbit scrolls with its section, then arcs gently into the destination orbit.
+        screenPoint.y -= pin.top / height * 2;
+        const tan = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+        let scale = baseScale * 9 / depth;
+        if (travel > 0) {
+          screenPoint.x = THREE.MathUtils.lerp(screenPoint.x, destination.x, blend) + Math.sin(Math.PI * travel) * .18;
+          screenPoint.y = THREE.MathUtils.lerp(screenPoint.y, destination.y, blend);
+          const destinationScale = (1.6 / 2.5) * 9 * tan / (destination.depth * Math.tan(THREE.MathUtils.degToRad(destination.fov / 2)));
+          scale = THREE.MathUtils.lerp(scale, destinationScale, blend);
+          exitRotation.copy(camera.quaternion).multiply(destination.rotation);
+          // Lead with the turn: establish the glide heading before most of the crossing.
+          flight.quaternion.slerp(exitRotation, easeFlight(travel, 0, .32));
+          eagleHandoff.flap = flap.value;
+        }
+        viewPoint.set(screenPoint.x * 9 * tan * camera.aspect, screenPoint.y * 9 * tan, -9).applyMatrix4(camera.matrixWorld);
+        flight.position.copy(viewPoint); flight.scale.setScalar(scale);
+      }
+      if (destination && destination.top <= 0 && pin.top < 0) flight.visible = false;
       smoothMouse.lerp(aim.set(mouse.current.x, mouse.current.y), Math.min(1, dt * 5));
       // The sun: from low on the left up toward the right as the projects go by (eased, so it settles when you stop).
       sunAt += (progress - sunAt) * Math.min(1, dt * 3);
@@ -241,6 +307,11 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
         uniforms.uTime.value = time; uniforms.uSunSide.value = Math.max(-1, Math.min(1, (sunSprite.position.x * (9 - spot.z) / (9 - sunDepth) - sheet.group.position.x) / 3));
         uniforms.uSun.value = .5 + .5 * sunAt;
       }
+      syncMovies(visible && !document.hidden);
+      for (const sheet of sheets) {
+        if (sheet.src) sheet.uniforms.uMap.value = textureOf(sheet.src);
+        if (sheet.next) sheet.uniforms.uNext.value = textureOf(sheet.next);
+      }
       const span = Math.tan(THREE.MathUtils.degToRad(15)) * camera.aspect;
       for (const cloud of clouds) {
         const u = cloud.userData, w = span * (9 - u.z) + 3, x = u.x + drift * .35 * u.depth;
@@ -251,16 +322,21 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       const arriving = Math.max(0, Math.min(1, host.getBoundingClientRect().top / height));
       starUniforms.uFade.value = Math.max(0, 1 - progress / .3) * (.55 + .45 * arriving);
       starUniforms.uTime.value = time; starUniforms.uPixel.value = skyRenderer.getPixelRatio();
-      skyRenderer.render(skyScene, camera); eagleRenderer.render(eagleScene, camera);
+      skyRenderer.render(skyScene, camera);
+      eagleRenderer.render(eagleScene, camera);
     }
     frame = requestAnimationFrame(loop);
     // (The loading screen waits on each section; this one is ready as soon as its canvases are.)
     ready.current?.();
     return () => {
+      document.removeEventListener("visibilitychange", pauseHiddenMovies);
+      reduce.removeEventListener("change", pauseHiddenMovies);
+      eagleHandoff.flap = null;
       disposed = true; cancelAnimationFrame(frame); observer.disconnect(); seen.disconnect();
       clouds.forEach(c => { c.geometry.dispose(); c.material.dispose(); }); starGeometry.dispose(); stars.material.dispose();
       picker.current = null; sunTexture.dispose(); sunSprite.material.dispose(); shadowTexture.dispose(); sheetGeometry.dispose(); shadowGeometry.dispose();
       sheets.forEach(s => { s.mesh.material.dispose(); s.shadow.material.dispose(); }); textures.forEach(t => t.dispose());
+      for (const movie of movies.values()) { movie.video.pause(); movie.video.removeAttribute("src"); movie.video.load(); movie.texture.dispose(); }
       rig.traverse(o => o.geometry?.dispose()); eagleMaterials.forEach(m => m.dispose());
       skyRenderer.dispose(); eagleRenderer.dispose();
     };
@@ -291,7 +367,8 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
             <a href="/projects/">All projects <span aria-hidden="true">→</span></a>
             <a href="/journey/">Lab experiments <span aria-hidden="true">→</span></a>
           </p>
-        </div>
+          <button className="wl-preview-toggle" type="button" aria-pressed={previewsPaused} onClick={() => setPreviewsPaused(value => !value)}>{previewsPaused ? 'Play previews' : 'Pause previews'}</button>
+      </div>
 
         {/* The name, its letters rising in one after another (and lifting away for the next). */}
         <a className="wl-a-name" href={`/project/${project.slug}/`} aria-label={`${project.name}: view the project`}>
@@ -312,6 +389,7 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
           <motion.div key={project.slug} className="wl-a-meta"
             initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0, transition: { delay: .25, duration: .5, ease: [.2, .8, .2, 1] } }} exit={{ opacity: 0, y: -10, transition: { duration: .2 } }}>
             <span>{metaOf(project)}</span>
+            {project.highlight && <span className="wl-contribution">{project.highlight}</span>}
             <span className="wl-tags">{project.tags?.slice(0, 3).map(t => <em key={t}>{t}</em>)}</span>
           </motion.div>
         </AnimatePresence>
@@ -328,10 +406,11 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       <ul className="wl-phone">
         {work.map(p => (
           <li key={p.slug}>
+            <ProjectThumbnail project={p} href={`/project/${p.slug}/`} />
             <a href={`/project/${p.slug}/`}>
-              <WholePicture src={p.previewImage} />
-              <strong>{p.name}</strong>
+              <strong>{p.name}</strong>{p.highlight && <span>{p.highlight}</span>}
               <span>{metaOf(p)}</span>
+              <span className="wl-tags">{p.tags?.slice(0,3).map(tag=><em key={tag}>{tag}</em>)}</span>
             </a>
           </li>
         ))}
@@ -340,8 +419,3 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
   );
 }
 
-// A picture shown whole at its own shape.
-function WholePicture({ src }) {
-  const ratio = useImageRatio(src);
-  return <img src={src} alt="" decoding="async" style={{ aspectRatio: ratio }} />;
-}
