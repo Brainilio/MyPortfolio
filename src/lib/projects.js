@@ -174,6 +174,39 @@ const projects = [
 		slug: "newcold",
 	},
 	{
+		name: "Compassion Checkout",
+		// Contribution boundary from the owner: the Apple sign-in stories only; payments and fraud tooling are not claimed.
+		highlight: "Contributing Apple sign-in to Compassion's Next.js checkout experience.",
+		company: "Compassion International",
+		role: "Authentication integration",
+		responsibilities: ["Implementing the Apple sign-in stories for the checkout's sign-in step."],
+		media: [
+			{ type: "video", src: "/projects/compassion-checkout/thumbnail-loop.mp4", poster: "/projects/compassion-checkout/thumbnail.jpg", alt: "Compassion Checkout flow, from basket to submit", caption: "The checkout flow on the staging site, with test details. The sponsored child's details and the card line are blurred." },
+			{ type: "image", src: "/projects/compassion-checkout/1.jpg", alt: "Checkout summary with the contact form filled in", caption: "Summary step: contact information beside the donation." },
+			{ type: "image", src: "/projects/compassion-checkout/2.jpg", alt: "Checkout billing information fields", layout: "half" },
+			{ type: "image", src: "/projects/compassion-checkout/3.jpg", alt: "Checkout review step with contact and billing details", layout: "half" },
+			{ type: "image", src: "/projects/compassion-checkout/4.jpg", alt: "Checkout review of the donation before submitting" }
+		],
+		shortDescription:
+			"Compassion International's checkout, where supporters complete sponsorships and donations. I worked on its Apple sign-in.",
+		previewImage: "/projects/compassion-checkout/thumbnail.jpg",
+		thumbnailVideo: "/projects/compassion-checkout/thumbnail-loop.mp4",
+		livePreview: null,
+		gitHub: null,
+		tags: ["Next.js", "Apple sign-in"],
+		category: "Development",
+		description:
+			"The checkout is a two-step flow (summary, then review and submit) for child sponsorships and donations. My contribution was the Apple sign-in stories; the screens show the surrounding flow on the staging site with test details.",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
+		additionalLinks: [],
+		dateCreated: "2024",
+		fullImages: [1, 2, 3, 4].map(n => `/projects/compassion-checkout/${n}.jpg`),
+		slug: "compassion-checkout",
+	},
+	{
 		name: "Natours",
 		shortDescription:
 			"Natours is a full-stack web-application website that lets users check out and book the most exciting tours ever! Features include examples like CRUD operations for admins, payments using stripe, file upload handling and authorization",
