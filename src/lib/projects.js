@@ -185,7 +185,9 @@ const projects = [
 			{ type: "image", src: "/projects/compassion-checkout/1.jpg", alt: "Checkout summary with the contact form filled in", caption: "Summary step: contact information beside the donation." },
 			{ type: "image", src: "/projects/compassion-checkout/2.jpg", alt: "Checkout billing information fields", layout: "half" },
 			{ type: "image", src: "/projects/compassion-checkout/3.jpg", alt: "Checkout review step with contact and billing details", layout: "half" },
-			{ type: "image", src: "/projects/compassion-checkout/4.jpg", alt: "Checkout review of the donation before submitting" }
+			{ type: "image", src: "/projects/compassion-checkout/4.jpg", alt: "Checkout review of the donation before submitting" },
+			{ type: "image", src: "/projects/compassion-checkout/5.jpg", alt: "Checkout confirmation: thank you for making a difference", caption: "The confirmation after submitting.", layout: "half" },
+			{ type: "image", src: "/projects/compassion-checkout/6.jpg", alt: "Checkout confirmation with contact and billing summary", layout: "half" }
 		],
 		shortDescription:
 			"Compassion International's checkout, where supporters complete sponsorships and donations. I worked on its Apple sign-in.",
@@ -203,7 +205,7 @@ const projects = [
 		takeaway: "",
 		additionalLinks: [],
 		dateCreated: "2024",
-		fullImages: [1, 2, 3, 4].map(n => `/projects/compassion-checkout/${n}.jpg`),
+		fullImages: [1, 2, 3, 4, 5, 6].map(n => `/projects/compassion-checkout/${n}.jpg`),
 		slug: "compassion-checkout",
 	},
 	{
