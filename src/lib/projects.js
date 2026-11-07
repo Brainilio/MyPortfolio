@@ -113,8 +113,8 @@ const projects = [
 		// Contribution details supplied by the portfolio owner.
 		shortDescription:
 			"MyCompassion is Compassion International's sponsor portal, where supporters keep up with the children they sponsor, give gifts, manage payments and update their account.",
-		previewImage: "/projects/my-compassion/thumbnail.svg",
-        thumbnailVideo: "/projects/my-compassion/thumbnail-motion.mp4",
+		previewImage: "/projects/my-compassion/thumbnail.jpg",
+        thumbnailVideo: "/projects/my-compassion/thumbnail-loop.mp4",
 		previewVideo: "/projects/my-compassion/preview.mp4",
 		livePreview: "https://my.compassion.com/",
 		gitHub: null,
@@ -155,8 +155,8 @@ const projects = [
 		// Contribution details supplied by the portfolio owner.
 		shortDescription:
 			"NewCold's website, built as a front-end developer, with an interactive map of the company's facilities and offices worldwide.",
-		previewImage: "/projects/newcold/thumbnail.svg",
-        thumbnailVideo: "/projects/newcold/thumbnail-header.mp4",
+		previewImage: "/projects/newcold/thumbnail.jpg",
+        thumbnailVideo: "/projects/newcold/thumbnail-loop.mp4",
 		previewVideo: "/projects/newcold/preview.mp4",
 		livePreview: "https://newcold.com/",
 		gitHub: null,
