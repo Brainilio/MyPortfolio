@@ -305,11 +305,12 @@ const projects = [
 		role: "Design & development",
 		responsibilities: ["Designing and building the landing page: services, the price sheet, testimonials and a quote form, with content managed in Prismic."],
 		media: [
-			{ type: "image", src: "/projects/jonnyonthespot/1.jpg", alt: "JonnyOnTheSpot homepage: on the spot bartending for weddings and private events", caption: "The homepage." },
-			{ type: "image", src: "/projects/jonnyonthespot/2.jpg", alt: "Bartending services tailored to your needs", layout: "half" },
-			{ type: "image", src: "/projects/jonnyonthespot/3.jpg", alt: "Tailored price list", layout: "half" },
-			{ type: "image", src: "/projects/jonnyonthespot/m1.jpg", alt: "JonnyOnTheSpot homepage on a phone", layout: "portrait", presentation: "phone", tone: "#e9dfc9", caption: "On a phone." },
-			{ type: "image", src: "/projects/jonnyonthespot/m2.jpg", alt: "Services on a phone", layout: "portrait", presentation: "phone", tone: "#e9dfc9" }
+			{ type: "video", src: "/projects/jonnyonthespot/recording.mp4", poster: "/projects/jonnyonthespot/recording.jpg", alt: "The landing page scrolling on a laptop and a phone", caption: "The landing page on desktop and phone. Shown with refreshed photos and a tightened services section." },
+			{ type: "image", src: "/projects/jonnyonthespot/1.jpg", alt: "JonnyOnTheSpot homepage: on the spot bartending for weddings and private events" },
+			{ type: "image", src: "/projects/jonnyonthespot/2.jpg", alt: "Bartending services: signature cocktails, fresh garnishes and mixers, mobile bar setup, curated shopping list", caption: "Four services, each with its own photo." },
+			{ type: "image", src: "/projects/jonnyonthespot/m1.jpg", alt: "JonnyOnTheSpot homepage on a phone", layout: "portrait", presentation: "phone", tone: "#e9dfc9" },
+			{ type: "image", src: "/projects/jonnyonthespot/m2.jpg", alt: "Services on a phone", layout: "portrait", presentation: "phone", tone: "#e9dfc9" },
+			{ type: "image", src: "/projects/jonnyonthespot/3.jpg", alt: "Tailored price list" }
 		],
 		shortDescription:
 			"JonnyOnTheSpot is a husband-and-wife mobile bartending business from Livermore, serving weddings and private events across the Bay Area.",
