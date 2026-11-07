@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import projects from '../../../lib/projects';
+const MOTIONS = ['rise', 'zoom', 'slide-left', 'parallax', 'tilt', 'slide-right'];
 import ProjectMedia from '../project-media';
 import Woodland from '../woodland';
 import StickySummary from '../sticky-summary';
@@ -24,6 +25,8 @@ export default async function Project({ params }) {
     ...(project.previewVideo ? [{type:'video',src:project.previewVideo,poster:project.previewImage,alt:`${project.name} preview`,caption:'A closer look. Play the film to explore the interface.'}] : []),
     ...(project.fullImages || []).map((src,i)=>({type:'image',src,alt:`${project.name} screen ${i+1}`,layout:i%3===0?'wide':'half'})),
   ];
+  // A different order of scroll motions per project, so no two pages move the same way.
+  const motionOffset = [...project.slug].reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % MOTIONS.length;
   return <main className="case-page">
     <nav className="case-nav" aria-label="Project navigation"><Link href="/">Brainilio<span>.</span></Link><Link href="/projects/">All projects ↗</Link></nav>
     <div className="case-layout">
@@ -43,7 +46,7 @@ export default async function Project({ params }) {
         {(project.gitHub || project.livePreview) && <div className="case-links">{project.gitHub && <a href={project.gitHub} target="_blank" rel="noreferrer">View code ↗</a>}{project.livePreview && <a href={project.livePreview} target="_blank" rel="noreferrer">Visit website ↗</a>}</div>}
       </StickySummary>
       <section className="case-gallery" aria-label={`${project.name} gallery`}>
-        {media.map((item,i)=><ProjectMedia key={`${item.src}-${i}`} item={item} priority={i===0} />)}
+        {media.map((item,i)=><ProjectMedia key={`${item.src}-${i}`} item={item} priority={i===0} motion={MOTIONS[(i + motionOffset) % MOTIONS.length]} />)}
         {[['The process',project.process],['The challenges',project.challenges],['What I’d do differently',project.differently],['The takeaway',project.takeaway]].map(([title,text])=>text&&<section className="case-story" key={title}><h2>{title}</h2><p>{text}</p></section>)}
       </section>
     </div>

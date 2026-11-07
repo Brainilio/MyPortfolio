@@ -2,20 +2,44 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-// Native controls keep playback optional; leaving the viewport always stops it.
-export default function ProjectMedia({ item, priority = false }) {
-  const video = useRef(null);
+// Each block gets a scroll motion (rise, zoom, parallax, tilt or a slide); `--p` runs from 1 (below the fold) through 0
+// (centred) to -1 (above), updated only while the block is on screen. Reduced motion turns all of it off in CSS.
+// Native video controls keep playback optional; leaving the viewport always stops it.
+export default function ProjectMedia({ item, priority = false, motion = 'rise' }) {
+  const figure = useRef(null), video = useRef(null);
   const [portrait, setPortrait] = useState(item.layout === "portrait");
+  const [shown, setShown] = useState(priority);
+  const kind = item.motion || (item.type === 'video' && (motion === 'zoom' || motion === 'parallax') ? 'rise' : motion);
+
   useEffect(() => {
-    const element = video.current;
+    const element = figure.current;
     if (!element) return;
-    const observer = new IntersectionObserver(([entry]) => { if (!entry.isIntersecting) element.pause(); });
+    let frame = 0, visible = false;
+    const update = () => {
+      frame = 0;
+      const box = element.getBoundingClientRect(), centre = box.top + box.height / 2, half = innerHeight / 2 + box.height / 2;
+      element.style.setProperty('--p', Math.max(-1, Math.min(1, (centre - innerHeight / 2) / half)).toFixed(3));
+    };
+    const onScroll = () => { if (visible && !frame) frame = requestAnimationFrame(update); };
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (visible) { setShown(true); update(); }
+      else video.current?.pause();
+    }, { rootMargin: '0px 0px -8% 0px' });
     observer.observe(element);
-    const pauseHidden = () => { if (document.hidden) element.pause(); };
+    addEventListener('scroll', onScroll, { passive: true });
+    addEventListener('resize', onScroll);
+    const pauseHidden = () => { if (document.hidden) video.current?.pause(); };
     document.addEventListener('visibilitychange', pauseHidden);
-    return () => { observer.disconnect(); document.removeEventListener('visibilitychange', pauseHidden); element.pause(); };
+    return () => {
+      observer.disconnect(); removeEventListener('scroll', onScroll); removeEventListener('resize', onScroll);
+      document.removeEventListener('visibilitychange', pauseHidden); cancelAnimationFrame(frame); video.current?.pause();
+    };
   }, []);
-  return <figure className={`case-media case-media--${item.layout || 'wide'} case-media--${item.presentation || 'plain'}${portrait ? " case-media--compact" : ""}`} style={{ '--media-tone': item.tone || '#e9e5ee' }}>
+
+  return <figure ref={figure} data-motion={kind} data-shown={shown ? '' : undefined}
+    className={`case-media case-media--${item.layout || 'wide'} case-media--${item.presentation || 'plain'}${portrait ? " case-media--compact" : ""}`}
+    style={{ '--media-tone': item.tone || '#e9e5ee' }}>
     <div className="case-media-surface">
       <div className="case-media-frame">
         {item.type === 'video'

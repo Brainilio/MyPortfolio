@@ -40,3 +40,8 @@ Each loop has a `thumbnail.jpg` poster next to it (used as `previewImage`).
 - [ ] Give the next projects the same treatment (Compassion Authentication, JonnyOnTheSpot, …) once screens are available.
 - [ ] Higher-resolution captures: the browser pane captures at ~800 px wide; full-resolution screenshots would make square/4:5 exports sharper.
 - [ ] Optional: remove the unused older thumbnails (`thumbnail.svg`, `thumbnail-header.mp4`, `thumbnail-motion.mp4`) from `public/projects/newcold` and `public/projects/my-compassion`.
+
+## Detail pages: device scenes and scroll motion
+
+- Device scenes: screenshots keyed into green-screen photos (Unsplash) at `work/thumbs/assets/scenes/` (desk-typing, shoulder, shoulder2, phone-hands, phone-sofa). Render one with `?scene=mock&bg=scenes/<photo>.jpg&shot=assets/shots/<shot>.jpg&still=1&out=<name>`: the screen's edges are line-fitted (ignoring hands and hair), the shot is warped in, and the green key keeps hands in front. Output goes to `public/projects/<slug>/scene*.jpg` with `presentation: "scene"`.
+- Scroll motion: `ProjectMedia` gives each block one of rise, zoom, slide-left, parallax, tilt, slide-right, rotating down the page from a per-project starting point (from the slug), so pages move differently. An item can pin one with `motion`. Reduced motion turns it all off.

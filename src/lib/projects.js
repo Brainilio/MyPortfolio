@@ -100,6 +100,8 @@ const projects = [
 		],
 		media: [
 			{ type: "image", src: "/projects/crapp/header.jpg", alt: "Crapp: Find. Check. Go now. Three phones showing the app over a city skyline", caption: "Find. Check. Go now." },
+			{ type: "image", src: "/projects/crapp/scene-map.jpg", alt: "Crapp’s map in someone’s hands", presentation: "scene", layout: "half" },
+			{ type: "image", src: "/projects/crapp/scene-detail.jpg", alt: "A Crapp restroom page on a phone", presentation: "scene", layout: "half" },
 			{ type: "video", src: "/projects/crapp/thumbnail-loop.mp4", poster: "/projects/crapp/thumbnail.jpg", alt: "Crapp commercial: Need to go? Find. Check. Go now!", caption: "Need To Go? Find. Check. Go Now." },
 			{ type: "video", src: "/projects/crapp/walkthrough.mp4", poster: "/projects/crapp/walkthrough.jpg", alt: "Crapp on a phone: Explore, the map, a restroom card and Poopmergency", caption: "From Explore to the map, a restroom card, then Poopmergency's best match." },
 			{ type: "image", src: "/projects/crapp/s1.jpg", alt: "App Store screen: Find relief nearby", layout: "portrait" },
@@ -148,6 +150,7 @@ const projects = [
         ],
         media: [
             { type: "image", src: mc(1), alt: "MyCompassion supporter portal overview", caption: "The supporter portal. Personal information in these screens has been replaced or obscured." },
+            { type: "image", src: "/projects/my-compassion/scene.jpg", alt: "The MyCompassion portal on a laptop", presentation: "scene" },
             { type: "video", src: "/projects/my-compassion/preview.mp4", poster: mc("poster"), alt: "MyCompassion interface preview", caption: "A short visual tour. Play to explore the interface." },
             { type: "image", src: mc(2), alt: "MyCompassion interface, screen 2", layout: "half" },
             { type: "image", src: mc(3), alt: "MyCompassion interface, screen 3", layout: "half" },
@@ -188,6 +191,7 @@ const projects = [
 		responsibilities: ["Implementing the Apple sign-in stories for the checkout's sign-in step."],
 		media: [
 			{ type: "video", src: "/projects/compassion-checkout/thumbnail-loop.mp4", poster: "/projects/compassion-checkout/thumbnail.jpg", alt: "Compassion Checkout flow, from basket to submit", caption: "The checkout flow on the staging site, with test details. The sponsored child's details and the card line are blurred." },
+			{ type: "image", src: "/projects/compassion-checkout/scene.jpg", alt: "The checkout on a laptop", presentation: "scene" },
 			{ type: "image", src: "/projects/compassion-checkout/1.jpg", alt: "Checkout summary with the contact form filled in", caption: "Summary step: contact information beside the donation." },
 			{ type: "image", src: "/projects/compassion-checkout/7.jpg", alt: "Checkout in Safari with the Express Checkout Apple Pay button", caption: "In Safari, Express Checkout offers Apple Pay above the form.", layout: "half" },
 			{ type: "image", src: "/projects/compassion-checkout/8.jpg", alt: "The Apple Pay sheet over the checkout, with personal details blurred", caption: "The Apple Pay sheet. Card, contact and address details are blurred.", layout: "half" },
@@ -228,6 +232,7 @@ const projects = [
         responsibilities: ["Developing the interactive map feature on the homepage."],
         media: [
             { type: "image", src: "/projects/newcold/desktop-home.jpg", alt: "NewCold homepage", caption: "The NewCold website. My contribution focused on the interactive map." },
+            { type: "image", src: "/projects/newcold/scene.jpg", alt: "The NewCold homepage on a laptop", presentation: "scene" },
             { type: "image", src: "/projects/newcold/map-burley.jpg", alt: "NewCold North America map with the Burley facility panel", caption: "The map and facility detail panel." },
             { type: "image", src: "/projects/newcold/map-tacoma.jpg", alt: "NewCold North America map with the Tacoma facility panel", layout: "half" },
             { type: "image", src: "/projects/newcold/mobile-home.jpg", alt: "NewCold homepage on a narrow screen", layout: "portrait", presentation: "phone", tone: "#d8e0e7" },
@@ -270,6 +275,8 @@ const projects = [
 		responsibilities: ["Designing and building the site: a video hero, services, corporate programs, the process, testimonials, FAQ and a contact page with an inquiry form, with content managed in Prismic."],
 		media: [
 			{ type: "video", src: "/projects/karina-rodriguez/recording.mp4", poster: "/projects/karina-rodriguez/recording.jpg", alt: "The site on a laptop and a phone: the hero video plays, then the page scrolls", caption: "The homepage on desktop and phone, hero video and all." },
+			{ type: "image", src: "/projects/karina-rodriguez/scene.jpg", alt: "Karina Rodriguez’s site on a laptop", presentation: "scene" },
+			{ type: "image", src: "/projects/karina-rodriguez/scene-phone.jpg", alt: "Karina Rodriguez’s site on a phone", presentation: "scene", layout: "half" },
 			{ type: "image", src: "/projects/karina-rodriguez/1.jpg", alt: "Karina Rodriguez homepage: Body wisdom for leadership, visibility, and growth" },
 			{ type: "image", src: "/projects/karina-rodriguez/contact.jpg", alt: "Contact page: Let's partner up, with the inquiry form and other contact options", caption: "The contact page: an inquiry form beside a testimonial, with a discovery call and email as other ways in." },
 			{ type: "image", src: "/projects/karina-rodriguez/m3.jpg", alt: "Contact form on a phone", layout: "portrait", presentation: "phone", tone: "#efe2dc" },
@@ -306,6 +313,8 @@ const projects = [
 		responsibilities: ["Designing and building the landing page: services, the price sheet, testimonials and a quote form, with content managed in Prismic."],
 		media: [
 			{ type: "video", src: "/projects/jonnyonthespot/recording.mp4", poster: "/projects/jonnyonthespot/recording.jpg", alt: "The landing page scrolling on a laptop and a phone", caption: "The landing page on desktop and phone. Shown with refreshed photos and a tightened services section." },
+			{ type: "image", src: "/projects/jonnyonthespot/scene.jpg", alt: "JonnyOnTheSpot services on a laptop", presentation: "scene" },
+			{ type: "image", src: "/projects/jonnyonthespot/scene-phone.jpg", alt: "JonnyOnTheSpot on a phone", presentation: "scene", layout: "half" },
 			{ type: "image", src: "/projects/jonnyonthespot/1.jpg", alt: "JonnyOnTheSpot homepage: on the spot bartending for weddings and private events" },
 			{ type: "image", src: "/projects/jonnyonthespot/2.jpg", alt: "Bartending services: signature cocktails, fresh garnishes and mixers, mobile bar setup, curated shopping list", caption: "Four services, each with its own photo." },
 			{ type: "image", src: "/projects/jonnyonthespot/m1.jpg", alt: "JonnyOnTheSpot homepage on a phone", layout: "portrait", presentation: "phone", tone: "#e9dfc9" },
@@ -342,6 +351,7 @@ const projects = [
 		],
 		media: [
 			{ type: "video", src: "/projects/strength-concept/thumbnail-loop.mp4", poster: "/projects/strength-concept/thumbnail.jpg", alt: "The persona carousel: Marcus, Daniel, Andrea and Michelle", caption: "The persona stories carousel." },
+			{ type: "image", src: "/projects/strength-concept/scene.jpg", alt: "The concept’s persona story on a laptop", presentation: "scene" },
 			{ type: "image", src: "/projects/strength-concept/system.jpg", alt: "Design language and visual system: palette, typography, UI language and design goals", caption: "Design language and visual system." },
 			{ type: "image", src: "/projects/strength-concept/story1.jpg", alt: "Strength Without Pain for Marcus", layout: "half" },
 			{ type: "image", src: "/projects/strength-concept/story2.jpg", alt: "Performance Without Setbacks, for Daniel", layout: "half" },
