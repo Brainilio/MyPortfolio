@@ -16,7 +16,7 @@ function ProjectGrid({ items }) {
 }
 
 export default function Projects() {
-  const available = projects.filter(project => project.category === 'Development');
+  const available = projects.filter(project => ['Development', 'Design'].includes(project.category));
   return <main className="archive">
     <Link href="/">← Back to homepage</Link>
     <h1>Project archive.</h1>

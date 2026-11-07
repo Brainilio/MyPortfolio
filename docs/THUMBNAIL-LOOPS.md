@@ -45,3 +45,12 @@ Each loop has a `thumbnail.jpg` poster next to it (used as `previewImage`).
 
 - Device scenes: screenshots keyed into green-screen photos (Unsplash) at `work/thumbs/assets/scenes/` (desk-typing, shoulder, shoulder2, phone-hands, phone-sofa). Render one with `?scene=mock&bg=scenes/<photo>.jpg&shot=assets/shots/<shot>.jpg&still=1&out=<name>`: the screen's edges are line-fitted (ignoring hands and hair), the shot is warped in, and the green key keeps hands in front. Output goes to `public/projects/<slug>/scene*.jpg` with `presentation: "scene"`.
 - Scroll motion: `ProjectMedia` gives each block one of rise, zoom, slide-left, parallax, tilt, slide-right, rotating down the page from a per-project starting point (from the slug), so pages move differently. An item can pin one with `motion`. Reduced motion turns it all off.
+
+## Showreel guide (from the owner)
+
+How to build a showreel or reel that wins clients — share the process, not just the result, so clients feel confident and calm:
+
+1. **Research:** study existing showreels for pacing (typically 45–60 seconds), music and how case studies are presented.
+2. **Storyboard:** plan a narrative arc — first client conversation and sketching → branding → final implementation. Use short, punchy lines (e.g. "Exciting results, calm process").
+3. **Prepare:** motion-graphics templates can help; film real footage in good natural light from varied angles.
+4. **Edit:** organise assets, then cut to the beat of the music — matching cuts to the beat is the crucial step.

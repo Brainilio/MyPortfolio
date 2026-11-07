@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 
 // Each block gets a scroll motion (rise, zoom, parallax, tilt or a slide); `--p` runs from 1 (below the fold) through 0
 // (centred) to -1 (above), updated only while the block is on screen. Reduced motion turns all of it off in CSS.
+// No captions: the media speaks for itself (alt text still describes each one).
 // Native video controls keep playback optional; leaving the viewport always stops it.
 export default function ProjectMedia({ item, priority = false, motion = 'rise' }) {
   const figure = useRef(null), video = useRef(null);
@@ -49,6 +50,5 @@ export default function ProjectMedia({ item, priority = false, motion = 'rise' }
           : <img onLoad={event => setPortrait(phoneLike && event.currentTarget.naturalHeight > event.currentTarget.naturalWidth * 1.2)} src={item.src} alt={item.alt} loading={priority ? 'eager' : 'lazy'} decoding="async" />}
       </div>
     </div>
-    {item.caption && <figcaption>{item.caption}</figcaption>}
   </figure>;
 }
