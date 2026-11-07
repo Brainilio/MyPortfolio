@@ -43,3 +43,9 @@
 /* Device scenes are photographs: let them run edge to edge. */
 .case-media--scene .case-media-surface{background:none;border-radius:10px}
 @media(prefers-reduced-motion:reduce){.case-media[data-motion] .case-media-surface,.case-media[data-motion] img{transform:none!important;transition:none!important;opacity:1!important}}
+/* A long page design in a fixed window that scrolls through the design as the visitor scrolls past it. */
+.case-media--longpage .case-media-surface{display:grid;place-items:center;padding:clamp(24px,4vw,56px);background:radial-gradient(ellipse at 30% 0%,#ffffff70,transparent 70%),var(--media-tone)}
+.case-media--longpage .case-media-frame{width:min(100%,432px);height:min(78vh,720px);overflow:hidden;border-radius:12px;box-shadow:0 24px 50px #0f0d1430;background:#111}
+.case-media--longpage img{transform:translateY(calc((1 - (var(--p,1) + 1) / 2) * (-100% + min(78vh,720px))))!important;transition:none}
+.case-media--longpage[data-motion] .case-media-surface{transform:none!important}
+.case-media--flat .case-media-surface{background:none}

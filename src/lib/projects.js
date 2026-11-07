@@ -351,19 +351,16 @@ const projects = [
 		],
 		media: [
 			{ type: "video", src: "/projects/strength-concept/thumbnail-loop.mp4", poster: "/projects/strength-concept/thumbnail.jpg", alt: "The persona carousel: Marcus, Daniel, Andrea and Michelle", caption: "The persona stories carousel." },
-			{ type: "image", src: "/projects/strength-concept/scene.jpg", alt: "The concept’s persona story on a laptop", presentation: "scene" },
+			{ type: "image", src: "/projects/strength-concept/scene.jpg", alt: "Marcus's story on a laptop", presentation: "scene" },
 			{ type: "image", src: "/projects/strength-concept/system.jpg", alt: "Design language and visual system: palette, typography, UI language and design goals", caption: "Design language and visual system." },
+			{ type: "video", src: "/projects/strength-concept/cards.mp4", poster: "/projects/strength-concept/cards.jpg", alt: "The service cards stepping along the row", caption: "Service cards: pain-free movement, strength, injury recovery, real-life fitness, body awareness and personal coaching." },
+			{ type: "image", src: "/projects/strength-concept/scene2.jpg", alt: "Daniel's story on a laptop", presentation: "scene", layout: "half" },
+			{ type: "image", src: "/projects/strength-concept/scene3.jpg", alt: "Andrea's story on a laptop", presentation: "scene", layout: "half" },
+			{ type: "image", src: "/projects/strength-concept/page.jpg", alt: "The full homepage design, top to bottom", presentation: "longpage", tone: "#e6e3dc", caption: "The full homepage. Scroll past it to move through the design." },
 			{ type: "image", src: "/projects/strength-concept/story1.jpg", alt: "Strength Without Pain for Marcus", layout: "half" },
 			{ type: "image", src: "/projects/strength-concept/story2.jpg", alt: "Performance Without Setbacks, for Daniel", layout: "half" },
 			{ type: "image", src: "/projects/strength-concept/story3.jpg", alt: "Fitness that lasts for Andrea", layout: "half" },
-			{ type: "image", src: "/projects/strength-concept/story4.jpg", alt: "Movement That Feels Good Again, for Michelle", layout: "half" },
-			{ type: "image", src: "/projects/strength-concept/card1.jpg", alt: "Card: Move without fear again", layout: "portrait", caption: "Service cards." },
-			{ type: "image", src: "/projects/strength-concept/card2.jpg", alt: "Card: Build strength that lasts", layout: "portrait" },
-			{ type: "image", src: "/projects/strength-concept/card3.jpg", alt: "Card: Train smarter, not harder", layout: "portrait" },
-			{ type: "image", src: "/projects/strength-concept/card4.jpg", alt: "Card: Strength for real life", layout: "portrait" },
-			{ type: "image", src: "/projects/strength-concept/card5.jpg", alt: "Card: Understand your pain", layout: "portrait" },
-			{ type: "image", src: "/projects/strength-concept/card6.jpg", alt: "Card: Training built around you", layout: "portrait" },
-			{ type: "image", src: "/projects/strength-concept/page.jpg", alt: "The full homepage design, top to bottom", layout: "portrait", caption: "The full homepage design." }
+			{ type: "image", src: "/projects/strength-concept/story4.jpg", alt: "Movement That Feels Good Again, for Michelle", layout: "half" }
 		],
 		shortDescription:
 			"A concept for a Colorado Springs personal trainer: strength without pain, fitness that lasts. Designed in Figma and available for a business that wants to adopt it.",
