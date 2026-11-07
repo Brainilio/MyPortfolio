@@ -100,7 +100,7 @@ const projects = [
 		],
 		media: [
 			{ type: "image", src: "/projects/crapp/header.jpg", alt: "Crapp: Find. Check. Go now. Three phones showing the app over a city skyline", caption: "Find. Check. Go now." },
-			{ type: "video", src: "/projects/crapp/thumbnail-loop.mp4", poster: "/projects/crapp/thumbnail.jpg", alt: "Crapp commercial: Need to go? Find. Check. Go now!", caption: "Need to go? Find. Check. Go now." },
+			{ type: "video", src: "/projects/crapp/thumbnail-loop.mp4", poster: "/projects/crapp/thumbnail.jpg", alt: "Crapp commercial: Need to go? Find. Check. Go now!", caption: "Need To Go? Find. Check. Go Now." },
 			{ type: "video", src: "/projects/crapp/walkthrough.mp4", poster: "/projects/crapp/walkthrough.jpg", alt: "Crapp on a phone: Explore, the map, a restroom card and Poopmergency", caption: "From Explore to the map, a restroom card, then Poopmergency's best match." },
 			{ type: "image", src: "/projects/crapp/s1.jpg", alt: "App Store screen: Find relief nearby", layout: "portrait" },
 			{ type: "image", src: "/projects/crapp/s2.jpg", alt: "App Store screen: See what's around you", layout: "portrait" },
