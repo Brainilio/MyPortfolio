@@ -120,7 +120,7 @@ const projects = [
 			"Crapp helps you find a restroom when you need one: nearby options on a map, with community reviews and the practical details that matter, then Go Now.",
 		previewImage: "/projects/crapp/thumbnail.jpg",
 		thumbnailVideo: "/projects/crapp/thumbnail-loop.mp4",
-		livePreview: "https://getcrapp.app/",
+		livePreview: null,
 		gitHub: null,
 		tags: ["React Native", "Expo", "TanStack Query", "Supabase"],
 		category: "Development",
@@ -164,7 +164,7 @@ const projects = [
 		previewImage: "/projects/my-compassion/thumbnail.jpg",
         thumbnailVideo: "/projects/my-compassion/thumbnail-loop.mp4",
 		previewVideo: "/projects/my-compassion/preview.mp4",
-		livePreview: "https://my.compassion.com/",
+		livePreview: null,
 		gitHub: null,
 		tags: ["Next.js", "NX", "GraphQL / AppSync", "React Query", "AWS Lambda", "Redis", "SST", "Cognito"],
 		category: "Development",
@@ -247,7 +247,7 @@ const projects = [
 		previewImage: "/projects/newcold/thumbnail.jpg",
         thumbnailVideo: "/projects/newcold/thumbnail-loop.mp4",
 		previewVideo: "/projects/newcold/preview.mp4",
-		livePreview: "https://newcold.com/",
+		livePreview: null,
 		gitHub: null,
 		tags: ["Next.js", "React", "Mapbox", "Tailwind CSS"],
 		category: "Development",
@@ -279,7 +279,7 @@ const projects = [
 		shortDescription:
 			"Karina Rodriguez helps leaders, professionals and teams work with pressure through executive coaching, 1:1 coaching and workshops rooted in body wisdom.",
 		previewImage: "/projects/karina-rodriguez/thumbnail.jpg",
-		livePreview: "https://iamkarinarodriguez.netlify.app/",
+		livePreview: null,
 		gitHub: null,
 		tags: ["Next.js", "Prismic", "Netlify"],
 		category: "Development",
@@ -310,7 +310,7 @@ const projects = [
 		shortDescription:
 			"JonnyOnTheSpot is a husband-and-wife mobile bartending business from Livermore, serving weddings and private events across the Bay Area.",
 		previewImage: "/projects/jonnyonthespot/thumbnail.jpg",
-		livePreview: "https://jotsmobilebar.com/",
+		livePreview: null,
 		gitHub: null,
 		tags: ["Next.js", "Prismic", "Web design"],
 		category: "Development",
@@ -326,12 +326,56 @@ const projects = [
 		slug: "jonnyonthespot",
 	},
 	{
+		name: "Strength Without Pain",
+		highlight: "A research-led brand and website concept for a personal training business.",
+		company: "Concept",
+		role: "Research & design",
+		responsibilities: [
+			"Researching personal training businesses and competitors to shape the positioning.",
+			"A fresh brand: palette, type (Inter and Source Sans Pro) and a UI language of story-driven sections, grids and large calls to action.",
+			"A full website design in Figma, with persona stories, service cards and a discovery-call journey."
+		],
+		media: [
+			{ type: "video", src: "/projects/strength-concept/thumbnail-loop.mp4", poster: "/projects/strength-concept/thumbnail.jpg", alt: "The persona carousel: Marcus, Daniel, Andrea and Michelle", caption: "The persona stories carousel." },
+			{ type: "image", src: "/projects/strength-concept/system.jpg", alt: "Design language and visual system: palette, typography, UI language and design goals", caption: "Design language and visual system." },
+			{ type: "image", src: "/projects/strength-concept/story1.jpg", alt: "Strength Without Pain for Marcus", layout: "half" },
+			{ type: "image", src: "/projects/strength-concept/story2.jpg", alt: "Performance Without Setbacks, for Daniel", layout: "half" },
+			{ type: "image", src: "/projects/strength-concept/story3.jpg", alt: "Fitness that lasts for Andrea", layout: "half" },
+			{ type: "image", src: "/projects/strength-concept/story4.jpg", alt: "Movement That Feels Good Again, for Michelle", layout: "half" },
+			{ type: "image", src: "/projects/strength-concept/card1.jpg", alt: "Card: Move without fear again", layout: "portrait", caption: "Service cards." },
+			{ type: "image", src: "/projects/strength-concept/card2.jpg", alt: "Card: Build strength that lasts", layout: "portrait" },
+			{ type: "image", src: "/projects/strength-concept/card3.jpg", alt: "Card: Train smarter, not harder", layout: "portrait" },
+			{ type: "image", src: "/projects/strength-concept/card4.jpg", alt: "Card: Strength for real life", layout: "portrait" },
+			{ type: "image", src: "/projects/strength-concept/card5.jpg", alt: "Card: Understand your pain", layout: "portrait" },
+			{ type: "image", src: "/projects/strength-concept/card6.jpg", alt: "Card: Training built around you", layout: "portrait" },
+			{ type: "image", src: "/projects/strength-concept/page.jpg", alt: "The full homepage design, top to bottom", layout: "portrait", caption: "The full homepage design." }
+		],
+		shortDescription:
+			"A concept for a Colorado Springs personal trainer: strength without pain, fitness that lasts. Designed in Figma and available for a business that wants to adopt it.",
+		previewImage: "/projects/strength-concept/thumbnail.jpg",
+		thumbnailVideo: "/projects/strength-concept/thumbnail-loop.mp4",
+		livePreview: null,
+		gitHub: null,
+		tags: ["Figma", "Competitor research", "Brand concept"],
+		category: "Design",
+		description:
+			"A brand and website concept for a personal training business focused on pain-free strength. Persona stories (a veteran, a HYROX competitor, a busy professional, a hiker) lead into services, the coach, a step-by-step journey and testimonials, all guiding visitors to book a discovery call. It is a concept, not a launched site, and is up for grabs.",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
+		additionalLinks: [],
+		dateCreated: "2026",
+		fullImages: [1, 2, 3, 4].map(n => `/projects/strength-concept/story${n}.jpg`),
+		slug: "strength-without-pain",
+	},
+	{
 		name: "Natours",
 		shortDescription:
 			"Natours is a full-stack web-application website that lets users check out and book the most exciting tours ever! Features include examples like CRUD operations for admins, payments using stripe, file upload handling and authorization",
 		previewImage: Natours,
 		livePreview: null,
-		gitHub: "https://github.com/Brainilio/natours",
+		gitHub: null,
 		tags: [
 			"React",
 			"MVC",
@@ -364,7 +408,7 @@ const projects = [
 		shortDescription:
 			"Oracui is a global mentorship platform that connects senior students with enrolling students in order to provide mentorship and build relationship. I've been mainly responsible for bringing the product's REST API to MVP ready conditions by improving documentation and adding over 20+ new business features.",
 		previewImage: Oracui,
-		livePreview: "https://oracui.com/",
+		livePreview: null,
 		gitHub: null,
 		tags: ["REACTJS", "REDUX", "EXPRESSJS", "MONGODB", "NODEJS", "GOOGLE API"],
 		category: "Development",
@@ -389,8 +433,8 @@ const projects = [
 		shortDescription:
 			"[WIP] I've developed a landing page, dedicated to my freelance web and creative services under the name of a brand I'm working on (Bay Vine). Bay Vine Media seeks to allow minorities and small businesses to still have a presentable brand and online presence. ",
 		previewImage: BayVineMedia,
-		livePreview: "https://bayvinemedia.com/",
-		gitHub: "https://github.com/Brainilio/bayvinemedia",
+		livePreview: null,
+		gitHub: null,
 		tags: [
 			"REACTJS",
 			"NETLIFY",
@@ -421,8 +465,8 @@ const projects = [
 		shortDescription:
 			"Salvame is an art-initiative to empower and inform the locals of Boyle Heights about environmental racism. I created a web-app using three-js to display local art in an abstract and symbolic way.",
 		previewImage: Salvame,
-		livePreview: "https://salvame-react.netlify.app/",
-		gitHub: "https://github.com/Brainilio/salvame-app",
+		livePreview: null,
+		gitHub: null,
 		tags: ["REACTJS", "THREEJS", "GSAP", "UX/UI", "PITCHING", "USER RESEARCH"],
 		category: "Development",
 		description:
@@ -435,32 +479,7 @@ const projects = [
 			"Next time I would definitely start looking at my tech-stack earlier on, and try to really break my web-application down into little pieces.",
 		takeaway:
 			"This is definitely how I want to approach every project. It is SO important to create something that is meaningful to your users, especially marginalized communities. Salvame was a project that allowed me to talk to fellow Latin(o/a/x)s and get to know more about their stories and experiences. I loved everything from the entrepreneurial side all the way to the technology aspects of it. ",
-		additionalLinks: [
-			{
-				link: "https://drive.google.com/file/d/1nwHwIIIn6-dzKIlBzooOL5XXjlql2UK7/view?usp=sharing",
-				name: "Teaser trailer",
-			},
-			{
-				link: "https://docs.google.com/document/d/12sID1tdnp5DRrCH0kw9jucZTqgWUZTiBcZcCAA-QBNU/edit?usp=sharing",
-				name: "User stories",
-			},
-			{
-				link: "https://docs.google.com/presentation/d/1kgoKBqwh1GhQosHqDB0XlKh-0hEbrd1vAJxy1KWRR9I/edit?usp=sharing",
-				name: "Pitch deck",
-			},
-			{
-				link: "https://drive.google.com/file/d/1yoR-Z9RDGxQXIaVY_V2IwmC8XrcRbVb2/view?usp=sharing",
-				name: "Pitch in front of dragons",
-			},
-			{
-				link: "https://drive.google.com/drive/folders/1Fpd3B_ogXf3KyZdbbQuaGJba8qjwfJar?usp=sharing",
-				name: "Frame your design challenge",
-			},
-			{
-				link: "https://drive.google.com/file/d/1NrkKX2QYba0TBcbk4SsJxwdLKppaHY2A/view?usp=sharing",
-				name: "Executive Summary",
-			},
-		],
+		additionalLinks: [],
 		dateCreated: "JULY, 2020",
 		fullImages: [s1, s2, s3, s4, s5, s6, s7, s8],
 		earlyWork: true,
@@ -472,8 +491,8 @@ const projects = [
 		shortDescription:
 			"Over the past couple of months, my portfolio's gone through a lot of changes. Despite the changes, I'm still incredibly proud of my previous designed and developed portfolio.",
 		previewImage: OldPortfolio,
-		livePreview: "https://dazzling-leakey-c1d429.netlify.app/",
-		gitHub: "https://github.com/Brainilio/MyPortfolio/tree/old-portfolio/src",
+		livePreview: null,
+		gitHub: null,
 		tags: ["REACTJS", "REACT HOOKS", "ADOBEXD", "GSAP"],
 		category: "Development",
 		description: "",
@@ -493,8 +512,8 @@ const projects = [
 		shortDescription:
 			"The burger builder is an app that I developed to train my React competencies. Build your burger, sign/log in and review your orders. React Hooks, Redux, Jest/Enzyme, JWT token based Auth.",
 		previewImage: BurgerBuilder,
-		livePreview: "https://react-my-burger-builder-d060b.web.app/",
-		gitHub: "https://github.com/Brainilio/burger-builder",
+		livePreview: null,
+		gitHub: null,
 		tags: [
 			"REACTJS",
 			"FIREBASE",
@@ -527,7 +546,7 @@ const projects = [
 			"LOL: My Favorite Champ is a MERN-stack application in which users can preview their favorite League of Legends champions and see their in-game pros and cons. This is a project that I made in 2018 and decided to remake in React.",
 		previewImage: Lolmfc,
 		livePreview: null,
-		gitHub: "https://github.com/Brainilio/lol-my-fav-champ",
+		gitHub: null,
 		tags: ["REACTJS", "EXPRESS", "MONGODB", "AWS", "NODEJS"],
 		category: "Development",
 		description:
@@ -540,12 +559,7 @@ const projects = [
 			"Next time, I would sketch out all my components, make sure I develop for mobile-first and add more form validation.",
 		takeaway:
 			"Revamping this project gave me a huge morale boost as a developer. To see how much I grew truly stimulated me to keep pushing forward in refining myself and learning more.",
-		additionalLinks: [
-			{
-				link: "https://vimeo.com/445248487",
-				name: "Previous version",
-			},
-		],
+		additionalLinks: [],
 		dateCreated: "AUGUST, 2020",
 		fullImages: [lol1, lol2, lol3, lol4, lol5],
 		earlyWork: true,
@@ -557,8 +571,8 @@ const projects = [
 		shortDescription:
 			"Thanos Runner is an endless runner game. In order to win the game you have to collect 6 infinity stones and avoid obstacles. This game gets progressively harder the more stones you collect! Use AD to run and SPACE to jump.",
 		previewImage: Thanosrunner,
-		livePreview: "https://brainilio.github.io/ThanosRunner/",
-		gitHub: "https://github.com/Brainilio/ThanosRunner",
+		livePreview: null,
+		gitHub: null,
 		tags: ["TYPESCRIPT", "OOP", "GAME"],
 		category: "Development",
 		description:
@@ -571,12 +585,7 @@ const projects = [
 			"Next time I would make more use of Typescript's type-checking advantages.",
 		takeaway:
 			"Really sticking to certain OOP principles is important to ensure best practices.",
-		additionalLinks: [
-			{
-				link: "https://raw.githubusercontent.com/Brainilio/ThanosRunner/master/UMLklassendiagram.png",
-				name: "UML Diagram",
-			},
-		],
+		additionalLinks: [],
 		dateCreated: "JULY, 2018",
 		fullImages: [t1, t2, t3, t4],
 		earlyWork: true,
@@ -587,8 +596,8 @@ const projects = [
 		shortDescription:
 			"Copy Invaders is a web-game that I developed in under 3 hours for my programming class. I implemented the observer’s pattern, strategy pattern and the singleton pattern in this game.",
 		previewImage: Paperinvaders,
-		livePreview: "https://brainilio.github.io/Typescript_Design_Patterns/",
-		gitHub: "https://github.com/Brainilio/Typescript_Design_Patterns",
+		livePreview: null,
+		gitHub: null,
 		tags: ["TSCRIPT", "DPATTERNS", "OOP"],
 		category: "Development",
 		description:
@@ -612,8 +621,8 @@ const projects = [
 		shortDescription:
 			"My PokeDex is my first ever Android app that I developed using Java and Android Studio. This project was made to play around with Android development concepts and to familiarize myself with different technologies. ",
 		previewImage: PokeDex,
-		livePreview: "",
-		gitHub: "https://github.com/Brainilio/My_Pokedex",
+		livePreview: null,
+		gitHub: null,
 		tags: ["ANDROID", "JAVA", "MOBILE"],
 		category: "Development",
 		description:
@@ -637,8 +646,8 @@ const projects = [
 		shortDescription:
 			"Leidsman is a dutch math discussion platform that allows you to post your favorite math subjects, favorite them and comment on other posts in order to discuss various math subjects.",
 		previewImage: Leidsman,
-		livePreview: "",
-		gitHub: "https://github.com/Brainilio/LeidsmanBegeleiding",
+		livePreview: null,
+		gitHub: null,
 		tags: ["LARAVEL", "PHP", "MVC"],
 		category: "Development",
 		description:
@@ -662,8 +671,8 @@ const projects = [
 		shortDescription:
 			"My first ever “web-application”! I made a reservation system for my mother’s salon in pure PHP, HTML/Materialize & MySQL. Functionalities include form validation, authentication, authorization and full CRUD operations over reservations",
 		previewImage: MariaBeautySalon,
-		livePreview: "https://stud.hosted.hr.nl/0924777/ProjectCLE2SPRINT1/",
-		gitHub: "https://github.com/Brainilio/MariaBeautySalon",
+		livePreview: null,
+		gitHub: null,
 		tags: ["PHP", "MATERIAL", "MYSQL"],
 		category: "Development",
 		description:
@@ -686,8 +695,8 @@ const projects = [
 		shortDescription:
 			"Machine Learning application that includes Kmeans clustering, logistic regression and decision trees using sklearn.",
 		previewImage: Classifier,
-		livePreview: "",
-		gitHub: "https://github.com/Brainilio/MachineLearningExample",
+		livePreview: null,
+		gitHub: null,
 		tags: ["ML", "PYTHON", "SCIKIT"],
 		category: "Development",
 		description:
@@ -720,8 +729,8 @@ comic goliath david, evolife, super bespaar app, killer robots, healthcare robot
 		shortDescription:
 			"",
 		previewImage: null,
-		livePreview: "",
-		gitHub: "",
+		livePreview: null,
+		gitHub: null,
 		tags: [],
 		category: "",
 		description: "",
