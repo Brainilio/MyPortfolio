@@ -183,11 +183,17 @@ const projects = [
 		media: [
 			{ type: "video", src: "/projects/compassion-checkout/thumbnail-loop.mp4", poster: "/projects/compassion-checkout/thumbnail.jpg", alt: "Compassion Checkout flow, from basket to submit", caption: "The checkout flow on the staging site, with test details. The sponsored child's details and the card line are blurred." },
 			{ type: "image", src: "/projects/compassion-checkout/1.jpg", alt: "Checkout summary with the contact form filled in", caption: "Summary step: contact information beside the donation." },
+			{ type: "image", src: "/projects/compassion-checkout/7.jpg", alt: "Checkout in Safari with the Express Checkout Apple Pay button", caption: "In Safari, Express Checkout offers Apple Pay above the form.", layout: "half" },
+			{ type: "image", src: "/projects/compassion-checkout/8.jpg", alt: "The Apple Pay sheet over the checkout, with personal details blurred", caption: "The Apple Pay sheet. Card, contact and address details are blurred.", layout: "half" },
 			{ type: "image", src: "/projects/compassion-checkout/2.jpg", alt: "Checkout billing information fields", layout: "half" },
 			{ type: "image", src: "/projects/compassion-checkout/3.jpg", alt: "Checkout review step with contact and billing details", layout: "half" },
 			{ type: "image", src: "/projects/compassion-checkout/4.jpg", alt: "Checkout review of the donation before submitting" },
 			{ type: "image", src: "/projects/compassion-checkout/5.jpg", alt: "Checkout confirmation: thank you for making a difference", caption: "The confirmation after submitting.", layout: "half" },
-			{ type: "image", src: "/projects/compassion-checkout/6.jpg", alt: "Checkout confirmation with contact and billing summary", layout: "half" }
+			{ type: "image", src: "/projects/compassion-checkout/6.jpg", alt: "Checkout confirmation with contact and billing summary", layout: "half" },
+			{ type: "image", src: "/projects/compassion-checkout/m1.jpg", alt: "Checkout summary on a phone, with two sponsorships in the donation", layout: "portrait", presentation: "phone", tone: "#d6def5", caption: "The same checkout on a phone." },
+			{ type: "image", src: "/projects/compassion-checkout/m2.jpg", alt: "Phone checkout: totals and the start of the contact form", layout: "portrait", presentation: "phone", tone: "#d6def5" },
+			{ type: "image", src: "/projects/compassion-checkout/m3.jpg", alt: "Phone checkout: billing information fields", layout: "portrait", presentation: "phone", tone: "#d6def5" },
+			{ type: "image", src: "/projects/compassion-checkout/m4.jpg", alt: "Phone checkout confirmation: thank you for making a difference", layout: "portrait", presentation: "phone", tone: "#d6def5" }
 		],
 		shortDescription:
 			"Compassion International's checkout, where supporters complete sponsorships and donations. I worked on its Apple sign-in.",
