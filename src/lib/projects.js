@@ -91,11 +91,12 @@ const projects = [
 		name: "Crapp",
 		highlight: "My own app for finding a restroom you can trust, now in beta on TestFlight.",
 		company: "Personal project",
-		role: "Mobile development",
+		role: "Design & mobile development",
 		responsibilities: [
 			"Building the app: Explore, the restroom map, details, reviews and the nine-step Add Restroom flow.",
 			"Poopmergency: a one-tap best nearby match, with a widget for when it can't wait.",
-			"Community contributions: reviews, photos, labels, edits, reports and a contributor leaderboard."
+			"Community contributions: reviews, photos, labels, edits, reports and a contributor leaderboard.",
+			"The brand, mascot, App Store screens and the website at getcrapp.app."
 		],
 		media: [
 			{ type: "image", src: "/projects/crapp/header.jpg", alt: "Crapp: Find. Check. Go now. Three phones showing the app over a city skyline", caption: "Find. Check. Go now." },

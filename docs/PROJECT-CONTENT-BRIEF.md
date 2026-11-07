@@ -17,7 +17,7 @@ Updated 2026-11-05 from the owner's account in the portfolio chat. This is worki
 
 ### Crapp — 2026 — personal project
 
-Owner's personal project. Stack confirmed by the owner: React Native, Expo, TanStack React Query, Supabase. Draft role pills: Personal project, Mobile development. Do not infer its functionality from its name or claim additional features from another chat without retrieving that context. Now on the site (2026-11-06) as the first project: description from getcrapp.app (beta on TestFlight, App Store launch coming), raw app screens and App Store screens supplied by the owner, a 12 s commercial as the thumbnail and a walkthrough loop. Order of selected work: Crapp, MyCompassion, Compassion Checkout, NewCold. Not yet claimed in copy: who made the brand, mascot, website and App Store art — confirm before adding.
+Owner's personal project. Stack confirmed by the owner: React Native, Expo, TanStack React Query, Supabase. Draft role pills: Personal project, Mobile development. Do not infer its functionality from its name or claim additional features from another chat without retrieving that context. Now on the site (2026-11-06) as the first project: description from getcrapp.app (beta on TestFlight, App Store launch coming), raw app screens and App Store screens supplied by the owner, a 12 s commercial as the thumbnail and a walkthrough loop. Order of selected work: Crapp, MyCompassion, Compassion Checkout, NewCold. Owner confirmed (2026-11-06) the brand, mascot, website and App Store art are all theirs; role is now "Design & mobile development".
 
 ### MyCompassion — 2026 — professional work
 
