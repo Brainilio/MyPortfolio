@@ -350,14 +350,15 @@ const projects = [
 			"A full website design in Figma, with persona stories, service cards and a discovery-call journey."
 		],
 		media: [
-			{ type: "video", src: "/projects/strength-concept/motion.mp4", poster: "/projects/strength-concept/motion.jpg", alt: "A motion piece built from the design's headline, service cards and persona stories" },
-			{ type: "video", src: "/projects/strength-concept/laptop-scroll.mp4", poster: "/projects/strength-concept/laptop-scroll.jpg", alt: "The full homepage scrolling section by section on a laptop" },
+			{ type: "video", src: "/projects/strength-concept/scroll.mp4", poster: "/projects/strength-concept/scroll.jpg", alt: "A slow scroll through the full homepage design" },
+			{ type: "video", src: "/projects/strength-concept/laptop-scroll.mp4", poster: "/projects/strength-concept/laptop-scroll.jpg", alt: "The homepage moving section by section on a laptop" },
 			{ type: "image", src: "/projects/strength-concept/section1.jpg", alt: "Hero: Strength without pain. Fitness that lasts." },
 			{ type: "image", src: "/projects/strength-concept/section2.jpg", alt: "Persona stories carousel" },
 			{ type: "image", src: "/projects/strength-concept/section3.jpg", alt: "Most workouts treat symptoms. We fix the cause." },
-			{ type: "video", src: "/projects/strength-concept/laptop-scroll2.mp4", poster: "/projects/strength-concept/laptop-scroll2.jpg", alt: "The homepage scrolling back up on a laptop" },
+			{ type: "video", src: "/projects/strength-concept/motion.mp4", poster: "/projects/strength-concept/motion.jpg", alt: "A motion piece built from the design's headline, service cards and persona stories" },
 			{ type: "image", src: "/projects/strength-concept/section4.jpg", alt: "Meet your coach" },
 			{ type: "image", src: "/projects/strength-concept/section5.jpg", alt: "Coaching that fits your life" },
+			{ type: "video", src: "/projects/strength-concept/laptop-scroll2.mp4", poster: "/projects/strength-concept/laptop-scroll2.jpg", alt: "The homepage scrolling back up on a laptop" },
 			{ type: "image", src: "/projects/strength-concept/section6.jpg", alt: "Your mountain journey to better movement" },
 			{ type: "image", src: "/projects/strength-concept/section7.jpg", alt: "Real people. Real results." },
 			{ type: "image", src: "/projects/strength-concept/section8.jpg", alt: "Start training without pain, and the footer" },
@@ -365,8 +366,7 @@ const projects = [
 		],
 		shortDescription:
 			"A concept for a Colorado Springs personal trainer: strength without pain, fitness that lasts. Designed in Figma and available for a business that wants to adopt it.",
-		previewImage: "/projects/strength-concept/motion.jpg",
-		thumbnailVideo: "/projects/strength-concept/motion.mp4",
+		previewImage: "/projects/strength-concept/thumbnail.jpg",
 		livePreview: null,
 		gitHub: null,
 		tags: ["Figma", "Competitor research", "Brand concept"],
