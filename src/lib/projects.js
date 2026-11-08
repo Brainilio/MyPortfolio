@@ -435,7 +435,10 @@ const projects = [
 			{ type: "image", src: "/projects/garcia/m-pdp.jpg", alt: "Product page on a phone", layout: "portrait", presentation: "phone", tone: "#e9e4dd" },
 			{ type: "image", src: "/projects/garcia/added.jpg", alt: "Added to the bag: the mini bag drops down", layout: "half" },
 			{ type: "image", src: "/projects/garcia/cart.jpg", alt: "The bag, with Apple Pay among the accepted payment methods", layout: "half" },
-			{ type: "image", src: "/projects/garcia/checkout.jpg", alt: "Checkout, step one: email, then delivery and payment" }
+			{ type: "image", src: "/projects/garcia/checkout.jpg", alt: "Checkout, step one: email, then delivery and payment" },
+			{ type: "image", src: "/projects/garcia/payment.jpg", alt: "Checkout, step three: payment methods, with Apple Pay selected" },
+			{ type: "image", src: "/projects/garcia/m-payment.jpg", alt: "The payment step on a phone, with the Apple Pay button", layout: "portrait", presentation: "phone", tone: "#e9e4dd" },
+			{ type: "image", src: "/projects/garcia/payment-applepay.jpg", alt: "Apple Pay selected: the Apple Pay checkout button appears under the option" }
 		],
 		shortDescription: "Apple Pay and back-end work for Garcia, the Dutch jeanswear brand.",
 		previewImage: "/projects/garcia/shop-flow.jpg",
@@ -468,7 +471,10 @@ const projects = [
 			{ type: "image", src: "/projects/jeans-centre/m-pdp.jpg", alt: "Product page on a phone", layout: "portrait", presentation: "phone", tone: "#e3e9de" },
 			{ type: "image", src: "/projects/jeans-centre/added.jpg", alt: "Added to the bag: the mini bag drops down", layout: "half" },
 			{ type: "image", src: "/projects/jeans-centre/cart.jpg", alt: "The bag, with Apple Pay among the accepted payment methods", layout: "half" },
-			{ type: "image", src: "/projects/jeans-centre/checkout.jpg", alt: "Checkout, step one: email, then delivery and payment" }
+			{ type: "image", src: "/projects/jeans-centre/checkout.jpg", alt: "Checkout, step one: email, then delivery and payment" },
+			{ type: "image", src: "/projects/jeans-centre/payment-menu.jpg", alt: "Payment methods: Apple Pay sits under other methods, next to PayPal and Bancontact", layout: "half" },
+			{ type: "image", src: "/projects/jeans-centre/payment-applepay.jpg", alt: "Apple Pay chosen: the Apple Pay checkout button replaces the order button", layout: "half" },
+			{ type: "image", src: "/projects/jeans-centre/m-payment.jpg", alt: "The payment step on a phone, with the Apple Pay button", layout: "portrait", presentation: "phone", tone: "#e3e9de" }
 		],
 		shortDescription: "Apple Pay and back-end work for Jeans Centre, the Dutch family jeans store.",
 		previewImage: "/projects/jeans-centre/shop-flow.jpg",

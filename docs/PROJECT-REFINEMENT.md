@@ -22,7 +22,8 @@ Every project is listed on the site. The new ones are drafts: they have only the
 
 Not possible yet, needs the owner:
 - HKliving cart animation: the 2022 site's cart sits behind the B2B login and isn't in the archive. Need a video or the right snapshot.
-- Garcia / Jeans Centre Apple Pay button itself: it appears at the payment step in Safari, after entering an email and address on the live store. Owner can record it, or approve entering test details.
+
+Apple Pay step (2026-11-08, owner approved test details): went through guest checkout on both live stores with placeholder details (name "Test Portfolio", an example.com email, a public Amsterdam address), no account created, nothing paid. Captured the payment step with Apple Pay selected, desktop and phone. The browser used isn't Safari, so for the capture a display-only `ApplePaySession` stand-in was defined before checkout mounted (the sites only list Apple Pay when Safari reports support). The button's label was drawn in, because only Safari paints `-apple-pay-button`; it matches Safari's Dutch check-out button ("Reken af met  Pay"). The test address is blurred in every capture. A real Safari recording would still be the most faithful version if the owner has one.
 
 ## Existing projects to review
 
