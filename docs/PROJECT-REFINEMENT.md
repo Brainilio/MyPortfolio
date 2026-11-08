@@ -14,6 +14,16 @@ Every project is listed on the site. The new ones are drafts: they have only the
 | HKliving | `hkliving` | Homepage from the Wayback snapshot the owner picked: `web.archive.org/web/20221209080256/https://hkliving.com/`. Year listed as 2021 (owner's word). | Year, company, role, tech. Check whether the headline overlapping the intro text is the real design or an archive artifact. | **Motion idea: the homepage scrolls sideways.** Build a loop of that horizontal scroll. Also capture the owner's work: the search bar animation, the cart animation, product detail pages and the Press Room. |
 | Count Group | `count-group` | Placeholder thumbnail. Year listed as 2021–2022. | Owner will give the right Wayback date (the oldest automatic snapshot, Oct 2022, isn't the version they built). | Captures from that snapshot. |
 
+## Media built (2026-11-08, second pass)
+
+- Compassion Authentication: person-icon loop (thumbnail), phone recording, 9 screens.
+- HKliving: sideways homepage loop (thumbnail), search reel, Press Room reel, product page and homepage stills with photos restored.
+- Garcia and Jeans Centre: shop-flow loop each (thumbnail), listing, product, mini bag, bag (Apple Pay mark), checkout step one, phone product page.
+
+Not possible yet, needs the owner:
+- HKliving cart animation: the 2022 site's cart sits behind the B2B login and isn't in the archive. Need a video or the right snapshot.
+- Garcia / Jeans Centre Apple Pay button itself: it appears at the payment step in Safari, after entering an email and address on the live store. Owner can record it, or approve entering test details.
+
 ## Existing projects to review
 
 Crapp, MyCompassion, Compassion Checkout, NewCold, Karina Rodriguez, JonnyOnTheSpot, Strength Without Pain: check each story, year, company, tech and media.
