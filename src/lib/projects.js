@@ -391,7 +391,7 @@ const projects = [
 		role: "",
 		responsibilities: [],
 		media: [
-			{ type: "video", src: "/projects/compassion-auth/thumbnail-loop.mp4", poster: "/projects/compassion-auth/thumbnail.jpg", alt: "A person icon opens into the Compassion login; the username and password are typed, Continue signs in to MyCompassion, and the icon turns into a green check" },
+			{ type: "video", src: "/projects/compassion-auth/thumbnail-loop.mp4", poster: "/projects/compassion-auth/thumbnail.jpg", alt: "A person icon opens into the Compassion login; the username and password are typed, Continue signs in and the MyCompassion dashboard loads in, and the icon turns into a green check" },
 			{ type: "video", src: "/projects/compassion-auth/phone-recording.mp4", poster: "/projects/compassion-auth/phone-recording.jpg", alt: "On a phone: creating an account, the password rules ticking off as it is typed, then logging in and landing signed in" },
 			{ type: "image", src: "/projects/compassion-auth/login.jpg", alt: "Log in with your Compassion account" },
 			{ type: "image", src: "/projects/compassion-auth/m-rules.jpg", alt: "Create account on a phone: every password rule met and the Create my account button enabled", layout: "portrait", presentation: "phone", tone: "#e6ecf7" },
