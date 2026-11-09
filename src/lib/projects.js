@@ -532,7 +532,7 @@ const projects = [
 		role: "Mobile development",
 		responsibilities: [],
 		media: [
-			{ type: "video", src: "/projects/trend-trade/thumbnail-loop.mp4", poster: "/projects/trend-trade/thumbnail.jpg", alt: "Two phones in front of a clothing rail: one swipes through the onboarding’s fashion photos, the other browses Trend Trade and searches for jeans" },
+			{ type: "video", src: "/projects/trend-trade/thumbnail-loop.mp4", poster: "/projects/trend-trade/thumbnail.jpg", alt: "A tilted wall of Trend Trade screens, the onboarding’s fashion photos among explore, item, booking and posting screens, its columns drifting up and down" },
 			{ type: "video", src: "/projects/trend-trade/onboarding.mp4", poster: "/projects/trend-trade/onboarding.jpg", alt: "The onboarding: swiping from the splash screen through Access more trends, Rent your closet and Quality assurance" },
 			{ type: "image", src: "/projects/trend-trade/m-splash.jpg", alt: "The Trend Trade splash screen: Style anywhere", layout: "portrait", presentation: "phone", tone: "#efe9e1" },
 			{ type: "image", src: "/projects/trend-trade/m-model.jpg", alt: "Onboarding: Rent your closet, earn money by renting out your wardrobe", layout: "portrait", presentation: "phone", tone: "#efe9e1" },
