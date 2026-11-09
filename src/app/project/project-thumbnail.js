@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import './thumbnail.css';
 
-export default function ProjectThumbnail({ project, href }) {
+// `toggle={false}` hides the pause button (the project archive shows the loops without it).
+export default function ProjectThumbnail({ project, href, toggle = true }) {
   const host = useRef(null), movie = useRef(null);
   const [paused, setPaused] = useState(false), [ready, setReady] = useState(false), [reduced, setReduced] = useState(false);
   useEffect(() => {
@@ -28,6 +29,6 @@ export default function ProjectThumbnail({ project, href }) {
       <img src={project.previewImage} alt={`${project.name} screen composition`} loading="lazy" width="1280" height="800" />
       {project.thumbnailVideo && <video ref={movie} className={ready && !reduced ? 'is-ready' : ''} muted loop playsInline preload="none" aria-hidden="true" onLoadedData={() => setReady(true)} />}
     </Link>
-    {project.thumbnailVideo && ready && !reduced && <button className="motion-thumb-toggle" type="button" aria-label={`${paused ? 'Play' : 'Pause'} ${project.name} preview`} aria-pressed={paused} onClick={() => setPaused(value => !value)}>{paused ? '▶' : 'Ⅱ'}</button>}
+    {toggle && project.thumbnailVideo && ready && !reduced && <button className="motion-thumb-toggle" type="button" aria-label={`${paused ? 'Play' : 'Pause'} ${project.name} preview`} aria-pressed={paused} onClick={() => setPaused(value => !value)}>{paused ? '▶' : 'Ⅱ'}</button>}
   </div>;
 }
