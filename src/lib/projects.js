@@ -392,7 +392,7 @@ const projects = [
 		responsibilities: [],
 		media: [
 			{ type: "video", src: "/projects/compassion-auth/thumbnail-loop.mp4", poster: "/projects/compassion-auth/thumbnail.jpg", alt: "A person icon opens into the Compassion login; the username and password are typed, Continue signs in and the MyCompassion dashboard loads in, and the icon turns into a green check" },
-			{ type: "video", src: "/projects/compassion-auth/phone-recording.mp4", poster: "/projects/compassion-auth/phone-recording.jpg", alt: "On a phone: creating an account, the password rules ticking off as it is typed, then logging in and landing signed in" },
+			{ type: "video", src: "/projects/compassion-auth/phone-recording.mp4", poster: "/projects/compassion-auth/phone-recording.jpg", alt: "On a phone: creating an account, the password rules ticking off as it is typed, then logging in and landing on the MyCompassion home" },
 			{ type: "image", src: "/projects/compassion-auth/login.jpg", alt: "Log in with your Compassion account" },
 			{ type: "image", src: "/projects/compassion-auth/m-rules.jpg", alt: "Create account on a phone: every password rule met and the Create my account button enabled", layout: "portrait", presentation: "phone", tone: "#e6ecf7" },
 			{ type: "image", src: "/projects/compassion-auth/create.jpg", alt: "Create account: email or sponsor number, then a username and password" },
@@ -401,7 +401,7 @@ const projects = [
 			{ type: "image", src: "/projects/compassion-auth/m-login-signedin.jpg", alt: "Log in on a phone, with the already-logged-in notice", layout: "portrait", presentation: "phone", tone: "#e6ecf7" },
 			{ type: "image", src: "/projects/compassion-auth/m-create.jpg", alt: "Create account on a phone", layout: "portrait", presentation: "phone", tone: "#e6ecf7" },
 			{ type: "image", src: "/projects/compassion-auth/login-filled.jpg", alt: "The login form filled in with a test account" },
-			{ type: "image", src: "/projects/compassion-auth/signed-in.jpg", alt: "Signed in: MyCompassion, reached through the shared login" }
+			{ type: "image", src: "/projects/compassion-auth/signed-in.jpg", alt: "Signed in: the MyCompassion home, reached through the shared login (children’s photos blurred)" }
 		],
 		shortDescription: "One Compassion login for Compassion.com, MyCompassion and the rest of the Compassion family.",
 		previewImage: "/projects/compassion-auth/thumbnail.jpg",

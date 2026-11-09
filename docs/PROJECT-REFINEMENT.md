@@ -37,3 +37,4 @@ Crapp, MyCompassion, Compassion Checkout, NewCold, Karina Rodriguez, JonnyOnTheS
 - Order: the drafts sit after Strength Without Pain for now, so the homepage's top four (Crapp, MyCompassion, Checkout, NewCold) don't change. Reorder once the stories are settled.
 - Raw captures live in ignored `work/` (`work/auth/shots`, `work/sites/new`).
 - No CC details, children or personal data appear in any of the new captures.
+- Compassion Authentication signed-in screens: the staging test account signs in but its dashboard stays empty, so the desktop loop, the phone recording and the signed-in still land on the filled MyCompassion home from the MyCompassion project (children blurred, placeholder email). The phone dashboard is laid out in the renderer from that desktop capture; there's no real phone capture of it.
