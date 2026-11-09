@@ -6,7 +6,7 @@ export const metadata = { title: 'Project archive — Brainilio' };
 function ProjectGrid({ items }) {
   return <div className="project-grid">{items.map(project => (
     <article className="project-card" key={project.slug}>
-      <div className="project-image"><ProjectThumbnail project={project} href={`/project/${project.slug}/`} toggle={false} /></div>
+      <div className="project-image"><ProjectThumbnail project={project} href={`/project/${project.slug}/`} /></div>
       <h3><Link href={`/project/${project.slug}/`}>{project.name}</Link><span aria-hidden="true">↗</span></h3>
       <p>{project.highlight || project.shortDescription}</p>
       {(project.company || project.role || project.dateCreated) && <span className="archive-card-context">{[project.dateCreated, project.company, project.role].filter(Boolean).join(" · ")}</span>}
