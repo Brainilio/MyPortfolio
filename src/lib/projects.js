@@ -583,9 +583,9 @@ const projects = [
 		// Draft: listed so everything is in place; story, year, company, tech and media to be refined with the owner.
 		name: "Count Group",
 		highlight: "The website for COUNT Group, an energy and petrochemical solutions company.",
-		company: "",
-		role: "",
-		responsibilities: [],
+		company: "COUNT Group",
+		role: "Front-end development",
+		responsibilities: ["Front-end development across the site.", "Animations, including page animations."],
 		media: [
 			{ type: "video", src: "/projects/count-group/thumbnail-loop.mp4", poster: "/projects/count-group/thumbnail.jpg", alt: "The COUNT homepage scrolling from Energy for the future through the three companies, Solutions and COUNT in numbers, then back to the top" },
 			{ type: "image", src: "/projects/count-group/home-hero.jpg", alt: "Homepage: Energy for the future" },
@@ -608,7 +608,7 @@ const projects = [
 		gitHub: null,
 		tags: [],
 		category: "Development",
-		description: "COUNT Group works in energy and petrochemical solutions. I worked on its website in 2021 and early 2022; the site has changed since, so the screens come from the Wayback Machine (December 2022).",
+		description: "COUNT Group works in energy and petrochemical solutions. I worked on its website in 2021 and early 2022 as a front-end developer, building the pages and their animations. The site has changed since, so the screens come from the Wayback Machine (December 2022).",
 		process: "",
 		challenges: "",
 		differently: "",
