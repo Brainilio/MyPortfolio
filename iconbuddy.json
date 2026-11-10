@@ -493,6 +493,61 @@
       "source": "https://files.svgcdn.io/tabler/cloud.svg",
       "path": "public/icons/tech/tabler--cloud.svg",
       "license": "MIT (Tabler)"
+    },
+    "tabler/arrow-down": {
+      "source": "https://files.svgcdn.io/tabler/arrow-down.svg",
+      "path": "public/icons/tech/tabler--arrow-down.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/arrow-left": {
+      "source": "https://files.svgcdn.io/tabler/arrow-left.svg",
+      "path": "public/icons/tech/tabler--arrow-left.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/arrow-right": {
+      "source": "https://files.svgcdn.io/tabler/arrow-right.svg",
+      "path": "public/icons/tech/tabler--arrow-right.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/arrow-up-right": {
+      "source": "https://files.svgcdn.io/tabler/arrow-up-right.svg",
+      "path": "public/icons/tech/tabler--arrow-up-right.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/calendar-event": {
+      "source": "https://files.svgcdn.io/tabler/calendar-event.svg",
+      "path": "public/icons/tech/tabler--calendar-event.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/mail": {
+      "source": "https://files.svgcdn.io/tabler/mail.svg",
+      "path": "public/icons/tech/tabler--mail.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/browser": {
+      "source": "https://files.svgcdn.io/tabler/browser.svg",
+      "path": "public/icons/tech/tabler--browser.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/components": {
+      "source": "https://files.svgcdn.io/tabler/components.svg",
+      "path": "public/icons/tech/tabler--components.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/briefcase": {
+      "source": "https://files.svgcdn.io/tabler/briefcase.svg",
+      "path": "public/icons/tech/tabler--briefcase.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/send": {
+      "source": "https://files.svgcdn.io/tabler/send.svg",
+      "path": "public/icons/tech/tabler--send.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/circle-check": {
+      "source": "https://files.svgcdn.io/tabler/circle-check.svg",
+      "path": "public/icons/tech/tabler--circle-check.svg",
+      "license": "MIT (Tabler)"
     }
   }
 }

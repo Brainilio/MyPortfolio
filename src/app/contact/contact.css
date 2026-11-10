@@ -12,14 +12,36 @@
 .ct-offer li{display:flex;align-items:center;gap:10px}.ct-offer .ui-icon{width:18px;height:18px;color:#c9b6ff}
 .ct-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
 .ct-or{margin:24px 0 10px;font-size:13px;color:rgba(246,248,251,.65)}
-.ct-form{display:grid;gap:12px}
+/* The three-step form: progress dashes, a fieldset per step (fading in), choice cards, then Back / Next. */
+.ct-form{display:grid;gap:14px}
+.ct-hidden{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.ct-progress{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.ct-progress i{height:3px;border-radius:3px;background:rgba(255,255,255,.18);transition:background .3s}.ct-progress i.is-on{background:#c9b6ff}
+.ct-step-count{margin:-4px 0 0;font-size:12px;color:rgba(246,248,251,.6)}
+.ct-step{margin:0;padding:0;border:0;min-width:0;display:grid;gap:12px;animation:ct-in .35s cubic-bezier(.2,.7,.2,1)}
+.ct-step legend{padding:0;margin-bottom:12px;font-size:19px;font-weight:650;letter-spacing:-.02em;outline:none}
+@keyframes ct-in{from{opacity:0;transform:translateY(8px)}}
+.ct-choices{display:grid;gap:8px}
+.ct-choices--goals{grid-template-columns:1fr 1fr}
+.ct-choice{position:relative;display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);cursor:pointer;transition:background .2s,border-color .2s}
+.ct-choice:hover{background:rgba(255,255,255,.12)}
+.ct-choice.is-on{border-color:#c9b6ff;background:rgba(150,120,255,.22)}
+.ct-choice:has(input:focus-visible){outline:2px solid var(--violet);outline-offset:2px}
+.ct-choice input{position:absolute;opacity:0;pointer-events:none}
+.ct-choice .ui-icon{flex:none;width:20px;height:20px;color:#c9b6ff}
+.ct-choice span{display:grid;gap:2px}.ct-choice b{font-size:15px;font-weight:600}.ct-choice small{font-size:13px;color:rgba(246,248,251,.7)}
+.ct-choices--goals .ct-choice b{font-size:14px;font-weight:500}
+.ct-field{display:grid;gap:6px;font-size:13px;color:rgba(246,248,251,.75)}.ct-field em{font-style:normal;opacity:.6}
 .ct-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.ct-form label{display:grid;gap:6px;font-size:13px;color:rgba(246,248,251,.75)}
-.ct-form input,.ct-form textarea{width:100%;font:inherit;font-size:15px;color:#fff;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);resize:vertical}
-.ct-form input:focus,.ct-form textarea:focus{outline:2px solid var(--violet);outline-offset:1px;border-color:transparent}
-.ct-form .ui-btn{justify-self:start}
-.ct-error{margin:0;font-size:13px;color:#ffd6d6}.ct-sent{margin:0;padding:18px 0;font-size:16px}
+.ct-form input:not([type=radio]),.ct-form textarea{width:100%;font:inherit;font-size:15px;color:#fff;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);resize:vertical}
+.ct-form textarea::placeholder{color:rgba(246,248,251,.45)}
+.ct-form input:not([type=radio]):focus,.ct-form textarea:focus{outline:2px solid var(--violet);outline-offset:1px;border-color:transparent}
+.ct-note{margin:-2px 0 0;font-size:13px;color:rgba(246,248,251,.65)}
+.ct-nav{display:flex;justify-content:space-between;gap:10px}.ct-nav .ui-btn:last-child{margin-left:auto}
+.ct-error{margin:0;font-size:13px;color:#ffd6d6}
+.ct-sent{display:flex;align-items:center;gap:12px;padding:18px 0;font-size:16px}.ct-sent p{margin:0}.ct-sent .ui-icon{width:26px;height:26px;color:#9be7b4}
+@media(prefers-reduced-motion:reduce){.ct-step{animation:none}}
 .ct-links{display:flex;gap:18px;margin:22px 0 0;padding:0;list-style:none;font-size:14px}
 .ct-links a{display:inline-flex;align-items:center;gap:6px}.ct-links .ui-icon{width:15px;height:15px;opacity:.7}
 .ct .ui-footer{margin-top:auto;color:rgba(246,248,251,.8);text-shadow:0 1px 6px rgba(10,20,30,.4)}
-@media(max-width:760px){.ct-card{margin:84px 16px 24px}.ct-row{grid-template-columns:1fr}}
+@media(max-width:760px){.ct-card{margin:84px 16px 24px}.ct-row,.ct-choices--goals{grid-template-columns:1fr}}

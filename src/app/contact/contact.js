@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import '../(home)/home.css';
 import './contact.css';
@@ -7,35 +7,10 @@ import { getStage } from '../(home)/stage';
 import SiteHeader from '../site-header';
 import SiteFooter from '../site-footer';
 import { Icon } from '../tech-chip';
+import ContactForm from './contact-form';
 import { EMAIL, LINKS, OFFER, scheduleHref } from '../../lib/contact';
 const CoastScene = dynamic(() => import('../(home)/coast-scene'), { ssr: false });
 const OFFER_ICONS = ['tabler--device-mobile', 'tabler--browser', 'tabler--cloud', 'tabler--components'];
-
-// The form posts to Formspree with fetch and thanks you in place. Replace REPLACE_WITH_ID with the form's ID from
-// formspree.io; until then it asks you to email instead.
-const FORMSPREE = 'https://formspree.io/f/REPLACE_WITH_ID';
-function ContactForm() {
-  const [status, setStatus] = useState('idle');
-  const submit = async event => {
-    event.preventDefault();
-    if (FORMSPREE.endsWith('REPLACE_WITH_ID')) { setStatus('error'); return; }
-    setStatus('sending');
-    try {
-      const response = await fetch(FORMSPREE, { method: 'POST', body: new FormData(event.currentTarget), headers: { Accept: 'application/json' } });
-      setStatus(response.ok ? 'sent' : 'error');
-    } catch { setStatus('error'); }
-  };
-  if (status === 'sent') return <p className="ct-sent" role="status">Got it. I&apos;ll be in touch.</p>;
-  return <form className="ct-form" onSubmit={submit}>
-    <div className="ct-row">
-      <label><span>Name</span><input type="text" name="name" autoComplete="name" required /></label>
-      <label><span>Email</span><input type="email" name="email" autoComplete="email" required /></label>
-    </div>
-    <label><span>What are you building?</span><textarea name="message" rows={4} required /></label>
-    <button className="ui-btn" type="submit" disabled={status === 'sending'}>{status === 'sending' ? 'Sending…' : 'Send message'}<Icon src="/icons/tech/tabler--arrow-right.svg" /></button>
-    {status === 'error' && <p className="ct-error" role="alert">That didn&apos;t go through. Email me at {EMAIL} instead.</p>}
-  </form>;
-}
 
 // The contact page: the Big Sur coast fills the screen behind a frosted card.
 export default function Contact() {
@@ -59,7 +34,7 @@ export default function Contact() {
         <a className="ui-btn" href={scheduleHref}>Book a call<Icon src="/icons/tech/tabler--calendar-event.svg" /></a>
         <a className="ui-btn ui-btn--secondary" href={`mailto:${EMAIL}`}>Email me<Icon src="/icons/tech/tabler--mail.svg" /></a>
       </div>
-      <p className="ct-or">or send a message</p>
+      <p className="ct-or">or tell me what you have in mind</p>
       <ContactForm />
       <ul className="ct-links">{LINKS.map(([label, href]) => <li key={label}><a href={href} target="_blank" rel="noopener noreferrer">{label}<Icon src="/icons/tech/tabler--arrow-up-right.svg" /></a></li>)}</ul>
     </section>

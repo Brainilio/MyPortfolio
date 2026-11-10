@@ -5,7 +5,10 @@ import { TECH_ICONS } from "../src/lib/tech-icons.js";
 const dir = "public/icons/tech"; fs.mkdirSync(dir, { recursive: true });
 const manifest = JSON.parse(fs.readFileSync("iconbuddy.json", "utf8")); manifest.tech = {};
 const failed = [];
-for (const ref of new Set(Object.values(TECH_ICONS))) {
+// Interface icons (buttons, the contact page and its form) live beside the technology icons.
+const UI_ICONS = ["arrow-down", "arrow-left", "arrow-right", "arrow-up-right", "calendar-event", "mail", "browser", "components",
+  "device-mobile", "cloud", "palette", "briefcase", "send", "circle-check"].map(name => `tabler/${name}`);
+for (const ref of new Set([...Object.values(TECH_ICONS), ...UI_ICONS])) {
   const file = `${dir}/${ref.replace("/", "--")}.svg`, source = `https://files.svgcdn.io/${ref}.svg`;
   manifest.tech[ref] = { source, path: file, license: ref.startsWith("tabler/") ? "MIT (Tabler)" : "CC0 (Simple Icons)" };
   if (fs.existsSync(file)) continue;
