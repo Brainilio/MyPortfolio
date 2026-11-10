@@ -137,7 +137,7 @@ const projects = [
         ],
         media: [
             { type: "image", src: mc(1), alt: "MyCompassion supporter portal overview", caption: "The supporter portal. Personal information in these screens has been replaced or obscured." },
-            { type: "image", src: "/projects/my-compassion/scene.jpg", alt: "The MyCompassion portal on a laptop", presentation: "scene" },
+            { type: "image", src: "/projects/my-compassion/collage.jpg", alt: "MyCompassion cards at an angle: a child’s profile, a letter on its way through translation, Just for You suggestions, a project center update and My Sponsored Children. Children’s photos and personal details are blurred." },
             { type: "video", src: "/projects/my-compassion/preview.mp4", poster: mc("poster"), alt: "MyCompassion interface preview", caption: "A short visual tour. Play to explore the interface." },
             { type: "image", src: mc(2), alt: "MyCompassion interface, screen 2", layout: "half" },
             { type: "image", src: mc(3), alt: "MyCompassion interface, screen 3", layout: "half" },
