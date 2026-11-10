@@ -1,7 +1,7 @@
 "use client";
 import { eagleHandoff } from "./eagle-handoff";
 import ProjectThumbnail from "../project/project-thumbnail";
-import TechChip, { Icon } from "../tech-chip";
+import TechChip, { Icon, Roll } from "../tech-chip";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import * as THREE from "three";
@@ -381,8 +381,8 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
         <div className="wl-head">
           <h2 id="ht-work-title" className="wl-title">Built &amp; worked on</h2>
           <p className="wl-pills">
-            <a className="ui-btn ui-btn--secondary" href="/projects/">All work<Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
-            <a className="ui-btn ui-btn--secondary" href="/journey/">Lab<Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
+            <a className="ui-btn ui-btn--secondary" href="/projects/"><Roll>All work</Roll><Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
+            <a className="ui-btn ui-btn--secondary" href="/journey/"><Roll>Lab</Roll><Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
           </p>
       </div>
 
@@ -415,8 +415,8 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       <div className="wl-phone-head">
         <h2 className="wl-title">Built &amp; worked on</h2>
         <p className="wl-pills">
-          <a className="ui-btn ui-btn--secondary" href="/projects/">All work<Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
-          <a className="ui-btn ui-btn--secondary" href="/journey/">Lab<Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
+          <a className="ui-btn ui-btn--secondary" href="/projects/"><Roll>All work</Roll><Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
+          <a className="ui-btn ui-btn--secondary" href="/journey/"><Roll>Lab</Roll><Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
         </p>
       </div>
       <ul className="wl-phone">

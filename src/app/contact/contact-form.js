@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { Icon } from '../tech-chip';
+import { Icon, Roll } from '../tech-chip';
 import { EMAIL } from '../../lib/contact';
 
 // A three-step enquiry: what it's about, the main goal, then how to reach you (email or phone, at least one).
@@ -100,9 +100,9 @@ export default function ContactForm() {
     {error && <p className="ct-error" role="alert">{error}</p>}
     <div className="ct-nav">
       {step > 0 && <button type="button" className="ui-btn ui-btn--secondary" onClick={() => { setError(''); setStep(s => s - 1); }}>
-        <Icon src="/icons/tech/tabler--arrow-left.svg" />Back</button>}
+        <Icon src="/icons/tech/tabler--arrow-left.svg" /><Roll>Back</Roll></button>}
       <button className="ui-btn" type="submit" disabled={status === 'sending'}>
-        {step < 2 ? 'Next' : status === 'sending' ? 'Sending…' : 'Send'}<Icon src={`/icons/tech/tabler--${step < 2 ? 'arrow-right' : 'send'}.svg`} /></button>
+        <Roll>{step < 2 ? 'Next' : status === 'sending' ? 'Sending…' : 'Send'}</Roll><Icon src={`/icons/tech/tabler--${step < 2 ? 'arrow-right' : 'send'}.svg`} /></button>
     </div>
   </form>;
 }

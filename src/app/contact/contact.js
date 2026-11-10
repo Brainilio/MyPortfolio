@@ -6,7 +6,7 @@ import './contact.css';
 import { getStage } from '../(home)/stage';
 import SiteHeader from '../site-header';
 import SiteFooter from '../site-footer';
-import { Icon } from '../tech-chip';
+import { Icon, Roll } from '../tech-chip';
 import ContactForm from './contact-form';
 import { EMAIL, LINKS, OFFER, scheduleHref } from '../../lib/contact';
 const CoastScene = dynamic(() => import('../(home)/coast-scene'), { ssr: false });
@@ -31,8 +31,8 @@ export default function Contact() {
         {OFFER.map((line, i) => <li key={line}><Icon src={`/icons/tech/${OFFER_ICONS[i]}.svg`} />{line}</li>)}
       </ul>
       <div className="ct-actions">
-        <a className="ui-btn" href={scheduleHref}>Book a call<Icon src="/icons/tech/tabler--calendar-event.svg" /></a>
-        <a className="ui-btn ui-btn--secondary" href={`mailto:${EMAIL}`}>Email me<Icon src="/icons/tech/tabler--mail.svg" /></a>
+        <a className="ui-btn" href={scheduleHref}><Roll>Book a call</Roll><Icon src="/icons/tech/tabler--calendar-event.svg" /></a>
+        <a className="ui-btn ui-btn--secondary" href={`mailto:${EMAIL}`}><Roll>Email me</Roll><Icon src="/icons/tech/tabler--mail.svg" /></a>
       </div>
       <p className="ct-or">or tell me what you have in mind</p>
       <ContactForm />

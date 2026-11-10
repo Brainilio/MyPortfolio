@@ -19,14 +19,20 @@
 .ui-chip .ui-icon{width:15px;height:15px;opacity:.9}
 
 /* Header: a frosted bar that stays readable over the 3D, linking to the pages. */
-.ui-header{position:fixed;z-index:40;top:16px;left:50%;transform:translateX(-50%);width:max-content;max-width:calc(100% - 24px);display:flex;align-items:center;justify-content:space-between;gap:28px;
-  padding:6px 6px 6px 22px;border-radius:999px;color:var(--ui-cream)}
-.ui-header .ui-wordmark{font-weight:750;font-size:18px;letter-spacing:-.04em}.ui-wordmark span{color:var(--ui-violet)}
-.ui-header nav{display:flex;align-items:center;gap:4px}
+/* Header: the wordmark on the left edge of the page, the links in a centred pill. The bar itself lets clicks through. */
+.ui-header{position:fixed;z-index:40;top:16px;left:0;right:0;display:flex;align-items:center;justify-content:center;padding:0 var(--gutter,24px);pointer-events:none;color:var(--ui-cream)}
+.ui-header>*{pointer-events:auto}
+.ui-header .ui-wordmark{position:absolute;left:var(--gutter,24px);font-weight:750;font-size:20px;letter-spacing:-.04em;text-shadow:0 1px 10px rgba(10,14,30,.45)}.ui-wordmark span{color:var(--ui-violet)}
+.ui-header nav{display:flex;align-items:center;gap:4px;padding:6px;border-radius:999px}
 .ui-header nav a{padding:10px 14px;border-radius:999px;font-size:14px;transition:background .2s}
-.ui-header nav a:hover,.ui-header nav a[aria-current=page]{background:rgba(255,255,255,.1)}
+.ui-header nav a:not(.ui-btn):hover,.ui-header nav a[aria-current=page]{background:rgba(255,255,255,.1)}
 .ui-header .ui-btn{min-height:40px;padding:0 16px;font-size:14px;margin-left:6px;white-space:nowrap;border-radius:999px}
-@media(max-width:700px){.ui-header{top:10px;gap:10px;padding:5px 5px 5px 16px}.ui-header nav a{padding:9px 9px;font-size:13px}.ui-header nav .ui-hide-sm{display:none}.ui-header .ui-btn{padding:0 12px}}
+@media(max-width:700px){.ui-header{top:10px;justify-content:flex-end;padding:0 12px}.ui-header .ui-wordmark{left:16px;font-size:18px}.ui-header nav{padding:5px}.ui-header nav a{padding:9px 10px;font-size:13px}.ui-header nav .ui-hide-sm{display:none}.ui-header .ui-btn{padding:0 12px}}
+/* Button labels roll: on hover the text slides up and a copy rises in from below. */
+.ui-roll{display:inline-block;overflow:hidden;vertical-align:middle;height:1.3em;line-height:1.3}
+.ui-roll>span{display:flex;flex-direction:column;transition:transform .45s cubic-bezier(.65,0,.35,1)}
+.ui-btn:hover .ui-roll>span,.ui-btn:focus-visible .ui-roll>span{transform:translateY(-50%)}
+@media(prefers-reduced-motion:reduce){.ui-roll>span{transition:none}.ui-btn:hover .ui-roll>span,.ui-btn:focus-visible .ui-roll>span{transform:none}}
 
 /* Footer: the same on every page; credits open in a dialog. */
 .ui-footer{position:relative;z-index:5;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;padding:22px var(--gutter,24px);font-size:13px;color:rgba(251,247,255,.7)}

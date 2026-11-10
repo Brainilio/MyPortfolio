@@ -5,7 +5,7 @@ import ProjectMedia from '../project-media';
 import StickySummary from '../sticky-summary';
 import SiteHeader from '../../site-header';
 import SiteFooter from '../../site-footer';
-import TechChip, { Icon } from '../../tech-chip';
+import TechChip, { Icon, Roll } from '../../tech-chip';
 import '../project.css';
 
 const MOTIONS = ['rise', 'zoom', 'slide-left', 'parallax', 'tilt', 'slide-right'];
@@ -65,8 +65,8 @@ export default async function Project({ params }) {
         <h2>Have something in mind?</h2>
         <p>A project, a role or an idea: I&apos;d like to hear about it.</p>
         <div className="case-talk-actions">
-          <Link className="ui-btn" href="/contact/">Let&apos;s talk<Icon src="/icons/tech/tabler--arrow-up-right.svg" /></Link>
-          <a className="ui-btn ui-btn--secondary" href="mailto:brainilioir@gmail.com"><Icon src="/icons/tech/tabler--mail.svg" />Email me</a>
+          <Link className="ui-btn" href="/contact/"><Roll>Let&apos;s talk</Roll><Icon src="/icons/tech/tabler--arrow-up-right.svg" /></Link>
+          <a className="ui-btn ui-btn--secondary" href="mailto:brainilioir@gmail.com"><Icon src="/icons/tech/tabler--mail.svg" /><Roll>Email me</Roll></a>
         </div>
       </div>
       {next && next !== project && <Link className="case-next" href={`/project/${next.slug}/`}>

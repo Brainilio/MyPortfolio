@@ -15,7 +15,7 @@ const SkillsScene = dynamic(() => import("./skills-scene"), { ssr: false });
 import { SKILLS } from "./content";
 import SiteHeader from "../site-header";
 import SiteFooter from "../site-footer";
-import { Icon } from "../tech-chip";
+import { Icon, Roll } from "../tech-chip";
 import { techIcon } from "../../lib/tech-icons";
 import { scheduleHref, RESUME_URL as RESUME } from "../../lib/contact";
 const work = allProjects.filter(project => project.slug && project.previewImage && !project.earlyWork).slice(0, 4);
@@ -222,8 +222,8 @@ export default function Home({ copy = {} }) {
           <p className="ht-roles"><span className="ht-sr">I build mobile apps, web platforms, cloud back ends and design systems.</span><span aria-hidden="true">I build</span> <SlidingWords /></p>
           <p className="ht-lede">{("Full-stack developer working mostly in React, React Native and AWS. I design and build products from the first sketch to production.")}</p>
           <div className="ht-links">
-            <a className="ui-btn" href="#work" onClick={event => { event.preventDefault(); jump(WORK); }}>See my work<Icon src="/icons/tech/tabler--arrow-down.svg" /></a>
-            <a className="ui-btn ui-btn--secondary" href="/contact/">Let&apos;s talk<Icon src="/icons/tech/tabler--arrow-up-right.svg" /></a>
+            <a className="ui-btn" href="#work" onClick={event => { event.preventDefault(); jump(WORK); }}><Roll>See my work</Roll><Icon src="/icons/tech/tabler--arrow-down.svg" /></a>
+            <a className="ui-btn ui-btn--secondary" href="/contact/"><Roll>Let&apos;s talk</Roll><Icon src="/icons/tech/tabler--arrow-up-right.svg" /></a>
           </div>
         </div>
       </section>
@@ -237,7 +237,7 @@ export default function Home({ copy = {} }) {
           <div className="ht-portrait" aria-hidden="true" />
           <RevealHeading id="ht-about-title" text={copyText(copy.about_heading, "Around the fire")} />
           <p>{("I’m a full-stack developer from the Netherlands, now in Colorado Springs. I work across the whole product: React and Next.js on the web, React Native on phones, and serverless on AWS behind them, with SST, Lambda, AppSync and Cognito. I like owning a feature from the data model to the last bit of motion. Away from the keyboard you’ll find me on a trail, on a road trip through a national park, or by a campfire.")}</p>
-          <div className="ht-links"><a className="ui-btn ui-btn--secondary" href={RESUME} target="_blank" rel="noopener noreferrer">Resume<Icon src="/icons/tech/tabler--arrow-up-right.svg" /></a></div>
+          <div className="ht-links"><a className="ui-btn ui-btn--secondary" href={RESUME} target="_blank" rel="noopener noreferrer"><Roll>Resume</Roll><Icon src="/icons/tech/tabler--arrow-up-right.svg" /></a></div>
         </div>
       </section>
 
@@ -288,8 +288,8 @@ export default function Home({ copy = {} }) {
           <h2 id="ht-outro-title">Have something in mind?</h2>
           <p>Mobile apps, web platforms and the cloud behind them. Tell me what you&apos;re building.</p>
           <div className="ht-links">
-            <a className="ui-btn" href="/contact/">Let&apos;s talk<Icon src="/icons/tech/tabler--arrow-up-right.svg" /></a>
-            <a className="ui-btn ui-btn--secondary" href={scheduleHref}>Book a call<Icon src="/icons/tech/tabler--calendar-event.svg" /></a>
+            <a className="ui-btn" href="/contact/"><Roll>Let&apos;s talk</Roll><Icon src="/icons/tech/tabler--arrow-up-right.svg" /></a>
+            <a className="ui-btn ui-btn--secondary" href={scheduleHref}><Roll>Book a call</Roll><Icon src="/icons/tech/tabler--calendar-event.svg" /></a>
           </div>
         </div>
         <SiteFooter />
