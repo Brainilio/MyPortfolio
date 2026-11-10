@@ -100,8 +100,7 @@ const projects = [
 		],
 		media: [
 			{ type: "image", src: "/projects/crapp/header.jpg", alt: "Crapp: Find. Check. Go now. Three phones showing the app over a city skyline", caption: "Find. Check. Go now." },
-			{ type: "image", src: "/projects/crapp/scene-map.jpg", alt: "Crapp’s map in someone’s hands", presentation: "scene", layout: "half" },
-			{ type: "image", src: "/projects/crapp/scene-detail.jpg", alt: "A Crapp restroom page on a phone", presentation: "scene", layout: "half" },
+			{ type: "video", src: "/projects/crapp/screens-flow.mp4", poster: "/projects/crapp/screens-flow.jpg", alt: "Crapp’s screens sliding past one by one on Crapp blue: Explore, the map, a restroom page, adding a restroom, the label guide and Poopmergency" },
 			{ type: "video", src: "/projects/crapp/thumbnail-loop.mp4", poster: "/projects/crapp/thumbnail.jpg", alt: "Crapp commercial: Need to go? Find. Check. Go now!", caption: "Need To Go? Find. Check. Go Now." },
 			{ type: "video", src: "/projects/crapp/walkthrough.mp4", poster: "/projects/crapp/walkthrough.jpg", alt: "Crapp on a phone: Explore, the map, a restroom card and Poopmergency", caption: "From Explore to the map, a restroom card, then Poopmergency's best match." },
 			{ type: "image", src: "/projects/crapp/s1.jpg", alt: "App Store screen: Find relief nearby", layout: "portrait" },
@@ -111,12 +110,7 @@ const projects = [
 			{ type: "image", src: "/projects/crapp/s5.jpg", alt: "App Store screen: Make the map better", layout: "portrait" },
 			{ type: "image", src: "/projects/crapp/s6.jpg", alt: "App Store screen: In a Poopmergency?", layout: "portrait" },
 			{ type: "image", src: "/projects/crapp/s7.jpg", alt: "App Store screen: Better together", layout: "portrait", caption: "The App Store screens." },
-			{ type: "image", src: "/projects/crapp/p1.jpg", alt: "Crapp Explore screen", layout: "portrait", presentation: "phone", tone: "#d3e1ff", caption: "Screens from the app." },
-			{ type: "image", src: "/projects/crapp/p2.jpg", alt: "Crapp map with restroom pins and nearby sanctuaries", layout: "portrait", presentation: "phone", tone: "#d3e1ff" },
-			{ type: "image", src: "/projects/crapp/p3.jpg", alt: "Crapp restroom details with ratings and restroom information", layout: "portrait", presentation: "phone", tone: "#d3e1ff" },
-			{ type: "image", src: "/projects/crapp/p4.jpg", alt: "Add Restroom step 6: rating and cleanliness", layout: "portrait", presentation: "phone", tone: "#d3e1ff" },
-			{ type: "image", src: "/projects/crapp/p5.jpg", alt: "Add Restroom label guide with positive and cautionary labels", layout: "portrait", presentation: "phone", tone: "#d3e1ff" },
-			{ type: "image", src: "/projects/crapp/p6.jpg", alt: "Poopmergency: best nearby match using your preferences", layout: "portrait", presentation: "phone", tone: "#d3e1ff" }
+			{ type: "image", src: "/projects/crapp/screens.jpg", alt: "Six Crapp screens side by side: Explore, the map with nearby sanctuaries, a restroom page, rating a restroom, the label guide and Poopmergency" },
 		],
 		shortDescription:
 			"Crapp helps you find a restroom when you need one: nearby options on a map, with community reviews and the practical details that matter, then Go Now.",
