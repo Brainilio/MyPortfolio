@@ -3,3 +3,14 @@
   publish = "out"
 [build.environment]
   NODE_VERSION = "24"
+
+# Garcia and Jeans Centre are one project now.
+[[redirects]]
+  from = "/project/garcia/*"
+  to = "/project/jogg-group/"
+  status = 301
+
+[[redirects]]
+  from = "/project/jeans-centre/*"
+  to = "/project/jogg-group/"
+  status = 301
