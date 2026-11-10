@@ -42,7 +42,7 @@ export default async function Project({ params }) {
         </dl>
         {project.responsibilities?.length > 0 && <section className="case-responsibilities"><h2>My contribution</h2><ul>{project.responsibilities.map(text=><li key={text}>{text}</li>)}</ul></section>}
         <ul className="case-pills" aria-label="Technologies">{project.tags.map(tag=><li key={tag}>{tag}</li>)}</ul>
-        {project.description && <details className="case-description"><summary>About the project</summary><p>{project.description}</p></details>}
+        {project.description && <section className="case-description"><h2>About the project</h2><p>{project.description}</p></section>}
         {(project.gitHub || project.livePreview) && <div className="case-links">{project.gitHub && <a href={project.gitHub} target="_blank" rel="noreferrer">View code ↗</a>}{project.livePreview && <a href={project.livePreview} target="_blank" rel="noreferrer">Visit website ↗</a>}</div>}
       </StickySummary>
       <section className="case-gallery" aria-label={`${project.name} gallery`}>
