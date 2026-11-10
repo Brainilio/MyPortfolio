@@ -420,7 +420,7 @@ const projects = [
 		slug: "compassion-auth",
 	},
 	{
-		// Garcia and Jeans Centre, both JOGG Group stores, built as one project at foryouandyourcustomers (Amsterdam). Year still to confirm.
+		// Garcia and Jeans Centre, both JOGG Group stores, built as one project at foryouandyourcustomers (Amsterdam), 2022–2023.
 		name: "Garcia & Jeans Centre",
 		highlight: "Back-end and Apple Pay for the webshops of Garcia and Jeans Centre, two JOGG Group stores on one platform.",
 		company: "foryouandyourcustomers",
@@ -465,7 +465,7 @@ const projects = [
 		differently: "",
 		takeaway: "",
 		additionalLinks: [],
-		dateCreated: "",
+		dateCreated: "2022–2023",
 		slug: "jogg-group",
 	},
 	{
