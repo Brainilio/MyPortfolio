@@ -8,9 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 // Videos autoplay (muted, looping) while on screen and pause when they leave or the tab hides; reduced motion keeps them still.
 export default function ProjectMedia({ item, priority = false, motion = 'rise' }) {
   const figure = useRef(null), video = useRef(null);
-  // Tall screenshots read as phone screens, unless the item says otherwise (cards, long page designs).
-  const phoneLike = !item.flat && item.presentation !== "longpage";
-  const [portrait, setPortrait] = useState(phoneLike && item.layout === "portrait");
+  // No device frames: every image shows as it is (phone screens are combined into one picture beforehand).
   const [shown, setShown] = useState(priority);
   const kind = item.motion || (item.type === 'video' && (motion === 'zoom' || motion === 'parallax') ? 'rise' : motion);
 
@@ -41,13 +39,13 @@ export default function ProjectMedia({ item, priority = false, motion = 'rise' }
   }, []);
 
   return <figure ref={figure} data-motion={kind} data-shown={shown ? '' : undefined}
-    className={`case-media case-media--${item.layout || 'wide'} case-media--${item.presentation || 'plain'}${portrait ? " case-media--compact" : ""}`}
+    className={`case-media case-media--${item.layout || 'wide'} case-media--${item.presentation || 'plain'}`}
     style={{ '--media-tone': item.tone || '#e9e5ee' }}>
     <div className="case-media-surface">
       <div className="case-media-frame">
         {item.type === 'video'
           ? <video ref={video} src={item.src} poster={item.poster} muted loop playsInline preload="metadata" aria-label={item.alt} />
-          : <img onLoad={event => setPortrait(phoneLike && event.currentTarget.naturalHeight > event.currentTarget.naturalWidth * 1.2)} src={item.src} alt={item.alt} loading={priority ? 'eager' : 'lazy'} decoding="async" />}
+          : <img src={item.src} alt={item.alt} loading={priority ? 'eager' : 'lazy'} decoding="async" />}
       </div>
     </div>
   </figure>;
