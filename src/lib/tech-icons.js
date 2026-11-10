@@ -13,7 +13,7 @@ export const TECH_ICONS = {
   "react query": "simple-icons/reactquery", "tanstack query": "simple-icons/reactquery",
   "redux": "tabler/brand-redux", "react router": "simple-icons/reactrouter",
   "aws": "tabler/brand-aws", "aws ec2 & s3": "tabler/brand-aws", "aws lambda": "simple-icons/awslambda", "lambda": "simple-icons/awslambda",
-  "cognito": "simple-icons/amazoncognito", "dynamodb": "simple-icons/amazondynamodb", "sst": "simple-icons/sst",
+  "cognito": "simple-icons/amazoncognito", "dynamodb": "simple-icons/amazondynamodb", "elasticache": "simple-icons/amazonelasticache", "eas": "simple-icons/expo", "testflight": "tabler/brand-apple", "sst": "simple-icons/sst",
   "redis": "simple-icons/redis", "salesforce": "simple-icons/salesforce", "supabase": "simple-icons/supabase", "firebase": "tabler/brand-firebase",
   "mongodb": "tabler/brand-mongodb", "mysql": "simple-icons/mysql", "nx": "simple-icons/nx",
   "tailwind css": "tabler/brand-tailwind", "tailwind": "tabler/brand-tailwind", "gsap": "simple-icons/greensock",

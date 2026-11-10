@@ -179,6 +179,16 @@
       "path": "public/icons/tech/simple-icons--amazondynamodb.svg",
       "license": "CC0 (Simple Icons)"
     },
+    "simple-icons/amazonelasticache": {
+      "source": "https://files.svgcdn.io/simple-icons/amazonelasticache.svg",
+      "path": "public/icons/tech/simple-icons--amazonelasticache.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "tabler/brand-apple": {
+      "source": "https://files.svgcdn.io/tabler/brand-apple.svg",
+      "path": "public/icons/tech/tabler--brand-apple.svg",
+      "license": "MIT (Tabler)"
+    },
     "simple-icons/sst": {
       "source": "https://files.svgcdn.io/simple-icons/sst.svg",
       "path": "public/icons/tech/simple-icons--sst.svg",
@@ -273,11 +283,6 @@
       "source": "https://files.svgcdn.io/simple-icons/applepay.svg",
       "path": "public/icons/tech/simple-icons--applepay.svg",
       "license": "CC0 (Simple Icons)"
-    },
-    "tabler/brand-apple": {
-      "source": "https://files.svgcdn.io/tabler/brand-apple.svg",
-      "path": "public/icons/tech/tabler--brand-apple.svg",
-      "license": "MIT (Tabler)"
     },
     "tabler/brand-figma": {
       "source": "https://files.svgcdn.io/tabler/brand-figma.svg",
