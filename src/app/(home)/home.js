@@ -13,7 +13,6 @@ const AboutScene = dynamic(() => import("./about-scene"), { ssr: false });
 const WorkShowcase = dynamic(() => import("./work-showcase"), { ssr: false });
 const SkillsScene = dynamic(() => import("./skills-scene"), { ssr: false });
 import { SKILLS } from "./content";
-import SiteHeader from "../site-header";
 import SiteFooter from "../site-footer";
 import { Icon, Roll } from "../tech-chip";
 import { techIcon } from "../../lib/tech-icons";
@@ -212,7 +211,6 @@ export default function Home({ copy = {} }) {
     <main ref={mainRef} className={`ht${loaded ? " is-entered" : ""}`} data-section={SECTIONS[section].id}>
       <div className="ht-skies" aria-hidden="true"><div className="ht-sky-live" ref={sky} /></div>
       <div className="ht-finish" aria-hidden="true" />
-      <SiteHeader />
 
       <section className="ht-zone ht-home" id="home" ref={el => (zones.current[0] = el)} aria-label="Introduction">
         <div className="ht-stage"><IslandScene active={scene} onReady={onReady(0)} /></div>

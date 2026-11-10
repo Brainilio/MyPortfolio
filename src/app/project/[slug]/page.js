@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation';
 import projects from '../../../lib/projects';
 import ProjectMedia from '../project-media';
 import StickySummary from '../sticky-summary';
-import SiteHeader from '../../site-header';
 import SiteFooter from '../../site-footer';
 import TechChip, { Icon, Roll } from '../../tech-chip';
 import '../project.css';
@@ -40,7 +39,6 @@ export default async function Project({ params }) {
   const motionOffset = [...project.slug].reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % MOTIONS.length;
   const intro = !early && (project.highlight || project.shortDescription);
   return <div className="case-page">
-    <SiteHeader />
     <main className="case-layout">
       <StickySummary>
         <Link className="case-back" href="/projects/"><Icon src="/icons/tech/tabler--arrow-left.svg" />All work</Link>

@@ -51,10 +51,6 @@ export default function WorldExperiment({ slug }) {
       {experiment.world === "hike" && <HikeScene state={state} altitude={altitude} slot={0} />}
       {experiment.world === "lighthouse" && <CoastScene state={state} onSpot={setSpotted} slot={0} />}
       {experiment.world === "meadow" && <MeadowStage state={state} />}
-      <header className="lab-top">
-        <Link href="/" className="journey-wordmark">Brainilio<span>.</span></Link>
-        <Link href="/journey/" className="lab-name">Lab</Link>
-      </header>
 
       <main className="lab-panel" id="main">
         <h1>{experiment.title}</h1>

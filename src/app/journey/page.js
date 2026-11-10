@@ -8,9 +8,7 @@ export const metadata = { title: "Lab — Brainilio" };
 export default function LabPage() {
   return (
     <div className="lab-index">
-      <header className="lab-index-top">
-        <Link href="/" className="journey-wordmark">Brainilio<span>.</span></Link>
-      </header>
+      <div className="lab-index-top" aria-hidden="true" />
       <main id="main">
         <h1>Lab<span>.</span></h1>
         <p className="lab-index-intro">Small experiments: 3D scenes, interface details and animation tricks.</p>

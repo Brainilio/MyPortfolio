@@ -4,7 +4,6 @@ import dynamic from 'next/dynamic';
 import '../(home)/home.css';
 import './contact.css';
 import { getStage } from '../(home)/stage';
-import SiteHeader from '../site-header';
 import SiteFooter from '../site-footer';
 import { Icon, Roll } from '../tech-chip';
 import ContactForm from './contact-form';
@@ -21,7 +20,6 @@ export default function Contact() {
   }, []);
   return <main ref={main} className="ht ct" data-section="contact">
     <div className="ct-sky" aria-hidden="true" />
-    <SiteHeader current="/contact/" />
     <section className="ct-stage" aria-hidden="true"><CoastScene state={state} slot={4} lite /></section>
     <section className="ct-card ui-glass" aria-labelledby="ct-title">
       <p className="ht-badge"><i aria-hidden="true" />Available for freelance projects</p>

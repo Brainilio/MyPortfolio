@@ -40,10 +40,6 @@ export default function SpaceExperiment({ slug }) {
     <div className="journey lab" ref={root} data-stage={chapter.id} onPointerDown={shoot}>
       <JourneyScene controls={controls} flashRef={flash} hudRef={hud} scoreRef={score} onPhase={onPhase} />
       <div className="journey-flash" ref={flash} aria-hidden="true" />
-      <header className="lab-top">
-        <Link href="/" className="journey-wordmark">Brainilio<span>.</span></Link>
-        <Link href="/journey/" className="lab-name">Lab</Link>
-      </header>
       {debug && <output className="journey-debug" ref={hud} />}
       <SpaceAudio src="/audio/space-ambient.mp3" />
 
