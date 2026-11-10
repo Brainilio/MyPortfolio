@@ -469,6 +469,11 @@
       "path": "public/icons/tech/tabler--git-merge.svg",
       "license": "MIT (Tabler)"
     },
+    "simple-icons/lighthouse": {
+      "source": "https://files.svgcdn.io/simple-icons/lighthouse.svg",
+      "path": "public/icons/tech/simple-icons--lighthouse.svg",
+      "license": "CC0 (Simple Icons)"
+    },
     "tabler/cloud": {
       "source": "https://files.svgcdn.io/tabler/cloud.svg",
       "path": "public/icons/tech/tabler--cloud.svg",

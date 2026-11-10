@@ -32,7 +32,7 @@ export const TECH_ICONS = {
   "unit testing": "tabler/test-pipe", "oop": "tabler/code", "dpatterns": "tabler/topology-star", "game": "tabler/device-gamepad-2",
   "design patterns": "tabler/topology-star", "materialize": "simple-icons/materialdesign", "machine learning": "tabler/brain", "scikit-learn": "simple-icons/scikitlearn",
   "jwt": "simple-icons/jsonwebtokens", "apollo": "simple-icons/apollographql", "oauth": "tabler/key",
-  "mobile": "tabler/device-mobile", "agile": "tabler/refresh", "ci/cd": "tabler/git-merge", "serverless": "tabler/cloud",
+  "mobile": "tabler/device-mobile", "agile": "tabler/refresh", "ci/cd": "tabler/git-merge", "lighthouse": "simple-icons/lighthouse", "serverless": "tabler/cloud",
 };
 export const techIcon = name => {
   const ref = TECH_ICONS[String(name).trim().toLowerCase()];
