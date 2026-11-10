@@ -189,6 +189,11 @@
       "path": "public/icons/tech/simple-icons--redis.svg",
       "license": "CC0 (Simple Icons)"
     },
+    "simple-icons/salesforce": {
+      "source": "https://files.svgcdn.io/simple-icons/salesforce.svg",
+      "path": "public/icons/tech/simple-icons--salesforce.svg",
+      "license": "CC0 (Simple Icons)"
+    },
     "simple-icons/supabase": {
       "source": "https://files.svgcdn.io/simple-icons/supabase.svg",
       "path": "public/icons/tech/simple-icons--supabase.svg",

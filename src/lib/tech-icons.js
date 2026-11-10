@@ -14,7 +14,7 @@ export const TECH_ICONS = {
   "redux": "tabler/brand-redux", "react router": "simple-icons/reactrouter",
   "aws": "tabler/brand-aws", "aws ec2 & s3": "tabler/brand-aws", "aws lambda": "simple-icons/awslambda", "lambda": "simple-icons/awslambda",
   "cognito": "simple-icons/amazoncognito", "dynamodb": "simple-icons/amazondynamodb", "sst": "simple-icons/sst",
-  "redis": "simple-icons/redis", "supabase": "simple-icons/supabase", "firebase": "tabler/brand-firebase",
+  "redis": "simple-icons/redis", "salesforce": "simple-icons/salesforce", "supabase": "simple-icons/supabase", "firebase": "tabler/brand-firebase",
   "mongodb": "tabler/brand-mongodb", "mysql": "simple-icons/mysql", "nx": "simple-icons/nx",
   "tailwind css": "tabler/brand-tailwind", "tailwind": "tabler/brand-tailwind", "gsap": "simple-icons/greensock",
   "three.js": "tabler/brand-threejs", "threejs": "tabler/brand-threejs", "framer motion": "tabler/brand-framer-motion",

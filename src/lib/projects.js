@@ -249,8 +249,8 @@ const projects = [
 	{
 		name: "Karina Rodriguez",
 		highlight: "Designed and built the site, from Figma to Next.js.",
-		company: "Karina Rodriguez Coaching",
-		companyLabel: "Client",
+		company: "Karina Rodriguez",
+		companyLabel: "Freelance",
 		role: "Designed & built",
 		responsibilities: [],
 		media: [
@@ -290,8 +290,8 @@ const projects = [
 	{
 		name: "JonnyOnTheSpot",
 		highlight: "Designed and built the landing page for a Bay Area mobile bar.",
-		company: "JonnyOnTheSpot Mobile Bar",
-		companyLabel: "Client",
+		company: "JonnyOnTheSpot",
+		companyLabel: "Freelance",
 		role: "Designed & built",
 		responsibilities: [],
 		media: [
@@ -324,10 +324,10 @@ const projects = [
 		slug: "jonnyonthespot",
 	},
 	{
-		name: "Strength Without Pain",
+		name: "Personal Trainer Concept",
 		highlight: "Research, brand and website design for a personal training concept.",
-		company: "Concept",
-		companyLabel: "Type",
+		company: "Personal Trainer Concept",
+		companyLabel: "Freelance",
 		role: "Research & design",
 		responsibilities: [],
 		media: [
@@ -360,15 +360,17 @@ const projects = [
 		slug: "strength-without-pain",
 	},
 	{
-		// Draft: listed so everything is in place; story, year, company, tech and media to be refined with the owner.
 		name: "Compassion Authentication",
 		highlight: "Built the core login, logout and verification components for Compassion's shared login.",
 		company: "Compassion International",
 		role: "Front-end development",
 		responsibilities: [
 			"Login, logout and verification components.",
-			"Cognito integration.",
+			"Cognito integration, with Lambdas behind it.",
 			"Passing and decoding JWTs.",
+			"Redis caching for supporter data.",
+			"Salesforce integration.",
+			"Components documented in Storybook.",
 		],
 		media: [
 			{ type: "video", src: "/projects/compassion-auth/thumbnail-loop.mp4", poster: "/projects/compassion-auth/thumbnail.jpg", alt: "A person icon opens into the Compassion login; the username and password are typed, Continue signs in and the MyCompassion dashboard loads in, and the icon turns into a green check" },
@@ -389,8 +391,12 @@ const projects = [
 		tags: [
 			"Next.js",
 			"React",
+			"AWS",
 			"Cognito",
-			"JWT",
+			"AWS Lambda",
+			"Redis",
+			"Salesforce",
+			"Storybook",
 		],
 		category: "Development",
 		description: "",
