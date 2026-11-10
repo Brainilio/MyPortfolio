@@ -103,13 +103,6 @@ const projects = [
 			{ type: "video", src: "/projects/crapp/screens-flow.mp4", poster: "/projects/crapp/screens-flow.jpg", alt: "Crapp’s screens sliding past one by one on Crapp blue: Explore, the map, a restroom page, adding a restroom, the label guide and Poopmergency" },
 			{ type: "video", src: "/projects/crapp/thumbnail-loop.mp4", poster: "/projects/crapp/thumbnail.jpg", alt: "Crapp commercial: Need to go? Find. Check. Go now!", caption: "Need To Go? Find. Check. Go Now." },
 			{ type: "video", src: "/projects/crapp/walkthrough.mp4", poster: "/projects/crapp/walkthrough.jpg", alt: "Crapp on a phone: Explore, the map, a restroom card and Poopmergency", caption: "From Explore to the map, a restroom card, then Poopmergency's best match." },
-			{ type: "image", src: "/projects/crapp/s1.jpg", alt: "App Store screen: Find relief nearby", layout: "portrait" },
-			{ type: "image", src: "/projects/crapp/s2.jpg", alt: "App Store screen: See what's around you", layout: "portrait" },
-			{ type: "image", src: "/projects/crapp/s3.jpg", alt: "App Store screen: Choose with confidence", layout: "portrait" },
-			{ type: "image", src: "/projects/crapp/s4.jpg", alt: "App Store screen: Know what to expect", layout: "portrait" },
-			{ type: "image", src: "/projects/crapp/s5.jpg", alt: "App Store screen: Make the map better", layout: "portrait" },
-			{ type: "image", src: "/projects/crapp/s6.jpg", alt: "App Store screen: In a Poopmergency?", layout: "portrait" },
-			{ type: "image", src: "/projects/crapp/s7.jpg", alt: "App Store screen: Better together", layout: "portrait", caption: "The App Store screens." },
 			{ type: "image", src: "/projects/crapp/screens.jpg", alt: "Six Crapp screens side by side: Explore, the map with nearby sanctuaries, a restroom page, rating a restroom, the label guide and Poopmergency" },
 		],
 		shortDescription:
