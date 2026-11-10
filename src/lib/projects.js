@@ -293,7 +293,9 @@ const projects = [
 			{ type: "image", src: "/projects/jonnyonthespot/1.jpg", alt: "JonnyOnTheSpot homepage: on the spot bartending for weddings and private events" },
 			{ type: "image", src: "/projects/jonnyonthespot/2.jpg", alt: "Bartending services: signature cocktails, fresh garnishes and mixers, mobile bar setup, curated shopping list", caption: "Four services, each with its own photo." },
 			{ type: "image", src: "/projects/jonnyonthespot/screens.jpg", alt: "JonnyOnTheSpot on phones: the homepage and the services" },
-			{ type: "image", src: "/projects/jonnyonthespot/3.jpg", alt: "Tailored price list" }
+			{ type: "image", src: "/projects/jonnyonthespot/testimonials-1.jpg", alt: "Testimonials: These guys make the party a paaarrrty", layout: "half" },
+			{ type: "image", src: "/projects/jonnyonthespot/testimonials-2.jpg", alt: "More testimonials from clients across the Bay Area", layout: "half" },
+			{ type: "image", src: "/projects/jonnyonthespot/contact.jpg", alt: "Contact: get a quote and boost your next event, with the quote form over a backlit bar. Phone number and email blurred." }
 		],
 		shortDescription:
 			"JonnyOnTheSpot is a husband-and-wife mobile bartending business from Livermore, serving weddings and private events across the Bay Area.",
