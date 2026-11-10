@@ -26,7 +26,7 @@ export const TECH_ICONS = {
   "php": "tabler/brand-php", "laravel": "tabler/brand-laravel", "java": "tabler/coffee", "android": "tabler/brand-android",
   "material": "simple-icons/mui", "google api": "tabler/brand-google", "google analytics": "tabler/brand-google-analytics",
   "docker": "tabler/brand-docker", "github actions": "tabler/brand-github", "jest": "simple-icons/jest",
-  "ux/ui": "tabler/layout", "web design": "tabler/layout", "user research": "tabler/users", "pitching": "tabler/presentation",
+  "ux/ui": "tabler/layout", "web design": "tabler/layout", "animation": "tabler/sparkles", "user research": "tabler/users", "pitching": "tabler/presentation",
   "competitor research": "tabler/chart-bar", "brand concept": "tabler/palette", "e-commerce": "tabler/shopping-cart",
   "performance": "tabler/gauge", "architecture": "tabler/topology-star-3", "mvc": "tabler/stack-2", "multer": "tabler/upload",
   "unit testing": "tabler/test-pipe", "oop": "tabler/code", "dpatterns": "tabler/topology-star", "game": "tabler/device-gamepad-2",

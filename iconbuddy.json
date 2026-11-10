@@ -364,6 +364,11 @@
       "path": "public/icons/tech/tabler--layout.svg",
       "license": "MIT (Tabler)"
     },
+    "tabler/sparkles": {
+      "source": "https://files.svgcdn.io/tabler/sparkles.svg",
+      "path": "public/icons/tech/tabler--sparkles.svg",
+      "license": "MIT (Tabler)"
+    },
     "tabler/users": {
       "source": "https://files.svgcdn.io/tabler/users.svg",
       "path": "public/icons/tech/tabler--users.svg",
