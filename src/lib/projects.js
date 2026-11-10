@@ -130,6 +130,8 @@ const projects = [
 			"Designed the Redis cache and built the caching.",
 			"Connected authentication to the site.",
 			"Some infrastructure work with SST.",
+			"Financial, account settings, preferences and giving history features.",
+			"Shared Storybook components, GraphQL resolvers and typed contracts between front end and back end.",
 		],
         media: [
             { type: "image", src: mc(1), alt: "MyCompassion supporter portal overview", caption: "The supporter portal. Personal information in these screens has been replaced or obscured." },
@@ -180,10 +182,13 @@ const projects = [
 		responsibilities: [
 			"Lambda development on AWS with SST.",
 			"Authentication integration with Cognito, including Apple sign-in.",
+			"Apple Pay and the payment and cart experience.",
+			"APIs and SDKs for the checkout.",
 			"Cart functionality, with the cart saved in DynamoDB.",
 			"Cookie work so the cart persists between visits.",
 			"Caching with ElastiCache.",
 			"Rewrote class components as functional components.",
+			"Production defect fixes through launch.",
 		],
 		media: [
 			{ type: "video", src: "/projects/compassion-checkout/thumbnail-loop.mp4", poster: "/projects/compassion-checkout/thumbnail.jpg", alt: "Compassion Checkout flow, from basket to submit", caption: "The checkout flow on the staging site, with test details. The sponsored child's details and the card line are blurred." },
@@ -202,7 +207,7 @@ const projects = [
 		thumbnailVideo: "/projects/compassion-checkout/thumbnail-loop.mp4",
 		livePreview: null,
 		gitHub: null,
-		tags: ["AWS", "SST", "AWS Lambda", "Cognito", "DynamoDB", "ElastiCache", "Next.js", "React"],
+		tags: ["AWS", "SST", "AWS Lambda", "Cognito", "DynamoDB", "ElastiCache", "Apple Pay", "Next.js", "React"],
 		category: "Development",
 		description: "",
 		process: "",
@@ -380,6 +385,8 @@ const projects = [
 			"Redis caching for supporter data.",
 			"Salesforce integration.",
 			"Components documented in Storybook.",
+			"Secure session handling, with APIs and SDKs for other Compassion apps.",
+			"Helped coordinate the major Auth deployment: code reviews, testing and fixing issues across teams.",
 		],
 		media: [
 			{ type: "video", src: "/projects/compassion-auth/thumbnail-loop.mp4", poster: "/projects/compassion-auth/thumbnail.jpg", alt: "A person icon opens into the Compassion login; the username and password are typed, Continue signs in and the MyCompassion dashboard loads in, and the icon turns into a green check" },
@@ -401,6 +408,7 @@ const projects = [
 			"Next.js",
 			"React",
 			"AWS",
+			"SST",
 			"Cognito",
 			"AWS Lambda",
 			"Redis",
@@ -426,8 +434,12 @@ const projects = [
 		responsibilities: [
 			"Added Lighthouse CI to the AWS CI/CD pipeline, which made 20+ pages about 20% faster.",
 			"Cut the build logs by 80% with code cleanup, bug fixes, package upgrades and fixed tests.",
-			"Integrated Apple Pay into checkout for both stores.",
+			"Monitored and deployed 100+ builds on AWS.",
+			"Built the Apple Pay payment integration for both stores.",
 			"Moved the shops to GraphQL.",
+			"Helped upgrade Gatsby from v2 to v4, along with the other packages.",
+			"New features: error messaging, payment integrations and newsletter sign-up in forms.",
+			"Updated the tests to match the current apps.",
 		],
 		media: [
 			{ type: "video", src: "/projects/jogg-group/thumbnail-loop.mp4", poster: "/projects/jogg-group/thumbnail.jpg", alt: "The Garcia and Jeans Centre webshops side by side, each going from the listing to a product, the bag and checkout" },
@@ -459,6 +471,7 @@ const projects = [
 		gitHub: null,
 		tags: [
 			"React",
+			"Gatsby",
 			"AWS",
 			"CI/CD",
 			"Lighthouse",
@@ -477,7 +490,6 @@ const projects = [
 		slug: "jogg-group",
 	},
 	{
-		// Draft: listed so everything is in place; story, year, company, tech and media to be refined with the owner.
 		name: "Sobolt cloud platform",
 		highlight: "Built the first version of Sobolt's cloud platform and its component library.",
 		company: "Sobolt (internship)",
@@ -529,7 +541,8 @@ const projects = [
 			"Stripe payments.",
 			"OAuth social sign-in.",
 			"Push notifications for order reminders.",
-			"Builds through EAS and TestFlight.",
+			"Builds through EAS and TestFlight for the MVP testing.",
+			"Met with the client to set the MVP scope, and ran bug-bash sessions.",
 		],
 		media: [
 			{ type: "video", src: "/projects/trend-trade/thumbnail-loop.mp4", poster: "/projects/trend-trade/thumbnail.jpg", alt: "A tilted wall of Trend Trade screens, the onboarding’s fashion photos among explore, item, booking and posting screens, its columns drifting up and down" },
@@ -573,11 +586,13 @@ const projects = [
 		role: "Front-end development",
 		responsibilities: [
 			"Built components from the Adobe XD designs.",
-			"Integrated the Prismic data and its hydration into Next.js, with server-side rendering.",
+			"Integrated the Prismic and BigCommerce data and its hydration into Next.js, with server-side rendering.",
+			"Product count and cart state with React hooks and cookies.",
 			"Animations, including the search animations.",
 			"Search integration.",
 			"Product cards.",
 			"Authentication.",
+			"Nominated for Awwwards e-commerce site of the year 2022.",
 		],
 		media: [
 			{ type: "video", src: "/projects/hkliving/thumbnail-loop.mp4", poster: "/projects/hkliving/thumbnail.jpg", alt: "The HKliving homepage scrolling sideways, section by section, then sweeping back to the start" },
@@ -593,7 +608,7 @@ const projects = [
 		thumbnailVideo: "/projects/hkliving/thumbnail-loop.mp4",
 		livePreview: null,
 		gitHub: null,
-		tags: ["React", "Next.js", "Tailwind CSS", "Prismic", "Adobe XD"],
+		tags: ["React", "Next.js", "Tailwind CSS", "Prismic", "BigCommerce", "Adobe XD"],
 		category: "Development",
 		description: "",
 		process: "",

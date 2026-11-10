@@ -254,6 +254,16 @@
       "path": "public/icons/tech/simple-icons--prismic.svg",
       "license": "CC0 (Simple Icons)"
     },
+    "tabler/brand-gatsby": {
+      "source": "https://files.svgcdn.io/tabler/brand-gatsby.svg",
+      "path": "public/icons/tech/tabler--brand-gatsby.svg",
+      "license": "MIT (Tabler)"
+    },
+    "simple-icons/bigcommerce": {
+      "source": "https://files.svgcdn.io/simple-icons/bigcommerce.svg",
+      "path": "public/icons/tech/simple-icons--bigcommerce.svg",
+      "license": "CC0 (Simple Icons)"
+    },
     "simple-icons/netlify": {
       "source": "https://files.svgcdn.io/simple-icons/netlify.svg",
       "path": "public/icons/tech/simple-icons--netlify.svg",

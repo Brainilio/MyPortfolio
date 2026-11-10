@@ -18,7 +18,7 @@ export const TECH_ICONS = {
   "mongodb": "tabler/brand-mongodb", "mysql": "simple-icons/mysql", "nx": "simple-icons/nx",
   "tailwind css": "tabler/brand-tailwind", "tailwind": "tabler/brand-tailwind", "gsap": "simple-icons/greensock",
   "three.js": "tabler/brand-threejs", "threejs": "tabler/brand-threejs", "framer motion": "tabler/brand-framer-motion",
-  "prismic": "simple-icons/prismic", "netlify": "simple-icons/netlify", "mapbox": "simple-icons/mapbox",
+  "prismic": "simple-icons/prismic", "gatsby": "tabler/brand-gatsby", "bigcommerce": "simple-icons/bigcommerce", "netlify": "simple-icons/netlify", "mapbox": "simple-icons/mapbox",
   "stencil": "simple-icons/stencil", "stencil web components": "simple-icons/stencil", "storybook": "simple-icons/storybook",
   "stripe": "tabler/brand-stripe", "apple pay": "simple-icons/applepay", "apple sign-in": "tabler/brand-apple",
   "figma": "tabler/brand-figma", "adobe xd": "tabler/brand-adobe", "adobexd": "tabler/brand-adobe",
