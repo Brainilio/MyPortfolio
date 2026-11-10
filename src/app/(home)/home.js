@@ -5,20 +5,24 @@ import { motion, AnimatePresence, MotionConfig } from "motion/react";
 import Lenis from "lenis";
 import "lenis/dist/lenis.css";
 import allProjects from "../../lib/projects";
+import { copyText } from "../../lib/homepage-copy";
 import "./home.css";
 import { getStage } from "./stage";
 const IslandScene = dynamic(() => import("./island-scene"), { ssr: false });
 const AboutScene = dynamic(() => import("./about-scene"), { ssr: false });
 const WorkShowcase = dynamic(() => import("./work-showcase"), { ssr: false });
 const SkillsScene = dynamic(() => import("./skills-scene"), { ssr: false });
-const CoastScene = dynamic(() => import("./coast-scene"), { ssr: false });
-import { MODEL_CREDITS } from "./model-credits";
-import { SKILLS, TOOL_ICONS } from "./content";
+import { SKILLS } from "./content";
+import SiteHeader from "../site-header";
+import SiteFooter from "../site-footer";
+import { Icon } from "../tech-chip";
+import { techIcon } from "../../lib/tech-icons";
+import { scheduleHref, RESUME_URL as RESUME } from "../../lib/contact";
 const work = allProjects.filter(project => project.slug && project.previewImage && !project.earlyWork).slice(0, 4);
 
 // Every model the homepage loads (fetched up front by the loading screen).
-const MODELS = ["kit", "stag", "deer", "fox", "bear", "eagle", "prairiedog", "wagon", "moose", "orca", "shark", "sealion", "kayak", "eagle-flying", "bison"].map(name => `/models/island/${name}.glb`);
-const LOADING_LINES = ["Raising the island", "Stoking the campfire", "Rounding up the bison", "Packing the wagon", "Lighting the lighthouse"];
+const MODELS = ["kit", "stag", "deer", "fox", "bear", "eagle", "prairiedog", "wagon", "moose", "eagle-flying", "bison"].map(name => `/models/island/${name}.glb`);
+const LOADING_LINES = ["Raising the island", "Stoking the campfire", "Rounding up the bison", "Packing the wagon"];
 
 // One long page. Each section is a floating diorama that holds still (sticky) while its words scroll past on the other
 // side, alternating right, left, right; the coast closes the page full width. Behind everything one fixed sky
@@ -29,7 +33,6 @@ const SECTIONS = [
   { id: "about", label: "About", steps: 1 },
   { id: "work", label: "Work", steps: work.length },
   { id: "skills", label: "Skills", steps: SKILLS.length },
-  { id: "contact", label: "Contact", steps: 1 },
 ];
 // One sky for the whole page: a five-colour gradient (top to bottom) that shifts continuously with how far down
 // the page you are. Each stop belongs to a section and sits where that section is settled on screen; the last two
@@ -39,8 +42,7 @@ const SKY = [
   ["#120e2c", "#1f1846", "#3d2c66", "#7a4f86", "#b27390"], // About: blue hour by the fire
   ["#5f5d8c", "#b57796", "#f5a389", "#f9c195", "#f2b98f"], // Work: prairie sunset
   ["#e9bfa0", "#f1cba8", "#f6d8b5", "#f6d6b4", "#f0cba6"], // Skills: warm valley morning
-  ["#4f8cc6", "#86b1d8", "#c4d7e5", "#d4e0e7", "#d4e0e7"], // Contact: Big Sur, arriving
-  ["#4f8cc6", "#86b1d8", "#c4d7e5", "#d4e0e7", "#d4e0e7"], // Contact, the end
+  ["#c98f96", "#dfa79f", "#eebda8", "#f3c9ad", "#f0c2a2"], // The end: the same valley, the light turning rosy
 ].map(stops => stops.map(hex => [1, 3, 5].map(k => parseInt(hex.slice(k, k + 2), 16))));
 const mix = (a, b, t) => a.map((c, k) => Math.round(c + (b[k] - c) * t));
 // No gaps between sections and no fading: each island holds while its section is pinned and travels up and away with
@@ -48,7 +50,7 @@ const mix = (a, b, t) => a.map((c, k) => Math.round(c + (b[k] - c) * t));
 // travels: steeper as it comes up, lower as it leaves.
 const ARRIVE = 14, DEPART = 10;
 // Which slot each scene reads in the shared scroll state.
-const ABOUT = 1, WORK = 2, SKILLS_AT = 3, CONTACT = 4;
+const ABOUT = 1, WORK = 2, SKILLS_AT = 3;
 // Each line of the Skills story: rising in out of a soft blur, lifting away (quicker) for the next.
 const STORY_LINE = {
   hidden: { opacity: 0, y: 18, filter: "blur(6px)" },
@@ -57,30 +59,20 @@ const STORY_LINE = {
 };
 const clamp = v => Math.min(1, Math.max(0, v));
 
-// The contact form posts to Formspree with fetch, so the card stays put and thanks you in place.
-// Replace REPLACE_WITH_ID with your Formspree form ID from formspree.io; until then the form says to email instead.
-const FORMSPREE = "https://formspree.io/f/REPLACE_WITH_ID";
-function ContactForm() {
-  const [status, setStatus] = useState("idle");
-  const submit = async event => {
-    event.preventDefault();
-    if (FORMSPREE.endsWith("REPLACE_WITH_ID")) { setStatus("error"); return; }
-    setStatus("sending");
-    try {
-      const response = await fetch(FORMSPREE, { method: "POST", body: new FormData(event.currentTarget), headers: { Accept: "application/json" } });
-      setStatus(response.ok ? "sent" : "error");
-    } catch { setStatus("error"); }
-  };
-  if (status === "sent") return <p className="ht-form-sent" role="status">Got it. I&apos;ll be in touch.</p>;
-  return (
-    <form className="ht-form" onSubmit={submit}>
-      <input type="text" name="name" placeholder="Your name" aria-label="Your name" autoComplete="name" required />
-      <input type="email" name="email" placeholder="Your email" aria-label="Your email" autoComplete="email" required />
-      <textarea name="message" placeholder="What are you building?" aria-label="What are you building?" rows={4} required />
-      <button type="submit" disabled={status === "sending"}>{status === "sending" ? "Sending…" : <>Send it <span aria-hidden="true">→</span></>}</button>
-      {status === "error" && <p className="ht-form-error" role="alert">That didn&apos;t go through. Email me instead, below.</p>}
-    </form>
-  );
+// A line whose last words slide up and away, one phrase after another (still with reduced motion).
+const SLIDES = ["mobile apps", "web platforms", "cloud back ends", "design systems"];
+function SlidingWords() {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = setInterval(() => setI(k => (k + 1) % SLIDES.length), 2600);
+    return () => clearInterval(timer);
+  }, []);
+  return <span className="ht-slide" aria-hidden="true">
+    <AnimatePresence mode="popLayout" initial={false}>
+      <motion.span key={i} initial={{ y: "100%", opacity: 0 }} animate={{ y: "0%", opacity: 1 }} exit={{ y: "-100%", opacity: 0 }} transition={{ duration: .55, ease: [.2, .8, .2, 1] }}>{SLIDES[i]}</motion.span>
+    </AnimatePresence>
+  </span>;
 }
 
 // A section heading that writes itself in as you arrive: once its section is a fifth of the way up the screen, each
@@ -108,11 +100,11 @@ function RevealHeading({ id, text, arrive = 20 }) {
   );
 }
 
-export default function Home() {
+export default function Home({ copy = {} }) {
   const [where, setWhere] = useState({ section: 0, stop: 0 }), [menu, setMenu] = useState(false);
   // Shared with the 3D scenes (read every frame): which sections are on screen and how far through each one we are.
   const scene = useRef({ section: 0, live: [0], progress: [0, 0, 0, 0, 0], tilt: [0, 0, 0, 0, 0] });
-  const [spotted, setSpotted] = useState([]), [still, setStill] = useState(false);
+  const [still, setStill] = useState(false);
   // Reduced motion, and phones: the Work postcard shows its still image instead of playing its preview.
   useEffect(() => {
     const queries = [matchMedia("(prefers-reduced-motion: reduce)"), matchMedia("(max-width: 760px)")], sync = () => setStill(queries.some(q => q.matches));
@@ -173,10 +165,10 @@ export default function Home() {
         // How far its island has still to travel in (from below) and has travelled out (above), 0 → 1 a screen each.
         const arriving = i ? clamp((top - y) / vh) : 0, leaving = i < last_ ? clamp((y - (top + height - vh)) / vh) : 0;
         scene.current.tilt[i] = ARRIVE * arriving - DEPART * leaving;
-        stops[i] = i === CONTACT ? top - vh * .6 : i ? top + run * .5 : 0;
+        stops[i] = i ? top + run * .5 : 0;
       });
       // The sky: find the two section stops either side of this scroll position and blend between them.
-      const end = Math.max(1, document.documentElement.scrollHeight - vh), marks = [...stops.slice(0, 5).map(v => v / end), 1], p = clamp(y / end);
+      const end = Math.max(1, document.documentElement.scrollHeight - vh), marks = [...stops.map(v => v / end), 1], p = clamp(y / end);
       let k = 0; while (k < marks.length - 2 && p > marks[k + 1]) k++;
       const blend = clamp((p - marks[k]) / Math.max(1e-6, marks[k + 1] - marks[k])), colors = SKY[k].map((c, n) => mix(c, SKY[k + 1][n], blend));
       if (sky.current) sky.current.style.background = `linear-gradient(180deg,${colors.map((c, n) => `rgb(${c}) ${[0, 30, 55, 80, 100][n]}%`).join(",")})`;
@@ -220,28 +212,18 @@ export default function Home() {
     <main ref={mainRef} className={`ht${loaded ? " is-entered" : ""}`} data-section={SECTIONS[section].id}>
       <div className="ht-skies" aria-hidden="true"><div className="ht-sky-live" ref={sky} /></div>
       <div className="ht-finish" aria-hidden="true" />
-      <header className="ht-header">
-        <a href="#" className="ht-wordmark" onClick={event => { event.preventDefault(); jump(0); }}>Brainilio<span>.</span></a>
-        <nav aria-label="Main">
-          <a href="#about" onClick={event => { event.preventDefault(); jump(ABOUT); }}>About</a>
-          <a href="#work" onClick={event => { event.preventDefault(); jump(WORK); }}>Work</a>
-          <a href="#skills" onClick={event => { event.preventDefault(); jump(SKILLS_AT); }}>Skills</a>
-          <a href="/journey/">Lab</a>
-          <a href="#contact" onClick={event => { event.preventDefault(); jump(CONTACT); }}>Contact</a>
-        </nav>
-      </header>
+      <SiteHeader />
 
       <section className="ht-zone ht-home" id="home" ref={el => (zones.current[0] = el)} aria-label="Introduction">
         <div className="ht-stage"><IslandScene active={scene} onReady={onReady(0)} /></div>
         {/* The name comes in letter by letter, each rising into view through its own little window. */}
         <h1 className="ht-name" aria-label="Brainilio">{"Brainilio".split("").map((letter, i) => <span key={i} className="ht-name-window" aria-hidden="true" style={{ "--c": i }}><span>{letter}</span></span>)}</h1>
         <div className="ht-intro">
-          <p className="ht-roles">I build digital products<span>,</span> and the odd little world<span>.</span></p>
-          <p className="ht-lede">Full-stack, from REST APIs to 3D on the web. I explore new ideas and try to leave the world a little better than I found it.</p>
-          <p className="ht-stack">React · Node · TypeScript · Three.js</p>
+          <p className="ht-roles"><span className="ht-sr">I build mobile apps, web platforms, cloud back ends and design systems.</span><span aria-hidden="true">I build</span> <SlidingWords /></p>
+          <p className="ht-lede">{("Full-stack developer working mostly in React, React Native and AWS. I build my own products, and I’ve worked on platforms for Compassion International, HKLiving and JOGG Group.")}</p>
           <div className="ht-links">
-            <a className="ht-button" href="#work" onClick={event => { event.preventDefault(); jump(WORK); }}>See my work <span aria-hidden="true">↓</span></a>
-            <a className="ht-button ht-button-ghost" href="mailto:brainilioir@gmail.com">Say hello <span aria-hidden="true">↗</span></a>
+            <a className="ui-btn" href="#work" onClick={event => { event.preventDefault(); jump(WORK); }}>See my work<Icon src="/icons/tech/tabler--arrow-down.svg" /></a>
+            <a className="ui-btn ui-btn--secondary" href="/contact/">Let&apos;s talk<Icon src="/icons/tech/tabler--arrow-up-right.svg" /></a>
           </div>
         </div>
       </section>
@@ -253,12 +235,11 @@ export default function Home() {
         <div className="ht-copy">
           {/* Replace with: <Image src="/me.jpg" alt="Brainilio" width={120} height={120} /> (drop me.jpg into /public) */}
           <div className="ht-portrait" aria-hidden="true" />
-          <RevealHeading id="ht-about-title" text="Around the fire" />
+          <RevealHeading id="ht-about-title" text={copyText(copy.about_heading, "Around the fire")} />
           {/* PLACEHOLDER copy: replace the companies with your own. */}
-          <p>I&apos;m a software developer who likes building things people enjoy using — from the API to the last bit of motion. Away from the keyboard you&apos;ll find me on a trail, on a road trip through a national park, or by a campfire with a marshmallow on a stick. <span className="ht-now">Currently at [Company] · previously [Company].</span></p>
-          <p className="ht-drive">Tap the bear for a marshmallow, or the fire to stoke it</p>
-          {/* Drop resume.pdf into /public */}
-          <p className="ht-drive"><a className="ht-resume" href="/resume.pdf" target="_blank" rel="noopener noreferrer">Full experience <span aria-hidden="true">→</span></a></p>
+          <p>{("I’m a full-stack developer from the Netherlands, now in San Jose. I work across the whole product: React and Next.js on the web, React Native on phones, and serverless on AWS behind them, with SST, Lambda, AppSync and Cognito. I like owning a feature from the data model to the last bit of motion. Away from the keyboard you’ll find me on a trail, on a road trip through a national park, or by a campfire.")}</p>
+          <p className="ht-now">{("Now at Compassion International. Before that: foryouandyourcustomers, DPDK, Tofu and Sobolt.")}</p>
+          <div className="ht-links"><a className="ui-btn ui-btn--secondary" href={RESUME} target="_blank" rel="noopener noreferrer">Resume<Icon src="/icons/tech/tabler--arrow-up-right.svg" /></a></div>
         </div>
       </section>
 
@@ -272,8 +253,7 @@ export default function Home() {
       <section className="ht-zone ht-skills ht-pinned" id="skills" data-side="right" style={{ "--steps": SKILLS.length }} ref={el => (zones.current[SKILLS_AT] = el)} aria-labelledby="ht-skills-title">
         <div className="ht-stage">{built[SKILLS_AT] && <SkillsScene state={scene} skills={SKILLS} onCar={onCar} slot={SKILLS_AT} side="right" onReady={onReady(SKILLS_AT)} />}</div>
         <div className="ht-copy">
-          <RevealHeading id="ht-skills-title" text="What I bring along" />
-          <p className="ht-drive">Scroll or click the wagon to drive on</p>
+          <RevealHeading id="ht-skills-title" text={copyText(copy.skills_heading, "What I bring along")} />
           {/* The whole list, for screen readers; on screen each stop is spelled out on its own as the wagon pulls up. */}
           <ol className="ht-sr">
             {SKILLS.map(skill => (
@@ -286,15 +266,13 @@ export default function Home() {
             <MotionConfig reducedMotion="user">
               <AnimatePresence mode="wait">
                 {section === SKILLS_AT && SKILLS[stop] && (
-                  <motion.div className="ht-skill-panel" key={stop} initial="hidden" animate="shown" exit="gone"
+                  <motion.div className="ht-skill-panel ui-glass" key={stop} initial="hidden" animate="shown" exit="gone"
                     variants={{ shown: { transition: { delayChildren: .2, staggerChildren: .09 } }, gone: { transition: { staggerChildren: .04 } } }}>
                     <motion.p className="ht-skill-lead" variants={STORY_LINE}>{SKILLS[stop].lead}</motion.p>
                     <motion.p className="ht-skill-blurb" variants={STORY_LINE}>{SKILLS[stop].blurb}</motion.p>
-                    <motion.ul className="ht-skill-tools" variants={{ shown: { transition: { staggerChildren: .05 } } }}>
+                    <motion.ul className="ht-skill-tools ui-chips" variants={{ shown: { transition: { staggerChildren: .05 } } }}>
                       {SKILLS[stop].items.map(tool => (
-                        <motion.li key={tool} variants={STORY_LINE}>
-                          {TOOL_ICONS[tool] && <i style={{ "--icon": `url(/icons/iconbuddy/${TOOL_ICONS[tool]}.svg)` }} />}{tool}
-                        </motion.li>
+                        <motion.li key={tool} className="ui-chip" variants={STORY_LINE}>{techIcon(tool) && <Icon src={techIcon(tool)} />}{tool}</motion.li>
                       ))}
                     </motion.ul>
                   </motion.div>
@@ -305,32 +283,18 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Contact: the end of the road, on the Big Sur coast, full width. The pointer steers the lighthouse beam. */}
-      <section className="ht-zone ht-contact" id="contact" ref={el => (zones.current[CONTACT] = el)} aria-labelledby="ht-contact-title">
-        <div className="ht-stage">{built[CONTACT] && <CoastScene state={scene} onSpot={setSpotted} slot={CONTACT} lite onReady={onReady(CONTACT)} />}</div>
-        <div className="ht-contact-card">
-          <RevealHeading id="ht-contact-title" text="Let’s build something" />
-          <p>Have a project, a role or an idea worth exploring? I&apos;d love to hear about it.</p>
-          <ContactForm />
-          <p className="ht-contact-or">or email directly</p>
-          <a className="ht-contact-email" href="mailto:brainilioir@gmail.com">brainilioir@gmail.com <span aria-hidden="true">↗</span></a>
-          <ul className="ht-contact-links">
-            <li><a href="https://github.com/Brainilio" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-            <li><a href="https://linkedin.com/in/brainilio" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
-            <li><a href="https://twitter.com/brainilio" target="_blank" rel="noopener noreferrer">X / Twitter</a></li>
-          </ul>
+      {/* The end: the valley's light turns rosy behind a frosted card; the full contact page has the coast. */}
+      <section className="ht-outro" aria-labelledby="ht-outro-title">
+        <div className="ht-outro-card ui-glass">
+          <p className="ht-badge"><i aria-hidden="true" />Available for freelance projects</p>
+          <h2 id="ht-outro-title">Have something in mind?</h2>
+          <p>Mobile apps, web platforms and the cloud behind them. Tell me what you&apos;re building.</p>
+          <div className="ht-links">
+            <a className="ui-btn" href="/contact/">Let&apos;s talk<Icon src="/icons/tech/tabler--arrow-up-right.svg" /></a>
+            <a className="ui-btn ui-btn--secondary" href={scheduleHref}>Book a call<Icon src="/icons/tech/tabler--calendar-event.svg" /></a>
+          </div>
         </div>
-        <div className="ht-beam-hint" aria-hidden="true">
-          <span>Move your cursor to steer the lighthouse beam</span>
-          <b>Spotted {spotted.length}/4{spotted.length ? `: ${spotted.join(", ")}` : ""}</b>
-        </div>
-        <footer className="ht-credits">
-          3D models: {MODEL_CREDITS.map((group, g) => (
-            <span key={group.author}>{group.works.map(([title, id], i) => (
-              <span key={id}><a href={`https://poly.pizza/m/${id}`} target="_blank" rel="noopener noreferrer">{title}</a>{i < group.works.length - 1 ? ", " : ""}</span>
-            ))} by {group.author}{g < MODEL_CREDITS.length - 1 ? "; " : ""}</span>
-          ))}. All <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">CC BY 3.0</a>, via Poly Pizza; other models CC0 (Quaternius) or made in code. No endorsement implied.
-        </footer>
+        <SiteFooter />
       </section>
 
       {/* The loading screen: a little sun rising over the ridges while the worlds are built. */}

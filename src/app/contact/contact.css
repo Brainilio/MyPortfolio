@@ -1,0 +1,25 @@
+/* Contact: the coast fixed behind, a frosted card on the left, the page scrolling only if the card needs it. */
+.ct{min-height:100svh;display:flex;flex-direction:column;background:#4f8cc6}
+.ct-sky{position:fixed;inset:0;z-index:0;background:linear-gradient(180deg,#4f8cc6 0%,#86b1d8 30%,#c4d7e5 55%,#d4e0e7 100%)}
+.ct-stage{position:fixed;inset:0;z-index:1;pointer-events:none}
+.ct-stage .ht-coast-canvas{position:absolute;inset:0}
+.ct-card{position:relative;z-index:4;width:min(520px,calc(100% - 32px));margin:110px 0 40px var(--gutter);padding:clamp(24px,2.6vw,36px);color:#f6f8fb;
+  background:linear-gradient(135deg,rgba(18,34,58,.5),rgba(18,34,58,.32))}
+.ct-card h1{margin:16px 0 0;font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:var(--ui-t-h2);line-height:.95;letter-spacing:-.05em}
+.ct-card h1 span{color:var(--violet)}
+.ct-lede{margin:14px 0 0;font-size:var(--ui-t-body);line-height:1.55;color:rgba(246,248,251,.84)}
+.ct-offer{display:grid;gap:10px;margin:20px 0 0;padding:0;list-style:none;font-size:15px}
+.ct-offer li{display:flex;align-items:center;gap:10px}.ct-offer .ui-icon{width:18px;height:18px;color:#c9b6ff}
+.ct-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+.ct-or{margin:24px 0 10px;font-size:13px;color:rgba(246,248,251,.65)}
+.ct-form{display:grid;gap:12px}
+.ct-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ct-form label{display:grid;gap:6px;font-size:13px;color:rgba(246,248,251,.75)}
+.ct-form input,.ct-form textarea{width:100%;font:inherit;font-size:15px;color:#fff;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);resize:vertical}
+.ct-form input:focus,.ct-form textarea:focus{outline:2px solid var(--violet);outline-offset:1px;border-color:transparent}
+.ct-form .ui-btn{justify-self:start}
+.ct-error{margin:0;font-size:13px;color:#ffd6d6}.ct-sent{margin:0;padding:18px 0;font-size:16px}
+.ct-links{display:flex;gap:18px;margin:22px 0 0;padding:0;list-style:none;font-size:14px}
+.ct-links a{display:inline-flex;align-items:center;gap:6px}.ct-links .ui-icon{width:15px;height:15px;opacity:.7}
+.ct .ui-footer{margin-top:auto;color:rgba(246,248,251,.8);text-shadow:0 1px 6px rgba(10,20,30,.4)}
+@media(max-width:760px){.ct-card{margin:84px 16px 24px}.ct-row{grid-template-columns:1fr}}

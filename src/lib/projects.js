@@ -1,3 +1,4 @@
+// The 2021 gradient cards below are no longer used: early work shows a plain screenshot from its own images.
 const BurgerBuilder = "/legacy/projects/burger-builder.webp"
 const Salvame = "/legacy/projects/salvame.webp"
 const Lolmfc = "/legacy/projects/lolmfc.webp"
@@ -89,15 +90,11 @@ const nc = n => `/projects/newcold/${n}.jpg`
 const projects = [
 	{
 		name: "Crapp",
-		highlight: "My own app for finding a restroom you can trust, now in beta on TestFlight.",
+		highlight: "Designed and built the whole app, from the code to the brand.",
 		company: "Personal project",
-		role: "Design & mobile development",
-		responsibilities: [
-			"Building the app: Explore, the restroom map, details, reviews and the nine-step Add Restroom flow.",
-			"Poopmergency: a one-tap best nearby match, with a widget for when it can't wait.",
-			"Community contributions: reviews, photos, labels, edits, reports and a contributor leaderboard.",
-			"The brand, mascot, App Store screens and the website at getcrapp.app."
-		],
+		companyLabel: "Type",
+		role: "Designed & built",
+		responsibilities: [],
 		media: [
 			{ type: "image", src: "/projects/crapp/header.jpg", alt: "Crapp: Find. Check. Go now. Three phones showing the app over a city skyline", caption: "Find. Check. Go now." },
 			{ type: "video", src: "/projects/crapp/screens-flow.mp4", poster: "/projects/crapp/screens-flow.jpg", alt: "Crapp’s screens sliding past one by one on Crapp blue: Explore, the map, a restroom page, adding a restroom, the label guide and Poopmergency" },
@@ -105,16 +102,14 @@ const projects = [
 			{ type: "video", src: "/projects/crapp/walkthrough.mp4", poster: "/projects/crapp/walkthrough.jpg", alt: "Crapp on a phone: Explore, the map, a restroom card and Poopmergency", caption: "From Explore to the map, a restroom card, then Poopmergency's best match." },
 			{ type: "image", src: "/projects/crapp/screens.jpg", alt: "Six Crapp screens side by side: Explore, the map with nearby sanctuaries, a restroom page, rating a restroom, the label guide and Poopmergency" },
 		],
-		shortDescription:
-			"Crapp helps you find a restroom when you need one: nearby options on a map, with community reviews and the practical details that matter, then Go Now.",
+		shortDescription: "An app for finding a restroom you can trust.",
 		previewImage: "/projects/crapp/thumbnail.jpg",
 		thumbnailVideo: "/projects/crapp/thumbnail-loop.mp4",
 		livePreview: null,
 		gitHub: null,
 		tags: ["React Native", "Expo", "TanStack Query", "Supabase"],
 		category: "Development",
-		description:
-			"Crapp is my own app for finding a restroom you can trust. A pin on a map isn't enough, so every restroom carries what people actually want to know: cleanliness, privacy and access, door codes, customer-only spots, photos and labels from real visits. Find a spot, check it, then Go Now. It's in beta on TestFlight, with the App Store launch coming.",
+		description: "An app for finding a restroom you can trust. I designed and built all of it: the app in React Native and Expo with TanStack Query and Supabase, the brand, the mascot, the website and the App Store art.",
 		process: "",
 		challenges: "",
 		differently: "",
@@ -126,15 +121,16 @@ const projects = [
 	},
 	{
 		name: "MyCompassion",
-        highlight: "Connecting the supporter experience, from frontend components to GraphQL services and caching.",
-        company: "Compassion International",
-        role: "Full-stack development",
-        responsibilities: [
-            "Integrating GraphQL through AWS AppSync and connecting React Query to frontend components.",
-            "Building frontend features and backend Lambda functions.",
-            "Designing Redis caching and implementing caching behavior.",
-            "Connecting authentication to the portal and contributing to infrastructure work."
-        ],
+		highlight: "Worked on the supporter portal, from React components to GraphQL, Lambdas and caching.",
+		company: "Compassion International",
+		role: "Full-stack development",
+		responsibilities: [
+			"Integrated GraphQL through AWS AppSync and connected React Query to the components.",
+			"Built front-end features and back-end Lambda functions.",
+			"Designed the Redis cache and built the caching.",
+			"Connected authentication to the site.",
+			"Some infrastructure work with SST.",
+		],
         media: [
             { type: "image", src: mc(1), alt: "MyCompassion supporter portal overview", caption: "The supporter portal. Personal information in these screens has been replaced or obscured." },
             { type: "image", src: "/projects/my-compassion/collage.jpg", alt: "MyCompassion cards at an angle: a child’s profile, a letter on its way through translation, Just for You suggestions, a project center update and My Sponsored Children. Children’s photos and personal details are blurred." },
@@ -149,17 +145,24 @@ const projects = [
             { type: "image", src: mc(9), alt: "MyCompassion interface, screen 9", layout: "half" }
         ],
 		// Contribution details supplied by the portfolio owner.
-		shortDescription:
-			"MyCompassion is Compassion International's sponsor portal, where supporters keep up with the children they sponsor, give gifts, manage payments and update their account.",
+		shortDescription: "Compassion International's supporter portal.",
 		previewImage: "/projects/my-compassion/thumbnail.jpg",
         thumbnailVideo: "/projects/my-compassion/thumbnail-loop.mp4",
 		previewVideo: "/projects/my-compassion/preview.mp4",
 		livePreview: null,
 		gitHub: null,
-		tags: ["Next.js", "NX", "GraphQL / AppSync", "React Query", "AWS Lambda", "Redis", "SST", "Cognito"],
+		tags: [
+			"Next.js",
+			"TypeScript",
+			"NX",
+			"GraphQL / AppSync",
+			"React Query",
+			"AWS Lambda",
+			"Redis",
+			"SST",
+		],
 		category: "Development",
-		description:
-			"MyCompassion is Compassion International's sponsor portal, where supporters keep up with the children they sponsor, give gifts, manage payments and update their account. Screens shown include the dashboard, sponsorships, giving, payments and billing (with its commitment and payment dialogs) and settings.",
+		description: "Next.js and TypeScript in an NX monorepo.",
 		process: "",
 		challenges: "",
 		differently: "",
@@ -172,10 +175,10 @@ const projects = [
 	{
 		name: "Compassion Checkout",
 		// Contribution boundary from the owner: the Apple sign-in stories only; payments and fraud tooling are not claimed.
-		highlight: "Contributing Apple sign-in to Compassion's Next.js checkout experience.",
+		highlight: "Worked on the Apple sign-in for Compassion's Next.js checkout.",
 		company: "Compassion International",
-		role: "Authentication integration",
-		responsibilities: ["Implementing the Apple sign-in stories for the checkout's sign-in step."],
+		role: "Authentication",
+		responsibilities: [],
 		media: [
 			{ type: "video", src: "/projects/compassion-checkout/thumbnail-loop.mp4", poster: "/projects/compassion-checkout/thumbnail.jpg", alt: "Compassion Checkout flow, from basket to submit", caption: "The checkout flow on the staging site, with test details. The sponsored child's details and the card line are blurred." },
 			{ type: "image", src: "/projects/compassion-checkout/1.jpg", alt: "Checkout summary with the contact form filled in", caption: "Summary step: contact information beside the donation." },
@@ -188,16 +191,14 @@ const projects = [
 			{ type: "image", src: "/projects/compassion-checkout/6.jpg", alt: "Checkout confirmation with contact and billing summary", layout: "half" },
 			{ type: "image", src: "/projects/compassion-checkout/screens.jpg", alt: "The checkout on phones: the donation summary, contact details, billing information and the thank-you page" },
 		],
-		shortDescription:
-			"Compassion International's checkout, where supporters complete sponsorships and donations. I worked on its Apple sign-in.",
+		shortDescription: "Apple sign-in for Compassion's checkout.",
 		previewImage: "/projects/compassion-checkout/thumbnail.jpg",
 		thumbnailVideo: "/projects/compassion-checkout/thumbnail-loop.mp4",
 		livePreview: null,
 		gitHub: null,
 		tags: ["Next.js", "Apple sign-in"],
 		category: "Development",
-		description:
-			"The checkout is a two-step flow (summary, then review and submit) for child sponsorships and donations. My contribution was the Apple sign-in stories; the screens show the surrounding flow on the staging site with test details.",
+		description: "",
 		process: "",
 		challenges: "",
 		differently: "",
@@ -209,10 +210,10 @@ const projects = [
 	},
 	{
 		name: "NewCold",
-        highlight: "Building the interactive map at the heart of NewCold’s global locations experience.",
-        company: "DPDK",
-        role: "Frontend development",
-        responsibilities: ["Developing the interactive map feature on the homepage.", "Building the image carousel on the Careers page."],
+		highlight: "Worked on the interactive map on NewCold's homepage.",
+		company: "DPDK",
+		role: "Front-end development",
+		responsibilities: [],
         media: [
             { type: "video", src: "/projects/newcold/hero-recording.mp4", poster: "/projects/newcold/hero-recording.jpg", alt: "The NewCold homepage on a laptop and a phone: the hero video plays, then the page scrolls to the global presence map" },
             { type: "image", src: "/projects/newcold/map-burley.jpg", alt: "NewCold North America map with the Burley facility panel" },
@@ -227,8 +228,7 @@ const projects = [
 			{ type: "image", src: "/projects/newcold/screens.jpg", alt: "The NewCold site on phones: facility facts, the global network map and the homepage hero" },
         ],
 		// Contribution details supplied by the portfolio owner.
-		shortDescription:
-			"NewCold's website, built as a front-end developer, with an interactive map of the company's facilities and offices worldwide.",
+		shortDescription: "The interactive map on NewCold's homepage.",
 		previewImage: "/projects/newcold/thumbnail.jpg",
         thumbnailVideo: "/projects/newcold/thumbnail-loop.mp4",
 		previewVideo: "/projects/newcold/preview.mp4",
@@ -236,8 +236,7 @@ const projects = [
 		gitHub: null,
 		tags: ["Next.js", "React", "Mapbox", "Tailwind CSS"],
 		category: "Development",
-		description:
-			"NewCold is a refrigerated food logistics provider. I worked on its website as a front-end developer, including the interactive facilities map (filter by facilities or offices, fly to a region, and click a pin to open a side panel with that site's photo and figures) and the image carousel on the Careers page.",
+		description: "The map is built with Mapbox: filter facilities and offices, fly to a region and open a site's details from its pin.",
 		process: "",
 		challenges: "",
 		differently: "",
@@ -249,10 +248,11 @@ const projects = [
 	},
 	{
 		name: "Karina Rodriguez",
-		highlight: "A calm, editorial site for a Denver executive coach.",
+		highlight: "Designed and built the site, from Figma to Next.js.",
 		company: "Karina Rodriguez Coaching",
-		role: "Design & development",
-		responsibilities: ["Designing and building the site: a video hero, services, corporate programs, the process, testimonials, FAQ and a contact page with an inquiry form, with content managed in Prismic."],
+		companyLabel: "Client",
+		role: "Designed & built",
+		responsibilities: [],
 		media: [
 			{ type: "video", src: "/projects/karina-rodriguez/recording.mp4", poster: "/projects/karina-rodriguez/recording.jpg", alt: "The site on a laptop and a phone: the hero video plays, then the page scrolls", caption: "The homepage on desktop and phone, hero video and all." },
 			{ type: "video", src: "/projects/karina-rodriguez/sections.mp4", poster: "/projects/karina-rodriguez/sections.jpg", alt: "Sections of the site on tilted rows drifting past: the hero, about the work, ways to work together, corporate programs, the process, meet your coach, FAQ and the executive coaching page" },
@@ -263,16 +263,21 @@ const projects = [
 			{ type: "image", src: "/projects/karina-rodriguez/3.jpg", alt: "Ways to work together: executive coaching, 1:1 coaching, leadership development, workshops", layout: "half" },
 			{ type: "image", src: "/projects/karina-rodriguez/4.jpg", alt: "Why Karina: body wisdom, pattern awareness, practical integration" },
 		],
-		shortDescription:
-			"Karina Rodriguez helps leaders, professionals and teams work with pressure through executive coaching, 1:1 coaching and workshops rooted in body wisdom.",
+		shortDescription: "A site for an executive coach, designed and built.",
 		previewImage: "/projects/karina-rodriguez/thumbnail.jpg",
 		thumbnailVideo: "/projects/karina-rodriguez/thumbnail-loop.mp4",
 		livePreview: null,
 		gitHub: null,
-		tags: ["Next.js", "Prismic", "Netlify"],
+		tags: [
+			"Figma",
+			"Next.js",
+			"Framer Motion",
+			"Tailwind CSS",
+			"Prismic",
+			"Netlify",
+		],
 		category: "Development",
-		description:
-			"A site for Karina Rodriguez, an executive coach in Denver, CO: a warm, editorial layout in Gambarino and Inter that introduces her approach, her ways of working with leaders and teams, and a free discovery call.",
+		description: "Designed in Figma and built with Next.js, Framer Motion and Tailwind CSS, with the content in Prismic.",
 		process: "",
 		challenges: "",
 		differently: "",
@@ -284,10 +289,11 @@ const projects = [
 	},
 	{
 		name: "JonnyOnTheSpot",
-		highlight: "A landing page for a Bay Area mobile bar.",
+		highlight: "Designed and built the landing page for a Bay Area mobile bar.",
 		company: "JonnyOnTheSpot Mobile Bar",
-		role: "Design & development",
-		responsibilities: ["Designing and building the landing page: services, the price sheet, testimonials and a quote form, with content managed in Prismic."],
+		companyLabel: "Client",
+		role: "Designed & built",
+		responsibilities: [],
 		media: [
 			{ type: "video", src: "/projects/jonnyonthespot/recording.mp4", poster: "/projects/jonnyonthespot/recording.jpg", alt: "The landing page scrolling on a laptop and a phone", caption: "The landing page on desktop and phone. Shown with refreshed photos and a tightened services section." },
 			{ type: "image", src: "/projects/jonnyonthespot/1.jpg", alt: "JonnyOnTheSpot homepage: on the spot bartending for weddings and private events" },
@@ -297,15 +303,17 @@ const projects = [
 			{ type: "image", src: "/projects/jonnyonthespot/testimonials-2.jpg", alt: "More testimonials from clients across the Bay Area", layout: "half" },
 			{ type: "image", src: "/projects/jonnyonthespot/contact.jpg", alt: "Contact: get a quote and boost your next event, with the quote form over a backlit bar. Phone number and email blurred." }
 		],
-		shortDescription:
-			"JonnyOnTheSpot is a husband-and-wife mobile bartending business from Livermore, serving weddings and private events across the Bay Area.",
+		shortDescription: "A landing page for a Bay Area mobile bar.",
 		previewImage: "/projects/jonnyonthespot/thumbnail.jpg",
 		livePreview: null,
 		gitHub: null,
-		tags: ["Next.js", "Prismic", "Web design"],
+		tags: [
+			"Next.js",
+			"Prismic",
+			"Web design",
+		],
 		category: "Development",
-		description:
-			"A focused landing page for JonnyOnTheSpot, a mobile bar for weddings and private events in the Bay Area: what's included, a clear price sheet, testimonials and a way to get a quote.",
+		description: "A Next.js landing page with the content in Prismic.",
 		process: "",
 		challenges: "",
 		differently: "",
@@ -317,14 +325,11 @@ const projects = [
 	},
 	{
 		name: "Strength Without Pain",
-		highlight: "A research-led brand and website concept for a personal training business.",
+		highlight: "Research, brand and website design for a personal training concept.",
 		company: "Concept",
+		companyLabel: "Type",
 		role: "Research & design",
-		responsibilities: [
-			"Researching personal training businesses and competitors to shape the positioning.",
-			"A fresh brand: palette, type (Inter and Source Sans Pro) and a UI language of story-driven sections, grids and large calls to action.",
-			"A full website design in Figma, with persona stories, service cards and a discovery-call journey."
-		],
+		responsibilities: [],
 		media: [
 			{ type: "video", src: "/projects/strength-concept/scroll.mp4", poster: "/projects/strength-concept/scroll.jpg", alt: "A slow scroll through the full homepage design" },
 			{ type: "image", src: "/projects/strength-concept/section1.jpg", alt: "Hero: Strength without pain. Fitness that lasts." },
@@ -338,15 +343,13 @@ const projects = [
 			{ type: "image", src: "/projects/strength-concept/section8.jpg", alt: "Start training without pain, and the footer" },
 			{ type: "image", src: "/projects/strength-concept/system.jpg", alt: "Design language and visual system: palette, typography, UI language and design goals" }
 		],
-		shortDescription:
-			"A concept for a Colorado Springs personal trainer: strength without pain, fitness that lasts. Designed in Figma and available for a business that wants to adopt it.",
+		shortDescription: "A brand and website concept for a personal trainer.",
 		previewImage: "/projects/strength-concept/thumbnail.jpg",
 		livePreview: null,
 		gitHub: null,
 		tags: ["Figma", "Competitor research", "Brand concept"],
 		category: "Design",
-		description:
-			"A brand and website concept for a personal training business focused on pain-free strength. Persona stories (a veteran, a HYROX competitor, a busy professional, a hiker) lead into services, the coach, a step-by-step journey and testimonials, all guiding visitors to book a discovery call. It is a concept, not a launched site, and is up for grabs.",
+		description: "A concept, not a launched product: competitor research, a new brand and a full website design in Figma.",
 		process: "",
 		challenges: "",
 		differently: "",
@@ -359,10 +362,14 @@ const projects = [
 	{
 		// Draft: listed so everything is in place; story, year, company, tech and media to be refined with the owner.
 		name: "Compassion Authentication",
-		highlight: "One Compassion login for Compassion.com, MyCompassion and the rest of the Compassion family.",
-		company: "",
-		role: "",
-		responsibilities: [],
+		highlight: "Built the core login, logout and verification components for Compassion's shared login.",
+		company: "Compassion International",
+		role: "Front-end development",
+		responsibilities: [
+			"Login, logout and verification components.",
+			"Cognito integration.",
+			"Passing and decoding JWTs.",
+		],
 		media: [
 			{ type: "video", src: "/projects/compassion-auth/thumbnail-loop.mp4", poster: "/projects/compassion-auth/thumbnail.jpg", alt: "A person icon opens into the Compassion login; the username and password are typed, Continue signs in and the MyCompassion dashboard loads in, and the icon turns into a green check" },
 			{ type: "video", src: "/projects/compassion-auth/phone-recording.mp4", poster: "/projects/compassion-auth/phone-recording.jpg", alt: "On a phone: creating an account, the password rules ticking off as it is typed, then logging in and landing on the MyCompassion home" },
@@ -374,29 +381,38 @@ const projects = [
 			{ type: "image", src: "/projects/compassion-auth/login-filled.jpg", alt: "The login form filled in with a test account" },
 			{ type: "image", src: "/projects/compassion-auth/signed-in.jpg", alt: "Signed in: the MyCompassion home, reached through the shared login (children’s photos blurred)" }
 		],
-		shortDescription: "One Compassion login for Compassion.com, MyCompassion and the rest of the Compassion family.",
+		shortDescription: "Compassion's shared login.",
 		previewImage: "/projects/compassion-auth/thumbnail.jpg",
 		thumbnailVideo: "/projects/compassion-auth/thumbnail-loop.mp4",
 		livePreview: null,
 		gitHub: null,
-		tags: [],
+		tags: [
+			"Next.js",
+			"React",
+			"Cognito",
+			"JWT",
+		],
 		category: "Development",
-		description: "The sign-in service behind the Compassion family of sites: log in, create an account with an email or sponsor number, and recover a password or username. Screens are from the staging site with a test account.",
+		description: "",
 		process: "",
 		challenges: "",
 		differently: "",
 		takeaway: "",
 		additionalLinks: [],
-		dateCreated: "",
+		dateCreated: "2025",
 		slug: "compassion-auth",
 	},
 	{
 		// Garcia and Jeans Centre, both JOGG Group stores, built as one project at foryouandyourcustomers (Amsterdam), 2022–2023.
 		name: "Garcia & Jeans Centre",
-		highlight: "Back-end and Apple Pay for the webshops of Garcia and Jeans Centre, two JOGG Group stores on one platform.",
+		highlight: "Worked on the back end of both webshops, including Apple Pay.",
 		company: "foryouandyourcustomers",
 		role: "Back-end development",
-		responsibilities: [],
+		responsibilities: [
+			"Integrated Apple Pay into checkout for both stores.",
+			"A GraphQL migration.",
+			"Performance work, including Lighthouse CI in the AWS CI/CD pipeline.",
+		],
 		media: [
 			{ type: "video", src: "/projects/jogg-group/thumbnail-loop.mp4", poster: "/projects/jogg-group/thumbnail.jpg", alt: "The Garcia and Jeans Centre webshops side by side, each going from the listing to a product, the bag and checkout" },
 			{ type: "video", src: "/projects/garcia/shop-flow.mp4", poster: "/projects/garcia/shop-flow.jpg", alt: "The Garcia webshop: a product chosen from the listing, size picked, added to the bag, the accepted payment marks including Apple Pay, then checkout" },
@@ -420,14 +436,20 @@ const projects = [
 			{ type: "image", src: "/projects/jeans-centre/payment-applepay.jpg", alt: "Jeans Centre with Apple Pay chosen: the Apple Pay checkout button replaces the order button", layout: "half" },
 			{ type: "image", src: "/projects/garcia/payment-applepay.jpg", alt: "Garcia with Apple Pay selected: the Apple Pay checkout button appears under the option" }
 		],
-		shortDescription: "Back-end and Apple Pay for the webshops of Garcia and Jeans Centre, two JOGG Group stores on one platform.",
+		shortDescription: "Back end and Apple Pay for two JOGG Group webshops.",
 		previewImage: "/projects/jogg-group/thumbnail.jpg",
 		thumbnailVideo: "/projects/jogg-group/thumbnail-loop.mp4",
 		livePreview: null,
 		gitHub: null,
-		tags: ["E-commerce", "Apple Pay", "GraphQL", "Performance"],
+		tags: [
+			"E-commerce",
+			"Apple Pay",
+			"GraphQL",
+			"Performance",
+			"CI/CD",
+		],
 		category: "Development",
-		description: "Garcia, a Dutch jeanswear brand (\"jeanswear for real people\"), and Jeans Centre, which sells jeans and clothing for the whole family in stores across the Netherlands and online, both belong to JOGG Group. Their webshops run on the same platform, so for me it was one project throughout my time at foryouandyourcustomers in Amsterdam. My work was mostly on the back end, including integrating Apple Pay into checkout for both stores, a GraphQL migration and performance work.",
+		description: "Two JOGG Group webshops on one platform, so one project.",
 		process: "",
 		challenges: "",
 		differently: "",
@@ -439,10 +461,13 @@ const projects = [
 	{
 		// Draft: listed so everything is in place; story, year, company, tech and media to be refined with the owner.
 		name: "Sobolt cloud platform",
-		highlight: "One place for Sobolt’s customers to see their AI apps, usage, requests and the app marketplace.",
-		company: "Sobolt",
+		highlight: "Built the first version of Sobolt's cloud platform and its component library.",
+		company: "Sobolt (internship)",
 		role: "Full-stack development",
-		responsibilities: [],
+		responsibilities: [
+			"The platform's first version: React, TypeScript and Redux on the front end, FastAPI and Python on the back end.",
+			"The Stencil web-component library, with Storybook: 20+ components.",
+		],
 		media: [
 			{ type: "video", src: "/projects/sobolt/thumbnail-loop.mp4", poster: "/projects/sobolt/thumbnail.jpg", alt: "The Sobolt cloud dashboard: hovering the quick actions, then opening Reports as the usage bars fill in" },
 			{ type: "image", src: "/projects/sobolt/dashboard.jpg", alt: "Dashboard: last week’s CPU, GPU, RAM and storage usage, and the customer’s apps" },
@@ -452,14 +477,22 @@ const projects = [
 			{ type: "image", src: "/projects/sobolt/marketplace.jpg", alt: "The apps marketplace" },
 			{ type: "image", src: "/projects/sobolt/submit-request.jpg", alt: "Submitting a request for a quote" }
 		],
-		shortDescription: "A cloud platform for Sobolt’s AI apps: usage, requests and an app marketplace.",
+		shortDescription: "The first version of Sobolt's cloud platform.",
 		previewImage: "/projects/sobolt/thumbnail.jpg",
 		thumbnailVideo: "/projects/sobolt/thumbnail-loop.mp4",
 		livePreview: null,
 		gitHub: null,
-		tags: ["FastAPI", "Python", "React", "Stencil web components"],
+		tags: [
+			"React",
+			"TypeScript",
+			"Redux",
+			"FastAPI",
+			"Python",
+			"Stencil",
+			"Storybook",
+		],
 		category: "Development",
-		description: "Sobolt is a Dutch company that uses AI to inspect infrastructure such as wind turbines from images. Its cloud platform gave customers one place for their AI apps: one-click sign-in with Google, Microsoft or GitHub, a dashboard of the computing they used, reports for any date range, support and feature requests, and a marketplace to add more apps. The back end ran on FastAPI and Python, the front end on React with custom components built in Stencil. The platform is no longer online, so this page uses Sobolt’s 2021 walkthrough recording.",
+		description: "",
 		process: "",
 		challenges: "",
 		differently: "",
@@ -471,10 +504,13 @@ const projects = [
 	{
 		// Draft: listed so everything is in place; story, year, company, tech and media to be refined with the owner.
 		name: "Trend Trade",
-		highlight: "A mobile app for renting clothes from other people’s closets, and lending out your own.",
-		company: "",
+		highlight: "Built the React Native app for renting and lending clothes.",
+		company: "Tofu",
 		role: "Mobile development",
-		responsibilities: [],
+		responsibilities: [
+			"Built the app with React Native and Expo, on GraphQL and Apollo.",
+			"Stripe payments, OAuth social sign-in and push notifications.",
+		],
 		media: [
 			{ type: "video", src: "/projects/trend-trade/thumbnail-loop.mp4", poster: "/projects/trend-trade/thumbnail.jpg", alt: "A tilted wall of Trend Trade screens, the onboarding’s fashion photos among explore, item, booking and posting screens, its columns drifting up and down" },
 			{ type: "video", src: "/projects/trend-trade/onboarding.mp4", poster: "/projects/trend-trade/onboarding.jpg", alt: "The onboarding: swiping from the splash screen through Access more trends, Rent your closet and Quality assurance" },
@@ -491,24 +527,36 @@ const projects = [
 		previewImage: "/projects/trend-trade/thumbnail.jpg",
 		livePreview: null,
 		gitHub: null,
-		tags: [],
+		tags: [
+			"React Native",
+			"Expo",
+			"GraphQL",
+			"Apollo",
+			"Stripe",
+			"OAuth",
+		],
 		category: "Development",
-		description: "Trend Trade is a mobile app for renting clothes from other people’s closets and earning money by lending out your own; the app describes itself as designed for college students renting to others on campus. It covers onboarding and sign-in, a size profile, an explore feed you can sort by newly listed or trending, search with filters for occasion, clothing type, price and rental dates, item pages with a rental FAQ, booking an item for a range of days with an order summary and payment methods, a three-step flow for posting an item with photos, and a list of your own items. These are screen recordings from the app in development, in 2022.",
+		description: "",
 		process: "",
 		challenges: "",
 		differently: "",
 		takeaway: "",
 		additionalLinks: [],
-		dateCreated: "2022",
+		dateCreated: "2021–2022",
 		slug: "trend-trade",
 	},
 	{
 		// Draft: listed so everything is in place; story, year, company, tech and media to be refined with the owner.
 		name: "HKliving",
-		highlight: "Search, cart, product pages and the Press Room for HKliving, the Amsterdam interior brand.",
-		company: "",
-		role: "",
-		responsibilities: ["The search bar animation.", "The cart animation.", "The product detail pages.", "The Press Room."],
+		highlight: "Worked on animations, product cards, search and authentication.",
+		company: "DPDK",
+		role: "Front-end development",
+		responsibilities: [
+			"Animations, including the search bar animation.",
+			"Product card designs.",
+			"Search integration.",
+			"Authentication.",
+		],
 		media: [
 			{ type: "video", src: "/projects/hkliving/thumbnail-loop.mp4", poster: "/projects/hkliving/thumbnail.jpg", alt: "The HKliving homepage scrolling sideways, section by section, then sweeping back to the start" },
 			{ type: "image", src: "/projects/hkliving/home-1.jpg", alt: "Homepage: Festive season" },
@@ -518,14 +566,14 @@ const projects = [
 			{ type: "image", src: "/projects/hkliving/home-2.jpg", alt: "Homepage: festive products", layout: "half" },
 			{ type: "video", src: "/projects/hkliving/press-room.mp4", poster: "/projects/hkliving/press-room.jpg", alt: "The Press Room: HKliving’s product library with category, material and colour filters, packshots loading in as it scrolls" }
 		],
-		shortDescription: "Search, cart, product pages and the Press Room for HKliving, the Amsterdam interior brand.",
+		shortDescription: "Animations, product cards, search and authentication for HKliving.",
 		previewImage: "/projects/hkliving/thumbnail.jpg",
 		thumbnailVideo: "/projects/hkliving/thumbnail-loop.mp4",
 		livePreview: null,
 		gitHub: null,
 		tags: [],
 		category: "Development",
-		description: "HKliving is an Amsterdam interior and homeware brand known for bold, eclectic collections. I built the search bar and cart animations, the product detail pages and the Press Room. The site has since been replaced, so these screens come from the Wayback Machine. The archive lost most images: the homepage and product photos are HKliving’s own, still on its image CDN, put back where they belonged, and the Press Room shows current HKliving packshots labelled with their own product codes.",
+		description: "",
 		process: "",
 		challenges: "",
 		differently: "",
@@ -537,10 +585,10 @@ const projects = [
 	{
 		// Draft: listed so everything is in place; story, year, company, tech and media to be refined with the owner.
 		name: "Count Group",
-		highlight: "The website for COUNT Group, an energy and petrochemical solutions company.",
-		company: "COUNT Group",
+		highlight: "Front-end development and animations, including the page animations.",
+		company: "DPDK",
 		role: "Front-end development",
-		responsibilities: ["Front-end development across the site.", "Animations, including page animations."],
+		responsibilities: [],
 		media: [
 			{ type: "video", src: "/projects/count-group/thumbnail-loop.mp4", poster: "/projects/count-group/thumbnail.jpg", alt: "The COUNT homepage scrolling from Energy for the future through the three companies, Solutions and COUNT in numbers, then back to the top" },
 			{ type: "image", src: "/projects/count-group/home-hero.jpg", alt: "Homepage: Energy for the future" },
@@ -555,14 +603,14 @@ const projects = [
 			{ type: "image", src: "/projects/count-group/home-careers.jpg", alt: "Homepage: Careers", layout: "half" },
 			{ type: "image", src: "/projects/count-group/home-insights.jpg", alt: "Homepage: Latest insights" }
 		],
-		shortDescription: "The website for COUNT Group, an energy and petrochemical solutions company.",
+		shortDescription: "Front-end development and animations for COUNT Group.",
 		previewImage: "/projects/count-group/thumbnail.jpg",
 		thumbnailVideo: "/projects/count-group/thumbnail-loop.mp4",
 		livePreview: null,
 		gitHub: null,
 		tags: [],
 		category: "Development",
-		description: "COUNT Group works in energy and petrochemical solutions. I worked on its website in 2021 and early 2022 as a front-end developer, building the pages and their animations. The site has changed since, so the screens come from the Wayback Machine (December 2022).",
+		description: "",
 		process: "",
 		challenges: "",
 		differently: "",
@@ -573,9 +621,25 @@ const projects = [
 	},
 	{
 		name: "Natours",
+		// Early work shows only title, tech and images; no links to the old sites or code. The original copy and links, kept for reference:
+		/*
 		shortDescription:
 			"Natours is a full-stack web-application website that lets users check out and book the most exciting tours ever! Features include examples like CRUD operations for admins, payments using stripe, file upload handling and authorization",
-		previewImage: Natours,
+		description:
+			"Natours is a MERN application that lets you check out the coolest tours around the globe, book them and review them after experiencing them! As a guide/administrator you have full CRUD functionalities over users, tours and reviews, along with your own statistic dashboard. This project was develop to really combine both front-end and back-end skills. As this project is still in progress, some features are still missing such as payments and extra security protocols.",
+		process:
+			"Before diving into this application, I went to refresh my knowledge on NodeJS by following a broad and deep fundamentals course. So again, I coded as I learned; which to me is one of the best methods to learn. I decided to really control the structure of my back-end by making use of the MVC pattern. This allows me to scale my project as much as I want. After deploying my back-end, I made visuals using AdobeXD before setting up my front-end using react, react-router and redux for global state management.",
+		challenges:
+			"Knowing how security practices work can be a pain and a challenge, but with a lot of practice, asking and dedication I believe one will get better at it.",
+		differently:
+			"As of now, I am satisfied with my results, but will comment later on this point, when this project is \n'finished'.",
+		takeaway:
+			"I love how I approached this project. I made sure to not fully develop all back-end and front-end features (just like how you avoid tightening the screws when assembling a desk from IKEA until everything is in place).  ",
+		livePreview: null,
+		gitHub: "https://github.com/Brainilio/natours",
+		*/
+		shortDescription: "",
+		previewImage: "/legacy/projects/natours.png", // the original 2020 thumbnail from the first portfolio (master: src/resources/projects/natours.png)
 		livePreview: null,
 		gitHub: null,
 		tags: [
@@ -589,16 +653,11 @@ const projects = [
 			"AdobeXD",
 		],
 		category: "Development",
-		description:
-			"Natours is a MERN application that lets you check out the coolest tours around the globe, book them and review them after experiencing them! As a guide/administrator you have full CRUD functionalities over users, tours and reviews, along with your own statistic dashboard. This project was develop to really combine both front-end and back-end skills. As this project is still in progress, some features are still missing such as payments and extra security protocols.",
-		process:
-			"Before diving into this application, I went to refresh my knowledge on NodeJS by following a broad and deep fundamentals course. So again, I coded as I learned; which to me is one of the best methods to learn. I decided to really control the structure of my back-end by making use of the MVC pattern. This allows me to scale my project as much as I want. After deploying my back-end, I made visuals using AdobeXD before setting up my front-end using react, react-router and redux for global state management.",
-		challenges:
-			"Knowing how security practices work can be a pain and a challenge, but with a lot of practice, asking and dedication I believe one will get better at it.",
-		differently:
-			"As of now, I am satisfied with my results, but will comment later on this point, when this project is \n'finished'.",
-		takeaway:
-			"I love how I approached this project. I made sure to not fully develop all back-end and front-end features (just like how you avoid tightening the screws when assembling a desk from IKEA until everything is in place).  ",
+		description: "",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
 		additionalLinks: [],
 		dateCreated: "OCTOBER, 2020",
 		fullImages: [n1, n2, n3, n4, n5, n6, n7],
@@ -607,13 +666,10 @@ const projects = [
 	},
 	{
 		name: "Oracui's MVP",
+		// Early work shows only title, tech and images; no links to the old sites or code. The original copy and links, kept for reference:
+		/*
 		shortDescription:
 			"Oracui is a global mentorship platform that connects senior students with enrolling students in order to provide mentorship and build relationship. I've been mainly responsible for bringing the product's REST API to MVP ready conditions by improving documentation and adding over 20+ new business features.",
-		previewImage: Oracui,
-		livePreview: null,
-		gitHub: null,
-		tags: ["REACTJS", "REDUX", "EXPRESSJS", "MONGODB", "NODEJS", "GOOGLE API"],
-		category: "Development",
 		description:
 			"Oracui is a global mentorship platform that connects senior students with enrolling students in order to provide mentorship and build relationship. I've been mainly responsible for bringing the product's REST API to MVP ready conditions by improving documentation and adding over 20+ new business features. I've also connected 80% of all available endpoints to the front-end's redux store. I worked on Oracui together with Joao Lucas Nina Matos, who is the responsible CTO. Together with Joao, we ensured that this product was viable enough to be used by 30+ users.",
 		process:
@@ -624,6 +680,20 @@ const projects = [
 			"Next time, I would try and be more involved with the front-end architecture and development as well, so communication between the two ends can go smoothly.",
 		takeaway:
 			"My takeaway is that developing Oracui in its early stages was a big, but necessary challenge. Not only did it allow me to grow as a developer, but it also taught me how to work on a single codebase together with another developer. Something that definitely brought me a lot of joy was having this product actually being used by 35 students at Melbourne University.",
+		livePreview: "https://oracui.com/",
+		gitHub: null,
+		*/
+		shortDescription: "",
+		previewImage: or1,
+		livePreview: null,
+		gitHub: null,
+		tags: ["React", "Redux", "Express", "MongoDB", "Node.js", "Google API"],
+		category: "Development",
+		description: "",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
 		additionalLinks: [],
 		dateCreated: "MARCH, 2021",
 		fullImages: [or, or1, or3, or5, or6],
@@ -632,20 +702,10 @@ const projects = [
 	},
 	{
 		name: "Bay Vine Media",
+		// Early work shows only title, tech and images; no links to the old sites or code. The original copy and links, kept for reference:
+		/*
 		shortDescription:
 			"[WIP] I've developed a landing page, dedicated to my freelance web and creative services under the name of a brand I'm working on (Bay Vine). Bay Vine Media seeks to allow minorities and small businesses to still have a presentable brand and online presence. ",
-		previewImage: BayVineMedia,
-		livePreview: null,
-		gitHub: null,
-		tags: [
-			"REACTJS",
-			"NETLIFY",
-			"GSAP",
-			"REACT HOOKS",
-			"ADOBE XD",
-			"GOOGLE ANALYTICS",
-		],
-		category: "Development",
 		description:
 			"[WIP] I've developed a landing page, dedicated to my freelance web and creative services under the name of a brand I'm working on (Bay Vine). Bay Vine Media seeks to allow minorities and small businesses to still have a presentable brand and online presence. I've designed and developed everything using AdobeXD, React, and GSAP. Bay Vine Media is just one of many creative ideas I have in store for Bay Vine, and I hope to grow this brand out to multiple side projects that I can reflect my identity in.",
 		process:
@@ -656,21 +716,40 @@ const projects = [
 			"Something I would do differently is try and design out every little scenario. For example the round cursor was not meant to be in the final project, but was added later on. This caused me to re-write most of my code in order to properly use ContextAPI. The reason behind re-writing most of my code, is that I wanted to take full advantage of ContextAPI so that meant moving most of the state to the store.",
 		takeaway:
 			"A big takeaway is that there is a sea of creative opportunities. There should be no limits to a developer. One year ago I would've never imagined developing this site with all the animations and details. There is constant opportunity to learn and growth.",
+		livePreview: "https://bayvinemedia.com/",
+		gitHub: "https://github.com/Brainilio/bayvinemedia",
+		*/
+		shortDescription: "",
+		previewImage: BayVineMedia,
+		livePreview: null,
+		gitHub: null,
+		tags: [
+			"React",
+			"Netlify",
+			"GSAP",
+			"React Hooks",
+			"Adobe XD",
+			"Google Analytics",
+		],
+		category: "Development",
+		description: "",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
 		additionalLinks: [],
 		dateCreated: "JANUARY, 2021",
 		fullImages: [bv1, bv2, bv3, bv4],
 		earlyWork: true,
 		slug: "bayvinemedia",
+		hidden: true, // taken off the site
 	},
 	{
 		name: "Salvame",
+		// Early work shows only title, tech and images; no links to the old sites or code. The original copy and links, kept for reference:
+		/*
 		shortDescription:
 			"Salvame is an art-initiative to empower and inform the locals of Boyle Heights about environmental racism. I created a web-app using three-js to display local art in an abstract and symbolic way.",
-		previewImage: Salvame,
-		livePreview: null,
-		gitHub: null,
-		tags: ["REACTJS", "THREEJS", "GSAP", "UX/UI", "PITCHING", "USER RESEARCH"],
-		category: "Development",
 		description:
 			"Salvame is an art initiative to encourage, empower and inform the locals of Boyle Heights to stand up against environmental racism through an online local art museum. This project implements real time AQI data which “clouds” the art as the poor air quality intensifies. Salvame informs users about environmental racism, working to provide a platform for locals and organizations advocating against this problem.",
 		process:
@@ -681,6 +760,20 @@ const projects = [
 			"Next time I would definitely start looking at my tech-stack earlier on, and try to really break my web-application down into little pieces.",
 		takeaway:
 			"This is definitely how I want to approach every project. It is SO important to create something that is meaningful to your users, especially marginalized communities. Salvame was a project that allowed me to talk to fellow Latin(o/a/x)s and get to know more about their stories and experiences. I loved everything from the entrepreneurial side all the way to the technology aspects of it. ",
+		livePreview: "https://salvame-react.netlify.app/",
+		gitHub: "https://github.com/Brainilio/salvame-app",
+		*/
+		shortDescription: "",
+		previewImage: s1,
+		livePreview: null,
+		gitHub: null,
+		tags: ["React", "Three.js", "GSAP", "UX/UI", "Pitching", "User research"],
+		category: "Development",
+		description: "",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
 		additionalLinks: [],
 		dateCreated: "JULY, 2020",
 		fullImages: [s1, s2, s3, s4, s5, s6, s7, s8],
@@ -690,12 +783,23 @@ const projects = [
 
 	{
 		name: "My Old Portfolio",
+		// Early work shows only title, tech and images; no links to the old sites or code. The original copy and links, kept for reference:
+		/*
 		shortDescription:
 			"Over the past couple of months, my portfolio's gone through a lot of changes. Despite the changes, I'm still incredibly proud of my previous designed and developed portfolio.",
+		description: "",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
+		livePreview: "https://dazzling-leakey-c1d429.netlify.app/",
+		gitHub: "https://github.com/Brainilio/MyPortfolio/tree/old-portfolio/src",
+		*/
+		shortDescription: "",
 		previewImage: OldPortfolio,
 		livePreview: null,
 		gitHub: null,
-		tags: ["REACTJS", "REACT HOOKS", "ADOBEXD", "GSAP"],
+		tags: ["React", "React Hooks", "Adobe XD", "GSAP"],
 		category: "Development",
 		description: "",
 		process: "",
@@ -707,24 +811,15 @@ const projects = [
 		fullImages: [],
 		earlyWork: true,
 		slug: "oldportfolio",
+		hidden: true, // taken off the site
 	},
 
 	{
 		name: "Burger Builder",
+		// Early work shows only title, tech and images; no links to the old sites or code. The original copy and links, kept for reference:
+		/*
 		shortDescription:
 			"The burger builder is an app that I developed to train my React competencies. Build your burger, sign/log in and review your orders. React Hooks, Redux, Jest/Enzyme, JWT token based Auth.",
-		previewImage: BurgerBuilder,
-		livePreview: null,
-		gitHub: null,
-		tags: [
-			"REACTJS",
-			"FIREBASE",
-			"REDUX",
-			"UNIT TESTING",
-			"REACT HOOKS",
-			"REACT ROUTER",
-		],
-		category: "Development",
 		description:
 			"Burger builder is my first actual reactjs application in which i implemented general common fundamentals and features. I built this application while learning all about ReactJS, and implemented most of my learning into this project. Burger Builder lets users build their burger, order and review it. I used Redux for global state management, Jest/Enzyme for testing, react-router for routing and css modules for styling.",
 		process:
@@ -735,6 +830,27 @@ const projects = [
 			"Next time I would use react-functional components right away, really track when my components render and use memoization to my advantage.",
 		takeaway:
 			"This project really kickstarted my ReactJS journey and I'm glad I applied a lot of fundamentals and common features into this project.",
+		livePreview: "https://react-my-burger-builder-d060b.web.app/",
+		gitHub: "https://github.com/Brainilio/burger-builder",
+		*/
+		shortDescription: "",
+		previewImage: bb1,
+		livePreview: null,
+		gitHub: null,
+		tags: [
+			"React",
+			"Firebase",
+			"Redux",
+			"Unit testing",
+			"React Hooks",
+			"React Router",
+		],
+		category: "Development",
+		description: "",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
 		additionalLinks: [],
 		dateCreated: "AUGUST, 2020",
 		fullImages: [bb1, bb2, bb3],
@@ -744,13 +860,10 @@ const projects = [
 
 	{
 		name: "LOL: My Favorite Champ",
+		// Early work shows only title, tech and images; no links to the old sites or code. The original copy and links, kept for reference:
+		/*
 		shortDescription:
 			"LOL: My Favorite Champ is a MERN-stack application in which users can preview their favorite League of Legends champions and see their in-game pros and cons. This is a project that I made in 2018 and decided to remake in React.",
-		previewImage: Lolmfc,
-		livePreview: null,
-		gitHub: null,
-		tags: ["REACTJS", "EXPRESS", "MONGODB", "AWS", "NODEJS"],
-		category: "Development",
 		description:
 			"LOLMFC is a MERN-stack application which used to be a MEVN-stack application when I first developed it in 2018. I decided to revamp this project, because of the lack of features it had alogn with wanting to test out my skills in React. LOLMFC allows you to create an account and add your favorite League of Legends champions to your dashboard. By clicking on your champion card, you get to read more details about your favorite champion's backstory and they scale against other enemies. ",
 		process:
@@ -761,6 +874,20 @@ const projects = [
 			"Next time, I would sketch out all my components, make sure I develop for mobile-first and add more form validation.",
 		takeaway:
 			"Revamping this project gave me a huge morale boost as a developer. To see how much I grew truly stimulated me to keep pushing forward in refining myself and learning more.",
+		livePreview: null,
+		gitHub: "https://github.com/Brainilio/lol-my-fav-champ",
+		*/
+		shortDescription: "",
+		previewImage: lol1,
+		livePreview: null,
+		gitHub: null,
+		tags: ["React", "Express", "MongoDB", "AWS", "Node.js"],
+		category: "Development",
+		description: "",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
 		additionalLinks: [],
 		dateCreated: "AUGUST, 2020",
 		fullImages: [lol1, lol2, lol3, lol4, lol5],
@@ -770,13 +897,10 @@ const projects = [
 
 	{
 		name: "Thanos(?) Runner",
+		// Early work shows only title, tech and images; no links to the old sites or code. The original copy and links, kept for reference:
+		/*
 		shortDescription:
 			"Thanos Runner is an endless runner game. In order to win the game you have to collect 6 infinity stones and avoid obstacles. This game gets progressively harder the more stones you collect! Use AD to run and SPACE to jump.",
-		previewImage: Thanosrunner,
-		livePreview: null,
-		gitHub: null,
-		tags: ["TYPESCRIPT", "OOP", "GAME"],
-		category: "Development",
 		description:
 			"Thanos Runner is an endless runner game featuring... LINK! In order to win the game you have to collect 6 infinity stones while at the same time avoid obstacles such as mini hulks, stormbreakers and fireballs. The game gets harder the more stones you collect! This is the first time I’ve developed something in Typescript using OOP principles (Inheritance, UML diagramming, Encapsulation, Classes, Composition). Use AD to run and SPACE to jump.",
 		process:
@@ -787,6 +911,20 @@ const projects = [
 			"Next time I would make more use of Typescript's type-checking advantages.",
 		takeaway:
 			"Really sticking to certain OOP principles is important to ensure best practices.",
+		livePreview: "https://brainilio.github.io/ThanosRunner/",
+		gitHub: "https://github.com/Brainilio/ThanosRunner",
+		*/
+		shortDescription: "",
+		previewImage: t2,
+		livePreview: null,
+		gitHub: null,
+		tags: ["TypeScript", "OOP", "Game"],
+		category: "Development",
+		description: "",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
 		additionalLinks: [],
 		dateCreated: "JULY, 2018",
 		fullImages: [t1, t2, t3, t4],
@@ -795,13 +933,10 @@ const projects = [
 	},
 	{
 		name: "Paper Invaders",
+		// Early work shows only title, tech and images; no links to the old sites or code. The original copy and links, kept for reference:
+		/*
 		shortDescription:
 			"Copy Invaders is a web-game that I developed in under 3 hours for my programming class. I implemented the observer’s pattern, strategy pattern and the singleton pattern in this game.",
-		previewImage: Paperinvaders,
-		livePreview: null,
-		gitHub: null,
-		tags: ["TSCRIPT", "DPATTERNS", "OOP"],
-		category: "Development",
 		description:
 			"Copy Invaders is a web-game that I developed in under 3 hours for my programming class. This game was developed in order to prove my competencies in using common design patterns in OOP. I implemented the observer’s pattern, strategy pattern and the singleton pattern in this game.",
 		process:
@@ -812,6 +947,20 @@ const projects = [
 			"Next time, I would take a LITTLE more time figuring out how to apply my patterns. It can really be a brainteasers, because there are so may different ways of implementing correct patterns.",
 		takeaway:
 			"This project really gave me strong fundamentals on how to approach OOP programming, and this is something I know will stick with me for the rest of my career.",
+		livePreview: "https://brainilio.github.io/Typescript_Design_Patterns/",
+		gitHub: "https://github.com/Brainilio/Typescript_Design_Patterns",
+		*/
+		shortDescription: "",
+		previewImage: p1,
+		livePreview: null,
+		gitHub: null,
+		tags: ["TypeScript", "Design patterns", "OOP"],
+		category: "Development",
+		description: "",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
 		additionalLinks: [],
 		dateCreated: "JULY, 2020",
 		fullImages: [p1, p2],
@@ -820,13 +969,10 @@ const projects = [
 	},
 	{
 		name: "My PokeDex",
+		// Early work shows only title, tech and images; no links to the old sites or code. The original copy and links, kept for reference:
+		/*
 		shortDescription:
 			"My PokeDex is my first ever Android app that I developed using Java and Android Studio. This project was made to play around with Android development concepts and to familiarize myself with different technologies. ",
-		previewImage: PokeDex,
-		livePreview: null,
-		gitHub: null,
-		tags: ["ANDROID", "JAVA", "MOBILE"],
-		category: "Development",
 		description:
 			"As a creative empathy driven developer I have to familiarize myself with different types of technologies. This is why for my programming class I decided to program a mobile application using Java/Android. Despite having no familiarity with this language, I still was able to come up with a nice looking android app, using my own Pokemon API and the google maps API to really personalize someone’s user’s dashboard. In this app you have the possibility to view your pokemons, view your current location and adjust the settings of the current application.",
 		process:
@@ -837,6 +983,20 @@ const projects = [
 			"Next time, I would try and lay every 'feature' out and do proper research on each one before getting tangled up into a mess.",
 		takeaway:
 			"Android development is certainly interesting and I can definitely see the future of mobile applications being inevitable. Though, I do have a preference for technologies like React Native for cross-platform development.",
+		livePreview: null,
+		gitHub: "https://github.com/Brainilio/My_Pokedex",
+		*/
+		shortDescription: "",
+		previewImage: pd1,
+		livePreview: null,
+		gitHub: null,
+		tags: ["Android", "Java", "Mobile"],
+		category: "Development",
+		description: "",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
 		additionalLinks: [],
 		dateCreated: "MAY 2020",
 		fullImages: [pd1, pd2, pd3],
@@ -845,13 +1005,10 @@ const projects = [
 	},
 	{
 		name: "Leidsman Begeleiding",
+		// Early work shows only title, tech and images; no links to the old sites or code. The original copy and links, kept for reference:
+		/*
 		shortDescription:
 			"Leidsman is a dutch math discussion platform that allows you to post your favorite math subjects, favorite them and comment on other posts in order to discuss various math subjects.",
-		previewImage: Leidsman,
-		livePreview: null,
-		gitHub: null,
-		tags: ["LARAVEL", "PHP", "MVC"],
-		category: "Development",
 		description:
 			"Leidsman is a dutch math discussion platform in which you can post your favorite math subjects, favorite them and comment on other posts to discuss the subject at hand. I used Laravel for this website and MySQL as a database, for the front-end I used Bootstrap to keep things simple. the MVC architecture and it kept things neat and organized. Features include:  - Can’t access post if you’re not authenticated, - Search, sort, filters on posts, - Favorite math subjects, - Comment on posts, - Edit your profile-name, - Logincounter to keep track of your activity in DB -> certain features are limited if you have a logincounter less than 7 , - Admin can see all users, delete posts, comments and add posts",
 		process:
@@ -862,6 +1019,20 @@ const projects = [
 			"I would change the front-end, since the design and the front-end looks kind of scrappy.",
 		takeaway:
 			"I love Laravel! It's syntactically so chill to work in and it truly made me understand the MVC pattern.",
+		livePreview: null,
+		gitHub: "https://github.com/Brainilio/LeidsmanBegeleiding",
+		*/
+		shortDescription: "",
+		previewImage: lm3,
+		livePreview: null,
+		gitHub: null,
+		tags: ["Laravel", "PHP", "MVC"],
+		category: "Development",
+		description: "",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
 		additionalLinks: [],
 		dateCreated: "OCTOBER 2018",
 		fullImages: [lm1, lm2, lm3, lm4, lm5, lm6],
@@ -870,13 +1041,10 @@ const projects = [
 	},
 	{
 		name: "Maria Beauty Salon",
+		// Early work shows only title, tech and images; no links to the old sites or code. The original copy and links, kept for reference:
+		/*
 		shortDescription:
 			"My first ever “web-application”! I made a reservation system for my mother’s salon in pure PHP, HTML/Materialize & MySQL. Functionalities include form validation, authentication, authorization and full CRUD operations over reservations",
-		previewImage: MariaBeautySalon,
-		livePreview: null,
-		gitHub: null,
-		tags: ["PHP", "MATERIAL", "MYSQL"],
-		category: "Development",
 		description:
 			"My first ever “web-application”! I made a reservation system for my mother’s salon in pure PHP, HTML/Materialize & MySQL. This was my first time interacting with these languages, yet I was able to develop a reservation system for my mother at the time with a login-system and a dashboard with CRUD functionalities to view all of the reservations you have ahead of you. Only the admin (Maria) has access to all reservations and employee accounts. The front-end was developed using materialize/css and I used a weather API to display the weather in Rotterdam. Note: the file structure is terrible, but this was my first web-app, so expect spaghetti code upon reviewing.",
 		process:
@@ -886,6 +1054,20 @@ const projects = [
 		differently:
 			"I would try and ask for some advice on how to best prepare yourself and write PHP code. Though, at the time I had no clue what design patterns were or what quality code meant.",
 		takeaway: "I would definitely avoid such a terrible file structure.",
+		livePreview: "https://stud.hosted.hr.nl/0924777/ProjectCLE2SPRINT1/",
+		gitHub: "https://github.com/Brainilio/MariaBeautySalon",
+		*/
+		shortDescription: "",
+		previewImage: mb2,
+		livePreview: null,
+		gitHub: null,
+		tags: ["PHP", "Materialize", "MySQL"],
+		category: "Development",
+		description: "",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
 		additionalLinks: [],
 		dateCreated: "DEC 2017",
 		fullImages: [mb1, mb2, mb3, mb4, mb5, mb6],
@@ -894,13 +1076,10 @@ const projects = [
 	},
 	{
 		name: "Machine Learning Basics",
+		// Early work shows only title, tech and images; no links to the old sites or code. The original copy and links, kept for reference:
+		/*
 		shortDescription:
 			"Machine Learning application that includes Kmeans clustering, logistic regression and decision trees using sklearn.",
-		previewImage: Classifier,
-		livePreview: null,
-		gitHub: null,
-		tags: ["ML", "PYTHON", "SCIKIT"],
-		category: "Development",
 		description:
 			"This project was developed to get familiar with Python, skicit, famous algorithms, terms like under- and overfitting, supervised and unsupervised learning.",
 		process:
@@ -911,6 +1090,20 @@ const projects = [
 			"I would just try and practice these things more and try to understand the differences and applications of each algorithm.",
 		takeaway:
 			"Machine Learning is an interesting technology but I truly believe you need to know your dos and donts before applying and writing it",
+		livePreview: null,
+		gitHub: "https://github.com/Brainilio/MachineLearningExample",
+		*/
+		shortDescription: "",
+		previewImage: ml2,
+		livePreview: null,
+		gitHub: null,
+		tags: ["Machine learning", "Python", "scikit-learn"],
+		category: "Development",
+		description: "",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
 		additionalLinks: [],
 		dateCreated: "MARCH 2020",
 		fullImages: [ml1, ml2, ml3, ml4],
@@ -949,4 +1142,6 @@ comic goliath david, evolife, super bespaar app, killer robots, healthcare robot
 
 */
 
-export default projects
+// Projects flagged `hidden` are off the site: no card, no page. Every consumer imports this filtered list.
+export const allProjectsIncludingHidden = projects
+export default projects.filter(project => !project.hidden)

@@ -23,10 +23,12 @@ export default function ProjectThumbnail({ project, href }) {
     observer.observe(host.current); preference.addEventListener('change', sync); document.addEventListener('visibilitychange', sync); sync();
     return () => { disposed = true; observer.disconnect(); preference.removeEventListener('change', sync); document.removeEventListener('visibilitychange', sync); video.pause(); };
   }, [project.thumbnailVideo]);
+  const media = <>
+    <img src={project.previewImage} alt={href ? `${project.name} screen composition` : ''} loading="lazy" width="1280" height="800" />
+    {project.thumbnailVideo && <video ref={movie} className={ready && !reduced ? 'is-ready' : ''} muted loop playsInline preload="none" aria-hidden="true" onLoadedData={() => setReady(true)} />}
+  </>;
   return <div className="motion-thumb" ref={host}>
-    <Link className="motion-thumb-link" href={href} aria-label={`${project.name}: view project`}>
-      <img src={project.previewImage} alt={`${project.name} screen composition`} loading="lazy" width="1280" height="800" />
-      {project.thumbnailVideo && <video ref={movie} className={ready && !reduced ? 'is-ready' : ''} muted loop playsInline preload="none" aria-hidden="true" onLoadedData={() => setReady(true)} />}
-    </Link>
+    {/* Without href the picture is decorative: the card around it carries the link and the name. */}
+    {href ? <Link className="motion-thumb-link" href={href} aria-label={`${project.name}: view project`}>{media}</Link> : <div className="motion-thumb-link">{media}</div>}
   </div>;
 }

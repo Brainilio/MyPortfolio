@@ -1,59 +1,80 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import projects from '../../../lib/projects';
-const MOTIONS = ['rise', 'zoom', 'slide-left', 'parallax', 'tilt', 'slide-right'];
 import ProjectMedia from '../project-media';
-import Woodland from '../woodland';
 import StickySummary from '../sticky-summary';
+import SiteHeader from '../../site-header';
+import SiteFooter from '../../site-footer';
+import TechChip, { Icon } from '../../tech-chip';
 import '../project.css';
 
+const MOTIONS = ['rise', 'zoom', 'slide-left', 'parallax', 'tilt', 'slide-right'];
+
+// `projects` already leaves out hidden projects, so they get no page.
 export function generateStaticParams() { return projects.map(project => ({ slug: project.slug })); }
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const project = projects.find(project => project.slug === slug);
-  return { title: `${project?.name || 'Project'} — Brainilio`, description: project?.highlight || project?.shortDescription };
+  return { title: `${project?.name || 'Project'} — Brainilio`, description: project?.highlight || project?.shortDescription || undefined };
+}
+
+// Early work is title, tech and its own screenshots, shown whole: no upscaling, no zoom or crop motion.
+function earlyMedia(project) {
+  const images = project.fullImages || [];
+  const all = images.includes(project.previewImage) ? images : [project.previewImage, ...images];
+  return all.filter(Boolean).map((src, i) => ({ type: 'image', src, alt: `${project.name}, screen ${i + 1}`, layout: 'natural', motion: 'rise' }));
 }
 
 export default async function Project({ params }) {
   const { slug } = await params;
   const project = projects.find(project => project.slug === slug);
   if (!project) notFound();
-  const peers = projects.filter(p => Boolean(p.earlyWork) === Boolean(project.earlyWork));
+  const early = Boolean(project.earlyWork);
+  const peers = projects.filter(p => Boolean(p.earlyWork) === early);
   const next = peers[(peers.indexOf(project) + 1) % peers.length];
-  const media = project.media || [
-    { type:'image', src:project.previewImage, alt:`${project.name} overview` },
-    ...(project.previewVideo ? [{type:'video',src:project.previewVideo,poster:project.previewImage,alt:`${project.name} preview`,caption:'A closer look. Play the film to explore the interface.'}] : []),
-    ...(project.fullImages || []).map((src,i)=>({type:'image',src,alt:`${project.name} screen ${i+1}`,layout:i%3===0?'wide':'half'})),
+  const media = early ? earlyMedia(project) : project.media || [
+    { type: 'image', src: project.previewImage, alt: `${project.name} overview` },
+    ...(project.fullImages || []).map((src, i) => ({ type: 'image', src, alt: `${project.name} screen ${i + 1}`, layout: i % 3 === 0 ? 'wide' : 'half' })),
   ];
   // A different order of scroll motions per project, so no two pages move the same way.
   const motionOffset = [...project.slug].reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % MOTIONS.length;
-  return <main className="case-page">
-    <nav className="case-nav" aria-label="Project navigation"><Link href="/">Brainilio<span>.</span></Link><Link href="/projects/">All projects ↗</Link></nav>
-    <div className="case-layout">
+  const intro = !early && (project.highlight || project.shortDescription);
+  return <div className="case-page">
+    <SiteHeader />
+    <main className="case-layout">
       <StickySummary>
-        <Link className="case-back" href="/projects/">← Back to work</Link>
-        {project.earlyWork && <p className="case-era">Early projects &amp; learning</p>}
+        <Link className="case-back" href="/projects/"><Icon src="/icons/tech/tabler--arrow-left.svg" />All work</Link>
+        {early && <p className="case-era">Early projects &amp; learning</p>}
         <h1>{project.name}</h1>
-        <p className="case-highlight">{project.highlight || project.shortDescription}</p>
-        <dl className="case-facts">
-          {project.dateCreated && <div><dt>When</dt><dd>{project.dateCreated}</dd></div>}
-          {project.company && <div><dt>Working with</dt><dd>{project.company}</dd></div>}
-          {project.role && <div><dt>My role</dt><dd>{project.role}</dd></div>}
-        </dl>
-        {project.responsibilities?.length > 0 && <section className="case-responsibilities"><h2>My contribution</h2><ul>{project.responsibilities.map(text=><li key={text}>{text}</li>)}</ul></section>}
-        <ul className="case-pills" aria-label="Technologies">{project.tags.map(tag=><li key={tag}>{tag}</li>)}</ul>
-        {project.description && <section className="case-description"><h2>About the project</h2><p>{project.description}</p></section>}
-        {(project.gitHub || project.livePreview) && <div className="case-links">{project.gitHub && <a href={project.gitHub} target="_blank" rel="noreferrer">View code ↗</a>}{project.livePreview && <a href={project.livePreview} target="_blank" rel="noreferrer">Visit website ↗</a>}</div>}
+        {intro && <p className="case-highlight">{intro}</p>}
+        {!early && <dl className="case-facts">
+          {project.dateCreated && <div><dt>Year</dt><dd>{project.dateCreated}</dd></div>}
+          {project.company && <div><dt>{project.companyLabel || 'Company'}</dt><dd>{project.company}</dd></div>}
+          {project.role && <div><dt>Role</dt><dd>{project.role}</dd></div>}
+        </dl>}
+        {!early && project.responsibilities?.length > 0 && <section className="case-responsibilities"><h2>What I did</h2><ul>{project.responsibilities.map(text => <li key={text}>{text}</li>)}</ul></section>}
+        {project.tags.length > 0 && <ul className="ui-chips case-chips" aria-label="Built with">{project.tags.map(tag => <TechChip key={tag} name={tag} />)}</ul>}
+        {!early && project.description && <section className="case-description"><h2>About</h2><p>{project.description}</p></section>}
       </StickySummary>
       <section className="case-gallery" aria-label={`${project.name} gallery`}>
-        {media.map((item,i)=><ProjectMedia key={`${item.src}-${i}`} item={item} priority={i===0} motion={MOTIONS[(i + motionOffset) % MOTIONS.length]} />)}
-        {[['The process',project.process],['The challenges',project.challenges],['What I’d do differently',project.differently],['The takeaway',project.takeaway]].map(([title,text])=>text&&<section className="case-story" key={title}><h2>{title}</h2><p>{text}</p></section>)}
+        {media.map((item, i) => <ProjectMedia key={`${item.src}-${i}`} item={item} priority={i === 0} motion={MOTIONS[(i + motionOffset) % MOTIONS.length]} />)}
       </section>
-    </div>
-    <section className="case-contact" aria-labelledby="case-contact-title">
-      <div><p className="case-note">There’s always room for another good idea.</p><h2 id="case-contact-title">Like what you see?<br/>Let’s build something<span>.</span></h2><p>A project, a role, or a spark of an idea. I’d love to hear about it.</p><div className="case-contact-links"><a href="mailto:brainilioir@gmail.com">Say hello ↗</a><Link href="/#contact">Meet me by the coast →</Link></div></div>
-      <Woodland />
+    </main>
+    <section className="case-close" aria-label="What next">
+      <div className="ui-glass case-talk">
+        <h2>Have something in mind?</h2>
+        <p>A project, a role or an idea: I&apos;d like to hear about it.</p>
+        <div className="case-talk-actions">
+          <Link className="ui-btn" href="/contact/">Let&apos;s talk<Icon src="/icons/tech/tabler--arrow-up-right.svg" /></Link>
+          <a className="ui-btn ui-btn--secondary" href="mailto:brainilioir@gmail.com"><Icon src="/icons/tech/tabler--mail.svg" />Email me</a>
+        </div>
+      </div>
+      {next && next !== project && <Link className="case-next" href={`/project/${next.slug}/`}>
+        <img src={next.previewImage} alt="" loading="lazy" className={next.earlyWork ? 'is-whole' : undefined} />
+        <span className="case-next-text"><span>Next project</span><strong>{next.name}</strong></span>
+        <Icon src="/icons/tech/tabler--arrow-right.svg" className="case-next-arrow" />
+      </Link>}
     </section>
-    <footer className="case-end"><Link href="/projects/">← All projects</Link>{next && next!==project && <Link href={`/project/${next.slug}/`}>Next: {next.name} →</Link>}</footer>
-  </main>;
+    <SiteFooter />
+  </div>;
 }

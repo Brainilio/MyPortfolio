@@ -97,5 +97,372 @@
       "source": "https://files.svgcdn.io/tabler/refresh.svg",
       "path": "public/icons/iconbuddy/refresh.svg"
     }
+  },
+  "tech": {
+    "tabler/brand-react": {
+      "source": "https://files.svgcdn.io/tabler/brand-react.svg",
+      "path": "public/icons/tech/tabler--brand-react.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/brand-react-native": {
+      "source": "https://files.svgcdn.io/tabler/brand-react-native.svg",
+      "path": "public/icons/tech/tabler--brand-react-native.svg",
+      "license": "MIT (Tabler)"
+    },
+    "simple-icons/expo": {
+      "source": "https://files.svgcdn.io/simple-icons/expo.svg",
+      "path": "public/icons/tech/simple-icons--expo.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "tabler/brand-nextjs": {
+      "source": "https://files.svgcdn.io/tabler/brand-nextjs.svg",
+      "path": "public/icons/tech/tabler--brand-nextjs.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/brand-typescript": {
+      "source": "https://files.svgcdn.io/tabler/brand-typescript.svg",
+      "path": "public/icons/tech/tabler--brand-typescript.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/brand-javascript": {
+      "source": "https://files.svgcdn.io/tabler/brand-javascript.svg",
+      "path": "public/icons/tech/tabler--brand-javascript.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/brand-nodejs": {
+      "source": "https://files.svgcdn.io/tabler/brand-nodejs.svg",
+      "path": "public/icons/tech/tabler--brand-nodejs.svg",
+      "license": "MIT (Tabler)"
+    },
+    "simple-icons/express": {
+      "source": "https://files.svgcdn.io/simple-icons/express.svg",
+      "path": "public/icons/tech/simple-icons--express.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "simple-icons/graphql": {
+      "source": "https://files.svgcdn.io/simple-icons/graphql.svg",
+      "path": "public/icons/tech/simple-icons--graphql.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "simple-icons/reactquery": {
+      "source": "https://files.svgcdn.io/simple-icons/reactquery.svg",
+      "path": "public/icons/tech/simple-icons--reactquery.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "tabler/brand-redux": {
+      "source": "https://files.svgcdn.io/tabler/brand-redux.svg",
+      "path": "public/icons/tech/tabler--brand-redux.svg",
+      "license": "MIT (Tabler)"
+    },
+    "simple-icons/reactrouter": {
+      "source": "https://files.svgcdn.io/simple-icons/reactrouter.svg",
+      "path": "public/icons/tech/simple-icons--reactrouter.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "tabler/brand-aws": {
+      "source": "https://files.svgcdn.io/tabler/brand-aws.svg",
+      "path": "public/icons/tech/tabler--brand-aws.svg",
+      "license": "MIT (Tabler)"
+    },
+    "simple-icons/awslambda": {
+      "source": "https://files.svgcdn.io/simple-icons/awslambda.svg",
+      "path": "public/icons/tech/simple-icons--awslambda.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "simple-icons/amazoncognito": {
+      "source": "https://files.svgcdn.io/simple-icons/amazoncognito.svg",
+      "path": "public/icons/tech/simple-icons--amazoncognito.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "simple-icons/amazondynamodb": {
+      "source": "https://files.svgcdn.io/simple-icons/amazondynamodb.svg",
+      "path": "public/icons/tech/simple-icons--amazondynamodb.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "simple-icons/sst": {
+      "source": "https://files.svgcdn.io/simple-icons/sst.svg",
+      "path": "public/icons/tech/simple-icons--sst.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "simple-icons/redis": {
+      "source": "https://files.svgcdn.io/simple-icons/redis.svg",
+      "path": "public/icons/tech/simple-icons--redis.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "simple-icons/supabase": {
+      "source": "https://files.svgcdn.io/simple-icons/supabase.svg",
+      "path": "public/icons/tech/simple-icons--supabase.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "tabler/brand-firebase": {
+      "source": "https://files.svgcdn.io/tabler/brand-firebase.svg",
+      "path": "public/icons/tech/tabler--brand-firebase.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/brand-mongodb": {
+      "source": "https://files.svgcdn.io/tabler/brand-mongodb.svg",
+      "path": "public/icons/tech/tabler--brand-mongodb.svg",
+      "license": "MIT (Tabler)"
+    },
+    "simple-icons/mysql": {
+      "source": "https://files.svgcdn.io/simple-icons/mysql.svg",
+      "path": "public/icons/tech/simple-icons--mysql.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "simple-icons/nx": {
+      "source": "https://files.svgcdn.io/simple-icons/nx.svg",
+      "path": "public/icons/tech/simple-icons--nx.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "tabler/brand-tailwind": {
+      "source": "https://files.svgcdn.io/tabler/brand-tailwind.svg",
+      "path": "public/icons/tech/tabler--brand-tailwind.svg",
+      "license": "MIT (Tabler)"
+    },
+    "simple-icons/greensock": {
+      "source": "https://files.svgcdn.io/simple-icons/greensock.svg",
+      "path": "public/icons/tech/simple-icons--greensock.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "tabler/brand-threejs": {
+      "source": "https://files.svgcdn.io/tabler/brand-threejs.svg",
+      "path": "public/icons/tech/tabler--brand-threejs.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/brand-framer-motion": {
+      "source": "https://files.svgcdn.io/tabler/brand-framer-motion.svg",
+      "path": "public/icons/tech/tabler--brand-framer-motion.svg",
+      "license": "MIT (Tabler)"
+    },
+    "simple-icons/prismic": {
+      "source": "https://files.svgcdn.io/simple-icons/prismic.svg",
+      "path": "public/icons/tech/simple-icons--prismic.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "simple-icons/netlify": {
+      "source": "https://files.svgcdn.io/simple-icons/netlify.svg",
+      "path": "public/icons/tech/simple-icons--netlify.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "simple-icons/mapbox": {
+      "source": "https://files.svgcdn.io/simple-icons/mapbox.svg",
+      "path": "public/icons/tech/simple-icons--mapbox.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "simple-icons/stencil": {
+      "source": "https://files.svgcdn.io/simple-icons/stencil.svg",
+      "path": "public/icons/tech/simple-icons--stencil.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "simple-icons/storybook": {
+      "source": "https://files.svgcdn.io/simple-icons/storybook.svg",
+      "path": "public/icons/tech/simple-icons--storybook.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "tabler/brand-stripe": {
+      "source": "https://files.svgcdn.io/tabler/brand-stripe.svg",
+      "path": "public/icons/tech/tabler--brand-stripe.svg",
+      "license": "MIT (Tabler)"
+    },
+    "simple-icons/applepay": {
+      "source": "https://files.svgcdn.io/simple-icons/applepay.svg",
+      "path": "public/icons/tech/simple-icons--applepay.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "tabler/brand-apple": {
+      "source": "https://files.svgcdn.io/tabler/brand-apple.svg",
+      "path": "public/icons/tech/tabler--brand-apple.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/brand-figma": {
+      "source": "https://files.svgcdn.io/tabler/brand-figma.svg",
+      "path": "public/icons/tech/tabler--brand-figma.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/brand-adobe": {
+      "source": "https://files.svgcdn.io/tabler/brand-adobe.svg",
+      "path": "public/icons/tech/tabler--brand-adobe.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/brand-python": {
+      "source": "https://files.svgcdn.io/tabler/brand-python.svg",
+      "path": "public/icons/tech/tabler--brand-python.svg",
+      "license": "MIT (Tabler)"
+    },
+    "simple-icons/fastapi": {
+      "source": "https://files.svgcdn.io/simple-icons/fastapi.svg",
+      "path": "public/icons/tech/simple-icons--fastapi.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "simple-icons/scikitlearn": {
+      "source": "https://files.svgcdn.io/simple-icons/scikitlearn.svg",
+      "path": "public/icons/tech/simple-icons--scikitlearn.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "tabler/brain": {
+      "source": "https://files.svgcdn.io/tabler/brain.svg",
+      "path": "public/icons/tech/tabler--brain.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/brand-php": {
+      "source": "https://files.svgcdn.io/tabler/brand-php.svg",
+      "path": "public/icons/tech/tabler--brand-php.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/brand-laravel": {
+      "source": "https://files.svgcdn.io/tabler/brand-laravel.svg",
+      "path": "public/icons/tech/tabler--brand-laravel.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/coffee": {
+      "source": "https://files.svgcdn.io/tabler/coffee.svg",
+      "path": "public/icons/tech/tabler--coffee.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/brand-android": {
+      "source": "https://files.svgcdn.io/tabler/brand-android.svg",
+      "path": "public/icons/tech/tabler--brand-android.svg",
+      "license": "MIT (Tabler)"
+    },
+    "simple-icons/mui": {
+      "source": "https://files.svgcdn.io/simple-icons/mui.svg",
+      "path": "public/icons/tech/simple-icons--mui.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "tabler/brand-google": {
+      "source": "https://files.svgcdn.io/tabler/brand-google.svg",
+      "path": "public/icons/tech/tabler--brand-google.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/brand-google-analytics": {
+      "source": "https://files.svgcdn.io/tabler/brand-google-analytics.svg",
+      "path": "public/icons/tech/tabler--brand-google-analytics.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/brand-docker": {
+      "source": "https://files.svgcdn.io/tabler/brand-docker.svg",
+      "path": "public/icons/tech/tabler--brand-docker.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/brand-github": {
+      "source": "https://files.svgcdn.io/tabler/brand-github.svg",
+      "path": "public/icons/tech/tabler--brand-github.svg",
+      "license": "MIT (Tabler)"
+    },
+    "simple-icons/jest": {
+      "source": "https://files.svgcdn.io/simple-icons/jest.svg",
+      "path": "public/icons/tech/simple-icons--jest.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "tabler/layout": {
+      "source": "https://files.svgcdn.io/tabler/layout.svg",
+      "path": "public/icons/tech/tabler--layout.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/users": {
+      "source": "https://files.svgcdn.io/tabler/users.svg",
+      "path": "public/icons/tech/tabler--users.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/presentation": {
+      "source": "https://files.svgcdn.io/tabler/presentation.svg",
+      "path": "public/icons/tech/tabler--presentation.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/chart-bar": {
+      "source": "https://files.svgcdn.io/tabler/chart-bar.svg",
+      "path": "public/icons/tech/tabler--chart-bar.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/palette": {
+      "source": "https://files.svgcdn.io/tabler/palette.svg",
+      "path": "public/icons/tech/tabler--palette.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/shopping-cart": {
+      "source": "https://files.svgcdn.io/tabler/shopping-cart.svg",
+      "path": "public/icons/tech/tabler--shopping-cart.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/gauge": {
+      "source": "https://files.svgcdn.io/tabler/gauge.svg",
+      "path": "public/icons/tech/tabler--gauge.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/topology-star-3": {
+      "source": "https://files.svgcdn.io/tabler/topology-star-3.svg",
+      "path": "public/icons/tech/tabler--topology-star-3.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/stack-2": {
+      "source": "https://files.svgcdn.io/tabler/stack-2.svg",
+      "path": "public/icons/tech/tabler--stack-2.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/upload": {
+      "source": "https://files.svgcdn.io/tabler/upload.svg",
+      "path": "public/icons/tech/tabler--upload.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/test-pipe": {
+      "source": "https://files.svgcdn.io/tabler/test-pipe.svg",
+      "path": "public/icons/tech/tabler--test-pipe.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/code": {
+      "source": "https://files.svgcdn.io/tabler/code.svg",
+      "path": "public/icons/tech/tabler--code.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/topology-star": {
+      "source": "https://files.svgcdn.io/tabler/topology-star.svg",
+      "path": "public/icons/tech/tabler--topology-star.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/device-gamepad-2": {
+      "source": "https://files.svgcdn.io/tabler/device-gamepad-2.svg",
+      "path": "public/icons/tech/tabler--device-gamepad-2.svg",
+      "license": "MIT (Tabler)"
+    },
+    "simple-icons/materialdesign": {
+      "source": "https://files.svgcdn.io/simple-icons/materialdesign.svg",
+      "path": "public/icons/tech/simple-icons--materialdesign.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "simple-icons/jsonwebtokens": {
+      "source": "https://files.svgcdn.io/simple-icons/jsonwebtokens.svg",
+      "path": "public/icons/tech/simple-icons--jsonwebtokens.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "simple-icons/apollographql": {
+      "source": "https://files.svgcdn.io/simple-icons/apollographql.svg",
+      "path": "public/icons/tech/simple-icons--apollographql.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "tabler/key": {
+      "source": "https://files.svgcdn.io/tabler/key.svg",
+      "path": "public/icons/tech/tabler--key.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/device-mobile": {
+      "source": "https://files.svgcdn.io/tabler/device-mobile.svg",
+      "path": "public/icons/tech/tabler--device-mobile.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/refresh": {
+      "source": "https://files.svgcdn.io/tabler/refresh.svg",
+      "path": "public/icons/tech/tabler--refresh.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/git-merge": {
+      "source": "https://files.svgcdn.io/tabler/git-merge.svg",
+      "path": "public/icons/tech/tabler--git-merge.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/cloud": {
+      "source": "https://files.svgcdn.io/tabler/cloud.svg",
+      "path": "public/icons/tech/tabler--cloud.svg",
+      "license": "MIT (Tabler)"
+    }
   }
 }

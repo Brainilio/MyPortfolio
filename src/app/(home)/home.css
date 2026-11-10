@@ -3,9 +3,9 @@
 @import url('https://api.fontshare.com/v2/css?f[]=satoshi@500,700,900&f[]=satoshi@500i&display=swap');
 /* Park-sign lettering for the road trip (Google Fonts, OFL). */
 @import url('https://fonts.googleapis.com/css2?family=Bitter:wght@600;800&display=swap');
-/* Offset TM (Type Mania) is a paid typeface: add a licensed webfont at public/fonts/offset-tm/OffsetTM.woff2 and
-   the display type switches to it; until then it falls back to Satoshi. */
-@font-face{font-family:'Offset TM';src:local('Offset TM'),local('OffsetTM'),url('/fonts/offset-tm/OffsetTM.woff2') format('woff2');font-display:swap}
+/* Offset TM (Type Mania) is a paid typeface: used when installed locally; otherwise the display type is Satoshi.
+   (To ship it, add the licensed webfont and a url() source here.) */
+@font-face{font-family:'Offset TM';src:local('Offset TM'),local('OffsetTM');font-display:swap}
 /* Homepage test: one dusk palette, the brand violet, a giant name under a floating island. */
 .ht{overflow-x:clip;--font-display:'Offset TM','Satoshi';--sky-top:#1b1335;--sky-night-top:#1a1040;--sky-night:#2d1b6b;--violet:#a78bfa;--cream:#fbf7ff;--ink:#2a1636;background:var(--sky-top);color:var(--cream)}
 body:has(.ht){background:#1b1335}
@@ -14,6 +14,7 @@ body:has(.ht){background:#1b1335}
 .ht{--page-max-width:1600px}
 @media(min-width:1300px){.ht{--gutter:max(clamp(24px,6.3vw,100px),calc((100vw - var(--page-max-width)) / 2 + 100px))}}
 /* No visible scrollbar on the homepage (scrolling still works; the section pill shows where you are). */
+html:has(.ht){scrollbar-width:none;background:#1b1335}html:has(.ht)::-webkit-scrollbar{display:none}html:has(.ht) body{background:#1b1335}
 /* Sections are fixed full-screen layers over a tall scroll runway. The page script sets each layer's opacity and
    --shift from the scroll position: 0 when it's the scene in view, -1→0 while it rises in from below, 0→1 while it
    drifts up and out. Scenes move most, headings less and the giant titles least, which gives the parallax. */
@@ -40,14 +41,14 @@ body:has(.ht){background:#1b1335}
 /* About is a single screen: its words centred in it. */
 .ht-zone.ht-about .ht-copy{box-sizing:border-box;min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:60px 0 0}
 .ht-zone.ht-pinned .ht-copy{position:sticky;top:0;height:100svh;display:flex;flex-direction:column;justify-content:center;padding:60px 0 0}
-.ht-copy h2{margin:0;font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:clamp(34px,4.2vw,68px);line-height:.95;letter-spacing:-.05em}
+.ht-copy h2{margin:0;font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:var(--ui-t-h2);line-height:.95;letter-spacing:-.05em}
 .ht-copy h2 .ht-dot{color:var(--violet)}
 /* Headings write themselves in: each word uncovered left to right, then the full stop pops. */
 .ht-reveal .ht-word,.ht-reveal .ht-dot{display:inline-block;clip-path:inset(-.25em 100% -.25em 0);transition:clip-path .9s cubic-bezier(.76,0,.24,1) calc(var(--w,0) * .08s)}
 .ht-reveal .ht-dot{transform:scale(0);transform-origin:30% 80%;transition:clip-path .9s cubic-bezier(.76,0,.24,1) calc((var(--n) - 1) * .08s + .1s),transform .5s cubic-bezier(.34,1.56,.64,1) calc((var(--n) - 1) * .08s + .1s)}
 .ht-reveal.is-revealed .ht-word,.ht-reveal.is-revealed .ht-dot{clip-path:inset(-.25em -.2em -.25em 0)}
 .ht-reveal.is-revealed .ht-dot{transform:none}
-.ht-copy>p{margin:16px 0 0;font-size:16px;line-height:1.55;color:rgba(251,247,255,.8)}
+.ht-copy>p{margin:16px 0 0;font-size:var(--ui-t-body);line-height:1.55;color:rgba(251,247,255,.8)}
 .ht-sky{position:absolute;inset:0;z-index:0;background:
   radial-gradient(60% 45% at 78% 74%,rgba(255,196,160,.55),transparent 70%),
   linear-gradient(180deg,#1b1335 0%,#33225a 34%,#6e4a8f 60%,#c9849c 82%,#f3b89c 100%)}
@@ -70,7 +71,7 @@ body:has(.ht){background:#1b1335}
 .ht-header{position:fixed;z-index:20;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:28px var(--gutter);font-size:13px;transition:color .8s ease}
 .ht[data-section=contact] .ht-header{color:#f4f6f8}
 .ht-wordmark{font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:22px;letter-spacing:-.04em}
-.ht-wordmark span,.ht-roles span{color:var(--violet)}
+.ht-wordmark span{color:var(--violet)}
 .ht-header nav{display:flex;gap:44px}
 .ht-header nav a{position:relative}
 .ht-header nav a:after{content:'';position:absolute;left:0;right:100%;bottom:-5px;height:1px;background:currentColor;transition:right .35s}
@@ -151,9 +152,10 @@ body:has(.ht){background:#1b1335}
 .ht-list li{padding:16px 20px;border-radius:16px;background:rgba(255,255,255,.38);border:1px solid rgba(255,255,255,.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:background .5s,transform .5s,box-shadow .5s}
 /* Skills: a warm frosted surface keeps moving scenery from determining text contrast. */
 .ht-skill-story{position:absolute;left:calc(100% + clamp(48px,9vw,160px));top:clamp(104px,15svh,160px);width:min(560px,calc(100vw - 100% - var(--gutter) * 2 - clamp(48px,9vw,160px)));color:var(--ink)}
-.ht-skill-panel{padding:clamp(20px,2.2vw,32px);border:1px solid rgba(255,255,255,.7);border-radius:20px;
-  background:rgba(251,247,255,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  box-shadow:0 12px 40px rgba(42,22,54,.08),inset 0 1px 0 rgba(255,255,255,.65)}
+/* Frosted glass over the valley: light enough to let the road show through, the ink still crisp. */
+.ht-skill-panel.ui-glass{padding:clamp(22px,2.4vw,34px);border:1px solid rgba(255,255,255,.55);border-radius:22px;
+  background:linear-gradient(135deg,rgba(255,255,255,.42),rgba(255,244,236,.2));backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);
+  box-shadow:0 18px 50px rgba(90,40,30,.16),inset 0 1px 0 rgba(255,255,255,.7)}
 .ht-skill-panel .ht-skill-lead{margin-top:0}
 @media (prefers-reduced-transparency:reduce){.ht-skill-panel{background:#fbf7ff;backdrop-filter:none;-webkit-backdrop-filter:none}}
 @media (forced-colors:active){.ht-skill-panel{background:Canvas;color:CanvasText;border-color:CanvasText;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}.ht-skill-panel .ht-skill-blurb{color:CanvasText}}
@@ -240,9 +242,8 @@ body:has(.ht){background:#1b1335}
 }
 /* The stop's tools, each with its mark. */
 .ht-skill-tools{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 0;padding:0;list-style:none}
-.ht-skill-tools li{display:inline-flex;align-items:center;gap:7px;padding:7px 13px 7px 11px;border-radius:999px;font-size:13px;font-weight:600;line-height:1;color:var(--ink);text-shadow:none;
-  background:rgba(255,248,238,.62);border:1px solid rgba(42,22,54,.1);box-shadow:0 6px 18px rgba(120,60,20,.12)}
-.ht-skill-tools i{flex:none;width:17px;height:17px;background:#7c5cdb;-webkit-mask:var(--icon) center/contain no-repeat;mask:var(--icon) center/contain no-repeat}
+.ht-skill-tools .ui-chip{font-weight:600;color:var(--ink);background:rgba(255,255,255,.5);border-color:rgba(42,22,54,.1)}
+.ht-skill-tools .ui-icon{color:#7c5cdb;width:16px;height:16px}
 /* Very short screens: a tighter card, the credits moved to the right-hand column above the section menu, the beam
    hint to the top right, so nothing overlaps. */
 @media(max-height:640px) and (min-width:761px){
@@ -372,18 +373,16 @@ html.ht-locked{overflow:hidden}
    then turning to plum once the sky behind it has brightened. Top to foot it warms, as the project name does. */
 /* (Room round the words for the gradient to paint into: it only fills the box, and with this tight line-height the
    descenders, the g in "Things", hang below it.) */
-.wl-title{margin:-.12em -.12em -.26em;padding:.12em .12em .26em;font-family:var(--font-display),'Inter',sans-serif;font-size:clamp(38px,4vw,60px);font-weight:900;line-height:.95;letter-spacing:-.05em;
+.wl-title{margin:-.12em -.12em -.26em;padding:.12em .12em .26em;font-family:var(--font-display),'Inter',sans-serif;font-size:var(--ui-t-h2);font-weight:900;line-height:.95;letter-spacing:-.05em;
   color:transparent;--ink-top:color-mix(in oklab,color-mix(in oklab,#fff,#ffe3cf calc(var(--warm,0) * 100%)),#2a1636 calc(var(--rise,0) * 100%));
   --ink-foot:color-mix(in oklab,color-mix(in oklab,#ffe9da,#ffbd92 calc(var(--warm,0) * 100%)),#5a2a58 calc(var(--rise,0) * 100%));
   background:linear-gradient(180deg,var(--ink-top) 30%,var(--ink-foot) 100%);-webkit-background-clip:text;background-clip:text;
   /* A soft dusky halo behind the light ink, fading as it turns dark. */
   filter:drop-shadow(0 2px 16px rgb(42 22 54 / calc(.4 * (1 - var(--rise,0)))))}
 .wl-pills{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 0}
-.wl-pills a{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:999px;font-size:.9rem;font-weight:600;text-decoration:none;transition:transform .25s ease,box-shadow .25s ease}
-.wl-pills a:first-child{background:#7c3aed;color:#fff;box-shadow:0 10px 24px rgba(124,58,237,.35)}
-.wl-pills a:last-child{background:#fbf7ff;color:var(--ink);box-shadow:0 10px 24px rgba(42,22,54,.16)}
-.wl-pills a:hover{transform:translateY(-2px)}
-.wl-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
+.wl-pills .ui-btn{min-height:44px;font-size:14px}
+.wl-tags{justify-content:center}
+.wl-tags .ui-chip{background:rgba(255,255,255,.5);border-color:rgba(42,22,54,.1);color:var(--ink)}
 .wl-tags em{font-style:normal;font-size:12px;padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.5);border:1px solid rgba(42,22,54,.1);color:var(--ink)}
 
 .wl-a-name{position:absolute;z-index:2;left:0;right:0;top:52%;transform:translateY(-50%);display:flex;justify-content:center;color:var(--ink);text-decoration:none}
@@ -422,3 +421,22 @@ html.ht-locked{overflow:hidden}
 
 .wl-preview-toggle{display:block;width:fit-content;margin-top:14px;padding:8px 12px;border:1px solid #ffffff80;border-radius:999px;background:rgba(251,247,255,.9);color:#2a1636;font:inherit;font-size:12px;cursor:pointer}.wl-preview-toggle:focus-visible{outline:2px solid #7c5cdb;outline-offset:5px}
 @media(prefers-reduced-motion:reduce){.wl-preview-toggle{display:none}}
+
+/* The hero line: "I build" and a phrase that slides up and away for the next. */
+.ht-slide{position:relative;display:inline-flex;overflow:hidden;vertical-align:bottom;padding-bottom:.08em;margin-bottom:-.08em;color:var(--violet)}
+.ht-slide>span{display:inline-block;white-space:nowrap}
+.ht-hero-links .ui-btn,.ht-links .ui-btn{pointer-events:auto}
+.ht-about .ht-links{margin-top:20px}
+.ht-copy>p.ht-now{font-size:14px;opacity:.72}
+/* The end: the sky turning rosy behind a frosted card, the footer under it. */
+.ht-outro{position:relative;z-index:5;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 var(--gutter);color:var(--cream)}
+.ht-outro-card{align-self:center;width:min(620px,100%);margin:auto 0;padding:clamp(26px,3vw,44px);text-align:center;
+  background:linear-gradient(135deg,rgba(60,30,70,.42),rgba(40,20,60,.28))}
+.ht-outro-card h2{margin:14px 0 0;font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:var(--ui-t-h2);line-height:1;letter-spacing:-.05em}
+.ht-outro-card p{margin:14px auto 0;max-width:440px;font-size:var(--ui-t-body);line-height:1.55;color:rgba(251,247,255,.82)}
+.ht-outro-card .ht-links{justify-content:center;margin-top:24px}
+.ht-badge{display:inline-flex;align-items:center;gap:9px;margin:0;padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22)}
+.ht-badge i{width:8px;height:8px;border-radius:50%;background:#5ee39a;box-shadow:0 0 0 4px rgba(94,227,154,.22);animation:ht-ping 2.4s ease-in-out infinite}
+@keyframes ht-ping{50%{box-shadow:0 0 0 7px rgba(94,227,154,0)}}
+.ht-outro .ui-footer{padding-inline:0}
+@media(prefers-reduced-motion:reduce){.ht-badge i{animation:none}}

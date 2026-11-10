@@ -223,10 +223,11 @@ export default function AboutScene({ state, slot = 1, side = "right", onReady })
     const STARS=160,starPositions=new Float32Array(STARS*3),starSeeds=new Float32Array(STARS),star=new THREE.Vector3();
     for(let i=0;i<STARS;i++){skyAt((rng()-.5)*110,-4+Math.pow(rng(),.7)*34,star);starPositions.set([star.x,star.y,star.z],i*3);starSeeds[i]=rng();}
     const starGeometry=new THREE.BufferGeometry();starGeometry.setAttribute("position",new THREE.BufferAttribute(starPositions,3));starGeometry.setAttribute("aSeed",new THREE.BufferAttribute(starSeeds,1));
-    const starUniforms={uTime:{value:0},uPixel:{value:1}};
+    // (uFade: the stars come out only as this island settles, so none show over the hero island while it is still leaving.)
+    const starUniforms={uTime:{value:0},uPixel:{value:1},uFade:{value:0}};
     scene.add(new THREE.Points(starGeometry,new THREE.ShaderMaterial({uniforms:starUniforms,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
-      vertexShader:`attribute float aSeed;uniform float uTime,uPixel;varying float vAlpha;void main(){
-        vAlpha=(.35+.65*aSeed)*(.6+.4*sin(uTime*(1.+aSeed*2.)+aSeed*40.));gl_PointSize=(1.2+aSeed*2.3)*uPixel;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+      vertexShader:`attribute float aSeed;uniform float uTime,uPixel,uFade;varying float vAlpha;void main(){
+        vAlpha=uFade*(.35+.65*aSeed)*(.6+.4*sin(uTime*(1.+aSeed*2.)+aSeed*40.));gl_PointSize=(1.2+aSeed*2.3)*uPixel;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
       fragmentShader:`varying float vAlpha;void main(){float d=length(gl_PointCoord-.5)*2.;gl_FragColor=vec4(1.,.97,.9,vAlpha*smoothstep(1.,0.,d));}`})));
     const moonCanvas=document.createElement("canvas");moonCanvas.width=moonCanvas.height=128;
     {const g=moonCanvas.getContext("2d"),halo=g.createRadialGradient(64,64,10,64,64,64);halo.addColorStop(0,"rgba(255,240,210,.5)");halo.addColorStop(1,"rgba(255,240,210,0)");g.fillStyle=halo;g.fillRect(0,0,128,128);
@@ -327,7 +328,7 @@ export default function AboutScene({ state, slot = 1, side = "right", onReady })
       const toast=roast.toast;mallowMaterial.color.copy(RAW).lerp(GOLDEN,Math.min(1,toast));if(toast>1)mallowMaterial.color.lerp(CHARRED,Math.min(1,(toast-1)/.3));
       mallowMaterial.emissiveIntensity=(1-pull)*(.12+flare*.2);
       flies.forEach((fly,i)=>{flyPositions.set([fly.x+Math.sin(time*.4+fly.phase)*.4,fly.y+Math.sin(time*.9+fly.phase)*.15,fly.z+Math.cos(time*.35+fly.phase)*.4],i*3);});
-      flyGeometry.attributes.position.needsUpdate=true;starUniforms.uTime.value=time;if(!reduced||shooting.t>=0)updateShooting(dt);flyMaterial.opacity=.55+.45*Math.sin(time*1.7);
+      flyGeometry.attributes.position.needsUpdate=true;starUniforms.uTime.value=time;{const arriving=Math.min(1,Math.max(0,state.current.tilt[slot]/14));starUniforms.uFade.value=Math.pow(1-arriving,3);}if(!reduced||shooting.t>=0)updateShooting(dt);flyMaterial.opacity=.55+.45*Math.sin(time*1.7);
       needsRender=false;
     }
     // 30 fps is plenty while it's calm, full rate while dragged or while he's eating; paused while another section is on screen.

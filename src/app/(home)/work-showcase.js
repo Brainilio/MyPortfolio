@@ -1,6 +1,7 @@
 "use client";
 import { eagleHandoff } from "./eagle-handoff";
 import ProjectThumbnail from "../project/project-thumbnail";
+import TechChip, { Icon } from "../tech-chip";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import * as THREE from "three";
@@ -21,11 +22,28 @@ import { getImageRatio, fitWidth } from "../../lib/image-ratio";
 
 // The three sheets: where they hang (fraction of the screen), how wide (fraction of the screen's width, before their
 // own shape adjusts it), which of the project's pictures, their turn and tilt, and depth.
-const SHEETS = [
-  { fx: .64, fy: .21, w: .17, pick: 1, ry: -.32, rz: .05, z: -1.6 },
-  { fx: .85, fy: .63, w: .15, pick: 3, ry: -.5, rz: -.07, z: -1.1 },
-  { fx: .19, fy: .72, w: .16, pick: 0, ry: .45, rz: .04, z: -1.3 },
-];
+// Three layouts to compare (?work=1|2|3; 1 by default):
+// 1: three of the project's landscape screenshots hanging round the name (no phone screens, no thumbnail);
+// 2: the thumbnail loop alone, as one wide curved screen low behind the name;
+// 3: the thumbnail loop alone, as one tilted card floating to the right of the name.
+const LAYOUTS = {
+  1: [
+    { fx: .64, fy: .21, w: .17, pick: 0, ry: -.32, rz: .05, z: -1.6 },
+    { fx: .85, fy: .63, w: .15, pick: 1, ry: -.5, rz: -.07, z: -1.1 },
+    { fx: .19, fy: .72, w: .16, pick: 2, ry: .45, rz: .04, z: -1.3 },
+  ],
+  2: [{ fx: .5, fy: .6, w: .3, pick: "thumb", ry: 0, rz: 0, z: -3.2, bend: .3 }],
+  3: [{ fx: .74, fy: .46, w: .23, pick: "thumb", ry: -.42, rz: .035, z: -1.2 }],
+};
+// A project's landscape pictures, all different: its gallery screenshots first (no phone screens, not the thumbnail),
+// then its videos' posters, then its combined phone-screens picture if it still needs more.
+const landscapes = project => {
+  const media = project.media ?? [], plain = item => item.layout !== "portrait" && !item.presentation;
+  const shots = media.filter(item => item.type === "image" && plain(item) && !/\/(m-|m\d|screens)/.test(item.src)).map(item => item.src);
+  const posters = media.filter(item => item.type === "video" && item.poster && plain(item)).map(item => item.poster);
+  const combined = media.filter(item => item.type === "image" && /\/screens/.test(item.src)).map(item => item.src);
+  return [...new Set([...shots, ...posters, ...combined])].filter(src => src !== project.previewImage);
+};
 const SHEET_VERTEX = `uniform float uBend,uWave,uTime;varying vec2 vUv;varying float vSlope;void main(){
   vUv=uv;vec3 p=position;float x=uv.x-.5,y=uv.y-.5,ph=uv.x*5.+uv.y*3.+uTime*2.4;
   // A sheet: curled toward you at the sides (more at the top than the foot), rippling as it moves.
@@ -60,8 +78,6 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
   const root = useRef(null), back = useRef(null), front = useRef(null);
   const ready = useRef(onReady); ready.current = onReady;
   const [active, setActive] = useState(0);
-  const [previewsPaused, setPreviewsPaused] = useState(false), previewPause = useRef(false);
-  previewPause.current = previewsPaused;
   const mouse = useRef({ x: 0, y: 0 }), picker = useRef(null);
   const n = work.length;
 
@@ -122,7 +138,7 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
     };
     const syncMovies = enabled => {
       for (const [src, movie] of movies) {
-        const active = enabled && !previewPause.current && !reduce.matches && window.innerWidth > 760 && sheets.some(sheet => sheet.src === src || sheet.next === src);
+        const active = enabled && !reduce.matches && window.innerWidth > 760 && sheets.some(sheet => sheet.src === src || sheet.next === src);
         if (!active) { movie.video.pause(); continue; }
         if (!movie.video.getAttribute("src")) movie.video.src = movie.url;
         if (movie.video.paused && !movie.pending && !movie.blocked) {
@@ -136,7 +152,8 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
     reduce.addEventListener("change", pauseHiddenMovies);
     const shadowTexture = glow([[0, "rgba(255,255,255,.9)"], [.55, "rgba(255,255,255,.35)"], [1, "rgba(255,255,255,0)"]], 64);
     const sheetGeometry = new THREE.PlaneGeometry(1, 1, 40, 24), shadowGeometry = new THREE.PlaneGeometry(1, 1);
-    const sheets = SHEETS.map((spot, k) => {
+    const layout = LAYOUTS[new URLSearchParams(location.search).get("work")] ?? LAYOUTS[1];
+    const sheets = layout.map((spot, k) => {
       const uniforms = { uMap: { value: null }, uNext: { value: null }, uMix: { value: 0 }, uRatio: { value: 1.6 }, uRatioA: { value: 1.6 }, uRatioB: { value: 1.6 }, uBend: { value: .16 }, uWave: { value: 0 }, uTime: { value: 0 }, uAlpha: { value: 0 }, uSunSide: { value: 0 }, uSun: { value: 1 } };
       const mesh = new THREE.Mesh(sheetGeometry, new THREE.ShaderMaterial({ uniforms, transparent: true, side: THREE.DoubleSide, vertexShader: SHEET_VERTEX, fragmentShader: SHEET_FRAGMENT }));
       const shadow = new THREE.Mesh(shadowGeometry, new THREE.MeshBasicMaterial({ map: shadowTexture, color: "#3a1638", transparent: true, depthWrite: false, opacity: 0 }));
@@ -144,8 +161,8 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       return { spot, k, group, mesh, shadow, uniforms, ratio: 16 / 10, nextRatio: 16 / 10, src: null, next: null, want: null, href: null, wantHref: null, appear: 0, mix: 0, wait: 0 };
     });
     const showProject = (project, first) => {
-      const pics = [project.previewImage, ...(project.fullImages ?? [])];
-      sheets.forEach(sheet => { sheet.want = pics[sheet.spot.pick % pics.length]; sheet.wantHref = `/project/${project.slug}/`; sheet.wait = first ? .25 + sheet.k * .14 : sheet.k * .12; });
+      const pics = landscapes(project), fallback = [project.previewImage];
+      sheets.forEach(sheet => { sheet.want = sheet.spot.pick === "thumb" ? project.previewImage : (pics.length ? pics : fallback)[sheet.spot.pick % (pics.length || 1)]; sheet.wantHref = `/project/${project.slug}/`; sheet.wait = first ? .25 + sheet.k * .14 : sheet.k * .12; });
     };
     // (Clicking a sheet opens its project; the pointer turns to a hand over one.)
     const raycaster = new THREE.Raycaster(), ndc = new THREE.Vector2();
@@ -303,7 +320,7 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
         sheet.group.rotation.set(smoothMouse.y * .08, spot.ry + smoothMouse.x * .14 + breath * .06, spot.rz);
         sheet.group.scale.setScalar(.96 + .04 * a);
         uniforms.uAlpha.value = a; sheet.shadow.material.opacity = .4 * a;
-        uniforms.uBend.value = .14 + (1 - a) * .2 + breath * .12 + Math.min(.45, Math.abs(vel) * .14); uniforms.uWave.value = still ? 0 : .012 + Math.min(.1, Math.abs(vel) * .04);
+        uniforms.uBend.value = (spot.bend ?? .14) + (1 - a) * .2 + breath * .12 + Math.min(.45, Math.abs(vel) * .14); uniforms.uWave.value = still ? 0 : .012 + Math.min(.1, Math.abs(vel) * .04);
         uniforms.uTime.value = time; uniforms.uSunSide.value = Math.max(-1, Math.min(1, (sunSprite.position.x * (9 - spot.z) / (9 - sunDepth) - sheet.group.position.x) / 3));
         uniforms.uSun.value = .5 + .5 * sunAt;
       }
@@ -362,12 +379,11 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
         <canvas className="wl-canvas" ref={back} aria-hidden="true" />
         <canvas className="wl-canvas wl-front" ref={front} aria-hidden="true" />
         <div className="wl-head">
-          <h2 id="ht-work-title" className="wl-title">Things I’ve built</h2>
+          <h2 id="ht-work-title" className="wl-title">Built &amp; worked on</h2>
           <p className="wl-pills">
-            <a href="/projects/">All projects <span aria-hidden="true">→</span></a>
-            <a href="/journey/">Lab experiments <span aria-hidden="true">→</span></a>
+            <a className="ui-btn ui-btn--secondary" href="/projects/">All work<Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
+            <a className="ui-btn ui-btn--secondary" href="/journey/">Lab<Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
           </p>
-          <button className="wl-preview-toggle" type="button" aria-pressed={previewsPaused} onClick={() => setPreviewsPaused(value => !value)}>{previewsPaused ? 'Play previews' : 'Pause previews'}</button>
       </div>
 
         {/* The name, its letters rising in one after another (and lifting away for the next). */}
@@ -390,17 +406,17 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
             initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0, transition: { delay: .25, duration: .5, ease: [.2, .8, .2, 1] } }} exit={{ opacity: 0, y: -10, transition: { duration: .2 } }}>
             <span>{metaOf(project)}</span>
             {project.highlight && <span className="wl-contribution">{project.highlight}</span>}
-            <span className="wl-tags">{project.tags?.slice(0, 3).map(t => <em key={t}>{t}</em>)}</span>
+            <ul className="wl-tags ui-chips">{project.tags?.slice(0, 4).map(t => <TechChip key={t} name={t} />)}</ul>
           </motion.div>
         </AnimatePresence>
       </div>
 
       {/* Phones: the heading and the projects as a plain list, scrolling over the sky (the eagle behind them). */}
       <div className="wl-phone-head">
-        <h2 className="wl-title">Things I’ve built</h2>
+        <h2 className="wl-title">Built &amp; worked on</h2>
         <p className="wl-pills">
-          <a href="/projects/">All projects <span aria-hidden="true">→</span></a>
-          <a href="/journey/">Lab experiments <span aria-hidden="true">→</span></a>
+          <a className="ui-btn ui-btn--secondary" href="/projects/">All work<Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
+          <a className="ui-btn ui-btn--secondary" href="/journey/">Lab<Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
         </p>
       </div>
       <ul className="wl-phone">
@@ -410,7 +426,7 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
             <a href={`/project/${p.slug}/`}>
               <strong>{p.name}</strong>{p.highlight && <span>{p.highlight}</span>}
               <span>{metaOf(p)}</span>
-              <span className="wl-tags">{p.tags?.slice(0,3).map(tag=><em key={tag}>{tag}</em>)}</span>
+              <ul className="wl-tags ui-chips">{p.tags?.slice(0,4).map(tag=><TechChip key={tag} name={tag} />)}</ul>
             </a>
           </li>
         ))}

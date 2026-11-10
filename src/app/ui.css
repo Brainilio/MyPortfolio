@@ -1,0 +1,39 @@
+/* Shared look for every page: one type scale, one pair of buttons (square with rounded corners), frosted glass,
+   technology chips with their icons, the site header and the footer. */
+:root{--ui-cream:#fbf7ff;--ui-ink:#1d1233;--ui-violet:#a78bfa;--ui-radius:12px;
+  --ui-t-display:clamp(44px,6vw,88px);--ui-t-h2:clamp(34px,4vw,60px);--ui-t-h3:20px;--ui-t-body:16px;--ui-t-small:13px;
+  --ui-glass-bg:rgba(28,18,48,.38);--ui-glass-line:rgba(255,255,255,.16)}
+.ui-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:0 22px;border-radius:var(--ui-radius);border:1px solid transparent;
+  background:var(--ui-cream);color:var(--ui-ink);font:600 15px/1 'Inter',Arial,sans-serif;letter-spacing:-.01em;cursor:pointer;text-decoration:none;
+  box-shadow:0 10px 30px rgba(20,8,40,.25);transition:transform .25s,background .25s,box-shadow .25s,border-color .25s}
+.ui-btn:hover{transform:translateY(-2px);background:#fff;box-shadow:0 14px 36px rgba(20,8,40,.34)}
+.ui-btn--secondary{background:var(--ui-glass-bg);color:var(--ui-cream);border-color:rgba(251,247,255,.34);box-shadow:none;backdrop-filter:blur(14px) saturate(140%);-webkit-backdrop-filter:blur(14px) saturate(140%)}
+.ui-btn--secondary:hover{background:rgba(40,26,68,.6);border-color:rgba(251,247,255,.55);box-shadow:none}
+.ui-btn:focus-visible{outline:2px solid var(--ui-violet);outline-offset:4px}
+.ui-btn .ui-icon{width:17px;height:17px}
+.ui-glass{background:var(--ui-glass-bg);border:1px solid var(--ui-glass-line);border-radius:20px;backdrop-filter:blur(18px) saturate(150%);-webkit-backdrop-filter:blur(18px) saturate(150%);
+  box-shadow:0 20px 50px rgba(12,6,28,.22),inset 0 1px 0 rgba(255,255,255,.12)}
+.ui-icon{display:inline-block;flex:none;width:1em;height:1em;background:currentColor;-webkit-mask:var(--icon) center/contain no-repeat;mask:var(--icon) center/contain no-repeat}
+.ui-chips{display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;list-style:none}
+.ui-chip{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:10px;font-size:13px;line-height:1;border:1px solid var(--ui-glass-line);background:rgba(255,255,255,.06);color:inherit}
+.ui-chip .ui-icon{width:15px;height:15px;opacity:.9}
+
+/* Header: a frosted bar that stays readable over the 3D, linking to the pages. */
+.ui-header{position:fixed;z-index:40;top:16px;left:50%;transform:translateX(-50%);width:min(calc(100% - 32px),1180px);display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:10px 10px 10px 20px;border-radius:16px;color:var(--ui-cream)}
+.ui-header .ui-wordmark{font-weight:750;font-size:18px;letter-spacing:-.04em}.ui-wordmark span{color:var(--ui-violet)}
+.ui-header nav{display:flex;align-items:center;gap:4px}
+.ui-header nav a{padding:10px 14px;border-radius:10px;font-size:14px;transition:background .2s}
+.ui-header nav a:hover,.ui-header nav a[aria-current=page]{background:rgba(255,255,255,.1)}
+.ui-header .ui-btn{min-height:40px;padding:0 16px;font-size:14px;margin-left:6px;white-space:nowrap}
+@media(max-width:700px){.ui-header{top:10px;padding:8px 8px 8px 14px}.ui-header nav a{padding:9px 9px;font-size:13px}.ui-header nav .ui-hide-sm{display:none}.ui-header .ui-btn{padding:0 12px}}
+
+/* Footer: the same on every page; credits open in a dialog. */
+.ui-footer{position:relative;z-index:5;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;padding:22px var(--gutter,24px);font-size:13px;color:rgba(251,247,255,.7)}
+.ui-footer nav{display:flex;flex-wrap:wrap;gap:18px}.ui-footer a:hover,.ui-footer button:hover{color:var(--ui-cream)}
+.ui-footer button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+.ui-credits{max-width:560px;width:calc(100% - 32px);padding:28px;color:var(--ui-cream);background:rgba(24,16,42,.82);border:1px solid var(--ui-glass-line);border-radius:20px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.ui-credits::backdrop{background:rgba(10,6,20,.55)}
+.ui-credits h2{margin:0 0 6px;font-size:22px;letter-spacing:-.03em}.ui-credits p{margin:0 0 16px;color:rgba(251,247,255,.7);font-size:14px;line-height:1.55}
+.ui-credits ul{margin:0 0 20px;padding:0;list-style:none;display:grid;gap:8px;font-size:14px}.ui-credits li span{color:rgba(251,247,255,.6)}
+.ui-credits a{text-decoration:underline;text-underline-offset:3px}
