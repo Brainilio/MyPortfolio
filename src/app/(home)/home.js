@@ -236,7 +236,7 @@ export default function Home({ copy = {} }) {
           {/* Replace with: <Image src="/me.jpg" alt="Brainilio" width={120} height={120} /> (drop me.jpg into /public) */}
           <div className="ht-portrait" aria-hidden="true" />
           <RevealHeading id="ht-about-title" text={copyText(copy.about_heading, "Around the fire")} />
-          <p>{("I’m a full-stack developer from the Netherlands, now in San Jose. I work across the whole product: React and Next.js on the web, React Native on phones, and serverless on AWS behind them, with SST, Lambda, AppSync and Cognito. I like owning a feature from the data model to the last bit of motion. Away from the keyboard you’ll find me on a trail, on a road trip through a national park, or by a campfire.")}</p>
+          <p>{("I’m a full-stack developer from the Netherlands, now in Colorado Springs. I work across the whole product: React and Next.js on the web, React Native on phones, and serverless on AWS behind them, with SST, Lambda, AppSync and Cognito. I like owning a feature from the data model to the last bit of motion. Away from the keyboard you’ll find me on a trail, on a road trip through a national park, or by a campfire.")}</p>
           <div className="ht-links"><a className="ui-btn ui-btn--secondary" href={RESUME} target="_blank" rel="noopener noreferrer">Resume<Icon src="/icons/tech/tabler--arrow-up-right.svg" /></a></div>
         </div>
       </section>
