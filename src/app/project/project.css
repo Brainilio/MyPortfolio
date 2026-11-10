@@ -23,17 +23,9 @@
 .case-media--compact img{width:100%;height:auto;border-radius:17px}.case-media--compact.case-media--tablet .case-media-frame{transform:none}
 @media(max-width:520px){.case-media--compact{grid-column:span 12}.case-media--compact .case-media-surface{min-height:0;padding:28px}.case-media--compact .case-media-frame{width:min(100%,150px)}}
 
-/* Scroll motion on the gallery: each block arrives its own way, and some keep moving with the scroll (--p: 1 → 0 → -1). */
-.case-media[data-motion] .case-media-surface{transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform 1s cubic-bezier(.2,.7,.2,1);will-change:transform}
-.case-media[data-motion]:not([data-shown]) .case-media-surface{opacity:0}
-.case-media[data-motion=rise]:not([data-shown]) .case-media-surface{transform:translateY(48px)}
-.case-media[data-motion=slide-left]:not([data-shown]) .case-media-surface{transform:translateX(-64px)}
-.case-media[data-motion=slide-right]:not([data-shown]) .case-media-surface{transform:translateX(64px)}
-.case-media[data-motion=zoom] .case-media-frame,.case-media[data-motion=parallax] .case-media-frame{overflow:hidden}
-.case-media[data-motion=zoom] img{transform:scale(calc(1 + .1 * max(var(--p,0), calc(var(--p,0) * -1))));transform-origin:50% 50%}
-.case-media[data-motion=parallax] img{transform:translateY(calc(var(--p,0) * 5%)) scale(1.12)}
-.case-media[data-motion=tilt] .case-media-surface{transform:perspective(1400px) rotateX(calc(var(--p,0) * 9deg)) scale(calc(1 - .04 * max(var(--p,0), calc(var(--p,0) * -1))));transform-origin:50% 100%;transition:opacity .9s}
-.case-media[data-motion=tilt]:not([data-shown]) .case-media-surface{opacity:0}
+/* One reveal for every block: it fades and rises into place once, then stays still while scrolling. */
+.case-media[data-motion] .case-media-surface{transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform 1s cubic-bezier(.2,.7,.2,1)}
+.case-media[data-motion]:not([data-shown]) .case-media-surface{opacity:0;transform:translateY(32px)}
 /* Device scenes are photographs: let them run edge to edge. */
 .case-media--scene .case-media-surface{background:none;border-radius:10px}
 @media(prefers-reduced-motion:reduce){.case-media[data-motion] .case-media-surface,.case-media[data-motion] img{transform:none!important;transition:none!important;opacity:1!important}}
