@@ -29,14 +29,17 @@ import { getImageRatio, fitWidth } from "../../lib/image-ratio";
 // sheets; 10 Big index (huge names, a small card sliding along); 11 Big sheet (the thumbnail as one large sheet, the
 // name small at the bottom); 12 Scattered (four sheets at different depths); 13 Index mirrored (list right, sheets
 // left); 14 Big index + sheets; 15 Arc (a display wall: the thumbnail in the middle, two screenshots turned in at the
-// sides); 16 Pile (the thumbnail in front, the screenshots fanned behind it). Just the name, what I did and the tech.
+// sides); 16 Pile (the thumbnail in front, the screenshots fanned behind it); clean indexes: 17 Table (rows with thin
+// dividers, a preview beside), 18 Soft card (a quiet list, the thumbnail in a soft frosted card), 19 Accordion (a
+// dotted-leader list whose active row opens to show its thumbnail), 20 Panel (one frosted window: list left, thumbnail
+// right). Just the name, what I did and the tech.
 const LAYOUTS = {
   1: [
     { fx: .64, fy: .21, w: .17, pick: 0, ry: -.32, rz: .05, z: -1.6 },
     { fx: .85, fy: .63, w: .15, pick: 1, ry: -.5, rz: -.07, z: -1.1 },
     { fx: .19, fy: .72, w: .16, pick: 2, ry: .45, rz: .04, z: -1.3 },
   ],
-  7: [], 10: [],
+  7: [], 10: [], 17: [], 18: [], 19: [], 20: [],
   9: [
     { fx: .63, fy: .3, w: .2, pick: 0, ry: -.22, rz: .03, z: -1.4 },
     { fx: .86, fy: .56, w: .16, pick: 1, ry: -.48, rz: -.05, z: -1 },
@@ -74,10 +77,10 @@ const LAYOUTS = {
     { fx: .52, fy: .52, w: .27, pick: "thumb", ry: 0, rz: -.02, z: -1.2 },
   ],
 };
-const LAYOUT_NAMES = [["1", "Sheets"], ["7", "Index"], ["9", "Index + sheets"], ["10", "Big index"], ["11", "Big sheet"], ["12", "Scattered"], ["13", "Index mirrored"], ["14", "Big index + sheets"], ["15", "Arc"], ["16", "Pile"]];
-const HTML_LAYOUTS = ["7", "9", "10", "11", "12", "13", "14", "15", "16"];
+const LAYOUT_NAMES = [["1", "Sheets"], ["7", "Index"], ["9", "Index + sheets"], ["10", "Big index"], ["11", "Big sheet"], ["12", "Scattered"], ["13", "Index mirrored"], ["14", "Big index + sheets"], ["15", "Arc"], ["16", "Pile"], ["17", "Table"], ["18", "Soft card"], ["19", "Accordion"], ["20", "Panel"]];
+const HTML_LAYOUTS = ["7", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"];
 // Where the eagle circles (fraction of the screen's width): round the project, not always the middle.
-const EAGLE_AT = { 7: .66, 9: .72, 13: .3, 14: .78 };
+const EAGLE_AT = { 7: .66, 9: .72, 13: .3, 14: .78, 17: .8, 18: .7, 20: .66 };
 // A project's landscape pictures, all different: its gallery screenshots first (no phone screens, not the thumbnail),
 // then its videos' posters, then its combined phone-screens picture if it still needs more.
 const landscapes = project => {
