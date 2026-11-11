@@ -61,7 +61,7 @@ const STORY_LINE = {
 const clamp = v => Math.min(1, Math.max(0, v));
 
 // A line whose last words slide up and away, one phrase after another (still with reduced motion).
-const SLIDES = ["mobile apps", "web platforms", "cloud back ends", "design systems"];
+const SLIDES = ["cross-platform apps", "full-stack platforms", "serverless back ends", "design systems", "3D on the web"];
 function SlidingWords() {
   const [i, setI] = useState(0);
   useEffect(() => {
@@ -219,8 +219,8 @@ export default function Home({ copy = {} }) {
         {/* The name comes in letter by letter, each rising into view through its own little window. */}
         <h1 className="ht-name" aria-label="Brainilio">{"Brainilio".split("").map((letter, i) => <span key={i} className="ht-name-window" aria-hidden="true" style={{ "--c": i }}><span>{letter}</span></span>)}</h1>
         <div className="ht-intro">
-          <p className="ht-roles"><span className="ht-sr">I build mobile apps, web platforms, cloud back ends and design systems.</span><span aria-hidden="true">I build</span> <SlidingWords /></p>
-          <p className="ht-lede">{("Full-stack developer from the Netherlands, now in Colorado. I design and build apps and websites from the first sketch to launch, mostly in React, React Native and AWS.")}</p>
+          <p className="ht-roles"><span className="ht-sr">I build cross-platform apps, full-stack platforms, serverless back ends, design systems and 3D on the web.</span><span aria-hidden="true">I build</span> <SlidingWords /></p>
+          <p className="ht-lede">{("Software engineer with five years of shipping production products, from architecture to launch: React and React Native up front, serverless AWS behind them, and a designer’s eye for the details. Originally from the Netherlands, now in Colorado.")}</p>
           <div className="ht-links">
             <a className="ui-btn" href="#work" onClick={event => { event.preventDefault(); jump(WORK); }}><Roll>See my work</Roll><Icon src="/icons/tech/tabler--arrow-down.svg" /></a>
             <a className="ui-btn ui-btn--secondary" href="/contact/"><Roll>Let&apos;s talk</Roll><Icon src="/icons/tech/tabler--arrow-up-right.svg" /></a>

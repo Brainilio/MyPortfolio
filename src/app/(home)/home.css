@@ -80,11 +80,13 @@ html:has(.ht){scrollbar-width:none;background:#1b1335}html:has(.ht)::-webkit-scr
 .ht-available i{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 10px #4ade80}
 
 /* The intro and its buttons sit bottom-left, under the island. */
-.ht-intro{position:absolute;z-index:4;left:var(--gutter);bottom:clamp(36px,7svh,72px);max-width:360px;pointer-events:none}
+.ht-intro{position:absolute;z-index:4;left:var(--gutter);bottom:clamp(36px,7svh,72px);max-width:400px;pointer-events:none;isolation:isolate}
+/* The same soft dusk shade as behind Latest work, so the words read over clouds and the lighter sky low down. */
+.ht-intro::before{content:'';position:absolute;z-index:-1;inset:-90px -150px -70px -120px;background:radial-gradient(closest-side,rgba(42,22,54,.52),rgba(42,22,54,.34) 55%,transparent);pointer-events:none}
 .ht-intro a{pointer-events:auto}
 .ht-roles{margin:0;font-family:var(--font-display),'Inter',sans-serif;font-weight:700;font-size:clamp(24px,2.2vw,34px);line-height:1.02;letter-spacing:-.045em}
 .ht-stack{margin:16px 0 0;font-size:12px;letter-spacing:.08em;color:rgba(251,247,255,.55)}
-.ht-lede{margin:14px 0 0;font-family:var(--font-display),'Inter',sans-serif;font-weight:500;font-size:16px;line-height:1.55;color:rgba(251,247,255,.72)}
+.ht-lede{margin:14px 0 0;font-family:var(--font-display),'Inter',sans-serif;font-weight:500;font-size:16px;line-height:1.55;color:#fbf7ff;text-shadow:0 1px 2px rgba(36,18,48,.55),0 0 16px rgba(36,18,48,.45)}
 .ht-links{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
 /* Buttons, matching the contact email: a solid primary and a frosted secondary. */
 .ht-button{display:inline-flex;align-items:center;gap:8px;padding:14px 22px;border-radius:12px;background:var(--cream);color:#1d1233;font-weight:600;font-size:15px;pointer-events:auto;
@@ -373,12 +375,7 @@ html.ht-locked{overflow:hidden}
    then turning to plum once the sky behind it has brightened. Top to foot it warms, as the project name does. */
 /* (Room round the words for the gradient to paint into: it only fills the box, and with this tight line-height the
    descenders, the g in "Things", hang below it.) */
-.wl-title{margin:-.12em -.12em -.26em;padding:.12em .12em .26em;font-family:var(--font-display),'Inter',sans-serif;font-size:var(--ui-t-h2);font-weight:900;line-height:.95;letter-spacing:-.05em;
-  color:transparent;--ink-top:color-mix(in oklab,color-mix(in oklab,#fff,#ffe3cf calc(var(--warm,0) * 100%)),#2a1636 calc(var(--rise,0) * 100%));
-  --ink-foot:color-mix(in oklab,color-mix(in oklab,#ffe9da,#ffbd92 calc(var(--warm,0) * 100%)),#5a2a58 calc(var(--rise,0) * 100%));
-  background:linear-gradient(180deg,var(--ink-top) 30%,var(--ink-foot) 100%);-webkit-background-clip:text;background-clip:text;
-  /* A soft dusky halo behind the light ink, fading as it turns dark. */
-  filter:drop-shadow(0 2px 16px rgb(42 22 54 / calc(.4 * (1 - var(--rise,0)))))}
+.wl-title{margin:-.12em -.12em -.26em;padding:.12em .12em .26em;font-family:var(--font-display),'Inter',sans-serif;font-size:var(--ui-t-h2);font-weight:900;line-height:.95;letter-spacing:-.05em;color:#fbf7ff}
 .wl-pills{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 0}
 .wl-pills .ui-btn{min-height:44px;font-size:14px}
 .wl-tags{justify-content:center}
@@ -403,7 +400,9 @@ html.ht-locked{overflow:hidden}
 }
 
 /* The hero line: "I build" and a phrase that slides up and away for the next. */
-.ht-slide{position:relative;display:inline-flex;overflow:hidden;vertical-align:bottom;padding-bottom:.08em;margin-bottom:-.08em;color:var(--violet)}
+/* The sliding phrase: the same solid off-white as "I build", marked by a violet underline rather than a colour change. */
+.ht-slide{position:relative;display:inline-flex;overflow:hidden;vertical-align:bottom;padding-bottom:.16em;margin-bottom:-.16em;color:#fbf7ff}
+.ht-slide>span{background:linear-gradient(90deg,#c4b0ff,#a78bfa) left 100%/100% .09em no-repeat}
 .ht-slide>span{display:inline-block;white-space:nowrap}
 .ht-hero-links .ui-btn,.ht-links .ui-btn{pointer-events:auto}
 .ht-about .ht-links{margin-top:20px}
@@ -422,9 +421,15 @@ html.ht-locked{overflow:hidden}
 @media(prefers-reduced-motion:reduce){.ht-badge i{animation:none}}
 
 /* The line under the Work heading. */
-/* (Its colour follows the heading: light on the night sky, plum once the sunrise has lit it.) */
-.wl-intro{margin:14px 0 0;max-width:40ch;font-size:16px;line-height:1.55;color:color-mix(in oklab,color-mix(in oklab,#fbf7ff,#ffe9da calc(var(--warm,0) * 100%)),#4a2a52 calc(var(--rise,0) * 100%));text-shadow:0 1px 12px rgb(42 22 54 / calc(.35 * (1 - var(--rise,0))))}
-.wl-phone-head .wl-intro{color:var(--ink)}
+/* The heading and its line stay one solid off-white as the sky lightens behind them: a soft dusk shade feathered in
+   behind that corner, blending into the sky, and a close dark glow round the letters themselves for contrast. */
+.wl-intro{margin:14px 0 0;max-width:40ch;font-size:16px;line-height:1.55;color:#fbf7ff;text-shadow:0 1px 2px rgba(36,18,48,.55),0 0 16px rgba(36,18,48,.45)}
+.wl-head{isolation:isolate}
+.wl-head .wl-title{text-shadow:0 2px 24px rgba(36,18,48,.35)}
+.wl-head::before,.wl-phone-head::before{content:'';position:absolute;z-index:-1;inset:-90px -140px -80px -120px;background:radial-gradient(closest-side,rgba(42,22,54,.52),rgba(42,22,54,.34) 55%,transparent);pointer-events:none}
+.wl-phone-head{isolation:isolate}
+.wl-phone-head::before{inset:40px -20px -40px}
+
 
 /* The Work index (work-cards.js): the names huge on the left (the one you're on solid, the others faded), its role and
    tech under them, its thumbnail loop as a big screen on the right. */
