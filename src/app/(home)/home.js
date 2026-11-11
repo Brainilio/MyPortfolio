@@ -113,6 +113,13 @@ export default function Home({ copy = {} }) {
     return () => queries.forEach(q => q.removeEventListener("change", sync));
   }, []);
   const pill = useRef(null), bar = useRef(null);
+  // The section pill steps aside once the footer comes into view, so it never covers the footer's links.
+  const [atFooter, setAtFooter] = useState(false);
+  useEffect(() => {
+    const footer = document.querySelector(".ht-outro .ui-footer"); if (!footer) return;
+    const seen = new IntersectionObserver(([entry]) => { setAtFooter(entry.isIntersecting); if (entry.isIntersecting) setMenu(false); }, { rootMargin: "0px 0px 40px 0px" });
+    seen.observe(footer); return () => seen.disconnect();
+  }, []);
   const zones = useRef([]), sky = useRef(null), mainRef = useRef(null);
   const { section, stop } = where;
   // Loading: every model is fetched up front (to warm the cache) while the dioramas are built one after another
@@ -306,7 +313,7 @@ export default function Home({ copy = {} }) {
 
       <div className="ht-progress" ref={bar} aria-hidden="true" />
       {/* Where you are, and a way to jump anywhere. */}
-      <nav className="ht-pill" aria-label="Sections" ref={pill}>
+      <nav className={`ht-pill${atFooter ? " is-away" : ""}`} aria-label="Sections" ref={pill} inert={atFooter ? true : undefined}>
         <button type="button" aria-expanded={menu} onClick={() => setMenu(open => !open)}>
           <span className="ht-pill-dot" aria-hidden="true" />{SECTIONS[section].label}{counter && <em>{counter}</em>}<span aria-hidden="true" className="ht-pill-caret">▲</span>
         </button>
