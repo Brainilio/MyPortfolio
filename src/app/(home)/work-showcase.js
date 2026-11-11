@@ -28,8 +28,9 @@ import { getImageRatio, fitWidth } from "../../lib/image-ratio";
 // 2: the thumbnail loop alone, as one wide curved screen low behind the name;
 // 3: the thumbnail loop alone, as one tilted card floating to the right of the name;
 // 4: no big name or sheets: all three projects side by side as cards, the one the scroll is on lifted;
-// 5–8 (work-cards.js): one big card at a time, a deck, a numbered index with a card, a 3D cover flow. Just the name,
-// what I did and the tech on each.
+// 5, 7, 9, 10, 11 (with work-cards.js): one big card at a time; a numbered index with a card; the index with the
+// project's sheets hanging beside it; the names huge with a small card sliding along them; one big sheet of the
+// thumbnail loop with two screenshots beside it and the name small at the bottom. Just the name, what I did and the tech.
 const LAYOUTS = {
   1: [
     { fx: .64, fy: .21, w: .17, pick: 0, ry: -.32, rz: .05, z: -1.6 },
@@ -38,10 +39,22 @@ const LAYOUTS = {
   ],
   2: [{ fx: .5, fy: .6, w: .3, pick: "thumb", ry: 0, rz: 0, z: -3.2, bend: .3 }],
   3: [{ fx: .74, fy: .46, w: .23, pick: "thumb", ry: -.42, rz: .035, z: -1.2 }],
-  4: [], 5: [], 6: [], 7: [], 8: [],
+  4: [], 5: [], 7: [], 10: [],
+  9: [
+    { fx: .63, fy: .3, w: .2, pick: 0, ry: -.22, rz: .03, z: -1.4 },
+    { fx: .86, fy: .56, w: .16, pick: 1, ry: -.48, rz: -.05, z: -1 },
+    { fx: .62, fy: .76, w: .15, pick: 2, ry: .18, rz: .04, z: -1.6 },
+  ],
+  11: [
+    { fx: .5, fy: .5, w: .36, pick: "thumb", ry: 0, rz: 0, z: -1.9, bend: .1 },
+    { fx: .15, fy: .36, w: .14, pick: 0, ry: .5, rz: .05, z: -1.2 },
+    { fx: .86, fy: .64, w: .14, pick: 1, ry: -.5, rz: -.05, z: -1.2 },
+  ],
 };
-const LAYOUT_NAMES = [["1", "Sheets"], ["2", "Curved screen"], ["3", "Tilted card"], ["4", "Side by side"], ["5", "Big card"], ["6", "Deck"], ["7", "Index"], ["8", "Cover flow"]];
-const HTML_LAYOUTS = ["4", "5", "6", "7", "8"];
+const LAYOUT_NAMES = [["1", "Sheets"], ["2", "Curved screen"], ["3", "Tilted card"], ["4", "Side by side"], ["5", "Big card"], ["7", "Index"], ["9", "Index + sheets"], ["10", "Big index"], ["11", "Big sheet"]];
+const HTML_LAYOUTS = ["4", "5", "7", "9", "10", "11"];
+// Where the eagle circles (fraction of the screen's width): round the project, not always the middle.
+const EAGLE_AT = { 7: .66, 9: .72 };
 // A project's landscape pictures, all different: its gallery screenshots first (no phone screens, not the thumbnail),
 // then its videos' posters, then its combined phone-screens picture if it still needs more.
 const landscapes = project => {
@@ -251,7 +264,8 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       const blend = easeFlight(travel, 0, 1);
       const a = circle * .55, bank = .32 + Math.min(.3, Math.abs(vel) * .1);
       const baseScale = Math.min(1, camera.aspect / 1.2);
-      flight.position.set(Math.cos(a) * 1.25 * baseScale, (still ? 0 : Math.sin(time * 1.3) * .12) + .3, Math.sin(a) * 1.1 - .1);
+      const eagleX = ((EAGLE_AT[layoutKey] ?? .5) * 2 - 1) * Math.tan(THREE.MathUtils.degToRad(15)) * 9 * camera.aspect;
+      flight.position.set(eagleX + Math.cos(a) * 1.25 * baseScale, (still ? 0 : Math.sin(time * 1.3) * .12) + .3, Math.sin(a) * 1.1 - .1);
       orbitRotation.setFromEuler(pose.set(0, -a, bank, "YXZ"));
       flight.quaternion.copy(orbitRotation);
       flight.scale.setScalar(baseScale);
@@ -408,7 +422,7 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
           ))}
         </ol>}
 
-        {["5", "6", "7", "8"].includes(layoutKey) && <WorkCards layout={layoutKey} work={work} active={active} />}
+        {["5", "7", "9", "10", "11"].includes(layoutKey) && <WorkCards layout={layoutKey} work={work} active={active} />}
 
         {/* The name, its letters rising in one after another (and lifting away for the next). */}
         <a className="wl-a-name" href={`/project/${project.slug}/`} aria-label={`${project.name}: view the project`}>

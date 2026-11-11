@@ -3,7 +3,7 @@ import ProjectThumbnail from "../project/project-thumbnail";
 import { Icon } from "../tech-chip";
 import { techIcon } from "../../lib/tech-icons";
 
-// Big-card layouts for the homepage Work section (5–8 in work-showcase.js). Each card is the project's thumbnail loop,
+// HTML layers for the homepage Work section layouts 5, 7, 9, 10 and 11 (see work-showcase.js). Each card is the project's thumbnail loop,
 // with just the name (smaller), what I did, and the tech as icons. The scroll picks the active project (`active`);
 // everything else is CSS transitions on data attributes, so nothing re-renders per frame.
 const STACK = 3;
@@ -39,10 +39,6 @@ export default function WorkCards({ layout, work, active }) {
   if (layout === "5") return <ol className="wc wc-big">
     {work.map((p, i) => <li key={p.slug} data-pos={Math.sign(i - active)}><Card p={p} index={i} /></li>)}
   </ol>;
-  // 6 Deck: the cards stacked behind each other; the front one flies up and away to reveal the next.
-  if (layout === "6") return <ol className="wc wc-deck">
-    {work.map((p, i) => <li key={p.slug} data-pos={Math.sign(i - active)} style={{ "--depth": Math.max(0, i - active), zIndex: work.length - i }}><Card p={p} index={i} info="inside" /></li>)}
-  </ol>;
   // 7 Index: the names as a big numbered list on the left (the active one lit), its card large on the right.
   if (layout === "7") return <div className="wc wc-index">
     <ol className="wc-list">
@@ -54,9 +50,44 @@ export default function WorkCards({ layout, work, active }) {
       {work.map((p, i) => <li key={p.slug} data-pos={Math.sign(i - active)}><Card p={p} info="inside" /></li>)}
     </ol>
   </div>;
-  // 8 Cover flow: the three side by side in 3D, the active one square on in front, the others turned away.
-  if (layout === "8") return <ol className="wc wc-flow">
-    {work.map((p, i) => <li key={p.slug} data-pos={i - active}><Card p={p} index={i} /></li>)}
-  </ol>;
+  // 9 Index + sheets: the numbered list on the left with the active project's role and tech; its screenshots hang
+  // on the right as sheets (drawn in the section's canvas, see LAYOUTS[9] in work-showcase.js).
+  if (layout === "9") return <div className="wc wc-index wc-index--sheets">
+    <div>
+      <ol className="wc-list">
+        {work.map((p, i) => <li key={p.slug} className={i === active ? "is-on" : undefined}>
+          <a href={`/project/${p.slug}/`}><span className="wc-num">{String(i + 1).padStart(2, "0")}</span>{p.name}</a>
+        </li>)}
+      </ol>
+      <div className="wc-active" key={work[active]?.slug}>
+        {work[active]?.role && <span className="wc-role">{work[active].role}</span>}
+        <Tech tags={work[active]?.tags} />
+      </div>
+    </div>
+  </div>;
+  // 10 Big index: the names huge, one per line (the active one solid, the rest outlined); a small card with its
+  // thumbnail loop slides along beside the active name.
+  if (layout === "10") return <div className="wc wc-mega" style={{ "--i": active }}>
+    <ol className="wc-mega-list">
+      {work.map((p, i) => <li key={p.slug} className={i === active ? "is-on" : undefined}>
+        <a href={`/project/${p.slug}/`}>{p.name}</a>
+      </li>)}
+    </ol>
+    <div className="wc-mega-card">
+      {work.map((p, i) => <div key={p.slug} className="wc-mega-slide" data-pos={Math.sign(i - active)}>
+        <ProjectThumbnail project={p} />
+        <div className="wc-mega-meta">{p.role && <span className="wc-role">{p.role}</span>}<Tech tags={p.tags} /></div>
+      </div>)}
+    </div>
+  </div>;
+  // 11 Big sheet: the sheets do the showing (LAYOUTS[11]); the name sits small at the bottom left with what I did and the tech.
+  if (layout === "11") return <div className="wc wc-caption">
+    {work.map((p, i) => <a key={p.slug} href={`/project/${p.slug}/`} className="wc-caption-item" data-pos={Math.sign(i - active)}>
+      <span className="wc-num">{String(i + 1).padStart(2, "0")} / {String(work.length).padStart(2, "0")}</span>
+      <strong className="wc-name">{p.name}</strong>
+      {p.role && <span className="wc-role">{p.role}</span>}
+      <Tech tags={p.tags} />
+    </a>)}
+  </div>;
   return null;
 }
