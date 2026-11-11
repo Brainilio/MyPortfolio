@@ -8,7 +8,7 @@ export const metadata = { title: 'Work — Brainilio' };
 export default function Projects() {
   // Cards need only the name, the tech and the thumbnail.
   const available = projects.filter(project => ['Development', 'Design'].includes(project.category))
-    .map(({ slug, name, tags, previewImage, thumbnailVideo, earlyWork }) => ({ slug, name, tags, previewImage, thumbnailVideo: thumbnailVideo || null, earlyWork: Boolean(earlyWork) }));
+    .map(({ slug, name, role, tags, previewImage, thumbnailVideo, earlyWork }) => ({ slug, name, role: role || null, tags, previewImage, thumbnailVideo: thumbnailVideo || null, earlyWork: Boolean(earlyWork) }));
   return <div className="wk-page">
     <main className="wk-main">
       <h1 className="wk-heading">Work</h1>

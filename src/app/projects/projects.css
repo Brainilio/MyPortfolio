@@ -35,7 +35,8 @@
 [data-cards="1"] .wk-card:is(:hover,:focus-within) .motion-thumb :is(img,video){transform:scale(1.04)!important}
 
 /* Tech displays for style 2 (data-tech), all hidden unless picked. */
-.wk-line,.wk-stack,.wk-ticker{display:none}
+.wk-line,.wk-stack,.wk-ticker,.wk-role{display:none}
+.wk-head{min-width:0}
 .wk-switch--tech{margin-top:-8px}
 
 /* 2: the name sits under the thumbnail in large type; the tech is shown one of five ways (data-tech). */
@@ -66,9 +67,10 @@
 [data-cards="2"][data-tech=row] .wk-icons li:nth-child(7){transition-delay:240ms}
 [data-cards="2"][data-tech=row] .wk-icons li:nth-child(8){transition-delay:280ms}
 [data-cards="2"][data-tech=row] .wk-icons li:nth-child(9){transition-delay:320ms}
-/* stack: overlapping round icons beside the title, fanning out on hover; +N for the rest. */
-[data-cards="2"][data-tech=stack] .wk-info{display:flex;align-items:center;justify-content:space-between;gap:16px}
-[data-cards="2"][data-tech=stack] .wk-stack{display:flex;flex:none;margin:0;padding:0;list-style:none}
+/* stack: what I did under the title, two overlapping round icons beside it and +N for the rest; they fan out on hover. */
+[data-cards="2"][data-tech=stack] .wk-role{display:block;margin:4px 0 0;font-size:14px;line-height:1.4;color:rgba(251,247,255,.65)}
+[data-cards="2"][data-tech=stack] .wk-info{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+[data-cards="2"][data-tech=stack] .wk-stack{display:flex;flex:none;margin:4px 0 0;padding:0;list-style:none}
 [data-cards="2"][data-tech=stack] .wk-stack li{display:grid;place-items:center;width:36px;height:36px;margin-left:-10px;border-radius:50%;background:#2a2238;border:2px solid var(--wk-bg);color:var(--ui-cream);font-size:12px;font-weight:600;transition:margin .35s cubic-bezier(.22,1,.36,1)}
 [data-cards="2"][data-tech=stack] .wk-stack li:first-child{margin-left:0}
 [data-cards="2"][data-tech=stack] .wk-stack .ui-icon{width:17px;height:17px}

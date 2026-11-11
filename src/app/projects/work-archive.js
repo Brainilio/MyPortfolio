@@ -8,9 +8,9 @@ import { techIcon } from '../../lib/tech-icons';
 // Three card styles for the owner to compare; `?cards=1|2|3` picks one (read client-side: the site is a static export).
 const STYLES = [['1', 'Glass bar'], ['2', 'Title below'], ['3', 'Blur reveal']];
 // Ways to show the tech on style 2 (`?tech=`): icons over the corner on hover, a line of names, a row of icons,
-// an overlapping icon stack beside the title, or a ticker of chips running along the thumbnail on hover.
-const TECH = [['corner', 'Corner icons'], ['line', 'Name line'], ['row', 'Icon row'], ['stack', 'Icon stack'], ['ticker', 'Ticker']];
-const STACK = 4;
+// what I did with an icon stack beside it, or a ticker of chips running along the thumbnail on hover.
+const TECH = [['corner', 'Corner icons'], ['line', 'Name line'], ['row', 'Icon row'], ['stack', 'Role + stack'], ['ticker', 'Ticker']];
+const STACK = 2; // icons shown in the stack before the +N
 
 // Every card carries each tech display; CSS shows the one picked. Screen readers get the chip list once (the visual
 // variants are aria-hidden).
@@ -23,7 +23,10 @@ function Card({ project }) {
     </div>
     <div className="wk-info">
       {/* The title link stretches over the whole card, so the card has one link and one name. */}
-      <h3 className="wk-title"><Link href={href}>{project.name}</Link></h3>
+      <div className="wk-head">
+        <h3 className="wk-title"><Link href={href}>{project.name}</Link></h3>
+        {project.role && <p className="wk-role">{project.role}</p>}
+      </div>
       {tags.length > 0 && <ul className="ui-chips wk-chips" aria-label="Built with">{tags.map(tag => <TechChip key={tag} name={tag} />)}</ul>}
       {tags.length > 0 && <ul className="wk-icons" aria-hidden="true">{iconTags.map(tag => <li key={tag} title={tag}><Icon src={techIcon(tag)} /></li>)}</ul>}
       {tags.length > 0 && <p className="wk-line" aria-hidden="true">{tags.join(' · ')}</p>}
@@ -36,7 +39,7 @@ function Card({ project }) {
 const Grid = ({ items }) => <div className="wk-grid">{items.map(project => <Card key={project.slug} project={project} />)}</div>;
 
 export default function WorkArchive({ selected, early }) {
-  const [style, setStyle] = useState('1'), [tech, setTech] = useState('corner');
+  const [style, setStyle] = useState('1'), [tech, setTech] = useState('stack');
   useEffect(() => {
     const params = new URLSearchParams(location.search), cards = params.get('cards'), how = params.get('tech');
     if (STYLES.some(([key]) => key === cards)) setStyle(cards);
