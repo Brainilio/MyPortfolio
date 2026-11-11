@@ -6,4 +6,4 @@ export const scheduleHref = SCHEDULE_URL || `mailto:${EMAIL}?subject=${encodeURI
 export const RESUME_URL = "https://drive.google.com/file/d/1TgOjKdYPxZr7SmBChUm1osO84EPkXSA8/view?usp=sharing";
 export const LINKS = [["LinkedIn", "https://linkedin.com/in/brainilio"], ["GitHub", "https://github.com/Brainilio"]];
 // What I take on as a freelancer.
-export const OFFER = ["Mobile apps with React Native and Expo", "Web apps and sites with Next.js", "Back ends and cloud on AWS", "Design systems and component libraries"];
+export const OFFER = ["iOS and Android apps", "Websites and web apps", "Back ends and cloud on AWS", "Design, from first sketch to design system"];

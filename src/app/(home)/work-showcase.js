@@ -22,10 +22,11 @@ import { getImageRatio, fitWidth } from "../../lib/image-ratio";
 
 // The three sheets: where they hang (fraction of the screen), how wide (fraction of the screen's width, before their
 // own shape adjusts it), which of the project's pictures, their turn and tilt, and depth.
-// Three layouts to compare (?work=1|2|3; 1 by default):
+// Four layouts to compare (?work=1|2|3|4, with a switcher top-right of the section; 1 by default):
 // 1: three of the project's landscape screenshots hanging round the name (no phone screens, no thumbnail);
 // 2: the thumbnail loop alone, as one wide curved screen low behind the name;
-// 3: the thumbnail loop alone, as one tilted card floating to the right of the name.
+// 3: the thumbnail loop alone, as one tilted card floating to the right of the name;
+// 4: no big name or sheets: all three projects side by side as cards, the one the scroll is on lifted.
 const LAYOUTS = {
   1: [
     { fx: .64, fy: .21, w: .17, pick: 0, ry: -.32, rz: .05, z: -1.6 },
@@ -34,7 +35,9 @@ const LAYOUTS = {
   ],
   2: [{ fx: .5, fy: .6, w: .3, pick: "thumb", ry: 0, rz: 0, z: -3.2, bend: .3 }],
   3: [{ fx: .74, fy: .46, w: .23, pick: "thumb", ry: -.42, rz: .035, z: -1.2 }],
+  4: [],
 };
+const LAYOUT_NAMES = [["1", "Sheets"], ["2", "Curved screen"], ["3", "Tilted card"], ["4", "Side by side"]];
 // A project's landscape pictures, all different: its gallery screenshots first (no phone screens, not the thumbnail),
 // then its videos' posters, then its combined phone-screens picture if it still needs more.
 const landscapes = project => {
@@ -77,7 +80,9 @@ const metaOf = p => [tidy(p.dateCreated), p.role || p.category].filter(Boolean).
 export default function WorkShowcase({ work, scene, slot, onReady }) {
   const root = useRef(null), back = useRef(null), front = useRef(null);
   const ready = useRef(onReady); ready.current = onReady;
-  const [active, setActive] = useState(0);
+  const [active, setActive] = useState(0), [layoutKey, setLayoutKey] = useState("1");
+  useEffect(() => { const key = new URLSearchParams(location.search).get("work"); if (LAYOUTS[key]) setLayoutKey(key); }, []);
+  const chooseLayout = key => { setLayoutKey(key); const url = new URL(location.href); url.searchParams.set("work", key); history.replaceState(history.state, "", url); };
   const mouse = useRef({ x: 0, y: 0 }), picker = useRef(null);
   const n = work.length;
 
@@ -152,7 +157,7 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
     reduce.addEventListener("change", pauseHiddenMovies);
     const shadowTexture = glow([[0, "rgba(255,255,255,.9)"], [.55, "rgba(255,255,255,.35)"], [1, "rgba(255,255,255,0)"]], 64);
     const sheetGeometry = new THREE.PlaneGeometry(1, 1, 40, 24), shadowGeometry = new THREE.PlaneGeometry(1, 1);
-    const layout = LAYOUTS[new URLSearchParams(location.search).get("work")] ?? LAYOUTS[1];
+    const layout = LAYOUTS[layoutKey] ?? LAYOUTS[1];
     const sheets = layout.map((spot, k) => {
       const uniforms = { uMap: { value: null }, uNext: { value: null }, uMix: { value: 0 }, uRatio: { value: 1.6 }, uRatioA: { value: 1.6 }, uRatioB: { value: 1.6 }, uBend: { value: .16 }, uWave: { value: 0 }, uTime: { value: 0 }, uAlpha: { value: 0 }, uSunSide: { value: 0 }, uSun: { value: 1 } };
       const mesh = new THREE.Mesh(sheetGeometry, new THREE.ShaderMaterial({ uniforms, transparent: true, side: THREE.DoubleSide, vertexShader: SHEET_VERTEX, fragmentShader: SHEET_FRAGMENT }));
@@ -357,7 +362,7 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       rig.traverse(o => o.geometry?.dispose()); eagleMaterials.forEach(m => m.dispose());
       skyRenderer.dispose(); eagleRenderer.dispose();
     };
-  }, [scene, slot, n, work]);
+  }, [scene, slot, n, work, layoutKey]);
 
   // Pointer, relative to the pinned screen (-1..1, y up).
   const onMove = e => {
@@ -374,17 +379,30 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
   const project = work[active] ?? work[0];
 
   return (
-    <div className="wl" ref={root} style={{ "--n": n }}>
+    <div className="wl" ref={root} style={{ "--n": n }} data-layout={layoutKey}>
       <div className="wl-pin" onPointerMove={onMove} onClick={onClick} onPointerLeave={() => { mouse.current = { x: 0, y: 0 }; }}>
         <canvas className="wl-canvas" ref={back} aria-hidden="true" />
         <canvas className="wl-canvas wl-front" ref={front} aria-hidden="true" />
         <div className="wl-head">
-          <h2 id="ht-work-title" className="wl-title">Built &amp; worked on</h2>
+          <h2 id="ht-work-title" className="wl-title">Selected work</h2>
           <p className="wl-pills">
             <a className="ui-btn ui-btn--secondary" href="/projects/"><Roll>All work</Roll><Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
             <a className="ui-btn ui-btn--secondary" href="/journey/"><Roll>Lab</Roll><Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
           </p>
-      </div>
+        </div>
+        <div className="wl-switch" role="group" aria-label="Work layout">
+          {LAYOUT_NAMES.map(([key, label]) => <button key={key} type="button" aria-pressed={layoutKey === key} onClick={() => chooseLayout(key)}>{key} · {label}</button>)}
+        </div>
+
+        {/* 4: the three projects side by side, the one the scroll is on lifted. */}
+        {layoutKey === "4" && <ol className="wl-cards">
+          {work.map((p, i) => (
+            <li key={p.slug} className={i === active ? "is-active" : undefined}>
+              <ProjectThumbnail project={p} href={`/project/${p.slug}/`} />
+              <a href={`/project/${p.slug}/`}><strong>{p.name}</strong><span>{metaOf(p)}</span></a>
+            </li>
+          ))}
+        </ol>}
 
         {/* The name, its letters rising in one after another (and lifting away for the next). */}
         <a className="wl-a-name" href={`/project/${project.slug}/`} aria-label={`${project.name}: view the project`}>
@@ -413,7 +431,7 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
 
       {/* Phones: the heading and the projects as a plain list, scrolling over the sky (the eagle behind them). */}
       <div className="wl-phone-head">
-        <h2 className="wl-title">Built &amp; worked on</h2>
+        <h2 className="wl-title">Selected work</h2>
         <p className="wl-pills">
           <a className="ui-btn ui-btn--secondary" href="/projects/"><Roll>All work</Roll><Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
           <a className="ui-btn ui-btn--secondary" href="/journey/"><Roll>Lab</Roll><Icon src="/icons/tech/tabler--arrow-right.svg" /></a>

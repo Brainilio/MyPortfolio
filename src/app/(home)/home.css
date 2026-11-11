@@ -440,3 +440,19 @@ html.ht-locked{overflow:hidden}
 @keyframes ht-ping{50%{box-shadow:0 0 0 7px rgba(94,227,154,0)}}
 .ht-outro .ui-footer{padding-inline:0}
 @media(prefers-reduced-motion:reduce){.ht-badge i{animation:none}}
+
+/* Work layout switcher (top-right of the pinned screen; for comparing, removed once one is chosen). */
+.wl-switch{position:absolute;z-index:5;right:var(--gutter);top:clamp(96px,12svh,130px);display:flex;gap:4px;padding:5px;border-radius:999px;background:rgba(30,18,46,.82)}
+.wl-switch button{padding:8px 12px;border:0;border-radius:999px;background:none;color:#fbf7ff;font:inherit;font-size:12px;cursor:pointer}
+.wl-switch button[aria-pressed=true]{background:#fbf7ff;color:#2a1636}
+/* 4: the three projects side by side as cards; the big name and its meta give way. */
+.wl[data-layout="4"] .wl-a-name,.wl[data-layout="4"] .wl-a-meta{display:none}
+.wl-cards{position:absolute;z-index:4;left:var(--gutter);right:var(--gutter);top:50%;transform:translateY(-38%);display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(16px,2vw,28px);max-width:1280px;margin:0 auto;padding:0;list-style:none}
+.wl-cards li{transition:transform .5s cubic-bezier(.22,1,.36,1),opacity .4s;opacity:.72}
+.wl-cards li.is-active{transform:translateY(-14px);opacity:1}
+.wl-cards .motion-thumb{border-radius:16px;overflow:hidden;box-shadow:0 24px 50px rgba(42,22,54,.28)}
+.wl-cards a{display:grid;gap:4px;padding:14px 4px 0;color:var(--ink);text-decoration:none}
+.wl-cards strong{font-size:clamp(20px,1.8vw,26px);font-weight:650;letter-spacing:-.03em}
+.wl-cards span{font-size:14px;color:rgba(42,22,54,.72)}
+@media(max-width:760px){.wl-switch,.wl-cards{display:none}}
+@media(prefers-reduced-motion:reduce){.wl-cards li{transition:none}}

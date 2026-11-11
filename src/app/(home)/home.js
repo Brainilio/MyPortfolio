@@ -17,7 +17,9 @@ import SiteFooter from "../site-footer";
 import { Icon, Roll } from "../tech-chip";
 import { techIcon } from "../../lib/tech-icons";
 import { scheduleHref, RESUME_URL as RESUME } from "../../lib/contact";
-const work = allProjects.filter(project => project.slug && project.previewImage && !project.earlyWork).slice(0, 4);
+// The homepage shows three projects (the full list is on /projects/).
+const FEATURED = ["crapp", "my-compassion", "karina-rodriguez"];
+const work = FEATURED.map(slug => allProjects.find(project => project.slug === slug)).filter(Boolean);
 
 // Every model the homepage loads (fetched up front by the loading screen).
 const MODELS = ["kit", "stag", "deer", "fox", "bear", "eagle", "prairiedog", "wagon", "moose", "eagle-flying", "bison"].map(name => `/models/island/${name}.glb`);
@@ -218,7 +220,7 @@ export default function Home({ copy = {} }) {
         <h1 className="ht-name" aria-label="Brainilio">{"Brainilio".split("").map((letter, i) => <span key={i} className="ht-name-window" aria-hidden="true" style={{ "--c": i }}><span>{letter}</span></span>)}</h1>
         <div className="ht-intro">
           <p className="ht-roles"><span className="ht-sr">I build mobile apps, web platforms, cloud back ends and design systems.</span><span aria-hidden="true">I build</span> <SlidingWords /></p>
-          <p className="ht-lede">{("Full-stack developer working mostly in React, React Native and AWS. I design and build products from the first sketch to production.")}</p>
+          <p className="ht-lede">{("Full-stack developer from the Netherlands, now in Colorado. I design and build apps and websites from the first sketch to launch, mostly in React, React Native and AWS.")}</p>
           <div className="ht-links">
             <a className="ui-btn" href="#work" onClick={event => { event.preventDefault(); jump(WORK); }}><Roll>See my work</Roll><Icon src="/icons/tech/tabler--arrow-down.svg" /></a>
             <a className="ui-btn ui-btn--secondary" href="/contact/"><Roll>Let&apos;s talk</Roll><Icon src="/icons/tech/tabler--arrow-up-right.svg" /></a>
@@ -234,7 +236,7 @@ export default function Home({ copy = {} }) {
           {/* Replace with: <Image src="/me.jpg" alt="Brainilio" width={120} height={120} /> (drop me.jpg into /public) */}
           <div className="ht-portrait" aria-hidden="true" />
           <RevealHeading id="ht-about-title" text={copyText(copy.about_heading, "Around the fire")} />
-          <p>{("I’m a full-stack developer from the Netherlands, now in Colorado Springs. I work across the whole product: React and Next.js on the web, React Native on phones, and serverless on AWS behind them, with SST, Lambda, AppSync and Cognito. I like owning a feature from the data model to the last bit of motion. Away from the keyboard you’ll find me on a trail, on a road trip through a national park, or by a campfire.")}</p>
+          <p>{("By day I’m a software engineer. On the side I build my own products, like Crapp, and design and build sites and apps for people with an idea. I like owning the whole thing: the design, the code, the cloud it runs on, and the small details that make it feel good to use. When I’m not at my desk, I’m on a trail, on a road trip through a national park, or by a campfire.")}</p>
           <div className="ht-links"><a className="ui-btn ui-btn--secondary" href={RESUME} target="_blank" rel="noopener noreferrer"><Roll>Resume</Roll><Icon src="/icons/tech/tabler--arrow-up-right.svg" /></a></div>
         </div>
       </section>
@@ -283,8 +285,8 @@ export default function Home({ copy = {} }) {
       <section className="ht-outro" aria-labelledby="ht-outro-title">
         <div className="ht-outro-card ui-glass">
           <p className="ht-badge"><i aria-hidden="true" />Available for freelance projects</p>
-          <h2 id="ht-outro-title">Have something in mind?</h2>
-          <p>Mobile apps, web platforms and the cloud behind them. Tell me what you&apos;re building.</p>
+          <h2 id="ht-outro-title">Got an idea?</h2>
+          <p>An app, a website, or the feature your product is missing. I&apos;d love to hear about it.</p>
           <div className="ht-links">
             <a className="ui-btn" href="/contact/"><Roll>Let&apos;s talk</Roll><Icon src="/icons/tech/tabler--arrow-up-right.svg" /></a>
             <a className="ui-btn ui-btn--secondary" href={scheduleHref}><Roll>Book a call</Roll><Icon src="/icons/tech/tabler--calendar-event.svg" /></a>
