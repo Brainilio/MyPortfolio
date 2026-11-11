@@ -53,6 +53,7 @@ export default async function Project({ params }) {
         {!early && project.responsibilities?.length > 0 && <section className="case-responsibilities"><h2>What I did</h2><ul>{project.responsibilities.map(text => <li key={text}>{text}</li>)}</ul></section>}
         {project.tags.length > 0 && <ul className="ui-chips case-chips" aria-label="Built with">{project.tags.map(tag => <TechChip key={tag} name={tag} />)}</ul>}
         {!early && project.description && <section className="case-description"><h2>About</h2><p>{project.description}</p></section>}
+        {!early && project.quote && <figure className="case-quote"><blockquote><p>{project.quote.text}</p></blockquote><figcaption>{project.quote.by}</figcaption></figure>}
       </StickySummary>
       <section className="case-gallery" aria-label={`${project.name} gallery`}>
         {media.map((item, i) => <ProjectMedia key={`${item.src}-${i}`} item={item} priority={i === 0} motion={MOTIONS[(i + motionOffset) % MOTIONS.length]} />)}

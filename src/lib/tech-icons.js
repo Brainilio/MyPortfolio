@@ -19,7 +19,7 @@ export const TECH_ICONS = {
   "tailwind css": "tabler/brand-tailwind", "tailwind": "tabler/brand-tailwind", "gsap": "simple-icons/greensock",
   "three.js": "tabler/brand-threejs", "threejs": "tabler/brand-threejs", "framer motion": "tabler/brand-framer-motion",
   "prismic": "simple-icons/prismic", "gatsby": "tabler/brand-gatsby", "bigcommerce": "simple-icons/bigcommerce", "netlify": "simple-icons/netlify", "mapbox": "simple-icons/mapbox",
-  "stencil": "simple-icons/stencil", "stencil web components": "simple-icons/stencil", "storybook": "simple-icons/storybook",
+  "stencil": "simple-icons/stencil", "stencil web components": "simple-icons/stencil", "storybook": "simple-icons/storybook", "sass": "simple-icons/sass", "web components": "simple-icons/webcomponentsdotorg", "design systems": "tabler/components",
   "stripe": "tabler/brand-stripe", "apple pay": "simple-icons/applepay", "apple sign-in": "tabler/brand-apple",
   "figma": "tabler/brand-figma", "adobe xd": "tabler/brand-adobe", "adobexd": "tabler/brand-adobe",
   "python": "tabler/brand-python", "fastapi": "simple-icons/fastapi", "scikit": "simple-icons/scikitlearn", "ml": "tabler/brain",

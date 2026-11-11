@@ -93,7 +93,7 @@ const projects = [
 		highlight: "Designed and built the whole app, from the code to the brand.",
 		company: "Personal project",
 		companyLabel: "Type",
-		role: "Designed & built",
+		role: "Product & Development",
 		responsibilities: [],
 		media: [
 			{ type: "image", src: "/projects/crapp/header.jpg", alt: "Crapp: Find. Check. Go now. Three phones showing the app over a city skyline", caption: "Find. Check. Go now." },
@@ -123,7 +123,7 @@ const projects = [
 		name: "MyCompassion",
 		highlight: "Worked on the supporter portal, from React components to GraphQL, Lambdas and caching.",
 		company: "Compassion International",
-		role: "Full-stack development",
+		role: "Full-stack development & Cloud",
 		responsibilities: [
 			"Integrated GraphQL through AWS AppSync and connected React Query to the components.",
 			"Built front-end features and back-end Lambda functions.",
@@ -178,7 +178,7 @@ const projects = [
 		name: "Compassion Checkout",
 		highlight: "Built most of the back end for Compassion's checkout.",
 		company: "Compassion International",
-		role: "Back-end development",
+		role: "Full-stack development & Cloud",
 		responsibilities: [
 			"Lambda development on AWS with SST.",
 			"Authentication integration with Cognito, including Apple sign-in.",
@@ -258,7 +258,7 @@ const projects = [
 		slug: "newcold",
 	},
 	{
-		name: "IAmKarinaRodriguez",
+		name: "Karina Rodriguez",
 		highlight: "Designed and built the site, from Figma to Next.js.",
 		company: "IAmKarinaRodriguez",
 		companyLabel: "Freelance",
@@ -340,7 +340,7 @@ const projects = [
 		highlight: "Research, brand, website design and motion for a personal training concept.",
 		company: "Personal Trainer Concept",
 		companyLabel: "Freelance",
-		role: "Research, design & animation",
+		role: "Research & Design",
 		responsibilities: [],
 		media: [
 			{ type: "video", src: "/projects/strength-concept/scroll.mp4", poster: "/projects/strength-concept/scroll.jpg", alt: "A slow scroll through the full homepage design" },
@@ -375,7 +375,7 @@ const projects = [
 		name: "Compassion Authentication",
 		highlight: "Built the core login, logout and verification components for Compassion's shared login.",
 		company: "Compassion International",
-		role: "Front-end development",
+		role: "Full-stack development & Cloud",
 		responsibilities: [
 			"Login, logout and verification components.",
 			"Cognito integration, with Lambdas behind it.",
@@ -428,7 +428,7 @@ const projects = [
 		name: "Garcia & Jeans Centre",
 		highlight: "Worked on both webshops: the AWS pipeline, Lighthouse CI and Apple Pay.",
 		company: "foryouandyourcustomers",
-		role: "Front-end development & AWS",
+		role: "Full-stack development & Cloud",
 		responsibilities: [
 			"Added Lighthouse CI to the AWS CI/CD pipeline, which made 20+ pages about 20% faster.",
 			"Cut the build logs by 80% with code cleanup, bug fixes, package upgrades and fixed tests.",
@@ -486,6 +486,42 @@ const projects = [
 		additionalLinks: [],
 		dateCreated: "2022–2023",
 		slug: "jogg-group",
+	},
+	{
+		name: "Sobolt Design System",
+		highlight: "Researched and built Sobolt's entire component library: Stencil web components, documented in Storybook.",
+		company: "Sobolt (internship)",
+		role: "Research, design & development",
+		responsibilities: [
+			"Researched how to turn Sobolt's principles and practices into one design system, auditing its apps and workflows.",
+			"Built the whole library as Stencil web components with JSX, TypeScript and Sass: 20+ components.",
+			"Documented every component in Storybook, so anyone can try its options.",
+			"The library is used across Sobolt's apps, including the first version of its cloud platform.",
+		],
+		quote: {
+			text: "Brainilio has done an unprecedented amount of thinking, development, and writing over the past period. He combines understanding with practical implementation at a very high level. For Sobolt it was an exception not to have an MSc. student to collaborate with. This collaboration makes you want more!",
+			by: "Danny Hetharia & Jeroen van Zwieten, Sobolt (2021)",
+		},
+		media: [
+			{ type: "video", src: "/projects/sobolt-components/thumbnail-loop.mp4", poster: "/projects/sobolt-components/thumbnail.jpg", alt: "A tilted wall of the real Sobolt components (cards, buttons, the login form, selects, tickets) drifting in columns beside the Sobolt Design System logo" },
+			{ type: "video", src: "/projects/sobolt-components/assemble.mp4", poster: "/projects/sobolt-components/assemble.jpg", alt: "The components dropping into place one after another: the login form, a card, buttons, a badge and checkbox, a project tile, tickets, a text field and a select" },
+			{ type: "image", src: "/projects/sobolt-components/design-system.jpg", alt: "Sobolt Design System: Sustainability, Artificial Intelligence, Cloud, beside the components" }
+		],
+		shortDescription: "Sobolt's component library, from research to Storybook.",
+		previewImage: "/projects/sobolt-components/thumbnail.jpg",
+		thumbnailVideo: "/projects/sobolt-components/thumbnail-loop.mp4",
+		livePreview: null,
+		gitHub: null,
+		tags: ["Stencil", "Storybook", "TypeScript", "Sass", "Web components", "Design systems"],
+		category: "Development",
+		description: "Sobolt's apps each looked a little different. I researched what one design system for all of them should be, then built it as a library of web components that work in any framework, each one documented in Storybook.",
+		process: "",
+		challenges: "",
+		differently: "",
+		takeaway: "",
+		additionalLinks: [],
+		dateCreated: "2021",
+		slug: "sobolt-components",
 	},
 	{
 		name: "Sobolt cloud platform",
@@ -1179,7 +1215,7 @@ comic goliath david, evolife, super bespaar app, killer robots, healthcare robot
 // Projects flagged `hidden` are off the site: no card, no page. Every consumer imports this filtered list, in the
 // owner's order (ORDER, newest first); anything not in ORDER (the early projects) follows, by year, newest first.
 const ORDER = ["crapp", "my-compassion", "karina-rodriguez", "strength-without-pain", "compassion-auth", "compassion-checkout",
-	"jonnyonthespot", "trend-trade", "jogg-group", "count-group", "newcold", "hkliving", "sobolt"]
+	"jonnyonthespot", "trend-trade", "jogg-group", "count-group", "newcold", "hkliving", "sobolt", "sobolt-components"]
 const latestYear = project => Math.max(0, ...(String(project.dateCreated || "").match(/\d{4}/g) || []).map(Number))
 const rank = project => { const i = ORDER.indexOf(project.slug); return i < 0 ? ORDER.length : i }
 const byOrder = (a, b) => rank(a) - rank(b) || latestYear(b) - latestYear(a)
