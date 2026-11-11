@@ -1176,6 +1176,14 @@ comic goliath david, evolife, super bespaar app, killer robots, healthcare robot
 
 */
 
-// Projects flagged `hidden` are off the site: no card, no page. Every consumer imports this filtered list.
+// Projects flagged `hidden` are off the site: no card, no page. Every consumer imports this filtered list, ordered
+// by year, newest first: by the last year worked on, then by the first (with the same end year, the later start
+// comes first, so 2026 before 2025–2026). Projects without a year go last; ties keep the order above.
+const years = project => (String(project.dateCreated || "").match(/\d{4}/g) || []).map(Number)
+const byYear = (a, b) => {
+	const ya = years(a), yb = years(b)
+	if (!ya.length || !yb.length) return yb.length - ya.length
+	return Math.max(...yb) - Math.max(...ya) || Math.min(...yb) - Math.min(...ya)
+}
 export const allProjectsIncludingHidden = projects
-export default projects.filter(project => !project.hidden)
+export default projects.filter(project => !project.hidden).sort(byYear)
