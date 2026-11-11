@@ -2,135 +2,36 @@
 import { eagleHandoff } from "./eagle-handoff";
 import ProjectThumbnail from "../project/project-thumbnail";
 import TechChip, { Icon, Roll } from "../tech-chip";
-import WorkCards from "./work-cards";
+import WorkIndex from "./work-cards";
 import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { createCloud } from "./island-parts";
-import { getImageRatio, fitWidth } from "../../lib/image-ratio";
 
-// The Work section: one pinned screen, the scroll picking the project (in step with the section pill's counter). The
-// project's name runs huge across the middle, lit by a sun that rises behind it as you scroll; three of its pictures
-// hang round it as thin sheets, bent and warping (more the faster you scroll), sheened by that sun; a bald eagle flies
-// a slow circle, behind the name and in front of it, faster (and beating its wings faster) the faster you scroll.
-// Behind, the page's own sky turns to sunrise as you go, with low-poly clouds drifting across it and the last of the
-// About section's stars fading.
-// Two canvases of its own (the page's shared one sits above the words' layer, and the eagle has to pass in front of the
-// name while the clouds stay behind it): drawn only while on screen and the tab is visible; reduced motion stops the
-// flight and the drift. Phones get the sky and a plain list.
-
-// The three sheets: where they hang (fraction of the screen), how wide (fraction of the screen's width, before their
-// own shape adjusts it), which of the project's pictures, their turn and tilt, and depth.
-// Layouts to compare (?work=, with a switcher top-right of the section; 1 by default):
-// 1 Sheets: three of the project's landscape screenshots hanging round the huge name;
-// with work-cards.js (the big name gives way to a smaller one): 7 Index (a numbered list and a card); 9 Index +
-// sheets; 10 Big index (huge names, a small card sliding along); 11 Big sheet (the thumbnail as one large sheet, the
-// name small at the bottom); 12 Scattered (four sheets at different depths); 13 Index mirrored (list right, sheets
-// left); 14 Big index + sheets; 15 Arc (a display wall: the thumbnail in the middle, two screenshots turned in at the
-// sides); 16 Pile (the thumbnail in front, the screenshots fanned behind it); clean indexes: 17 Table (rows with thin
-// dividers, a preview beside), 18 Soft card (a quiet list, the thumbnail in a soft frosted card), 19 Accordion (a
-// dotted-leader list whose active row opens to show its thumbnail), 20 Panel (one frosted window: list left, thumbnail
-// right); 21 Big index + screen (the huge names left, the thumbnail loop as a big screen right); 22 Big index + big sheet
-// (the same with the screen as one large bent sheet). Just the name, what I did and the tech.
-const LAYOUTS = {
-  1: [
-    { fx: .64, fy: .21, w: .17, pick: 0, ry: -.32, rz: .05, z: -1.6 },
-    { fx: .85, fy: .63, w: .15, pick: 1, ry: -.5, rz: -.07, z: -1.1 },
-    { fx: .19, fy: .72, w: .16, pick: 2, ry: .45, rz: .04, z: -1.3 },
-  ],
-  7: [], 10: [], 17: [], 18: [], 19: [], 20: [], 21: [],
-  22: [{ fx: .71, fy: .55, w: .4, pick: "thumb", ry: -.2, rz: 0, z: -1.3, bend: .1 }],
-  9: [
-    { fx: .63, fy: .3, w: .2, pick: 0, ry: -.22, rz: .03, z: -1.4 },
-    { fx: .86, fy: .56, w: .16, pick: 1, ry: -.48, rz: -.05, z: -1 },
-    { fx: .62, fy: .76, w: .15, pick: 2, ry: .18, rz: .04, z: -1.6 },
-  ],
-  11: [
-    { fx: .5, fy: .5, w: .36, pick: "thumb", ry: 0, rz: 0, z: -1.9, bend: .1 },
-    { fx: .15, fy: .36, w: .14, pick: 0, ry: .5, rz: .05, z: -1.2 },
-    { fx: .86, fy: .64, w: .14, pick: 1, ry: -.5, rz: -.05, z: -1.2 },
-  ],
-  12: [
-    { fx: .36, fy: .38, w: .18, pick: "thumb", ry: .3, rz: -.04, z: -1.5 },
-    { fx: .7, fy: .27, w: .15, pick: 0, ry: -.35, rz: .05, z: -1.9 },
-    { fx: .6, fy: .68, w: .19, pick: 1, ry: -.18, rz: -.03, z: -1.1 },
-    { fx: .89, fy: .5, w: .12, pick: 2, ry: -.55, rz: .06, z: -2.3 },
-  ],
-  13: [
-    { fx: .37, fy: .3, w: .2, pick: 0, ry: .22, rz: -.03, z: -1.4 },
-    { fx: .14, fy: .56, w: .16, pick: 1, ry: .48, rz: .05, z: -1 },
-    { fx: .38, fy: .76, w: .15, pick: 2, ry: -.18, rz: -.04, z: -1.6 },
-  ],
-  14: [
-    { fx: .79, fy: .36, w: .19, pick: "thumb", ry: -.3, rz: .03, z: -1.3 },
-    { fx: .91, fy: .71, w: .12, pick: 0, ry: -.5, rz: -.05, z: -1.7 },
-    { fx: .67, fy: .75, w: .12, pick: 1, ry: -.12, rz: .04, z: -2.1 },
-  ],
-  15: [
-    { fx: .5, fy: .47, w: .29, pick: "thumb", ry: 0, rz: 0, z: -1.6, bend: .18 },
-    { fx: .19, fy: .47, w: .16, pick: 0, ry: .62, rz: 0, z: -2.4 },
-    { fx: .81, fy: .47, w: .16, pick: 1, ry: -.62, rz: 0, z: -2.4 },
-  ],
-  16: [
-    { fx: .63, fy: .34, w: .19, pick: 1, ry: -.28, rz: .09, z: -2.8 },
-    { fx: .58, fy: .42, w: .21, pick: 0, ry: -.16, rz: .045, z: -2.1 },
-    { fx: .52, fy: .52, w: .27, pick: "thumb", ry: 0, rz: -.02, z: -1.2 },
-  ],
-};
-const LAYOUT_NAMES = [["1", "Sheets"], ["7", "Index"], ["9", "Index + sheets"], ["10", "Big index"], ["11", "Big sheet"], ["12", "Scattered"], ["13", "Index mirrored"], ["14", "Big index + sheets"], ["15", "Arc"], ["16", "Pile"], ["17", "Table"], ["18", "Soft card"], ["19", "Accordion"], ["20", "Panel"], ["21", "Big index + screen"], ["22", "Big index + big sheet"]];
-const HTML_LAYOUTS = ["7", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22"];
-// Where the eagle circles (fraction of the screen's width): round the project, not always the middle.
-const EAGLE_AT = { 7: .66, 9: .72, 13: .3, 14: .78, 17: .8, 18: .7, 20: .66, 21: .5, 22: .72 };
-// How far above the middle it circles (world units; the screen is about 2.4 high from the middle to the top edge).
-const EAGLE_UP = { 21: 1.15 };
-// A project's landscape pictures, all different: its gallery screenshots first (no phone screens, not the thumbnail),
-// then its videos' posters, then its combined phone-screens picture if it still needs more.
-const landscapes = project => {
-  const media = project.media ?? [], plain = item => item.layout !== "portrait" && !item.presentation;
-  const shots = media.filter(item => item.type === "image" && plain(item) && !/\/(m-|m\d|screens)/.test(item.src)).map(item => item.src);
-  const posters = media.filter(item => item.type === "video" && item.poster && plain(item)).map(item => item.poster);
-  const combined = media.filter(item => item.type === "image" && /\/screens/.test(item.src)).map(item => item.src);
-  return [...new Set([...shots, ...posters, ...combined])].filter(src => src !== project.previewImage);
-};
-const SHEET_VERTEX = `uniform float uBend,uWave,uTime;varying vec2 vUv;varying float vSlope;void main(){
-  vUv=uv;vec3 p=position;float x=uv.x-.5,y=uv.y-.5,ph=uv.x*5.+uv.y*3.+uTime*2.4;
-  // A sheet: curled toward you at the sides (more at the top than the foot), rippling as it moves.
-  p.z+=uBend*(x*x*2.2+.5*y*y)+uWave*sin(ph);
-  vSlope=uBend*4.4*x+uWave*5.*cos(ph);
-  gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}`;
-const SHEET_FRAGMENT = `uniform sampler2D uMap,uNext;uniform float uAlpha,uSunSide,uSun,uMix,uRatio,uRatioA,uRatioB;varying vec2 vUv;varying float vSlope;
-// A picture filling the sheet (the sheet's shape eases from one picture's to the next's while they change over, so each
-// is fitted by cropping only as much as that takes; at rest the sheet is exactly its picture's shape).
-vec2 fill(vec2 uv,float r){vec2 k=r>uRatio?vec2(uRatio/r,1.):vec2(1.,r/uRatio);return (uv-.5)*k+.5;}
-void main(){
-  // Changing over: the next picture is revealed by a band of warm light sweeping across from the upper left, its edge
-  // softened with a little grain, then the light passes on.
-  float edge=vUv.x*.62+(1.-vUv.y)*.38+(fract(sin(dot(floor(vUv*90.),vec2(12.9898,78.233)))*43758.5453)-.5)*.035,front=uMix*1.3-.15;
-  float m=smoothstep(edge-.09,edge+.01,front);
-  vec3 c=mix(texture2D(uMap,fill(vUv,uRatioA)).rgb,texture2D(uNext,fill(vUv,uRatioB)).rgb,m);
-  c+=vec3(1.,.82,.58)*exp(-pow((front-edge)/.035,2.))*.55*step(.001,uMix)*step(uMix,.999);
-  // Lit on the side that turns toward the sun, a warm sheen where it catches it, shade where it turns away.
-  float lit=clamp(.5+.5*vSlope*uSunSide*1.6,0.,1.);
-  c*=.84+.26*lit;c+=vec3(1.,.78,.52)*pow(lit,5.)*.22*uSun;
-  gl_FragColor=vec4(c,uAlpha);
-  #include <colorspace_fragment>
-}`;
+// The Work section: one pinned screen, the scroll picking the project (in step with the section pill's counter): the
+// project names huge on the left, the one you're on solid, and its thumbnail loop as a big screen on the right
+// (work-cards.js). Behind, the page's own sky turns to sunrise as you go, a sun rising with it, low-poly clouds drifting
+// across and the last of the About section's stars fading; a bald eagle circles in the open sky above, faster (and
+// beating its wings faster) the faster you scroll, then flies on into the Skills section.
+// Two canvases of its own (the clouds behind the words, the eagle in front of them): drawn only while on screen and the
+// tab is visible; reduced motion stops the flight and the drift. Phones get the sky and a plain list.
+// Where the eagle circles: centred, and this far above the middle (world units; about 2.4 from the middle to the top).
+const EAGLE_UP = 1.15;
 // The clouds: x, y, depth, size, phase.
 const CLOUDS = [[-6, -1, -8, .3, 0], [6.5, 1.6, -10, .36, 1.7], [9, -1.9, -7, .26, 3.1], [-9, 1.9, -12, .34, 4.4], [2.5, -2.3, -9, .28, 2.6], [12, .2, -14, .4, .8]];
 // What a recruiter wants at a glance: its year and kind of work, and the first few tools (all from the project data).
 // (Dates written in capitals in the data are shown in sentence case.)
 const tidy = text => text && text === text.toUpperCase() ? text.charAt(0) + text.slice(1).toLowerCase() : text;
+// The line under the heading.
+const INTRO = "What I've built and worked on most recently, from my own app to a large platform. The rest is on the work page.";
 const metaOf = p => [tidy(p.dateCreated), p.role || p.category].filter(Boolean).join(" · ");
 
 export default function WorkShowcase({ work, scene, slot, onReady }) {
   const root = useRef(null), back = useRef(null), front = useRef(null);
   const ready = useRef(onReady); ready.current = onReady;
-  const [active, setActive] = useState(0), [layoutKey, setLayoutKey] = useState("1");
-  useEffect(() => { const key = new URLSearchParams(location.search).get("work"); if (LAYOUTS[key]) setLayoutKey(key); }, []);
-  const chooseLayout = key => { setLayoutKey(key); const url = new URL(location.href); url.searchParams.set("work", key); history.replaceState(history.state, "", url); };
-  const mouse = useRef({ x: 0, y: 0 }), picker = useRef(null);
+  const [active, setActive] = useState(0);
+  const mouse = useRef({ x: 0, y: 0 });
   const n = work.length;
 
   useEffect(() => {
@@ -146,7 +47,7 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
     const reduce = matchMedia("(prefers-reduced-motion: reduce)");
     const camera = new THREE.PerspectiveCamera(30, 1, .1, 100); camera.position.set(0, .35, 9); camera.lookAt(0, .2, 0);
 
-    // Behind the name: the islands' low-poly clouds, tinted for the sunrise, at a few depths, drifting left to right
+    // Behind: the islands' low-poly clouds, tinted for the sunrise, at a few depths, drifting left to right
     // and wrapping round; and the About section's stars carried on into the top of this one, twinkling, fading out as
     // you scroll in.
     const skyScene = new THREE.Scene(), clouds = [], starUniforms = { uTime: { value: 0 }, uPixel: { value: 1 }, uFade: { value: 1 } };
@@ -165,66 +66,16 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       fragmentShader: `varying float vAlpha;void main(){float d=length(gl_PointCoord-.5)*2.;gl_FragColor=vec4(1.,.97,.9,vAlpha*smoothstep(1.,0.,d));}` }));
     stars.frustumCulled = false; skyScene.add(stars);
 
-    // The sun, low behind everything, rising up and across as you scroll through the projects; it lights the letters
-    // (see the loop) and the sheets.
+    // The sun, low behind everything, rising up and across as you scroll through the projects.
     const glow = (stops, size = 128) => { const c = document.createElement("canvas"); c.width = c.height = size; const g = c.getContext("2d"), r = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2); stops.forEach(([k, col]) => r.addColorStop(k, col)); g.fillStyle = r; g.fillRect(0, 0, size, size); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; };
     const sunTexture = glow([[0, "rgba(255,246,222,1)"], [.12, "rgba(255,232,190,1)"], [.16, "rgba(255,196,140,.75)"], [.4, "rgba(255,160,110,.25)"], [1, "rgba(255,140,100,0)"]]);
     const sunSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: sunTexture, transparent: true, depthWrite: false, toneMapped: false }));
     sunSprite.scale.setScalar(16); skyScene.add(sunSprite);
 
-    // The sheets: the project's pictures on thin bent planes (a soft shadow behind each), shown whole at their own shape.
-    const textureLoader = new THREE.TextureLoader(), textures = new Map(), movies = new Map();
-    const textureOf = src => {
-      if (!textures.has(src)) {
-        const poster = textureLoader.load(src); poster.colorSpace = THREE.SRGBColorSpace; poster.anisotropy = 4; textures.set(src, poster);
-        const project = work.find(project => project.previewImage === src && project.thumbnailVideo);
-        if (project) {
-          const video = document.createElement("video");
-          Object.assign(video, { muted:true, loop:true, playsInline:true, preload:"none" });
-          const texture = new THREE.VideoTexture(video); texture.colorSpace = THREE.SRGBColorSpace;
-          movies.set(src, { video, texture, url:project.thumbnailVideo, pending:false, blocked:false });
-        }
-      }
-      const movie = movies.get(src);
-      return !reduce.matches && window.innerWidth > 760 && movie?.video.readyState >= 2 ? movie.texture : textures.get(src);
-    };
-    const syncMovies = enabled => {
-      for (const [src, movie] of movies) {
-        const active = enabled && !reduce.matches && window.innerWidth > 760 && sheets.some(sheet => sheet.src === src || sheet.next === src);
-        if (!active) { movie.video.pause(); continue; }
-        if (!movie.video.getAttribute("src")) movie.video.src = movie.url;
-        if (movie.video.paused && !movie.pending && !movie.blocked) {
-          movie.pending = true;
-          movie.video.play().catch(() => { movie.blocked = true; }).finally(() => { movie.pending = false; });
-        }
-      }
-    };
-    const pauseHiddenMovies = () => { if (document.hidden || reduce.matches) syncMovies(false); };
-    document.addEventListener("visibilitychange", pauseHiddenMovies);
-    reduce.addEventListener("change", pauseHiddenMovies);
-    const shadowTexture = glow([[0, "rgba(255,255,255,.9)"], [.55, "rgba(255,255,255,.35)"], [1, "rgba(255,255,255,0)"]], 64);
-    const sheetGeometry = new THREE.PlaneGeometry(1, 1, 40, 24), shadowGeometry = new THREE.PlaneGeometry(1, 1);
-    const layout = LAYOUTS[layoutKey] ?? LAYOUTS[1];
-    const sheets = layout.map((spot, k) => {
-      const uniforms = { uMap: { value: null }, uNext: { value: null }, uMix: { value: 0 }, uRatio: { value: 1.6 }, uRatioA: { value: 1.6 }, uRatioB: { value: 1.6 }, uBend: { value: .16 }, uWave: { value: 0 }, uTime: { value: 0 }, uAlpha: { value: 0 }, uSunSide: { value: 0 }, uSun: { value: 1 } };
-      const mesh = new THREE.Mesh(sheetGeometry, new THREE.ShaderMaterial({ uniforms, transparent: true, side: THREE.DoubleSide, vertexShader: SHEET_VERTEX, fragmentShader: SHEET_FRAGMENT }));
-      const shadow = new THREE.Mesh(shadowGeometry, new THREE.MeshBasicMaterial({ map: shadowTexture, color: "#3a1638", transparent: true, depthWrite: false, opacity: 0 }));
-      const group = new THREE.Group(); group.add(shadow, mesh); skyScene.add(group);
-      return { spot, k, group, mesh, shadow, uniforms, ratio: 16 / 10, nextRatio: 16 / 10, src: null, next: null, want: null, href: null, wantHref: null, appear: 0, mix: 0, wait: 0 };
-    });
-    const showProject = (project, first) => {
-      const pics = landscapes(project), fallback = [project.previewImage];
-      sheets.forEach(sheet => { sheet.want = sheet.spot.pick === "thumb" ? project.previewImage : (pics.length ? pics : fallback)[sheet.spot.pick % (pics.length || 1)]; sheet.wantHref = `/project/${project.slug}/`; sheet.wait = first ? .25 + sheet.k * .14 : sheet.k * .12; });
-    };
-    // (Clicking a sheet opens its project; the pointer turns to a hand over one.)
-    const raycaster = new THREE.Raycaster(), ndc = new THREE.Vector2();
-    picker.current = (x, y) => { ndc.set(x, y); raycaster.setFromCamera(ndc, camera); const hit = raycaster.intersectObjects(sheets.filter(s => s.uniforms.uAlpha.value > .5).map(s => s.mesh))[0]; return hit ? sheets.find(s => s.mesh === hit.object).href : null; };
-
-    // In front of the name: the bald eagle in flight (Robert Mirabelle, CC BY 3.0), lit warm from the upper left. Its
-    // wings (along x, the beak toward -z) beat in the vertex shader, bending more toward the tips, the tips a little
-    // behind.
+    // The bald eagle in flight (Robert Mirabelle, CC BY 3.0), lit warm from the upper left. Its wings (along x, the beak
+    // toward -z) beat in the vertex shader, bending more toward the tips, the tips a little behind.
     // (It and its lights are one rig, moved into the clouds' scene for the far half of its circle, so it passes behind
-    // the name there and in front of it on the near half.)
+    // the clouds there and in front of them on the near half.)
     const eagleScene = new THREE.Scene(), rig = new THREE.Group(), flight = new THREE.Group(), flap = { value: 0 }, eagleMaterials = [];
     rig.add(new THREE.HemisphereLight("#dce7ff", "#493448", .85));
     const sun = new THREE.DirectionalLight("#ffddb5", 2.2); sun.position.set(-4, 6, 5); rig.add(sun, sun.target);
@@ -278,11 +129,11 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       const rate = dt > 0 ? (progress - prevProgress) / dt * (n - 1) : 0; prevProgress = progress;
       vel += (rate - vel) * Math.min(1, dt * 6);
       const at = Math.min(n - 1, Math.max(0, Math.round(progress * (n - 1))));
-      if (at !== shown) { if (shown >= 0) speed += 2.2; showProject(work[at], shown < 0); shown = at; setActive(at); }
+      if (at !== shown) { if (shown >= 0) speed += 2.2; shown = at; setActive(at); }
       const destination = eagleHandoff.target;
       const crossing = !reduce.matches && destination && destination.top > 0 && destination.top < window.innerHeight;
-      if (document.hidden) { syncMovies(false); return; }
-      if (!visible && !crossing) { syncMovies(false); eagleRenderer.clear(); return; }
+      if (document.hidden) return;
+      if (!visible && !crossing) { eagleRenderer.clear(); return; }
       const still = reduce.matches;
       // Its pace: idle, plus however fast you're scrolling, easing back down when you stop.
       const target = still ? 0 : .35 + Math.min(7, Math.abs(vel) * 5);
@@ -294,8 +145,7 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       const blend = easeFlight(travel, 0, 1);
       const a = circle * .55, bank = .32 + Math.min(.3, Math.abs(vel) * .1);
       const baseScale = Math.min(1, camera.aspect / 1.2);
-      const eagleX = ((EAGLE_AT[layoutKey] ?? .5) * 2 - 1) * Math.tan(THREE.MathUtils.degToRad(15)) * 9 * camera.aspect;
-      flight.position.set(eagleX + Math.cos(a) * 1.25 * baseScale, (still ? 0 : Math.sin(time * 1.3) * .12) + .3 + (EAGLE_UP[layoutKey] ?? 0), Math.sin(a) * 1.1 - .1);
+      flight.position.set(Math.cos(a) * 1.25 * baseScale, (still ? 0 : Math.sin(time * 1.3) * .12) + .3 + EAGLE_UP, Math.sin(a) * 1.1 - .1);
       orbitRotation.setFromEuler(pose.set(0, -a, bank, "YXZ"));
       flight.quaternion.copy(orbitRotation);
       flight.scale.setScalar(baseScale);
@@ -335,53 +185,6 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       host.style.setProperty("--warm", step(0, .7)); host.style.setProperty("--rise", step(.68, .9));
       const tanHalf = Math.tan(THREE.MathUtils.degToRad(15)), sunDepth = -30, sunH = tanHalf * (9 - sunDepth), sunW = sunH * camera.aspect;
       sunSprite.position.set((-.55 + 1.1 * sunAt) * sunW, (-.5 + .55 * sunAt) * sunH + .2, sunDepth);
-      // Its light on the letters: a warm band across the word where the sun stands behind it.
-      const word = host.querySelector(".wl-a-word");
-      if (word) {
-        const sunScreen = sunSprite.position.clone().project(camera), r = word.getBoundingClientRect();
-        host.style.setProperty("--sun", `${((pin.left + (sunScreen.x + 1) / 2 * width - r.left) / r.width * 100).toFixed(1)}%`);
-      }
-      // The sheets: each swaps its picture by curling away and back (one after another), hangs at its spot at its own
-      // shape, sways a little with the pointer, and bends and ripples more the faster you scroll.
-      // The sheets: the first time, each fades in, rising a touch and settling; after that a new project's picture is
-      // revealed on the same sheet by a sweep of light (one sheet after another) while the sheet eases to its shape
-      // and breathes, curling a little as the light passes. They sway with the pointer, and bend and ripple more the
-      // faster you scroll.
-      const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-      for (const sheet of sheets) {
-        const { spot, uniforms } = sheet;
-        if (sheet.wait > 0) sheet.wait -= dt;
-        else if (!sheet.src && sheet.want) {
-          sheet.src = sheet.want; sheet.href = sheet.wantHref; uniforms.uMap.value = textureOf(sheet.src);
-          const src = sheet.src; getImageRatio(src).then(r => { if (r && sheet.src === src && !sheet.next) sheet.ratio = r; });
-        } else if (sheet.src && !sheet.next && sheet.want !== sheet.src) {
-          sheet.next = sheet.want; sheet.href = sheet.wantHref; sheet.mix = 0; uniforms.uNext.value = textureOf(sheet.next); sheet.nextRatio = sheet.ratio;
-          const next = sheet.next; getImageRatio(next).then(r => { if (r && sheet.next === next) sheet.nextRatio = r; });
-        }
-        if (sheet.src) sheet.appear = Math.min(1, sheet.appear + dt / (still ? .01 : 1.1));
-        if (sheet.next) {
-          sheet.mix = Math.min(1, sheet.mix + dt / (still ? .01 : 1.15));
-          if (sheet.mix >= 1) { sheet.src = sheet.next; sheet.ratio = sheet.nextRatio; uniforms.uMap.value = uniforms.uNext.value; sheet.next = null; sheet.mix = 0; }
-        }
-        const a = ease(sheet.appear), m = sheet.next ? ease(sheet.mix) : 0, breath = Math.sin(Math.PI * m);
-        const ratio = sheet.next ? sheet.ratio + (sheet.nextRatio - sheet.ratio) * m : sheet.ratio;
-        uniforms.uMix.value = m; uniforms.uRatio.value = ratio; uniforms.uRatioA.value = sheet.ratio; uniforms.uRatioB.value = sheet.nextRatio;
-        const halfH = tanHalf * (9 - spot.z), halfW = halfH * camera.aspect;
-        const w = spot.w * 2 * halfW * fitWidth(1, ratio, { min: .65, max: 1.3 }), h = w / ratio;
-        sheet.mesh.scale.set(w, h, 1); sheet.shadow.scale.set(w * 1.3, h * 1.4, 1); sheet.shadow.position.set(w * (.07 + breath * .03), -h * (.1 + breath * .04), -.2);
-        sheet.group.position.set((spot.fx * 2 - 1) * halfW - smoothMouse.x * .2, (1 - 2 * spot.fy) * halfH + .2 - (1 - a) * .18 + (still ? 0 : Math.sin(time * .6 + sheet.k * 2) * .05) - smoothMouse.y * .12, spot.z + breath * .12);
-        sheet.group.rotation.set(smoothMouse.y * .08, spot.ry + smoothMouse.x * .14 + breath * .06, spot.rz);
-        sheet.group.scale.setScalar(.96 + .04 * a);
-        uniforms.uAlpha.value = a; sheet.shadow.material.opacity = .4 * a;
-        uniforms.uBend.value = (spot.bend ?? .14) + (1 - a) * .2 + breath * .12 + Math.min(.45, Math.abs(vel) * .14); uniforms.uWave.value = still ? 0 : .012 + Math.min(.1, Math.abs(vel) * .04);
-        uniforms.uTime.value = time; uniforms.uSunSide.value = Math.max(-1, Math.min(1, (sunSprite.position.x * (9 - spot.z) / (9 - sunDepth) - sheet.group.position.x) / 3));
-        uniforms.uSun.value = .5 + .5 * sunAt;
-      }
-      syncMovies(visible && !document.hidden);
-      for (const sheet of sheets) {
-        if (sheet.src) sheet.uniforms.uMap.value = textureOf(sheet.src);
-        if (sheet.next) sheet.uniforms.uNext.value = textureOf(sheet.next);
-      }
       const span = Math.tan(THREE.MathUtils.degToRad(15)) * camera.aspect;
       for (const cloud of clouds) {
         const u = cloud.userData, w = span * (9 - u.z) + 3, x = u.x + drift * .35 * u.depth;
@@ -399,82 +202,43 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
     // (The loading screen waits on each section; this one is ready as soon as its canvases are.)
     ready.current?.();
     return () => {
-      document.removeEventListener("visibilitychange", pauseHiddenMovies);
-      reduce.removeEventListener("change", pauseHiddenMovies);
       eagleHandoff.flap = null;
       disposed = true; cancelAnimationFrame(frame); observer.disconnect(); seen.disconnect();
       clouds.forEach(c => { c.geometry.dispose(); c.material.dispose(); }); starGeometry.dispose(); stars.material.dispose();
-      picker.current = null; sunTexture.dispose(); sunSprite.material.dispose(); shadowTexture.dispose(); sheetGeometry.dispose(); shadowGeometry.dispose();
-      sheets.forEach(s => { s.mesh.material.dispose(); s.shadow.material.dispose(); }); textures.forEach(t => t.dispose());
-      for (const movie of movies.values()) { movie.video.pause(); movie.video.removeAttribute("src"); movie.video.load(); movie.texture.dispose(); }
+      sunTexture.dispose(); sunSprite.material.dispose();
       rig.traverse(o => o.geometry?.dispose()); eagleMaterials.forEach(m => m.dispose());
       skyRenderer.dispose(); eagleRenderer.dispose();
     };
-  }, [scene, slot, n, work, layoutKey]);
+  }, [scene, slot, n]);
 
-  // Pointer, relative to the pinned screen (-1..1, y up).
+  // Pointer, relative to the pinned screen (-1..1, y up): the clouds shift a little with it.
   const onMove = e => {
     const r = e.currentTarget.getBoundingClientRect();
     mouse.current = { x: ((e.clientX - r.left) / r.width) * 2 - 1, y: -(((e.clientY - r.top) / r.height) * 2 - 1) };
-    e.currentTarget.style.cursor = !e.target.closest("a") && picker.current?.(mouse.current.x, mouse.current.y) ? "pointer" : "";
   };
-  // A click on a sheet (not on a link or button over it) opens its project.
-  const onClick = e => {
-    if (e.target.closest("a, button")) return;
-    const r = e.currentTarget.getBoundingClientRect(), href = picker.current?.(((e.clientX - r.left) / r.width) * 2 - 1, -(((e.clientY - r.top) / r.height) * 2 - 1));
-    if (href) window.location.href = href;
-  };
-  const project = work[active] ?? work[0];
 
   return (
-    <div className="wl" ref={root} style={{ "--n": n }} data-layout={layoutKey} data-html={HTML_LAYOUTS.includes(layoutKey) ? "" : undefined}>
-      <div className="wl-pin" onPointerMove={onMove} onClick={onClick} onPointerLeave={() => { mouse.current = { x: 0, y: 0 }; }}>
+    <div className="wl" ref={root} style={{ "--n": n }}>
+      <div className="wl-pin" onPointerMove={onMove} onPointerLeave={() => { mouse.current = { x: 0, y: 0 }; }}>
         <canvas className="wl-canvas" ref={back} aria-hidden="true" />
         <canvas className="wl-canvas wl-front" ref={front} aria-hidden="true" />
         <div className="wl-head">
-          <h2 id="ht-work-title" className="wl-title">Selected work</h2>
+          <h2 id="ht-work-title" className="wl-title">Latest work</h2>
+          <p className="wl-intro">{INTRO}</p>
           <p className="wl-pills">
-            <a className="ui-btn ui-btn--secondary" href="/projects/"><Roll>All work</Roll><Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
+            <a className="ui-btn" href="/projects/"><Roll>All work</Roll><Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
             <a className="ui-btn ui-btn--secondary" href="/journey/"><Roll>Lab</Roll><Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
           </p>
         </div>
-        <div className="wl-switch" role="group" aria-label="Work layout">
-          {LAYOUT_NAMES.map(([key, label]) => <button key={key} type="button" aria-pressed={layoutKey === key} onClick={() => chooseLayout(key)}>{key} · {label}</button>)}
-        </div>
-
-
-        {HTML_LAYOUTS.includes(layoutKey) && <WorkCards layout={layoutKey} work={work} active={active} />}
-
-        {/* The name, its letters rising in one after another (and lifting away for the next). */}
-        <a className="wl-a-name" href={`/project/${project.slug}/`} aria-label={`${project.name}: view the project`}>
-          <AnimatePresence mode="popLayout" initial={false}>
-            <motion.span key={project.slug} className="wl-a-word" aria-hidden="true" style={{ "--n": [...project.name].length }}>
-              {[...project.name].map((ch, i) => (
-                <motion.span key={i} className="wl-a-char" style={{ "--i": i }}
-                  initial={{ y: "110%", opacity: 0, filter: "blur(10px)" }}
-                  animate={{ y: "0%", opacity: 1, filter: "blur(0px)", transition: { delay: i * .028, type: "spring", stiffness: 260, damping: 24 } }}
-                  exit={{ y: "-110%", opacity: 0, filter: "blur(10px)", transition: { delay: i * .015, duration: .28, ease: [.6, 0, .9, .4] } }}>
-                  {ch === " " ? "\u00A0" : ch}
-                </motion.span>
-              ))}
-            </motion.span>
-          </AnimatePresence>
-        </a>
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div key={project.slug} className="wl-a-meta"
-            initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0, transition: { delay: .25, duration: .5, ease: [.2, .8, .2, 1] } }} exit={{ opacity: 0, y: -10, transition: { duration: .2 } }}>
-            <span>{metaOf(project)}</span>
-            {project.highlight && <span className="wl-contribution">{project.highlight}</span>}
-            <ul className="wl-tags ui-chips">{project.tags?.slice(0, 4).map(t => <TechChip key={t} name={t} />)}</ul>
-          </motion.div>
-        </AnimatePresence>
+        <WorkIndex work={work} active={active} />
       </div>
 
       {/* Phones: the heading and the projects as a plain list, scrolling over the sky (the eagle behind them). */}
       <div className="wl-phone-head">
-        <h2 className="wl-title">Selected work</h2>
+        <h2 className="wl-title">Latest work</h2>
+        <p className="wl-intro">{INTRO}</p>
         <p className="wl-pills">
-          <a className="ui-btn ui-btn--secondary" href="/projects/"><Roll>All work</Roll><Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
+          <a className="ui-btn" href="/projects/"><Roll>All work</Roll><Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
           <a className="ui-btn ui-btn--secondary" href="/journey/"><Roll>Lab</Roll><Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
         </p>
       </div>

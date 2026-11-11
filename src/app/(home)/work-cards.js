@@ -3,12 +3,12 @@ import ProjectThumbnail from "../project/project-thumbnail";
 import { Icon } from "../tech-chip";
 import { techIcon } from "../../lib/tech-icons";
 
-// HTML layers for the homepage Work section layouts 7 and 9–20 (see work-showcase.js). Each card is the project's thumbnail loop,
-// with just the name (smaller), what I did, and the tech as icons. The scroll picks the active project (`active`);
-// everything else is CSS transitions on data attributes, so nothing re-renders per frame.
+// The homepage Work section's index: the project names huge on the left (the one the scroll is on solid, the others
+// faded), its role and tech under them, and its thumbnail loop as a big screen on the right. The scroll picks the
+// active project (`active`); everything else is CSS transitions, so nothing re-renders per frame.
 const STACK = 3;
 
-export function Tech({ tags = [] }) {
+function Tech({ tags = [] }) {
   const icons = tags.filter(techIcon), rest = icons.length - STACK;
   return <ul className="wc-tech" aria-label="Built with">
     {icons.slice(0, STACK).map(tag => <li key={tag} title={tag}><Icon src={techIcon(tag)} /><span className="wc-sr">{tag}</span></li>)}
@@ -16,147 +16,20 @@ export function Tech({ tags = [] }) {
   </ul>;
 }
 
-const Info = ({ p, index }) => <div className="wc-info">
-  <div>
-    {index != null && <span className="wc-num">{String(index + 1).padStart(2, "0")}</span>}
-    <strong className="wc-name">{p.name}</strong>
-    {p.role && <span className="wc-role">{p.role}</span>}
-  </div>
-  <Tech tags={p.tags} />
-</div>;
-
-function Card({ p, index, info = "below" }) {
-  const href = `/project/${p.slug}/`;
-  return <article className="wc-card">
-    <a className="wc-media" href={href} aria-label={`${p.name}: view the project`}><ProjectThumbnail project={p} /></a>
-    {info === "inside" && <div className="wc-glass"><Info p={p} index={index} /></div>}
-    {info === "below" && <Info p={p} index={index} />}
-  </article>;
-}
-
-export default function WorkCards({ layout, work, active }) {
-  // 7 Index: the names as a big numbered list on the left (the active one lit), its card large on the right.
-  if (layout === "7") return <div className="wc wc-index">
-    <ol className="wc-list">
-      {work.map((p, i) => <li key={p.slug} className={i === active ? "is-on" : undefined}>
-        <a href={`/project/${p.slug}/`}><span className="wc-num">{String(i + 1).padStart(2, "0")}</span>{p.name}</a>
-      </li>)}
-    </ol>
-    <ol className="wc-stage">
-      {work.map((p, i) => <li key={p.slug} data-pos={Math.sign(i - active)}><Card p={p} info="inside" /></li>)}
-    </ol>
-  </div>;
-  // 9 Index + sheets: the numbered list on the left with the active project's role and tech; its screenshots hang
-  // on the right as sheets (drawn in the section's canvas, see LAYOUTS[9] in work-showcase.js).
-  if (layout === "9" || layout === "13") return <div className={`wc wc-index wc-index--sheets${layout === "13" ? " wc-index--right" : ""}`}>
-    <div>
-      <ol className="wc-list">
-        {work.map((p, i) => <li key={p.slug} className={i === active ? "is-on" : undefined}>
-          <a href={`/project/${p.slug}/`}><span className="wc-num">{String(i + 1).padStart(2, "0")}</span>{p.name}</a>
-        </li>)}
-      </ol>
-      <div className="wc-active" key={work[active]?.slug}>
-        {work[active]?.role && <span className="wc-role">{work[active].role}</span>}
-        <Tech tags={work[active]?.tags} />
-      </div>
-    </div>
-  </div>;
-  // 10 Big index: the names huge, one per line (the active one solid, the rest outlined); a small card with its
-  // thumbnail loop slides along beside the active name.
-  if (layout === "10" || layout === "14") return <div className={`wc wc-mega${layout === "14" ? " wc-mega--sheets" : ""}`} style={{ "--i": active }}>
-    <ol className="wc-mega-list">
-      {work.map((p, i) => <li key={p.slug} className={i === active ? "is-on" : undefined}>
-        <a href={`/project/${p.slug}/`}>{p.name}</a>
-      </li>)}
-    </ol>
-    {layout === "14" && <div className="wc-active wc-mega-active" key={work[active]?.slug}>
-      {work[active]?.role && <span className="wc-role">{work[active].role}</span>}
-      <Tech tags={work[active]?.tags} />
-    </div>}
-    {layout === "10" && <div className="wc-mega-card">
-      {work.map((p, i) => <div key={p.slug} className="wc-mega-slide" data-pos={Math.sign(i - active)}>
-        <ProjectThumbnail project={p} />
-        <div className="wc-mega-meta">{p.role && <span className="wc-role">{p.role}</span>}<Tech tags={p.tags} /></div>
-      </div>)}
-    </div>}
-  </div>;
-  // 11 Big sheet: the sheets do the showing (LAYOUTS[11]); the name sits small at the bottom left with what I did and the tech.
-  if (["11", "12", "15", "16"].includes(layout)) return <div className="wc wc-caption">
-    {work.map((p, i) => <a key={p.slug} href={`/project/${p.slug}/`} className="wc-caption-item" data-pos={Math.sign(i - active)}>
-      <span className="wc-num">{String(i + 1).padStart(2, "0")} / {String(work.length).padStart(2, "0")}</span>
-      <strong className="wc-name">{p.name}</strong>
-      {p.role && <span className="wc-role">{p.role}</span>}
-      <Tech tags={p.tags} />
-    </a>)}
-  </div>;
-  // Clean indexes (17–20): small type, thin dividers, soft containers; the scroll picks the row.
-  const num = i => String(i + 1).padStart(2, "0");
-  const year = p => p.dateCreated || "";
-  // 17 Table: one row per project (number, name, what I did, tech, year); a preview card beside the table.
-  if (layout === "17") return <div className="wc wc-clean wc-table-wrap">
-    <ol className="wc-table">
-      <li className="wc-table-head" aria-hidden="true"><span>No.</span><span>Project</span><span>What I did</span><span>Tech</span><span>Year</span></li>
-      {work.map((p, i) => <li key={p.slug} className={i === active ? "is-on" : undefined}>
-        <a href={`/project/${p.slug}/`}><span className="wc-num">{num(i)}</span><strong>{p.name}</strong><span className="wc-role">{p.role}</span><Tech tags={p.tags} /><span className="wc-year">{year(p)}</span></a>
-      </li>)}
-    </ol>
-    <Previews work={work} active={active} />
-  </div>;
-  // 18 Soft card: a quiet list on the left; the thumbnail in a soft frosted card on the right.
-  if (layout === "18") return <div className="wc wc-clean wc-soft">
-    <ol className="wc-quiet">
-      {work.map((p, i) => <li key={p.slug} className={i === active ? "is-on" : undefined}>
-        <a href={`/project/${p.slug}/`}><i aria-hidden="true" /><strong>{p.name}</strong><span className="wc-year">{year(p)}</span></a>
-      </li>)}
-    </ol>
-    <div className="wc-soft-card">
-      {work.map((p, i) => <a key={p.slug} href={`/project/${p.slug}/`} className="wc-soft-slide" data-pos={Math.sign(i - active)}>
-        <ProjectThumbnail project={p} />
-        <span className="wc-soft-foot"><span><strong>{p.name}</strong><span className="wc-role">{p.role}</span></span><Tech tags={p.tags} /></span>
-      </a>)}
-    </div>
-  </div>;
-  // 19 Accordion: a centred list with dotted leaders; the active row opens to show its thumbnail.
-  if (layout === "19") return <div className="wc wc-clean wc-accordion">
-    <ol>
-      {work.map((p, i) => <li key={p.slug} className={i === active ? "is-on" : undefined}>
-        <a href={`/project/${p.slug}/`} className="wc-acc-row"><span className="wc-num">{num(i)}</span><strong>{p.name}</strong><i aria-hidden="true" /><span className="wc-role">{p.role}</span><span className="wc-year">{year(p)}</span></a>
-        <div className="wc-acc-body"><div><ProjectThumbnail project={p} /><Tech tags={p.tags} /></div></div>
-      </li>)}
-    </ol>
-  </div>;
-  // 20 Panel: one frosted window, the list down the left, the thumbnail filling the right.
-  if (layout === "20") return <div className="wc wc-clean wc-panel-wrap">
-    <div className="wc-panel">
-      <ol className="wc-panel-list">
-        {work.map((p, i) => <li key={p.slug} className={i === active ? "is-on" : undefined}>
-          <a href={`/project/${p.slug}/`}><span className="wc-num">{num(i)}</span><span><strong>{p.name}</strong><span className="wc-role">{p.role}</span></span></a>
-        </li>)}
-        <li className="wc-panel-tech" key={work[active]?.slug}><Tech tags={work[active]?.tags} /></li>
-      </ol>
-      <Previews work={work} active={active} bare />
-    </div>
-  </div>;
-  // 21 / 22: the huge names on the left (role and tech under them); a big screen on the right: the thumbnail loop
-  // (21), or the canvas's one large sheet (22, LAYOUTS[22]).
-  if (layout === "21" || layout === "22") return <div className={`wc wc-bigscreen${layout === "22" ? " is-sheet" : ""}`}>
+export default function WorkIndex({ work, active }) {
+  const current = work[active];
+  return <div className="wc wc-bigscreen">
     <div className="wc-bigscreen-index">
-      <ol className="wc-mega-list">
+      <ol className="wc-names">
         {work.map((p, i) => <li key={p.slug} className={i === active ? "is-on" : undefined}><a href={`/project/${p.slug}/`}>{p.name}</a></li>)}
       </ol>
-      <div className="wc-active" key={work[active]?.slug}>
-        {work[active]?.role && <span className="wc-role">{work[active].role}</span>}
-        <Tech tags={work[active]?.tags} />
+      <div className="wc-active" key={current?.slug}>
+        {current?.role && <span className="wc-role">{current.role}</span>}
+        <Tech tags={current?.tags} />
       </div>
     </div>
-    {layout === "21" && <Previews work={work} active={active} />}
-  </div>;
-  return null;
-}
-
-// The active project's thumbnail, cross-fading as the scroll moves on.
-function Previews({ work, active, bare }) {
-  return <div className={`wc-previews${bare ? " is-bare" : ""}`}>
-    {work.map((p, i) => <a key={p.slug} href={`/project/${p.slug}/`} className="wc-preview" data-pos={Math.sign(i - active)} aria-label={`${p.name}: view the project`}><ProjectThumbnail project={p} /></a>)}
+    <div className="wc-previews">
+      {work.map((p, i) => <a key={p.slug} href={`/project/${p.slug}/`} className="wc-preview" data-pos={Math.sign(i - active)} aria-label={`${p.name}: view the project`}><ProjectThumbnail project={p} /></a>)}
+    </div>
   </div>;
 }
