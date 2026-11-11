@@ -78,11 +78,14 @@ function createStage() {
         // An island: drawn into its rectangle grown by half its height above and below, with the projection squeezed to
         // match, so it lands exactly where it would but anything reaching past the stage's edge (the underside of an
         // island as it travels) isn't cut off.
+        // A plain number also grows it by that much of its width on each side, so an island whose stage is scaled down
+        // (the hero's entrance starts at 88%) isn't clipped along a hard vertical line at the stage's edges.
         // (A scene that fills its frame edge to edge, like the coast, sets overscan: 0 and stays inside its rectangle.)
-        // (overscan may also be { top, bottom }, to reach past one edge and not the other.)
+        // (overscan may also be { top, bottom }, to reach past one edge and not the other; then it doesn't grow sideways.)
         const over = entry.overscan ?? OVERSCAN, above = over.top ?? over, below = over.bottom ?? over, grow = 1 + above + below, projection = entry.camera.projectionMatrix;
-        renderer.setViewport(r.left, height - r.bottom - r.height * below, r.width, r.height * grow);
-        saved.copy(projection); projection.premultiply(squeeze.set(1, 0, 0, 0, 0, 1 / grow, 0, (2 * below + 1) / grow - 1, 0, 0, 1, 0, 0, 0, 0, 1));
+        const side = typeof over === "number" ? over : 0, wide = 1 + 2 * side;
+        renderer.setViewport(r.left - r.width * side, height - r.bottom - r.height * below, r.width * wide, r.height * grow);
+        saved.copy(projection); projection.premultiply(squeeze.set(1 / wide, 0, 0, 0, 0, 1 / grow, 0, (2 * below + 1) / grow - 1, 0, 0, 1, 0, 0, 0, 0, 1));
         renderer.render(entry.scene, entry.camera);
         projection.copy(saved);
         renderer.setViewport(r.left, height - r.bottom, r.width, r.height);
