@@ -331,7 +331,7 @@ const projects = [
 		differently: "",
 		takeaway: "",
 		additionalLinks: [],
-		dateCreated: "2022",
+		dateCreated: "2023",
 		fullImages: [1, 2, 3].map(n => `/projects/jonnyonthespot/${n}.jpg`),
 		slug: "jonnyonthespot",
 	},
