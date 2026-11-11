@@ -178,7 +178,7 @@ html:has(.ht){scrollbar-width:none;background:#1b1335}html:has(.ht)::-webkit-scr
   linear-gradient(180deg,var(--sky-night-top) 0%,var(--sky-night) 100%)}
 /* The beat between About's night and Work's golden hour: deep indigo through purple to a rose dusk. */
 .ht-dusk-sky{position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,var(--sky-night) 0%,#6b3fa0 55%,#a0607a 100%)}
-.ht-portrait{flex:none;width:120px;height:120px;margin:0 0 22px;border-radius:50%;background:linear-gradient(135deg,var(--violet),#f4a089);border:2px solid color-mix(in srgb,var(--violet) 40%,transparent);box-shadow:0 12px 30px rgba(10,6,30,.35)}
+.ht-portrait{display:block;flex:none;width:120px;height:120px;margin:0 0 22px;border-radius:50%;object-fit:cover;background:linear-gradient(135deg,var(--violet),#f4a089);border:2px solid color-mix(in srgb,var(--violet) 40%,transparent);box-shadow:0 12px 30px rgba(10,6,30,.35)}
 .ht-now{font-weight:400;opacity:.7}
 .ht-about .ht-copy>p.ht-drive+p.ht-drive{margin-top:8px}
 .ht-resume{color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(251,247,255,.35);transition:text-decoration-color .3s}

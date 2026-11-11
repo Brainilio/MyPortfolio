@@ -240,8 +240,7 @@ export default function Home({ copy = {} }) {
       <section className="ht-zone ht-about" id="about" data-side="right" ref={el => (zones.current[ABOUT] = el)} aria-labelledby="ht-about-title">
         <div className="ht-stage">{built[ABOUT] && <AboutScene state={scene} slot={ABOUT} side="right" onReady={onReady(ABOUT)} />}</div>
         <div className="ht-copy">
-          {/* Replace with: <Image src="/me.jpg" alt="Brainilio" width={120} height={120} /> (drop me.jpg into /public) */}
-          <div className="ht-portrait" aria-hidden="true" />
+          <img className="ht-portrait" src="/me.jpg" alt="Brainilio, smiling, outdoors under a tree" width="120" height="120" loading="lazy" decoding="async" />
           <RevealHeading id="ht-about-title" text={copyText(copy.about_heading, "Around the fire")} />
           <p>{("By day I’m a software engineer. On the side I build my own products, like Crapp, and design and build sites and apps for people with an idea. I like owning the whole thing: the design, the code, the cloud it runs on, and the small details that make it feel good to use. When I’m not at my desk, I’m on a trail, on a road trip through a national park, or by a campfire.")}</p>
           <div className="ht-links"><a className="ui-btn ui-btn--secondary" href={RESUME} target="_blank" rel="noopener noreferrer"><Roll>Resume</Roll><Icon src="/icons/tech/tabler--arrow-up-right.svg" /></a></div>
