@@ -9,7 +9,6 @@ import { Icon, Roll } from '../tech-chip';
 import ContactForm from './contact-form';
 import { EMAIL, LINKS, OFFER, scheduleHref } from '../../lib/contact';
 const CoastScene = dynamic(() => import('../(home)/coast-scene'), { ssr: false });
-const OFFER_ICONS = ['tabler--device-mobile', 'tabler--browser', 'tabler--cloud', 'tabler--palette'];
 
 // Three layouts for the owner to compare (?layout=1|2|3, with a switcher bottom-left):
 // 1 Split: one card, the intro on the left and the form on the right.
@@ -29,9 +28,9 @@ function Intro() {
   </div>;
 }
 const Offer = () => <ul className="ct-offer" aria-label="What I take on">
-  {OFFER.map((line, i) => <li key={line}><Icon src={`/icons/tech/${OFFER_ICONS[i]}.svg`} />{line}</li>)}
+  {OFFER.map(([line, icon]) => <li key={line}><span className="ct-offer-icon"><Icon src={`/icons/tech/${icon}.svg`} /></span>{line}</li>)}
 </ul>;
-const Links = () => <ul className="ct-links">{LINKS.map(([label, href]) => <li key={label}><a href={href} target="_blank" rel="noopener noreferrer">{label}<Icon src="/icons/tech/tabler--arrow-up-right.svg" /></a></li>)}</ul>;
+const Links = () => <ul className="ct-links">{LINKS.map(([label, href, icon]) => <li key={label}><a href={href} target="_blank" rel="noopener noreferrer" aria-label={label} title={label}><Icon src={`/icons/tech/${icon}.svg`} /></a></li>)}</ul>;
 const Form = () => <div className="ct-form-panel"><p className="ct-or">Or tell me here</p><ContactForm /></div>;
 
 export default function Contact() {

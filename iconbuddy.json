@@ -558,6 +558,16 @@
       "source": "https://files.svgcdn.io/tabler/circle-check.svg",
       "path": "public/icons/tech/tabler--circle-check.svg",
       "license": "MIT (Tabler)"
+    },
+    "tabler/lock": {
+      "source": "https://files.svgcdn.io/tabler/lock.svg",
+      "path": "public/icons/tech/tabler--lock.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/brand-linkedin": {
+      "source": "https://files.svgcdn.io/tabler/brand-linkedin.svg",
+      "path": "public/icons/tech/tabler--brand-linkedin.svg",
+      "license": "MIT (Tabler)"
     }
   }
 }
