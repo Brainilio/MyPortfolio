@@ -32,14 +32,16 @@ import { getImageRatio, fitWidth } from "../../lib/image-ratio";
 // sides); 16 Pile (the thumbnail in front, the screenshots fanned behind it); clean indexes: 17 Table (rows with thin
 // dividers, a preview beside), 18 Soft card (a quiet list, the thumbnail in a soft frosted card), 19 Accordion (a
 // dotted-leader list whose active row opens to show its thumbnail), 20 Panel (one frosted window: list left, thumbnail
-// right). Just the name, what I did and the tech.
+// right); 21 Big index + screen (the huge names left, the thumbnail loop as a big screen right); 22 Big index + big sheet
+// (the same with the screen as one large bent sheet). Just the name, what I did and the tech.
 const LAYOUTS = {
   1: [
     { fx: .64, fy: .21, w: .17, pick: 0, ry: -.32, rz: .05, z: -1.6 },
     { fx: .85, fy: .63, w: .15, pick: 1, ry: -.5, rz: -.07, z: -1.1 },
     { fx: .19, fy: .72, w: .16, pick: 2, ry: .45, rz: .04, z: -1.3 },
   ],
-  7: [], 10: [], 17: [], 18: [], 19: [], 20: [],
+  7: [], 10: [], 17: [], 18: [], 19: [], 20: [], 21: [],
+  22: [{ fx: .71, fy: .55, w: .4, pick: "thumb", ry: -.2, rz: 0, z: -1.3, bend: .1 }],
   9: [
     { fx: .63, fy: .3, w: .2, pick: 0, ry: -.22, rz: .03, z: -1.4 },
     { fx: .86, fy: .56, w: .16, pick: 1, ry: -.48, rz: -.05, z: -1 },
@@ -77,10 +79,10 @@ const LAYOUTS = {
     { fx: .52, fy: .52, w: .27, pick: "thumb", ry: 0, rz: -.02, z: -1.2 },
   ],
 };
-const LAYOUT_NAMES = [["1", "Sheets"], ["7", "Index"], ["9", "Index + sheets"], ["10", "Big index"], ["11", "Big sheet"], ["12", "Scattered"], ["13", "Index mirrored"], ["14", "Big index + sheets"], ["15", "Arc"], ["16", "Pile"], ["17", "Table"], ["18", "Soft card"], ["19", "Accordion"], ["20", "Panel"]];
-const HTML_LAYOUTS = ["7", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"];
+const LAYOUT_NAMES = [["1", "Sheets"], ["7", "Index"], ["9", "Index + sheets"], ["10", "Big index"], ["11", "Big sheet"], ["12", "Scattered"], ["13", "Index mirrored"], ["14", "Big index + sheets"], ["15", "Arc"], ["16", "Pile"], ["17", "Table"], ["18", "Soft card"], ["19", "Accordion"], ["20", "Panel"], ["21", "Big index + screen"], ["22", "Big index + big sheet"]];
+const HTML_LAYOUTS = ["7", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22"];
 // Where the eagle circles (fraction of the screen's width): round the project, not always the middle.
-const EAGLE_AT = { 7: .66, 9: .72, 13: .3, 14: .78, 17: .8, 18: .7, 20: .66 };
+const EAGLE_AT = { 7: .66, 9: .72, 13: .3, 14: .78, 17: .8, 18: .7, 20: .66, 21: .72, 22: .72 };
 // A project's landscape pictures, all different: its gallery screenshots first (no phone screens, not the thumbnail),
 // then its videos' posters, then its combined phone-screens picture if it still needs more.
 const landscapes = project => {

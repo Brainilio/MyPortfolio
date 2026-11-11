@@ -589,3 +589,14 @@ html.ht-locked{overflow:hidden}
 .wc-panel-list .wc-num{padding-top:4px}
 .wc-panel-tech{margin-top:auto;padding:14px;animation:wc-rise .5s cubic-bezier(.22,1,.36,1) both}
 .wc-previews.is-bare .wc-preview .motion-thumb{border-radius:20px;box-shadow:none}
+
+/* 21 / 22 Big index + screen: the huge names left, a big screen right. */
+.wc-bigscreen{--fs:clamp(36px,4.7vw,84px);--row:calc(var(--fs) * 1.04);display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.25fr);align-items:center;gap:clamp(24px,3.5vw,60px);padding:clamp(210px,25svh,250px) var(--gutter) 60px}
+.wc-bigscreen.is-sheet{grid-template-columns:minmax(0,1fr)}
+.wc-bigscreen-index{display:grid;gap:22px;min-width:0}
+.wc-bigscreen .wc-mega-list{text-align:left}
+.wc-bigscreen .wc-mega-list a{white-space:nowrap}
+.wc-bigscreen .wc-active{padding-left:4px}
+.wc-bigscreen .wc-previews{width:min(100%,calc((100svh - 290px) * 1.6));justify-self:end}
+.wc-bigscreen .wc-preview .motion-thumb{border-radius:22px;box-shadow:0 50px 90px -30px rgba(42,22,54,.55),0 0 0 1px rgba(255,255,255,.4)}
+

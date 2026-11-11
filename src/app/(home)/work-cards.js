@@ -137,6 +137,20 @@ export default function WorkCards({ layout, work, active }) {
       <Previews work={work} active={active} bare />
     </div>
   </div>;
+  // 21 / 22: the huge names on the left (role and tech under them); a big screen on the right: the thumbnail loop
+  // (21), or the canvas's one large sheet (22, LAYOUTS[22]).
+  if (layout === "21" || layout === "22") return <div className={`wc wc-bigscreen${layout === "22" ? " is-sheet" : ""}`}>
+    <div className="wc-bigscreen-index">
+      <ol className="wc-mega-list">
+        {work.map((p, i) => <li key={p.slug} className={i === active ? "is-on" : undefined}><a href={`/project/${p.slug}/`}>{p.name}</a></li>)}
+      </ol>
+      <div className="wc-active" key={work[active]?.slug}>
+        {work[active]?.role && <span className="wc-role">{work[active].role}</span>}
+        <Tech tags={work[active]?.tags} />
+      </div>
+    </div>
+    {layout === "21" && <Previews work={work} active={active} />}
+  </div>;
   return null;
 }
 
