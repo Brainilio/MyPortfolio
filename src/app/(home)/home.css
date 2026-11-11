@@ -445,17 +445,9 @@ html.ht-locked{overflow:hidden}
 .wl-switch{position:absolute;z-index:5;right:var(--gutter);top:clamp(96px,12svh,130px);display:flex;flex-wrap:wrap;justify-content:flex-end;max-width:min(560px,52vw);border-radius:22px!important;gap:4px;padding:5px;border-radius:999px;background:rgba(30,18,46,.82)}
 .wl-switch button{padding:8px 12px;border:0;border-radius:999px;background:none;color:#fbf7ff;font:inherit;font-size:12px;cursor:pointer}
 .wl-switch button[aria-pressed=true]{background:#fbf7ff;color:#2a1636}
-/* 4: the three projects side by side as cards; the big name and its meta give way. */
+/* Layouts with their own (smaller) name: the huge name and its meta give way. */
 .wl[data-html] .wl-a-name,.wl[data-html] .wl-a-meta{display:none}
-.wl-cards{position:absolute;z-index:4;left:var(--gutter);right:var(--gutter);top:50%;transform:translateY(-38%);display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(16px,2vw,28px);max-width:1280px;margin:0 auto;padding:0;list-style:none}
-.wl-cards li{transition:transform .5s cubic-bezier(.22,1,.36,1),opacity .4s;opacity:.72}
-.wl-cards li.is-active{transform:translateY(-14px);opacity:1}
-.wl-cards .motion-thumb{border-radius:16px;overflow:hidden;box-shadow:0 24px 50px rgba(42,22,54,.28)}
-.wl-cards a{display:grid;gap:4px;padding:14px 4px 0;color:var(--ink);text-decoration:none}
-.wl-cards strong{font-size:clamp(20px,1.8vw,26px);font-weight:650;letter-spacing:-.03em}
-.wl-cards span{font-size:14px;color:rgba(42,22,54,.72)}
-@media(max-width:760px){.wl-switch,.wl-cards{display:none}}
-@media(prefers-reduced-motion:reduce){.wl-cards li{transition:none}}
+@media(max-width:760px){.wl-switch{display:none}}
 
 /* Work layouts 5–8 (work-cards.js): big cards with just the name, what I did and the tech. */
 .wc{position:absolute;z-index:4;inset:0;margin:0;padding:0;list-style:none;pointer-events:none}
@@ -478,12 +470,6 @@ html.ht-locked{overflow:hidden}
 /* Info inside the card, on a frosted strip along the bottom. */
 .wc-glass{position:absolute;left:14px;right:14px;bottom:14px;padding:4px 16px 14px;border-radius:16px;background:rgba(251,247,255,.72);backdrop-filter:blur(18px) saturate(150%);-webkit-backdrop-filter:blur(18px) saturate(150%);box-shadow:0 10px 30px rgba(42,22,54,.18);pointer-events:none}
 .wc-glass .wc-info{padding-top:12px}
-
-/* 5 Big card */
-.wc-big>li{position:absolute;left:50%;top:60%;width:min(60vw,calc((100svh - 400px) * 1.6),960px);transform:translate(-50%,-50%);transition:opacity .6s,transform .8s cubic-bezier(.22,1,.36,1),filter .6s}
-.wc-big>li[data-pos="1"]{opacity:0;transform:translate(-50%,-38%) scale(.94);filter:blur(6px)}
-.wc-big>li[data-pos="-1"]{opacity:0;transform:translate(-50%,-64%) scale(1.03);filter:blur(6px)}
-.wc-big>li:not([data-pos="0"]) .wc-card{pointer-events:none}
 
 /* 7 Index */
 .wc-index{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.4fr);align-items:center;gap:clamp(24px,4vw,64px);padding:clamp(250px,30svh,300px) var(--gutter) 70px}
@@ -518,7 +504,16 @@ html.ht-locked{overflow:hidden}
 .wc-mega-slide .motion-thumb{aspect-ratio:16/10;border-radius:16px;overflow:hidden;box-shadow:0 30px 60px -18px rgba(42,22,54,.5);transform:rotate(-3deg)}
 .wc-mega-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 4px 0}
 
-/* 11 Big sheet: a small caption bottom left. */
+/* 13 Index mirrored: the list on the right. */
+.wc-index--right>div{justify-self:end;justify-items:end;text-align:right}
+.wc-index--right .wc-list a{flex-direction:row-reverse}
+.wc-index--right .wc-list li.is-on a{transform:translateX(-10px)}
+/* 14 Big index + sheets: the names keep to the left of the sheets; role and tech under them. */
+.wc-mega--sheets{flex-direction:column;align-items:flex-start;justify-content:center;gap:22px}
+.wc-mega--sheets .wc-mega-list{max-width:60%}
+.wc-mega-active{padding-left:6px}
+
+/* 11, 12, 15, 16: a small caption bottom left. */
 .wc-caption-item{position:absolute;left:var(--gutter);bottom:clamp(40px,8svh,80px);display:grid;gap:6px;color:var(--ink);text-decoration:none;transition:opacity .5s,transform .6s cubic-bezier(.22,1,.36,1)}
 .wc-caption-item .wc-name{font-size:clamp(26px,2.4vw,36px)}
 .wc-caption-item .wc-tech{margin-top:6px}

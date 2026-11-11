@@ -23,23 +23,20 @@ import { getImageRatio, fitWidth } from "../../lib/image-ratio";
 
 // The three sheets: where they hang (fraction of the screen), how wide (fraction of the screen's width, before their
 // own shape adjusts it), which of the project's pictures, their turn and tilt, and depth.
-// Four layouts to compare (?work=1|2|3|4, with a switcher top-right of the section; 1 by default):
-// 1: three of the project's landscape screenshots hanging round the name (no phone screens, no thumbnail);
-// 2: the thumbnail loop alone, as one wide curved screen low behind the name;
-// 3: the thumbnail loop alone, as one tilted card floating to the right of the name;
-// 4: no big name or sheets: all three projects side by side as cards, the one the scroll is on lifted;
-// 5, 7, 9, 10, 11 (with work-cards.js): one big card at a time; a numbered index with a card; the index with the
-// project's sheets hanging beside it; the names huge with a small card sliding along them; one big sheet of the
-// thumbnail loop with two screenshots beside it and the name small at the bottom. Just the name, what I did and the tech.
+// Layouts to compare (?work=, with a switcher top-right of the section; 1 by default):
+// 1 Sheets: three of the project's landscape screenshots hanging round the huge name;
+// with work-cards.js (the big name gives way to a smaller one): 7 Index (a numbered list and a card); 9 Index +
+// sheets; 10 Big index (huge names, a small card sliding along); 11 Big sheet (the thumbnail as one large sheet, the
+// name small at the bottom); 12 Scattered (four sheets at different depths); 13 Index mirrored (list right, sheets
+// left); 14 Big index + sheets; 15 Arc (a display wall: the thumbnail in the middle, two screenshots turned in at the
+// sides); 16 Pile (the thumbnail in front, the screenshots fanned behind it). Just the name, what I did and the tech.
 const LAYOUTS = {
   1: [
     { fx: .64, fy: .21, w: .17, pick: 0, ry: -.32, rz: .05, z: -1.6 },
     { fx: .85, fy: .63, w: .15, pick: 1, ry: -.5, rz: -.07, z: -1.1 },
     { fx: .19, fy: .72, w: .16, pick: 2, ry: .45, rz: .04, z: -1.3 },
   ],
-  2: [{ fx: .5, fy: .6, w: .3, pick: "thumb", ry: 0, rz: 0, z: -3.2, bend: .3 }],
-  3: [{ fx: .74, fy: .46, w: .23, pick: "thumb", ry: -.42, rz: .035, z: -1.2 }],
-  4: [], 5: [], 7: [], 10: [],
+  7: [], 10: [],
   9: [
     { fx: .63, fy: .3, w: .2, pick: 0, ry: -.22, rz: .03, z: -1.4 },
     { fx: .86, fy: .56, w: .16, pick: 1, ry: -.48, rz: -.05, z: -1 },
@@ -50,11 +47,37 @@ const LAYOUTS = {
     { fx: .15, fy: .36, w: .14, pick: 0, ry: .5, rz: .05, z: -1.2 },
     { fx: .86, fy: .64, w: .14, pick: 1, ry: -.5, rz: -.05, z: -1.2 },
   ],
+  12: [
+    { fx: .36, fy: .38, w: .18, pick: "thumb", ry: .3, rz: -.04, z: -1.5 },
+    { fx: .7, fy: .27, w: .15, pick: 0, ry: -.35, rz: .05, z: -1.9 },
+    { fx: .6, fy: .68, w: .19, pick: 1, ry: -.18, rz: -.03, z: -1.1 },
+    { fx: .89, fy: .5, w: .12, pick: 2, ry: -.55, rz: .06, z: -2.3 },
+  ],
+  13: [
+    { fx: .37, fy: .3, w: .2, pick: 0, ry: .22, rz: -.03, z: -1.4 },
+    { fx: .14, fy: .56, w: .16, pick: 1, ry: .48, rz: .05, z: -1 },
+    { fx: .38, fy: .76, w: .15, pick: 2, ry: -.18, rz: -.04, z: -1.6 },
+  ],
+  14: [
+    { fx: .79, fy: .36, w: .19, pick: "thumb", ry: -.3, rz: .03, z: -1.3 },
+    { fx: .91, fy: .71, w: .12, pick: 0, ry: -.5, rz: -.05, z: -1.7 },
+    { fx: .67, fy: .75, w: .12, pick: 1, ry: -.12, rz: .04, z: -2.1 },
+  ],
+  15: [
+    { fx: .5, fy: .47, w: .29, pick: "thumb", ry: 0, rz: 0, z: -1.6, bend: .18 },
+    { fx: .19, fy: .47, w: .16, pick: 0, ry: .62, rz: 0, z: -2.4 },
+    { fx: .81, fy: .47, w: .16, pick: 1, ry: -.62, rz: 0, z: -2.4 },
+  ],
+  16: [
+    { fx: .63, fy: .34, w: .19, pick: 1, ry: -.28, rz: .09, z: -2.8 },
+    { fx: .58, fy: .42, w: .21, pick: 0, ry: -.16, rz: .045, z: -2.1 },
+    { fx: .52, fy: .52, w: .27, pick: "thumb", ry: 0, rz: -.02, z: -1.2 },
+  ],
 };
-const LAYOUT_NAMES = [["1", "Sheets"], ["2", "Curved screen"], ["3", "Tilted card"], ["4", "Side by side"], ["5", "Big card"], ["7", "Index"], ["9", "Index + sheets"], ["10", "Big index"], ["11", "Big sheet"]];
-const HTML_LAYOUTS = ["4", "5", "7", "9", "10", "11"];
+const LAYOUT_NAMES = [["1", "Sheets"], ["7", "Index"], ["9", "Index + sheets"], ["10", "Big index"], ["11", "Big sheet"], ["12", "Scattered"], ["13", "Index mirrored"], ["14", "Big index + sheets"], ["15", "Arc"], ["16", "Pile"]];
+const HTML_LAYOUTS = ["7", "9", "10", "11", "12", "13", "14", "15", "16"];
 // Where the eagle circles (fraction of the screen's width): round the project, not always the middle.
-const EAGLE_AT = { 7: .66, 9: .72 };
+const EAGLE_AT = { 7: .66, 9: .72, 13: .3, 14: .78 };
 // A project's landscape pictures, all different: its gallery screenshots first (no phone screens, not the thumbnail),
 // then its videos' posters, then its combined phone-screens picture if it still needs more.
 const landscapes = project => {
@@ -412,17 +435,8 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
           {LAYOUT_NAMES.map(([key, label]) => <button key={key} type="button" aria-pressed={layoutKey === key} onClick={() => chooseLayout(key)}>{key} · {label}</button>)}
         </div>
 
-        {/* 4: the three projects side by side, the one the scroll is on lifted. */}
-        {layoutKey === "4" && <ol className="wl-cards">
-          {work.map((p, i) => (
-            <li key={p.slug} className={i === active ? "is-active" : undefined}>
-              <ProjectThumbnail project={p} href={`/project/${p.slug}/`} />
-              <a href={`/project/${p.slug}/`}><strong>{p.name}</strong><span>{metaOf(p)}</span></a>
-            </li>
-          ))}
-        </ol>}
 
-        {["5", "7", "9", "10", "11"].includes(layoutKey) && <WorkCards layout={layoutKey} work={work} active={active} />}
+        {HTML_LAYOUTS.includes(layoutKey) && <WorkCards layout={layoutKey} work={work} active={active} />}
 
         {/* The name, its letters rising in one after another (and lifting away for the next). */}
         <a className="wl-a-name" href={`/project/${project.slug}/`} aria-label={`${project.name}: view the project`}>

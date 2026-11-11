@@ -3,7 +3,7 @@ import ProjectThumbnail from "../project/project-thumbnail";
 import { Icon } from "../tech-chip";
 import { techIcon } from "../../lib/tech-icons";
 
-// HTML layers for the homepage Work section layouts 5, 7, 9, 10 and 11 (see work-showcase.js). Each card is the project's thumbnail loop,
+// HTML layers for the homepage Work section layouts 7 and 9–16 (see work-showcase.js). Each card is the project's thumbnail loop,
 // with just the name (smaller), what I did, and the tech as icons. The scroll picks the active project (`active`);
 // everything else is CSS transitions on data attributes, so nothing re-renders per frame.
 const STACK = 3;
@@ -35,10 +35,6 @@ function Card({ p, index, info = "below" }) {
 }
 
 export default function WorkCards({ layout, work, active }) {
-  // 5 Big card: one large card at a time, crossfading and rising as the scroll moves on.
-  if (layout === "5") return <ol className="wc wc-big">
-    {work.map((p, i) => <li key={p.slug} data-pos={Math.sign(i - active)}><Card p={p} index={i} /></li>)}
-  </ol>;
   // 7 Index: the names as a big numbered list on the left (the active one lit), its card large on the right.
   if (layout === "7") return <div className="wc wc-index">
     <ol className="wc-list">
@@ -52,7 +48,7 @@ export default function WorkCards({ layout, work, active }) {
   </div>;
   // 9 Index + sheets: the numbered list on the left with the active project's role and tech; its screenshots hang
   // on the right as sheets (drawn in the section's canvas, see LAYOUTS[9] in work-showcase.js).
-  if (layout === "9") return <div className="wc wc-index wc-index--sheets">
+  if (layout === "9" || layout === "13") return <div className={`wc wc-index wc-index--sheets${layout === "13" ? " wc-index--right" : ""}`}>
     <div>
       <ol className="wc-list">
         {work.map((p, i) => <li key={p.slug} className={i === active ? "is-on" : undefined}>
@@ -67,21 +63,25 @@ export default function WorkCards({ layout, work, active }) {
   </div>;
   // 10 Big index: the names huge, one per line (the active one solid, the rest outlined); a small card with its
   // thumbnail loop slides along beside the active name.
-  if (layout === "10") return <div className="wc wc-mega" style={{ "--i": active }}>
+  if (layout === "10" || layout === "14") return <div className={`wc wc-mega${layout === "14" ? " wc-mega--sheets" : ""}`} style={{ "--i": active }}>
     <ol className="wc-mega-list">
       {work.map((p, i) => <li key={p.slug} className={i === active ? "is-on" : undefined}>
         <a href={`/project/${p.slug}/`}>{p.name}</a>
       </li>)}
     </ol>
-    <div className="wc-mega-card">
+    {layout === "14" && <div className="wc-active wc-mega-active" key={work[active]?.slug}>
+      {work[active]?.role && <span className="wc-role">{work[active].role}</span>}
+      <Tech tags={work[active]?.tags} />
+    </div>}
+    {layout === "10" && <div className="wc-mega-card">
       {work.map((p, i) => <div key={p.slug} className="wc-mega-slide" data-pos={Math.sign(i - active)}>
         <ProjectThumbnail project={p} />
         <div className="wc-mega-meta">{p.role && <span className="wc-role">{p.role}</span>}<Tech tags={p.tags} /></div>
       </div>)}
-    </div>
+    </div>}
   </div>;
   // 11 Big sheet: the sheets do the showing (LAYOUTS[11]); the name sits small at the bottom left with what I did and the tech.
-  if (layout === "11") return <div className="wc wc-caption">
+  if (["11", "12", "15", "16"].includes(layout)) return <div className="wc wc-caption">
     {work.map((p, i) => <a key={p.slug} href={`/project/${p.slug}/`} className="wc-caption-item" data-pos={Math.sign(i - active)}>
       <span className="wc-num">{String(i + 1).padStart(2, "0")} / {String(work.length).padStart(2, "0")}</span>
       <strong className="wc-name">{p.name}</strong>
