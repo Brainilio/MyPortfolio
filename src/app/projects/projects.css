@@ -34,17 +34,57 @@
 [data-cards="1"] .wk-card:is(:hover,:focus-within) .wk-info{opacity:1;transform:none}
 [data-cards="1"] .wk-card:is(:hover,:focus-within) .motion-thumb :is(img,video){transform:scale(1.04)!important}
 
-/* 2: the name sits under the thumbnail in large type; tech icons fade in over the top corner. */
+/* Tech displays for style 2 (data-tech), all hidden unless picked. */
+.wk-line,.wk-stack,.wk-ticker{display:none}
+.wk-switch--tech{margin-top:-8px}
+
+/* 2: the name sits under the thumbnail in large type; the tech is shown one of five ways (data-tech). */
 [data-cards="2"] .wk-info{padding:16px 4px 0}
 [data-cards="2"] .wk-title{font-size:clamp(22px,2.3vw,30px);letter-spacing:-.035em}
-[data-cards="2"] .wk-chips{display:none}
-[data-cards="2"] .wk-icons{position:absolute;top:12px;right:12px;z-index:4;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;max-width:calc(100% - 24px);
+[data-cards="2"] .wk-chips{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* corner: icons fade in over the top corner of the thumbnail on hover. */
+[data-cards="2"][data-tech=corner] .wk-icons{position:absolute;top:12px;right:12px;z-index:4;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;max-width:calc(100% - 24px);
   opacity:0;transform:translateY(-6px);transition:opacity .3s,transform .35s}
-[data-cards="2"] .wk-icons li{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;color:var(--ui-cream);background:var(--ui-glass-bg);border:1px solid var(--ui-glass-line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
-[data-cards="2"] .wk-icons .ui-icon{width:17px;height:17px}
-[data-cards="2"] .wk-card:is(:hover,:focus-within) .wk-icons{opacity:1;transform:none}
+[data-cards="2"][data-tech=corner] .wk-icons li{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;color:var(--ui-cream);background:var(--ui-glass-bg);border:1px solid var(--ui-glass-line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+[data-cards="2"][data-tech=corner] .wk-icons .ui-icon{width:17px;height:17px}
+[data-cards="2"][data-tech=corner] .wk-card:is(:hover,:focus-within) .wk-icons{opacity:1;transform:none}
 [data-cards="2"] .wk-card:is(:hover,:focus-within) .motion-thumb :is(img,video){transform:scale(1.03)!important}
 [data-cards="2"] .wk-title a{transition:color .2s}[data-cards="2"] .wk-card:hover .wk-title a{color:#d9ccff}
+/* line: the names in one quiet line under the title. */
+[data-cards="2"][data-tech=line] .wk-line{display:block;margin:6px 0 0;font-size:14px;line-height:1.5;color:rgba(251,247,255,.62);transition:color .25s}
+[data-cards="2"][data-tech=line] .wk-card:hover .wk-line{color:rgba(251,247,255,.85)}
+/* row: small icons in a row under the title; they light up one after another on hover. */
+[data-cards="2"][data-tech=row] .wk-icons{display:flex;flex-wrap:wrap;gap:12px;margin:10px 0 0}
+[data-cards="2"][data-tech=row] .wk-icons li{display:grid;color:rgba(251,247,255,.5);transition:color .25s,transform .3s cubic-bezier(.22,1,.36,1)}
+[data-cards="2"][data-tech=row] .wk-icons .ui-icon{width:20px;height:20px}
+[data-cards="2"][data-tech=row] .wk-card:is(:hover,:focus-within) .wk-icons li{color:var(--ui-cream);transform:translateY(-2px)}
+[data-cards="2"][data-tech=row] .wk-icons li:nth-child(2){transition-delay:40ms}
+[data-cards="2"][data-tech=row] .wk-icons li:nth-child(3){transition-delay:80ms}
+[data-cards="2"][data-tech=row] .wk-icons li:nth-child(4){transition-delay:120ms}
+[data-cards="2"][data-tech=row] .wk-icons li:nth-child(5){transition-delay:160ms}
+[data-cards="2"][data-tech=row] .wk-icons li:nth-child(6){transition-delay:200ms}
+[data-cards="2"][data-tech=row] .wk-icons li:nth-child(7){transition-delay:240ms}
+[data-cards="2"][data-tech=row] .wk-icons li:nth-child(8){transition-delay:280ms}
+[data-cards="2"][data-tech=row] .wk-icons li:nth-child(9){transition-delay:320ms}
+/* stack: overlapping round icons beside the title, fanning out on hover; +N for the rest. */
+[data-cards="2"][data-tech=stack] .wk-info{display:flex;align-items:center;justify-content:space-between;gap:16px}
+[data-cards="2"][data-tech=stack] .wk-stack{display:flex;flex:none;margin:0;padding:0;list-style:none}
+[data-cards="2"][data-tech=stack] .wk-stack li{display:grid;place-items:center;width:36px;height:36px;margin-left:-10px;border-radius:50%;background:#2a2238;border:2px solid var(--wk-bg);color:var(--ui-cream);font-size:12px;font-weight:600;transition:margin .35s cubic-bezier(.22,1,.36,1)}
+[data-cards="2"][data-tech=stack] .wk-stack li:first-child{margin-left:0}
+[data-cards="2"][data-tech=stack] .wk-stack .ui-icon{width:17px;height:17px}
+[data-cards="2"][data-tech=stack] .wk-stack-more{background:#3a2f66}
+[data-cards="2"][data-tech=stack] .wk-card:is(:hover,:focus-within) .wk-stack li:not(:first-child){margin-left:4px}
+/* ticker: on hover a row of chips runs along the bottom of the thumbnail. */
+[data-cards="2"][data-tech=ticker] .wk-ticker{display:block;position:absolute;left:0;right:0;bottom:0;z-index:2;overflow:hidden;padding:28px 0 12px;
+  background:linear-gradient(transparent,rgba(12,8,22,.7));opacity:0;transform:translateY(8px);transition:opacity .3s,transform .35s;
+  -webkit-mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+[data-cards="2"][data-tech=ticker] .wk-ticker>div{display:flex;width:max-content;animation:wk-tick 14s linear infinite;animation-play-state:paused}
+[data-cards="2"][data-tech=ticker] .wk-ticker .ui-chips{flex-wrap:nowrap;margin:0;padding-right:8px}
+[data-cards="2"][data-tech=ticker] .wk-ticker .ui-chip{padding:6px 10px;font-size:12px;white-space:nowrap;background:rgba(24,16,42,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+[data-cards="2"][data-tech=ticker] .wk-ticker .ui-chip .ui-icon{width:14px;height:14px}
+[data-cards="2"][data-tech=ticker] .wk-card:is(:hover,:focus-within) .wk-ticker{opacity:1;transform:none}
+[data-cards="2"][data-tech=ticker] .wk-card:is(:hover,:focus-within) .wk-ticker>div{animation-play-state:running}
+@keyframes wk-tick{to{transform:translateX(-50%)}}
 
 /* 3: the whole card blurs over and shows the name and tech in the middle, with a slight tilt. */
 [data-cards="3"] .wk-card{transition:transform .5s cubic-bezier(.22,1,.36,1)}
@@ -59,11 +99,13 @@
 /* Touch screens and small screens: the name and tech stay visible. */
 @media(hover:none),(max-width:640px){
   [data-cards="1"] .wk-info{opacity:1;transform:none}
-  [data-cards="2"] .wk-icons{opacity:1;transform:none}
+  [data-cards="2"][data-tech=corner] .wk-icons{opacity:1;transform:none}
+  [data-cards="2"][data-tech=ticker] .wk-ticker{opacity:1;transform:none}
+  [data-cards="2"][data-tech=row] .wk-icons li{color:rgba(251,247,255,.8)}
   [data-cards="3"] .wk-info{inset:auto 0 0;justify-content:flex-end;gap:10px;padding:14px 16px;opacity:1;border-radius:0 0 var(--wk-radius) var(--wk-radius)}
   [data-cards="3"] .wk-title{font-size:var(--ui-t-h3)}
 }
-@media(prefers-reduced-motion:reduce){.wk-card,.wk-info,.wk-icons,.wk-media .motion-thumb :is(img,video){transition:none!important;transform:none!important}}
+@media(prefers-reduced-motion:reduce){.wk-ticker>div{animation:none!important}.wk-card,.wk-info,.wk-icons,.wk-media .motion-thumb :is(img,video){transition:none!important;transform:none!important}}
 
 /* Early projects & learning: closed by default. Their screenshots are shown whole. */
 .wk-early{margin-top:clamp(48px,7vw,88px);border-top:1px solid var(--ui-glass-line)}

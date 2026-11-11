@@ -48,3 +48,6 @@ body:has([data-bare="true"]) .ui-header{display:none}
 .ui-credits h2{margin:0 0 6px;font-size:22px;letter-spacing:-.03em}.ui-credits p{margin:0 0 16px;color:rgba(251,247,255,.7);font-size:14px;line-height:1.55}
 .ui-credits ul{margin:0 0 20px;padding:0;list-style:none;display:grid;gap:8px;font-size:14px}.ui-credits li span{color:rgba(251,247,255,.6)}
 .ui-credits a{text-decoration:underline;text-underline-offset:3px}
+/* While the homepage loading screen is up, the header waits; it slides in as the screen lifts. */
+body:has(.ht-loader:not(.is-done)) .ui-header{transform:translateY(-130%);opacity:0}
+body:has(.ht-loader:not(.is-done)) .ui-header>*{pointer-events:none}
