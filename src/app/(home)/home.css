@@ -596,6 +596,10 @@ html.ht-locked{overflow:hidden}
 .wc-bigscreen-index{display:grid;gap:22px;min-width:0}
 .wc-bigscreen .wc-mega-list{text-align:left}
 .wc-bigscreen .wc-mega-list a{white-space:nowrap}
+/* 21: the other names solid but faded (as in the Index), not outlined. */
+.wc-bigscreen:not(.is-sheet) .wc-mega-list a{color:var(--ink);-webkit-text-stroke:0;opacity:.28;transition:opacity .45s}
+.wc-bigscreen:not(.is-sheet) .wc-mega-list li.is-on a{opacity:1}
+.wc-bigscreen:not(.is-sheet) .wc-mega-list a:hover{opacity:.6}
 .wc-bigscreen .wc-active{padding-left:4px}
 .wc-bigscreen .wc-previews{width:min(100%,calc((100svh - 290px) * 1.6));justify-self:end}
 .wc-bigscreen .wc-preview .motion-thumb{border-radius:22px;box-shadow:0 50px 90px -30px rgba(42,22,54,.55),0 0 0 1px rgba(255,255,255,.4)}

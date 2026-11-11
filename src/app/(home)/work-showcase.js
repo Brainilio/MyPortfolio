@@ -82,7 +82,9 @@ const LAYOUTS = {
 const LAYOUT_NAMES = [["1", "Sheets"], ["7", "Index"], ["9", "Index + sheets"], ["10", "Big index"], ["11", "Big sheet"], ["12", "Scattered"], ["13", "Index mirrored"], ["14", "Big index + sheets"], ["15", "Arc"], ["16", "Pile"], ["17", "Table"], ["18", "Soft card"], ["19", "Accordion"], ["20", "Panel"], ["21", "Big index + screen"], ["22", "Big index + big sheet"]];
 const HTML_LAYOUTS = ["7", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22"];
 // Where the eagle circles (fraction of the screen's width): round the project, not always the middle.
-const EAGLE_AT = { 7: .66, 9: .72, 13: .3, 14: .78, 17: .8, 18: .7, 20: .66, 21: .72, 22: .72 };
+const EAGLE_AT = { 7: .66, 9: .72, 13: .3, 14: .78, 17: .8, 18: .7, 20: .66, 21: .5, 22: .72 };
+// How far above the middle it circles (world units; the screen is about 2.4 high from the middle to the top edge).
+const EAGLE_UP = { 21: 1.15 };
 // A project's landscape pictures, all different: its gallery screenshots first (no phone screens, not the thumbnail),
 // then its videos' posters, then its combined phone-screens picture if it still needs more.
 const landscapes = project => {
@@ -293,7 +295,7 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       const a = circle * .55, bank = .32 + Math.min(.3, Math.abs(vel) * .1);
       const baseScale = Math.min(1, camera.aspect / 1.2);
       const eagleX = ((EAGLE_AT[layoutKey] ?? .5) * 2 - 1) * Math.tan(THREE.MathUtils.degToRad(15)) * 9 * camera.aspect;
-      flight.position.set(eagleX + Math.cos(a) * 1.25 * baseScale, (still ? 0 : Math.sin(time * 1.3) * .12) + .3, Math.sin(a) * 1.1 - .1);
+      flight.position.set(eagleX + Math.cos(a) * 1.25 * baseScale, (still ? 0 : Math.sin(time * 1.3) * .12) + .3 + (EAGLE_UP[layoutKey] ?? 0), Math.sin(a) * 1.1 - .1);
       orbitRotation.setFromEuler(pose.set(0, -a, bank, "YXZ"));
       flight.quaternion.copy(orbitRotation);
       flight.scale.setScalar(baseScale);
