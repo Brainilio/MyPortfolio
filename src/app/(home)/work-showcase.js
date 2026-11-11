@@ -2,6 +2,7 @@
 import { eagleHandoff } from "./eagle-handoff";
 import ProjectThumbnail from "../project/project-thumbnail";
 import TechChip, { Icon, Roll } from "../tech-chip";
+import WorkCards from "./work-cards";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import * as THREE from "three";
@@ -26,7 +27,9 @@ import { getImageRatio, fitWidth } from "../../lib/image-ratio";
 // 1: three of the project's landscape screenshots hanging round the name (no phone screens, no thumbnail);
 // 2: the thumbnail loop alone, as one wide curved screen low behind the name;
 // 3: the thumbnail loop alone, as one tilted card floating to the right of the name;
-// 4: no big name or sheets: all three projects side by side as cards, the one the scroll is on lifted.
+// 4: no big name or sheets: all three projects side by side as cards, the one the scroll is on lifted;
+// 5–8 (work-cards.js): one big card at a time, a deck, a numbered index with a card, a 3D cover flow. Just the name,
+// what I did and the tech on each.
 const LAYOUTS = {
   1: [
     { fx: .64, fy: .21, w: .17, pick: 0, ry: -.32, rz: .05, z: -1.6 },
@@ -35,9 +38,10 @@ const LAYOUTS = {
   ],
   2: [{ fx: .5, fy: .6, w: .3, pick: "thumb", ry: 0, rz: 0, z: -3.2, bend: .3 }],
   3: [{ fx: .74, fy: .46, w: .23, pick: "thumb", ry: -.42, rz: .035, z: -1.2 }],
-  4: [],
+  4: [], 5: [], 6: [], 7: [], 8: [],
 };
-const LAYOUT_NAMES = [["1", "Sheets"], ["2", "Curved screen"], ["3", "Tilted card"], ["4", "Side by side"]];
+const LAYOUT_NAMES = [["1", "Sheets"], ["2", "Curved screen"], ["3", "Tilted card"], ["4", "Side by side"], ["5", "Big card"], ["6", "Deck"], ["7", "Index"], ["8", "Cover flow"]];
+const HTML_LAYOUTS = ["4", "5", "6", "7", "8"];
 // A project's landscape pictures, all different: its gallery screenshots first (no phone screens, not the thumbnail),
 // then its videos' posters, then its combined phone-screens picture if it still needs more.
 const landscapes = project => {
@@ -379,7 +383,7 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
   const project = work[active] ?? work[0];
 
   return (
-    <div className="wl" ref={root} style={{ "--n": n }} data-layout={layoutKey}>
+    <div className="wl" ref={root} style={{ "--n": n }} data-layout={layoutKey} data-html={HTML_LAYOUTS.includes(layoutKey) ? "" : undefined}>
       <div className="wl-pin" onPointerMove={onMove} onClick={onClick} onPointerLeave={() => { mouse.current = { x: 0, y: 0 }; }}>
         <canvas className="wl-canvas" ref={back} aria-hidden="true" />
         <canvas className="wl-canvas wl-front" ref={front} aria-hidden="true" />
@@ -403,6 +407,8 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
             </li>
           ))}
         </ol>}
+
+        {["5", "6", "7", "8"].includes(layoutKey) && <WorkCards layout={layoutKey} work={work} active={active} />}
 
         {/* The name, its letters rising in one after another (and lifting away for the next). */}
         <a className="wl-a-name" href={`/project/${project.slug}/`} aria-label={`${project.name}: view the project`}>
