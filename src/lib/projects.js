@@ -1176,14 +1176,12 @@ comic goliath david, evolife, super bespaar app, killer robots, healthcare robot
 
 */
 
-// Projects flagged `hidden` are off the site: no card, no page. Every consumer imports this filtered list, ordered
-// by year, newest first: by the last year worked on, then by the first (with the same end year, the later start
-// comes first, so 2026 before 2025–2026). Projects without a year go last; ties keep the order above.
-const years = project => (String(project.dateCreated || "").match(/\d{4}/g) || []).map(Number)
-const byYear = (a, b) => {
-	const ya = years(a), yb = years(b)
-	if (!ya.length || !yb.length) return yb.length - ya.length
-	return Math.max(...yb) - Math.max(...ya) || Math.min(...yb) - Math.min(...ya)
-}
+// Projects flagged `hidden` are off the site: no card, no page. Every consumer imports this filtered list, in the
+// owner's order (ORDER, newest first); anything not in ORDER (the early projects) follows, by year, newest first.
+const ORDER = ["crapp", "my-compassion", "karina-rodriguez", "strength-without-pain", "compassion-auth", "compassion-checkout",
+	"jonnyonthespot", "trend-trade", "jogg-group", "count-group", "newcold", "hkliving", "sobolt"]
+const latestYear = project => Math.max(0, ...(String(project.dateCreated || "").match(/\d{4}/g) || []).map(Number))
+const rank = project => { const i = ORDER.indexOf(project.slug); return i < 0 ? ORDER.length : i }
+const byOrder = (a, b) => rank(a) - rank(b) || latestYear(b) - latestYear(a)
 export const allProjectsIncludingHidden = projects
-export default projects.filter(project => !project.hidden).sort(byYear)
+export default projects.filter(project => !project.hidden).sort(byOrder)
