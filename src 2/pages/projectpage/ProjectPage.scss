@@ -1,0 +1,87 @@
+@import "../../styles/responsive/breakpoints.scss";
+
+.all-projects {
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+
+	.link-back {
+		margin: 1em;
+		font-size: 18px;
+		cursor: pointer;
+		color: white;
+		background: none;
+		transition: all 0.3s ease-in;
+		text-decoration: none;
+		&::after {
+			content: "";
+			display: block;
+			width: 0;
+			height: 2px;
+			background: #fff;
+			transition: width 0.3s;
+		}
+
+		&:hover::after {
+			width: 100%;
+			transition: width 0.3s;
+		}
+
+		@include screens {
+			margin: 1em auto;
+			text-align: center;
+		}
+
+		@include screenm {
+			margin: 1em auto;
+			text-align: center;
+		}
+
+		@include screenl {
+			margin: 1em auto;
+			text-align: center;
+		}
+	}
+
+	.project-page-title {
+		margin-top: 2em;
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		flex-direction: column;
+
+		@include screens {
+			margin: 5em 0 2em 0;
+			justify-content: center;
+		}
+
+		@include screenm {
+			margin: 5em 0 2em 0;
+			justify-content: center;
+		}
+
+		@include screenl {
+			margin: 5em 0 2em 0;
+			justify-content: center;
+		}
+
+		.project-page-title-title {
+			font-weight: 900;
+			font-size: 80px;
+		}
+	}
+
+	.projects {
+	}
+
+	// TODO: fix these projects
+
+	// .development-projects {
+	// }
+
+	// .design-projects {
+	// }
+
+	// .art-projects {
+	// }
+}

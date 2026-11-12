@@ -1,0 +1,95 @@
+/* Shared look for every page: one type scale, one pair of buttons (square with rounded corners), frosted glass,
+   technology chips with their icons, the site header and the footer. */
+:root{--ui-cream:#fbf7ff;--ui-ink:#1d1233;--ui-violet:#a78bfa;--ui-violet-on-light:#6544b6;--ui-radius:12px;--ui-radius-panel:20px;--ui-radius-pill:999px;
+  --ui-width-reading:1180px;--ui-width-compact:1000px;--ui-width-wide:1240px;
+  --ui-ease-out:cubic-bezier(.23,1,.32,1);--ui-press-duration:160ms;
+  --ui-t-display:clamp(44px,6vw,88px);--ui-t-h2:clamp(34px,4vw,60px);--ui-t-detail:clamp(30px,3.1vw,52px);--ui-t-h3:20px;--ui-t-body:16px;--ui-t-small:13px;
+  --ui-glass-bg:rgba(28,18,48,.38);--ui-glass-line:rgba(255,255,255,.16)}
+.ui-heading{margin:0;font-family:var(--font-display);font-weight:750;line-height:1.05;letter-spacing:normal;overflow-wrap:anywhere}
+.ui-heading--display{font-size:var(--ui-t-display)}
+.ui-heading--section{font-size:var(--ui-t-h2)}
+.ui-heading--detail{font-size:var(--ui-t-detail)}
+.ui-heading-mark{color:var(--heading-accent,var(--ui-violet))}
+.ui-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:0 22px;border-radius:var(--ui-radius);border:1px solid transparent;
+  background:var(--ui-cream);color:var(--ui-ink);font:600 15px/1 var(--font-display);letter-spacing:-.01em;cursor:pointer;text-decoration:none;
+  box-shadow:0 10px 30px rgba(20,8,40,.25);transition:transform var(--ui-press-duration) var(--ui-ease-out),background .2s,border-color .2s,box-shadow .25s}
+
+.ui-btn--secondary{background:var(--ui-secondary-bg,var(--ui-glass-bg));color:var(--ui-secondary-ink,var(--ui-cream));border-color:var(--ui-secondary-line,rgba(251,247,255,.34));box-shadow:none;backdrop-filter:var(--ui-secondary-filter,blur(14px) saturate(140%));-webkit-backdrop-filter:var(--ui-secondary-filter,blur(14px) saturate(140%))}
+@media(hover:hover) and (pointer:fine){
+  .ui-btn:hover:not(:disabled){transform:translateY(-2px);background:#fff;box-shadow:0 14px 36px rgba(20,8,40,.34)}
+  .ui-btn--secondary:hover:not(:disabled){background:var(--ui-secondary-hover,rgba(40,26,68,.6));border-color:var(--ui-secondary-hover-line,rgba(251,247,255,.55));box-shadow:none}
+  .ui-btn:hover:not(:disabled) .ui-roll>span{transform:translateY(-50%)}
+}
+.ui-btn:active:not(:disabled){transform:scale(.97)}
+.ui-btn:disabled{opacity:.55;cursor:not-allowed}
+.ui-btn--compact{min-height:44px;padding-inline:16px;border-radius:var(--ui-radius-pill);font-size:14px}
+.ui-btn:focus-visible{outline:2px solid var(--ui-violet);outline-offset:4px}
+.ui-btn .ui-icon{width:17px;height:17px}
+.ui-glass{background:var(--ui-glass-bg);border:1px solid var(--ui-glass-line);border-radius:var(--ui-radius-panel);backdrop-filter:blur(18px) saturate(150%);-webkit-backdrop-filter:blur(18px) saturate(150%);
+  box-shadow:0 20px 50px rgba(12,6,28,.22),inset 0 1px 0 rgba(255,255,255,.12)}
+.ui-glass--night{background:rgba(14,22,40,.88);border-color:rgba(255,255,255,.12);box-shadow:0 24px 60px rgba(8,14,28,.35);color:#f6f8fb}
+@media(prefers-reduced-transparency:reduce){.ui-glass--night{background:#0e1628;backdrop-filter:none;-webkit-backdrop-filter:none}}
+.ui-icon{display:inline-block;flex:none;width:1em;height:1em;background:currentColor;-webkit-mask:var(--icon) center/contain no-repeat;mask:var(--icon) center/contain no-repeat}
+.ui-chips{display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;list-style:none}
+.ui-chip{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:10px;font-size:13px;line-height:1;border:1px solid var(--ui-glass-line);background:rgba(255,255,255,.06);color:inherit}
+.ui-chip .ui-icon{width:15px;height:15px;opacity:.9}
+
+/* Header: a frosted bar that stays readable over the 3D, linking to the pages. */
+/* Header: the wordmark on the left edge, the links in a centred pill, "Let's talk" on the right edge. The bar itself lets
+   clicks through. Scrolling down fades it up and away (.is-hidden); see site-header.js for when it returns. */
+.ui-header{position:fixed;z-index:60;top:16px;left:0;right:0;display:flex;align-items:center;justify-content:center;min-height:52px;padding:0 var(--gutter,24px);pointer-events:none;color:var(--ui-cream);transition:transform .45s cubic-bezier(.2,.7,.2,1),opacity .35s}
+.ui-header>*{pointer-events:auto}
+.ui-header.is-hidden{transform:translateY(-130%);opacity:0}.ui-header.is-hidden>*{pointer-events:none}
+.ui-header .ui-wordmark{position:absolute;left:var(--gutter,24px);font-weight:750;font-size:20px;letter-spacing:-.04em;text-shadow:0 1px 10px rgba(10,14,30,.45)}.ui-wordmark span{color:var(--ui-violet)}
+.ui-header nav{display:flex;align-items:center;gap:4px;padding:6px;border-radius:var(--ui-radius-pill)}
+.ui-header nav a{padding:10px 14px;border-radius:var(--ui-radius-pill);font-size:14px;transition:background .2s}
+.ui-header nav a:hover,.ui-header nav a[aria-current=page]{background:rgba(255,255,255,.1)}
+.ui-header-actions{position:absolute;right:var(--gutter,24px);display:flex;align-items:center;gap:8px}
+.ui-header .ui-menu-toggle{display:none}
+.ui-header .ui-header-cta{min-height:44px;padding:0 18px;font-size:14px;white-space:nowrap;border-radius:var(--ui-radius-pill)}
+@media(max-width:760px){
+  .ui-header{top:calc(10px + env(safe-area-inset-top,0px));padding:0 16px;justify-content:space-between}
+  .ui-header .ui-wordmark{position:static;font-size:18px}
+  .ui-header-actions{position:static}
+  .ui-header .ui-header-cta{padding:0 14px;font-size:13px}
+  .ui-header .ui-menu-toggle{display:inline-flex;width:44px;min-height:44px;padding:0;border-radius:var(--ui-radius-pill);touch-action:manipulation}
+  .ui-menu-toggle .ui-icon{width:20px;height:20px}
+  .ui-menu-toggle[aria-expanded=true]{background:var(--ui-cream);color:var(--ui-ink)}
+  .ui-header nav{display:none;position:absolute;top:calc(100% + 4px);right:16px;min-width:180px;padding:6px;border-radius:14px;background:rgba(251,247,255,.96);color:var(--ui-ink)}
+  .ui-header nav[data-open=true]{display:grid}
+  .ui-header nav a{display:flex;align-items:center;min-height:44px;padding:0 12px;border-radius:9px}
+  .ui-header nav a:is(:focus-visible,:active,[aria-current=page]){background:rgba(167,139,250,.18)}
+  .ui-availability{max-width:100%;text-align:left}
+}
+@media(prefers-reduced-motion:reduce){.ui-header{transition:opacity .2s}.ui-header.is-hidden{transform:none}}
+/* The Lab's bare (capture) mode shows only the scene. */
+body:has([data-bare="true"]) .ui-header{display:none}
+/* Button labels roll: on hover the text slides up and a copy rises in from below. */
+.ui-roll{display:inline-block;overflow:hidden;vertical-align:middle;height:1.3em;line-height:1.3}
+.ui-roll>span{display:flex;flex-direction:column;transition:transform .45s cubic-bezier(.65,0,.35,1)}
+.ui-btn:focus-visible:not(:disabled) .ui-roll>span{transform:translateY(-50%)}
+@media(prefers-reduced-motion:reduce){
+  .ui-btn:is(:hover,:active):not(:disabled),.ui-btn:is(:hover,:focus-visible):not(:disabled) .ui-roll>span{transform:none}
+  .ui-roll>span{transition:none}
+}
+
+/* Footer: the same on every page; credits open in a dialog. */
+.ui-footer{position:relative;z-index:5;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;padding:22px var(--gutter,24px);font-size:13px;color:rgba(251,247,255,.7)}
+.ui-footer nav{display:flex;flex-wrap:wrap;gap:18px}.ui-footer a:hover,.ui-footer button:hover{color:var(--ui-cream)}
+.ui-footer button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+.ui-credits{max-width:560px;width:calc(100% - 32px);padding:28px;color:var(--ui-cream);background:rgba(24,16,42,.82);border:1px solid var(--ui-glass-line);border-radius:var(--ui-radius-panel);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.ui-credits::backdrop{background:rgba(10,6,20,.55)}
+.ui-credits h2{margin:0 0 6px;font-size:22px;letter-spacing:-.03em}.ui-credits p{margin:0 0 16px;color:rgba(251,247,255,.7);font-size:14px;line-height:1.55}
+.ui-credits ul{margin:0 0 20px;padding:0;list-style:none;display:grid;gap:8px;font-size:14px}.ui-credits li span{color:rgba(251,247,255,.6)}
+.ui-credits a{text-decoration:underline;text-underline-offset:3px}
+/* While the homepage loading screen is up, the header waits; it slides in as the screen lifts. */
+body:has(.ht-loader:not(.is-done)) .ui-header{transform:translateY(-130%);opacity:0}
+body:has(.ht-loader:not(.is-done)) .ui-header>*{pointer-events:none}
+.ui-availability{display:inline-flex;align-items:center;gap:9px;margin:0;padding:8px 14px;border-radius:var(--ui-radius-pill);font-size:13px;font-weight:600;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22)}
+.ui-availability i{flex:none;width:8px;height:8px;border-radius:50%;background:#5ee39a;box-shadow:0 0 0 4px rgba(94,227,154,.22);animation:ui-availability-ping 2.4s ease-in-out infinite}
+@keyframes ui-availability-ping{50%{box-shadow:0 0 0 7px rgba(94,227,154,0)}}
+@media(prefers-reduced-motion:reduce){.ui-availability i{animation:none}}
+
+.ui-tech-overflow{display:grid;place-items:center;width:36px;height:36px;padding:0;border:2px solid var(--wk-bg,#120e19);border-radius:50%;background:#3a2f66;color:var(--ui-cream);font:600 12px/1 var(--font-display)}
+
+.ui-icon--brand{background:none;mask:none;-webkit-mask:none;object-fit:contain}

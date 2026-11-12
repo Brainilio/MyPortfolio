@@ -1,0 +1,65 @@
+{
+  "format": "custom",
+  "id": "homepage_copy",
+  "json": {
+    "Main": {
+      "hero_description": {
+        "config": {
+          "label": "Introduction",
+          "single": "paragraph"
+        },
+        "type": "StructuredText"
+      },
+      "hero_stack": {
+        "config": {
+          "label": "Technology line"
+        },
+        "type": "Text"
+      },
+      "about_heading": {
+        "config": {
+          "label": "About heading",
+          "single": "heading2"
+        },
+        "type": "StructuredText"
+      },
+      "about_body": {
+        "config": {
+          "label": "About description",
+          "single": "paragraph"
+        },
+        "type": "StructuredText"
+      },
+      "about_now": {
+        "config": {
+          "label": "Current role"
+        },
+        "type": "Text"
+      },
+      "skills_heading": {
+        "config": {
+          "label": "Skills heading",
+          "single": "heading2"
+        },
+        "type": "StructuredText"
+      },
+      "contact_heading": {
+        "config": {
+          "label": "Contact heading",
+          "single": "heading2"
+        },
+        "type": "StructuredText"
+      },
+      "contact_body": {
+        "config": {
+          "label": "Contact description",
+          "single": "paragraph"
+        },
+        "type": "StructuredText"
+      }
+    }
+  },
+  "label": "Homepage Copy",
+  "repeatable": false,
+  "status": true
+}

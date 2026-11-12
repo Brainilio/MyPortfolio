@@ -1,0 +1,3 @@
+.motion-thumb{position:relative;display:block;width:100%;aspect-ratio:8/5;overflow:hidden;background:#e9e3ee}
+.motion-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.motion-thumb .project-loop{object-fit:cover}

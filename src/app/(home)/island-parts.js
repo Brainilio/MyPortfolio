@@ -1,0 +1,417 @@
+import * as THREE from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+
+// One palette for everything on the island, so downloaded props and procedural pieces read as one world.
+export const PALETTE={
+  grass:['#6aa66b','#78b56d','#5f9a63'],sand:'#e6c99c',edge:'#4f8a5c',dirt:'#8a5a44',
+  rock:['#6d5f80','#5d506f','#4a405c','#3c344b'],water:'#34d3bf',waterDeep:'#1a6fd0',
+  pine:['#2f7d5b','#3b9068'],trunk:'#6b4a3a',cloud:'#fbf6ff',bird:'#2a2140',
+};
+// Kit materials remapped onto the palette (by source material name).
+export const KIT_COLORS={Stone:'#8e86a3',Snow:'#f4f0ff',Dirt:'#7a5646',Wood:'#6b4a3a',Orange:'#ee8a4f',LightOrange:'#f5b366',White:'#ece6dc',Black:'#3a3340',DarkGreen:'#3f8a5f',Green:'#76b76a'};
+
+// Seeded random, so the island is the same on every visit.
+export function random(seed) {
+  let s=seed>>>0;
+  return ()=>{s=(s+0x6d2b79f5)>>>0;let t=s;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};
+}
+const smooth=(a,b,x)=>{const t=THREE.MathUtils.clamp((x-a)/(b-a),0,1);return t*t*(3-2*t);};
+
+// Island layout: a wobbly outline, the mountain at the back left, a river curling to the front right edge.
+export const RADIUS=7,MOUNTAIN=new THREE.Vector2(-1.6,-2.9);
+export const outline=a=>RADIUS*(1+.07*Math.sin(3*a+.5)+.05*Math.sin(5*a+2)+.03*Math.sin(9*a));
+const river=new THREE.CatmullRomCurve3([[-1.2,0,-.9],[-.2,0,.5],[1.2,0,1.5],[3,0,2.4],[4.9,0,3.6],[6.6,0,4.6]].map(p=>new THREE.Vector3(...p)));
+const riverPoints=river.getSpacedPoints(80);
+export function riverDistance(x,z) {
+  let best=1e9,at=0;
+  riverPoints.forEach((p,i)=>{const d=(p.x-x)**2+(p.z-z)**2;if(d<best){best=d;at=i;}});
+  return {d:Math.sqrt(best),t:at/(riverPoints.length-1)};
+}
+export function heightAt(x,z) {
+  const r=Math.hypot(x,z),edge=r/outline(Math.atan2(z,x));
+  let h=.16*Math.sin(x*.9+1.3)*Math.cos(z*.8-.4)+.08*Math.sin(x*2.1+z*1.7);
+  h+=.5*smooth(4.4,1.6,Math.hypot(x-MOUNTAIN.x,z-MOUNTAIN.y));
+  h-=.22*smooth(.72,1,edge);
+  const {d,t}=riverDistance(x,z);if(t>0)h-=.55*smooth(1.55,.55,d);
+  return h;
+}
+
+// Builds a flat-shaded, per-face coloured mesh from a list of triangles (shared corner points keep it seamless).
+export function faceted(triangles,colorOf) {
+  const positions=new Float32Array(triangles.length*9),colors=new Float32Array(triangles.length*9),c=new THREE.Color();
+  triangles.forEach((tri,i)=>{
+    colorOf(tri,c);
+    tri.forEach((v,j)=>{positions.set([v.x,v.y,v.z],i*9+j*3);colors.set([c.r,c.g,c.b],i*9+j*3);});
+  });
+  const geometry=new THREE.BufferGeometry();
+  geometry.setAttribute('position',new THREE.BufferAttribute(positions,3));geometry.setAttribute('color',new THREE.BufferAttribute(colors,3));
+  geometry.computeVertexNormals();
+  return geometry;
+}
+export const flatMaterial=()=>new THREE.MeshStandardMaterial({vertexColors:true,flatShading:true,roughness:.95,metalness:0});
+
+// The floating chunk: grassy top with a carved river bed, and a jagged, layered underside. Shaped by the island's
+// layout unless another one is passed (the About diorama has its own); `depth` scales how far the underside hangs and
+// `sand` is how far the sandy banks reach from the river; `grass` and `edge` recolour the top.
+// Options: hub moves the point every ring closes in on (somewhere it's hidden, say under a rock), and scatter nudges the
+// inner points sideways (a fraction of a segment) so the facets don't line up into spokes on open ground.
+// paint(x, z, colour), if given, gets the last word on each top face's colour (at the face's centre).
+export function createIsland(seed=7,{outline:edgeAt=outline,heightAt:groundAt=heightAt,riverDistance:riverAt=riverDistance,depth=1,sand:bank=1.6,grass=PALETTE.grass,edge:rim=PALETTE.edge,hub=null,scatter=0,paint=null}={}) {
+  const r=random(seed),SEG=64,RINGS=14,top=[],grid=[];
+  for(let ring=0;ring<=RINGS;ring++){
+    const row=[];
+    for(let s=0;s<SEG;s++){
+      const inner=ring>0&&ring<RINGS,a=s/SEG*Math.PI*2+(inner&&scatter?(r()-.5)*scatter*Math.PI*2/SEG:0),k=ring/RINGS,jitter=inner?(r()-.5)*.25:0;
+      const radius=edgeAt(a)*k+jitter;let x=Math.cos(a)*radius,z=Math.sin(a)*radius;
+      if(hub){x+=hub.x*(1-k);z+=hub.y*(1-k);}
+      row.push(new THREE.Vector3(x,groundAt(x,z),z));
+      if(ring===0)break;
+    }
+    grid.push(row);
+  }
+  for(let ring=1;ring<=RINGS;ring++)for(let s=0;s<SEG;s++){
+    const a=grid[ring][s],b=grid[ring][(s+1)%SEG];
+    if(ring===1){top.push([grid[0][0],b,a]);continue;}
+    const c=grid[ring-1][s],d=grid[ring-1][(s+1)%SEG];
+    top.push([c,d,a],[d,b,a]);
+  }
+  const grassColors=grass.map(h=>new THREE.Color(h)),sand=new THREE.Color(PALETTE.sand),edgeGreen=new THREE.Color(rim);
+  const topGeometry=faceted(top,(tri,c)=>{
+    const x=(tri[0].x+tri[1].x+tri[2].x)/3,z=(tri[0].z+tri[1].z+tri[2].z)/3,{d,t}=riverAt(x,z),edge=Math.hypot(x,z)/edgeAt(Math.atan2(z,x));
+    c.copy(grassColors[Math.floor(r()*grassColors.length)]);
+    if(edge>.86)c.lerp(edgeGreen,.6);
+    if(t>0&&d<bank)c.copy(sand);
+    paint?.(x,z,c);
+  });
+  // Underside: shrinking, jittered rings down to a point, banded dirt then rock.
+  const rings=[grid[RINGS]],layers=[[.97,-.7],[.82,-2],[.62,-3.6],[.4,-5.3],[.18,-7]].map(([k,y])=>[k,y*depth]);
+  for(const [scale,y] of layers)rings.push(grid[RINGS].map(v=>new THREE.Vector3(v.x*scale*(.9+r()*.2),y+(r()-.5)*.7*depth,v.z*scale*(.9+r()*.2))));
+  const tip=new THREE.Vector3(.3,-8.6*depth,-.2),under=[];
+  for(let k=1;k<rings.length;k++)for(let s=0;s<SEG;s++){const a=rings[k-1][s],b=rings[k-1][(s+1)%SEG],c=rings[k][s],d=rings[k][(s+1)%SEG];under.push([a,b,c],[b,d,c]);}
+  for(let s=0;s<SEG;s++)under.push([rings.at(-1)[s],rings.at(-1)[(s+1)%SEG],tip]);
+  const dirt=new THREE.Color(PALETTE.dirt),rocks=PALETTE.rock.map(h=>new THREE.Color(h));
+  const underGeometry=faceted(under,(tri,c)=>{const y=(tri[0].y+tri[1].y+tri[2].y)/3;if(y>-1.1*depth)c.copy(dirt);else c.copy(rocks[Math.min(3,Math.floor(-y/(2.2*depth))+(r()<.3?1:0))]);});
+  const material=flatMaterial(),group=new THREE.Group(),surface=new THREE.Mesh(topGeometry,material);
+  group.add(surface,new THREE.Mesh(underGeometry,material));
+  return {group,surface,material};
+}
+
+// River and waterfall: low-poly faceted water. The river follows `path` (the island's unless another is passed) at
+// height `level` until it leaves the land at `edgeAt`, then pours off the edge and drops `fall` units, fading out over
+// the lower part of the drop (and in over `head` at the start). It's a mesh six facets across, domed in the
+// middle by `volume` (a fraction of its width; never quite flat) so it reads as a body of water, its edges pinned to
+// the banks. Small waves roll down it in the vertex shader and every facet is lit flat on its own, vivid blue in the
+// channel to turquoise-green in the shallows and on the raised facets, with foam on the crests, along the banks and
+// down the fall. Under the clear surface is a second, deeper faceted layer (inside the dome while it flows, behind the
+// sheet once it falls), joined to the surface by walls at the edges, so it has depth: you look down into it, and the
+// fall is a thick sheet of water rather than a skin.
+// (It isn't lit by the scene: a night scene sets uniforms.uBright below 1 and darker uShallow / uDeep.)
+// pour: false ends it on the land (into a lake, say) with no waterfall; shape(k) then scales its width along it (0 → 1).
+export function createWater(path=riverPoints,edgeAt=outline,{width=1,fall=8,fade=Math.max(.6,fall*.19),level=-.2,volume=0,head=.25,pour=true,shape=null,swell=null}={}) {
+  const uniforms={uTime:{value:0},uFlow:{value:0},uSurge:{value:0},uLength:{value:1},uFade:{value:fade},uHead:{value:head},uLip:{value:1e9},uAmp:{value:width*.06},uBright:{value:1},
+    uShallow:{value:new THREE.Color(PALETTE.water)},uDeep:{value:new THREE.Color(PALETTE.waterDeep)}};
+  const shader={uniforms,transparent:true,depthWrite:false,side:THREE.DoubleSide,
+    vertexShader:`attribute vec3 aLift;attribute float aMid;varying vec2 vUv;varying vec3 vWorld;varying float vH;uniform float uSurge,uTime,uFlow,uAmp,uLip;
+      void main(){
+        vUv=uv;vec3 p=position;
+        // Waves rolling downstream (uv.y runs a quarter-unit per unit of length), pinned at the banks.
+        float h=.55*sin(uv.y*22.-uFlow*7.+uv.x*2.6)+.3*sin(uv.y*37.+uv.x*8.-uFlow*10.)+.15*sin(uv.y*9.-uTime*1.7);
+        h*=aMid;
+        #ifdef INNER
+        // (The deep layer stirs more slowly, a little out of step with the surface.)
+        h=(.6*sin(uv.y*14.-uFlow*4.+uv.x*3.)+.4*sin(uv.y*25.+uv.x*6.-uFlow*6.5))*aMid*.6;
+        #endif
+        vH=h;
+        // (Lifted only, never pushed down: the troughs sit at the old flat surface, so no wave dips into the bed.)
+        p+=aLift*(h*.5+.5)*uAmp*(1.+uSurge*1.6)*(1.+1.4*smoothstep(uLip,uLip+.12,uv.y));p.y+=uSurge*.05*(1.+sin(uv.y*9.-uTime*8.))*aMid;
+        vec4 w=modelMatrix*vec4(p,1.);vWorld=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}`,
+    fragmentShader:`varying vec2 vUv;varying vec3 vWorld;varying float vH;uniform float uTime,uFlow,uSurge,uLength,uFade,uHead,uLip,uBright;uniform vec3 uShallow,uDeep;
+      void main(){
+        // Each facet's own normal, lit by a high sun.
+        vec3 n=normalize(cross(dFdx(vWorld),dFdy(vWorld)));if(n.y<0.)n=-n;
+        float lit=clamp(dot(n,normalize(vec3(.45,.8,.4))),0.,1.),across=abs(vUv.x-.5)*2.;
+        float falling=smoothstep(uLip,uLip+.12,vUv.y);
+        vec3 color=mix(uDeep,uShallow,clamp(.15+across*.75+vH*.35,0.,1.));
+        color*=.42+.8*lit;color+=pow(lit,12.)*.3;
+        // Foam: on the crests, along the banks, and down the fall, whitest on the facets the water is tumbling over.
+        float foam=smoothstep(.55,.9,vH)*.4*(1.-falling*.5)+smoothstep(.84,1.,across)*.32*(1.-falling)+falling*(.05+.38*smoothstep(.25,.8,vH));
+        #ifdef INNER
+        // The depths: deeper and darker, lit the same way, with a little white where the fall churns.
+        color=mix(uDeep*.62,uDeep,clamp(.3+vH*.5,0.,1.))*(.5+.65*lit);
+        foam=falling*.3*smoothstep(.1,.7,vH);
+        #endif
+        color=(mix(color,vec3(.93,.99,1.),clamp(foam,0.,1.)*.75)+uSurge*.12)*uBright;
+        float fade=smoothstep(0.,uHead,vUv.y)*(1.-smoothstep(uLength-uFade,uLength,vUv.y));
+        #ifdef INNER
+        gl_FragColor=vec4(color,.92*fade);
+        #else
+        // (Clear enough to see the depths through.)
+        gl_FragColor=vec4(color,mix(.8,.9,falling)*fade);
+        #endif
+        #include <colorspace_fragment>
+      }`};
+  const material=new THREE.ShaderMaterial(shader),depthMaterial=new THREE.ShaderMaterial({...shader,defines:{INNER:1}});
+  // Even rows along the path (so the facets come out a regular size), each a domed cross-section.
+  const COLS=6,body=Math.max(volume,.2);
+  const resample=(points,step)=>{
+    const out=[points[0].clone()];let carry=0;
+    for(let i=1;i<points.length;i++){const a=points[i-1],b=points[i],d=a.distanceTo(b);let t=step-carry;
+      while(t<=d){out.push(a.clone().lerp(b,t/d));t+=step;}carry=d-(t-step);}
+    if(out.at(-1).distanceTo(points.at(-1))>step*.3)out.push(points.at(-1).clone());
+    return out;
+  };
+  const ribbon=(points,widthAt,lipV)=>{
+    const positions=[],uvs=[],lifts=[],mids=[],index=[],deep={positions:[],uvs:[],lifts:[],mids:[],index:[]},side=new THREE.Vector3(1,0,0),flat=new THREE.Vector3(),up=new THREE.Vector3(0,1,0),along=new THREE.Vector3(),lift=new THREE.Vector3(),rows=COLS+1,jitter=random(17);
+    const lengths=[0];for(let i=1;i<points.length;i++)lengths.push(lengths[i-1]+points[i].distanceTo(points[i-1]));
+    const total=lengths.at(-1);
+    points.forEach((p,i)=>{
+      // Side stays horizontal: from the flow direction while it runs flat, frozen once it pours straight down.
+      flat.subVectors(points[Math.min(i+1,points.length-1)],points[Math.max(i-1,0)]).setY(0);
+      if(flat.lengthSq()>.02)side.crossVectors(flat.normalize(),up).normalize();
+      // Lift: up while it flows, outward once it falls.
+      along.subVectors(points[Math.min(i+1,points.length-1)],points[Math.max(i-1,0)]).normalize();lift.crossVectors(side,along).normalize();
+      const k=lengths[i]/total,w=widthAt(k),v=lengths[i]/4,dome=w*body*(swell?swell(k):1);
+      // The depths: a quarter of the way up the dome while it flows, a third of its width behind the sheet once it falls.
+      const f=lipV<1e8?Math.min(1,Math.max(0,(v-lipV+.04)/.14)):0,sink=-w*.32*f;
+      for(let c=0;c<=COLS;c++){
+        const x=c/COLS*2-1,mid=1-x*x,inner=c&&c<COLS,s=x*w+(inner?(jitter()-.5)*w*.12:0),u=v+(inner?(jitter()-.5)*.012:0);
+        positions.push(p.x+side.x*s+lift.x*dome*mid,p.y+side.y*s+lift.y*dome*mid,p.z+side.z*s+lift.z*dome*mid);
+        uvs.push(c/COLS,u);lifts.push(lift.x,lift.y,lift.z);mids.push(mid);
+        const depth=dome*mid*.25*(1-f)+sink,ds=s*(.84+.16*(1-mid));
+        deep.positions.push(p.x+side.x*ds+lift.x*depth,p.y+side.y*ds+lift.y*depth,p.z+side.z*ds+lift.z*depth);
+        deep.uvs.push(c/COLS,u);deep.lifts.push(lift.x,lift.y,lift.z);deep.mids.push(mid);
+      }
+      if(i){const a=(i-1)*rows,b=i*rows;for(let c=0;c<COLS;c++){index.push(a+c,a+c+1,b+c,a+c+1,b+c+1,b+c);deep.index.push(a+c,a+c+1,b+c,a+c+1,b+c+1,b+c);}}
+    });
+    // The walls: from each edge of the surface down to the edge of the depths, the length of the water.
+    const n=points.length;
+    for(const c of [0,COLS]){
+      const start=deep.positions.length/3;
+      for(let i=0;i<n;i++){
+        const t=i*rows+c;
+        deep.positions.push(positions[t*3],positions[t*3+1],positions[t*3+2]);deep.uvs.push(c/COLS,uvs[t*2+1]);deep.lifts.push(lifts[t*3],lifts[t*3+1],lifts[t*3+2]);deep.mids.push(0);
+        deep.positions.push(deep.positions[t*3],deep.positions[t*3+1],deep.positions[t*3+2]);deep.uvs.push(c/COLS,uvs[t*2+1]);deep.lifts.push(lifts[t*3],lifts[t*3+1],lifts[t*3+2]);deep.mids.push(0);
+        if(i){const a=start+(i-1)*2,b=start+i*2;deep.index.push(a,a+1,b,a+1,b+1,b);}
+      }
+    }
+    const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));
+    g.setAttribute('aLift',new THREE.Float32BufferAttribute(lifts,3));g.setAttribute('aMid',new THREE.Float32BufferAttribute(mids,1));g.setIndex(index);
+    const d=new THREE.BufferGeometry();d.setAttribute('position',new THREE.Float32BufferAttribute(deep.positions,3));d.setAttribute('uv',new THREE.Float32BufferAttribute(deep.uvs,2));
+    d.setAttribute('aLift',new THREE.Float32BufferAttribute(deep.lifts,3));d.setAttribute('aMid',new THREE.Float32BufferAttribute(deep.mids,1));d.setIndex(deep.index);
+    return {surface:g,depths:d};
+  };
+  // The river runs until it leaves the island, then pours off the edge.
+  const flowing=[];
+  for(const p of path){const inside=Math.hypot(p.x,p.z)<edgeAt(Math.atan2(p.z,p.x))-.05;flowing.push(new THREE.Vector3(p.x,level,p.z));if(!inside)break;}
+  // One continuous sheet: the river curls over the lip and pours straight down.
+  const lip=flowing.at(-1),out=new THREE.Vector3(lip.x,0,lip.z).normalize(),raw=[...flowing];
+  const drop=level+.2;
+  if(pour){
+    [[.22,-.24],[.42,-.36],[.56,-.62],[.62,-1]].forEach(([o,y])=>raw.push(new THREE.Vector3(lip.x+out.x*o,y+drop,lip.z+out.z*o)));
+    for(let i=1;i<=20;i++){const t=i/20;raw.push(new THREE.Vector3(lip.x+out.x*(.62+t*t*1.3),-1+drop-t*fall,lip.z+out.z*(.62+t*t*1.3)));}
+  }
+  const span=list=>list.reduce((sum,p,i)=>i?sum+p.distanceTo(list[i-1]):0,0),riverShare=span(flowing)/span(raw);
+  const stream=resample(raw,Math.max(.16,width*.34));
+  const lipV=pour?span(flowing)/4:1e9;
+  const {surface:geometry,depths}=ribbon(stream,shape?k=>width*shape(k):k=>width*(k<riverShare?.62+.3*(k/riverShare)+.08*Math.sin(k*20):.92-(k-riverShare)*.45),lipV);
+  uniforms.uLength.value=span(stream)/4;if(pour)uniforms.uLip.value=lipV;
+  // The depths draw first, the clear surface over them.
+  const group=new THREE.Group(),under=new THREE.Mesh(depths,depthMaterial),top=new THREE.Mesh(geometry,material);
+  under.renderOrder=1;top.renderOrder=2;group.add(under,top);
+  return {group,uniforms,lip,path:flowing};
+}
+
+// Faceted pines: three stacked cones on a trunk, merged with vertex colours into one geometry.
+export function createPineGeometry(seed) {
+  const r=random(seed),parts=[],paint=(g,hex)=>{const c=new THREE.Color(hex),n=g.attributes.position.count,a=new Float32Array(n*3);for(let i=0;i<n;i++)a.set([c.r,c.g,c.b],i*3);g.setAttribute('color',new THREE.BufferAttribute(a,3));return g;};
+  parts.push(paint(new THREE.CylinderGeometry(.08,.12,.6,5).translate(0,.3,0),PALETTE.trunk));
+  [[.62,.9,.45],[.5,.8,.9],[.36,.7,1.3]].forEach(([radius,height,y],i)=>parts.push(paint(new THREE.ConeGeometry(radius*(.9+r()*.2),height,6).rotateY(r()*2).translate(0,y+height/2-.2,0),PALETTE.pine[i%2])));
+  const merged=mergeGeometries(parts.map(g=>{const flat=g.toNonIndexed();flat.deleteAttribute('uv');flat.deleteAttribute('normal');return flat;}));
+  merged.computeVertexNormals();
+  return merged;
+}
+
+// Turns a loaded prop into one vertex-coloured geometry (palette colours baked in), ready to instance.
+export function bakeProp(object) {
+  const parts=[];object.updateMatrixWorld(true);
+  object.traverse(child=>{
+    if(!child.isMesh)return;
+    const source=child.geometry,g=new THREE.BufferGeometry(),pos=source.attributes.position,n=pos.count;
+    // Copy into plain floats (the GLB uses quantized attributes), then apply the node transform.
+    const p=new Float32Array(n*3);for(let i=0;i<n;i++)p.set([pos.getX(i),pos.getY(i),pos.getZ(i)],i*3);
+    g.setAttribute('position',new THREE.BufferAttribute(p,3));if(source.index)g.setIndex(source.index.clone());
+    g.applyMatrix4(child.matrixWorld);
+    const flat=g.toNonIndexed(),c=new THREE.Color(KIT_COLORS[child.material.name]??'#888888'),col=new Float32Array(flat.attributes.position.count*3);
+    for(let i=0;i<flat.attributes.position.count;i++)col.set([c.r,c.g,c.b],i*3);
+    flat.setAttribute('color',new THREE.BufferAttribute(col,3));parts.push(flat);
+  });
+  const merged=mergeGeometries(parts);merged.computeVertexNormals();merged.computeBoundingBox();
+  return merged;
+}
+
+// Instanced foliage that sways: idle breeze plus a per-instance shake the pointer can kick.
+export function createSwayingInstances(geometry,placements,material) {
+  geometry.computeBoundingBox();
+  const height=geometry.boundingBox.max.y,count=placements.length,sway=new Float32Array(count),phase=new Float32Array(count);
+  const mesh=new THREE.InstancedMesh(geometry,material,count),dummy=new THREE.Object3D();
+  placements.forEach((p,i)=>{dummy.position.copy(p.position);dummy.rotation.set(0,p.rotation,0);dummy.scale.setScalar(p.scale);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);phase[i]=i*1.7;});
+  geometry.setAttribute('aSway',new THREE.InstancedBufferAttribute(sway,1));geometry.setAttribute('aPhase',new THREE.InstancedBufferAttribute(phase,1));
+  mesh.userData.placements=placements;
+  return {mesh,sway,height,update(){geometry.attributes.aSway.needsUpdate=true;}};
+}
+// Shared foliage material: flat shaded, vertex coloured, with the sway in the vertex shader.
+export function createFoliageMaterial(uniforms) {
+  const material=flatMaterial();
+  material.onBeforeCompile=shader=>{
+    shader.uniforms.uTime=uniforms.uTime;shader.uniforms.uBreeze=uniforms.uBreeze;shader.uniforms.uGust=uniforms.uGust;
+    shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nuniform float uTime,uBreeze,uGust;attribute float aSway,aPhase;')
+      .replace('#include <begin_vertex>',`#include <begin_vertex>
+        float bend=max(position.y,0.);bend*=bend*.25;
+        #ifdef USE_INSTANCING
+          vec3 root=instanceMatrix[3].xyz;
+        #else
+          vec3 root=vec3(0.);
+        #endif
+        // A gust rolls across the island from one side: each tree leans in turn, then springs back.
+        float wave=.5+.5*sin(uTime*1.15-root.x*.55-root.z*.3);wave=wave*wave*wave;
+        transformed.x+=wave*uGust*bend;transformed.z+=wave*uGust*.45*bend;
+        transformed.x+=(sin(uTime*1.3+aPhase)*uBreeze+sin(uTime*11.+aPhase)*aSway)*bend;
+        transformed.z+=(cos(uTime*1.1+aPhase*.7)*uBreeze*.6+cos(uTime*9.+aPhase)*aSway*.7)*bend;`);
+  };
+  return material;
+}
+
+// Low-poly cloud: a cluster of squashed icosahedrons.
+export function createCloud(seed) {
+  const r=random(seed),parts=[];
+  const puffs=4+Math.floor(r()*3);
+  for(let i=0;i<puffs;i++){const s=.7+r()*.8;parts.push(new THREE.IcosahedronGeometry(s,0).scale(1,.7,1).translate((i-puffs/2)*.9+r()*.3,r()*.35,(r()-.5)*.8).toNonIndexed());}
+  const g=mergeGeometries(parts);g.computeVertexNormals();
+  return new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:PALETTE.cloud,flatShading:true,roughness:1,emissive:'#3b2a5c',emissiveIntensity:.25}));
+}
+
+// A tiny flapping bird: a body wedge and two hinged wings.
+export function createBird(material) {
+  const bird=new THREE.Group();
+  const body=new THREE.Mesh(new THREE.ConeGeometry(.07,.36,4).rotateX(Math.PI/2),material);
+  const wing=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,-.1),new THREE.Vector3(0,0,.12),new THREE.Vector3(.42,0,-.04)]);wing.computeVertexNormals();
+  const left=new THREE.Mesh(wing,material),right=new THREE.Mesh(wing,material);right.scale.x=-1;
+  bird.add(body,left,right);bird.userData.wings=[left,right];
+  return bird;
+}
+
+// A soaring bald eagle: dark broad wings with fingered tips, white head and tail, yellow beak.
+export function createEagle() {
+  const brown=new THREE.MeshStandardMaterial({color:'#4a3426',flatShading:true,roughness:1,side:THREE.DoubleSide});
+  const white=new THREE.MeshStandardMaterial({color:'#f4efe6',flatShading:true,roughness:1,side:THREE.DoubleSide});
+  const yellow=new THREE.MeshStandardMaterial({color:'#f2b632',flatShading:true,roughness:1});
+  const eagle=new THREE.Group();
+  eagle.add(new THREE.Mesh(new THREE.ConeGeometry(.14,.7,5).rotateX(-Math.PI/2).scale(1,.8,1),brown));
+  const head=new THREE.Mesh(new THREE.IcosahedronGeometry(.12,0),white);head.position.set(0,.03,.4);eagle.add(head);
+  const beak=new THREE.Mesh(new THREE.ConeGeometry(.04,.13,4).rotateX(Math.PI/2),yellow);beak.position.set(0,.01,.53);eagle.add(beak);
+  const tail=new THREE.Mesh(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,-.3),new THREE.Vector3(-.16,0,-.62),new THREE.Vector3(.16,0,-.62)]),white);tail.geometry.computeVertexNormals();eagle.add(tail);
+  // Each wing: a broad inner panel and an outer hand with spread primaries, hinged at the shoulder.
+  const shape=new THREE.Shape([[0,.14],[.55,.2],[1.05,.1],[1.2,.02],[1.12,-.04],[1.18,-.1],[1.06,-.12],[1.1,-.18],[.95,-.18],[.5,-.2],[0,-.14]].map(([x,y])=>new THREE.Vector2(x,y)));
+  const wingGeometry=new THREE.ShapeGeometry(shape).rotateX(Math.PI/2);
+  const wings=[1,-1].map(side=>{const pivot=new THREE.Group(),wing=new THREE.Mesh(wingGeometry,brown);wing.scale.x=side;pivot.add(wing);pivot.position.set(.05*side,.03,.05);eagle.add(pivot);return pivot;});
+  eagle.userData.wings=wings;
+  return eagle;
+}
+
+// Rig-free four-legged walk (bear, bison). Below the hip line the mesh splits into four legs by quarter; each
+// swings from its hip on its own beat (a four-beat walk), lifts and folds at the knee while it swings forward,
+// and the head nods with the stride. `hip` is where the legs meet the body, as a fraction of height.
+// diagonal: legs move in diagonal pairs (front left with hind right, then front right with hind left), as the bison
+// trot; otherwise a four-beat walk.
+export function createBearMaterial(geometry,{hip:hipFraction=.36,diagonal=false}={}) {
+  geometry.computeBoundingBox();
+  const box=geometry.boundingBox,height=box.max.y-box.min.y,length=box.max.z-box.min.z,hip=box.min.y+height*hipFraction,mid=(box.min.z+box.max.z)/2,pos=geometry.attributes.position;
+  let front=0,back=0,nf=0,nb=0;
+  for(let i=0;i<pos.count;i++){const y=pos.getY(i),z=pos.getZ(i);if(y<box.min.y+(hip-box.min.y)*.6){if(z>mid){front+=z;nf++;}else{back+=z;nb++;}}}
+  const uniforms={uPhase:{value:0},uSwing:{value:0},uKnee:{value:0},uLift:{value:0},uNod:{value:0},uHeadDown:{value:0},uHeadTurn:{value:0},uTail:{value:0},uTailZ:{value:box.min.z+length*.07},uBob:{value:0},uHeight:{value:height},
+    uHip:{value:hip},uKneeY:{value:box.min.y+(hip-box.min.y)*.5},uLegTop:{value:(hip-box.min.y)*.35},uMid:{value:mid},uFront:{value:nf?front/nf:mid+1},uBack:{value:nb?back/nb:mid-1},
+    uCenterX:{value:(box.min.x+box.max.x)/2},uHeadZ:{value:box.max.z-length*.24},uNeckY:{value:hip+height*.35}};
+  const material=new THREE.MeshStandardMaterial({vertexColors:true,flatShading:true,roughness:.95});
+  material.onBeforeCompile=shader=>{
+    Object.assign(shader.uniforms,uniforms);
+    shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nuniform float uPhase,uSwing,uKnee,uLift,uNod,uHeadDown,uHeadTurn,uTail,uTailZ,uBob,uHeight,uHip,uKneeY,uLegTop,uMid,uFront,uBack,uCenterX,uHeadZ,uNeckY;')
+      .replace('#include <begin_vertex>',`#include <begin_vertex>
+        if(transformed.y<uHip){
+          bool front=transformed.z>uMid,left=transformed.x>uCenterX;
+          // Four-beat walk (left hind, left front, right hind, right front), or diagonal pairs.
+          float offset=${diagonal?"front?(left?3.14159:0.):(left?0.:3.14159)":"front?(left?1.5708:4.7124):(left?0.:3.14159)"};
+          float s=uPhase+offset,lift=max(0.,cos(s));
+          float pivot=front?uFront:uBack;
+          // Knee: the lower leg folds back while the leg swings forward.
+          if(transformed.y<uKneeY){
+            float k=-lift*uKnee*smoothstep(uKneeY,uKneeY-uLegTop*.4,transformed.y);
+            float dy=transformed.y-uKneeY,dz=transformed.z-pivot;
+            transformed.z=pivot+dz*cos(k)-dy*sin(k);transformed.y=uKneeY+dz*sin(k)+dy*cos(k);
+          }
+          transformed.y+=lift*uLift*smoothstep(uHip,uKneeY,transformed.y);
+          // Hip: the whole leg swings, fading out toward the body so the belly doesn't tear.
+          float a=sin(s)*uSwing*smoothstep(uHip,uHip-uLegTop,transformed.y);
+          float dy=transformed.y-uHip,dz=transformed.z-pivot;
+          transformed.z=pivot+dz*cos(a)-dy*sin(a);transformed.y=uHip+dz*sin(a)+dy*cos(a);
+        }
+        // Head nods twice per stride, and lowers to graze (uHeadDown).
+        if(transformed.z>uHeadZ-.1){
+          float n=(sin(uPhase*2.)*uNod-uHeadDown)*smoothstep(uHeadZ-.1,uHeadZ+.15,transformed.z);
+          float dy=transformed.y-uNeckY,dz=transformed.z-uHeadZ;
+          transformed.z=uHeadZ+dz*cos(n)-dy*sin(n);transformed.y=uNeckY+dz*sin(n)+dy*cos(n);
+          // ...and turns to glance aside.
+          float turn=uHeadTurn*smoothstep(uHeadZ-.1,uHeadZ+.15,transformed.z);
+          float hx=transformed.x-uCenterX,hz=transformed.z-uHeadZ;
+          transformed.x=uCenterX+hx*cos(turn)+hz*sin(turn);transformed.z=uHeadZ-hx*sin(turn)+hz*cos(turn);
+        }
+        // Tail swish: the rear tip, above the hips, swings side to side.
+        if(transformed.z<uTailZ&&transformed.y>uHip){
+          float w=uTail*smoothstep(uTailZ,uTailZ-.12,transformed.z);
+          float tx=transformed.x-uCenterX,tz=transformed.z-uTailZ;
+          transformed.x=uCenterX+tx*cos(w)+tz*sin(w);transformed.z=uTailZ-tx*sin(w)+tz*cos(w);
+        }
+        // Bob is a fraction of body height (the compressed mesh lives in its own small unit space).
+        transformed.y+=uBob*uHeight;`);
+  };
+  return {material,uniforms};
+}
+
+// A small river trout: a faceted body, a tail fin that wags, silvery with a pink flank.
+export function createFish(seed) {
+  const r=random(seed),fish=new THREE.Group();
+  const colors=['#9fb9c4','#c2b28f','#e59a7d'];
+  const body=new THREE.Mesh(new THREE.OctahedronGeometry(.1,0).scale(.6,.55,1.6),new THREE.MeshStandardMaterial({color:colors[Math.floor(r()*3)],flatShading:true,roughness:.5,metalness:.2}));
+  const tailGeometry=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0),new THREE.Vector3(0,.07,-.12),new THREE.Vector3(0,-.07,-.12)]);tailGeometry.computeVertexNormals();
+  const tail=new THREE.Mesh(tailGeometry,new THREE.MeshStandardMaterial({color:'#7d93a3',flatShading:true,side:THREE.DoubleSide}));tail.position.z=-.14;
+  fish.add(body,tail);fish.userData.tail=tail;
+  return fish;
+}
+
+// Drag to spin, like the hero island: a horizontal drag flings the diorama round with inertia, and it drifts back
+// to its resting angle once let go. A press that doesn't drag is a tap (handed to onTap); `over` says whether the
+// pointer is on something tappable (pointer cursor instead of grab). Vertical drags still scroll the page on touch.
+// The camera's attitude: tips a view direction (pointing from the target to the camera) up by deg degrees (down if
+// negative), about the horizontal axis across it, so the camera looks more steeply down onto the island.
+const UP=new THREE.Vector3(0,1,0),ACROSS=new THREE.Vector3();
+export function tilted(dir,deg,out=new THREE.Vector3()) {
+  ACROSS.crossVectors(dir,UP).normalize();
+  return out.copy(dir).applyAxisAngle(ACROSS,deg*Math.PI/180);
+}
+
+export function createSpin(canvas,{rest=0,onTap,over}={}) {
+  let yaw=rest,velocity=0,pressed=false,dragging=false,downX=0,lastX=0;
+  const cursor=event=>{canvas.style.cursor=dragging?"grabbing":over?.(event)?"pointer":"grab";};
+  const onDown=event=>{pressed=true;dragging=false;downX=lastX=event.clientX;};
+  const onMove=event=>{
+    if(pressed&&(dragging||Math.abs(event.clientX-downX)>5)){dragging=true;velocity+=(event.clientX-lastX)*.0009;}
+    lastX=event.clientX;if(event.target===canvas)cursor(event);
+  };
+  const onUp=event=>{if(pressed&&!dragging&&event.target===canvas)onTap?.(event);pressed=dragging=false;if(event.target===canvas)cursor(event);};
+  canvas.style.cursor="grab";canvas.style.touchAction="pan-y";
+  canvas.addEventListener("pointerdown",onDown);window.addEventListener("pointermove",onMove);window.addEventListener("pointerup",onUp);window.addEventListener("pointercancel",onUp);
+  return {
+    get busy(){return dragging||Math.abs(velocity)>2e-4||Math.abs(yaw-rest)>.01;},
+    update(dt){yaw+=velocity;velocity*=Math.exp(-dt*3.5);if(!dragging)yaw+=(rest-yaw)*(1-Math.exp(-dt*.25));return yaw;},
+    dispose(){canvas.removeEventListener("pointerdown",onDown);window.removeEventListener("pointermove",onMove);window.removeEventListener("pointerup",onUp);window.removeEventListener("pointercancel",onUp);},
+  };
+}

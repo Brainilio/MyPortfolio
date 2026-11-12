@@ -1,72 +1,20 @@
-# brainilio.netflify.com
+# Brainilio Portfolio
 
----
+Next.js portfolio with a scrollable 3D homepage, a project archive and case studies, a contact form, and a Lab of standalone experiments.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Run locally
 
-## Available Scripts
+Use the Node version in `.nvmrc`, then run `npm install` and `npm run dev`. Netlify runs `npm run build` and serves the static export in `out/`. To verify a build while the dev server is running, use `NEXT_BUILD_DIR=.next-verify npm run build`.
 
-In the project directory, you can run:
+## Content and styles
 
-### `npm start`
+- `src/app/(home)/` contains the homepage and its scenes.
+- `src/lib/projects.js` holds project copy and media. Project videos loop muted when in view and use still images as fallbacks.
+- `src/app/globals.css` defines the type and page rails; `ui.css` defines shared heading styles and controls; `scenes.css` contains scene framing reused by Home, Contact, and Lab.
+- `docs/prismic.md` explains the homepage copy integration.
+- `public/models/CREDITS.md` documents 3D sources, licenses, and asset preparation.
+- `docs/archive/portfolio-prototypes.css` preserves the older portrait and space-story styles outside the active app.
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Before shipping
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+`npm run check` validates project and Lab slugs, published still and video paths, intrinsic image dimensions, the Iconbuddy manifest assets, and the Netlify contact form declaration. The build runs it automatically. After adding or replacing a still, run `npm run measure:images` with FFmpeg's `ffprobe` installed, then include the updated dimensions file with the change. Netlify submission delivery must be verified on a deployed site.

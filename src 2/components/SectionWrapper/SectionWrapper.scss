@@ -1,0 +1,53 @@
+@import "../../styles/responsive/breakpoints.scss";
+@import "../../styles/index.scss";
+
+.section-wrapper {
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	// padding-top: 0em;
+	width: 100%;
+	// padding-bottom: 0em;
+	box-sizing: border-box;
+	overflow: hidden;
+	margin: 0 auto;
+
+	&.no-snap {
+		// scroll-snap-align: unset;
+	}
+
+	@include screenxs {
+		max-width: 320px;
+		padding-left: 10px;
+		padding-right: 10px;
+	}
+
+	@include screens {
+		max-width: 375px;
+		padding-left: 10px;
+		padding-right: 10px;
+	}
+
+	@include screenm {
+		// 	scroll-snap-align: start;
+
+		max-width: 768px;
+		padding-left: 20px;
+		padding-right: 20px;
+	}
+
+	@include screenl {
+		max-width: 1024px;
+	}
+
+	@include screenxl {
+		max-width: 1200px;
+		padding-left: 50px;
+		padding-right: 50px;
+	}
+
+	@include screenxxl {
+		max-width: 1440px;
+	}
+}

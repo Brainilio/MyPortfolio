@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Forms</title><meta name="robots" content="noindex"></head>
+<body>
+<!-- Netlify reads this static copy at deploy time to register the contact form (src/app/contact/contact-form.js posts here).
+     Keep the field names in sync with that component. -->
+<form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input type="hidden" name="form-name" value="contact">
+  <input name="bot-field">
+  <input name="topic">
+  <textarea name="details"></textarea>
+  <input name="name">
+  <input type="email" name="email">
+  <input name="reference">
+  <input name="company">
+</form>
+</body>
+</html>

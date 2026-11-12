@@ -1,0 +1,40 @@
+/* Work archive: each card is the thumbnail, then the name with what I did under it and a small stack of tech icons. */
+.wk-page{--wk-bg:#120e19;--wk-surface:#1e1828;--wk-radius:var(--ui-radius-panel);background:var(--wk-bg);color:var(--ui-cream);min-height:100svh;overflow-x:clip}
+.wk-main{padding:clamp(120px,14vw,168px) var(--content-gutter) clamp(64px,8vw,110px)}
+.wk-heading{margin-bottom:clamp(24px,3.5vw,40px)}
+
+.wk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:clamp(24px,3vw,36px) clamp(16px,2vw,24px)}
+.wk-card{position:relative;border-radius:var(--wk-radius);isolation:isolate}
+.wk-media{position:relative;aspect-ratio:8/5;border-radius:var(--wk-radius);overflow:hidden;background:var(--wk-surface);transform:translateZ(0)}
+.wk-media .motion-thumb{height:100%;aspect-ratio:auto;background:var(--wk-surface)}
+.wk-media .motion-thumb :is(img,video){transition:opacity .25s,transform .7s cubic-bezier(.22,1,.36,1)!important}
+.wk-card:is(:hover,:focus-within) .motion-thumb :is(img,video){transform:scale(1.03)!important}
+.wk-info{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:16px 4px 0}
+.wk-head{min-width:0}
+.wk-title{margin:0;font-size:clamp(22px,2.3vw,30px);font-weight:600;line-height:1.2;letter-spacing:-.035em}
+.wk-title a{transition:color .2s}.wk-card:hover .wk-title a{color:#d9ccff}
+/* One link per card: the title's link covers the whole card. */
+.wk-title a::after{content:'';position:absolute;inset:0;z-index:3;border-radius:var(--wk-radius)}
+.wk-title a:focus-visible{outline:none}
+.wk-card:has(.wk-title a:focus-visible){outline:2px solid var(--ui-violet);outline-offset:4px}
+.wk-role{margin:4px 0 0;font-size:14px;line-height:1.4;color:rgba(251,247,255,.65)}
+.wk-sr{position:absolute;width:1px;height:1px;margin:0;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* Two overlapping round icons and +N for the rest. */
+.wk-stack{display:flex;flex:none;margin:4px 0 0;padding:0;list-style:none}
+.wk-stack li{margin-left:-10px}
+.wk-stack li:not(.ui-tech-overflow){display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:#2a2238;border:2px solid var(--wk-bg);color:var(--ui-cream);font-size:12px;font-weight:600}
+.wk-stack li:first-child{margin-left:0}
+.wk-stack .ui-icon{width:17px;height:17px}
+@media(prefers-reduced-motion:reduce){.wk-media .motion-thumb :is(img,video){transition:none!important;transform:none!important}}
+
+/* Early projects & learning: closed by default. Their screenshots are shown whole. */
+.wk-early{margin-top:clamp(48px,7vw,88px);border-top:1px solid var(--ui-glass-line)}
+.wk-early summary{display:flex;align-items:center;gap:12px;padding:24px 0;font-size:var(--ui-t-h3);font-weight:600;letter-spacing:-.02em;cursor:pointer;list-style:none}
+.wk-early summary::-webkit-details-marker{display:none}
+.wk-early summary:hover .wk-chevron{background:var(--ui-cream)}
+.wk-early summary:focus-visible{outline:2px solid var(--ui-violet);outline-offset:4px;border-radius:8px}
+.wk-count{padding:4px 9px;border-radius:999px;background:rgba(167,139,250,.16);color:#d9ccff;font-size:13px;font-weight:500}
+.wk-chevron{width:20px;height:20px;margin-left:auto;color:rgba(251,247,255,.7);transition:transform .25s}
+.wk-early[open] .wk-chevron{transform:rotate(90deg)}
+.wk-early .wk-grid{padding-bottom:8px}
+.wk-early .motion-thumb img{object-fit:contain}

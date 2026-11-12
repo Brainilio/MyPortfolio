@@ -1,0 +1,77 @@
+.case-page{--case-ink:#f6f3fb;--case-muted:#bdb5c9;--case-line:#d8c5ff2a;background:#17131e;color:var(--case-ink);padding:0 var(--content-gutter);min-height:100svh}
+.case-layout{padding-top:clamp(104px,11vw,128px)!important;display:grid;grid-template-columns:minmax(260px,.78fr) minmax(0,1.65fr);gap:clamp(32px,4vw,72px);padding:42px 0 100px;align-items:start}
+.case-summary{position:sticky;top:var(--summary-top,24px);min-width:0}.case-back{display:block;font-size:13px;border-bottom:1px solid var(--case-line);padding-bottom:20px;margin-bottom:28px;color:var(--case-muted)}
+.case-summary .ui-heading{margin-bottom:18px}
+.case-highlight{font-size:16px;line-height:1.65;color:var(--case-muted);margin:0 0 28px;max-width:40ch}
+.case-era{font-size:12px;color:#cdb3f4;margin:0 0 18px}.case-facts{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:0 0 30px}.case-facts div{min-width:0}.case-facts dt{font-size:12px;color:var(--case-muted);margin-bottom:6px}.case-facts dd{margin:0;font-size:14px;line-height:1.5}
+.case-responsibilities h2{font-size:14px;font-weight:600;margin:0 0 12px}.case-responsibilities ul{padding-left:17px;margin:0 0 28px}.case-responsibilities li{padding-left:3px;margin:0 0 9px;font-size:14px;line-height:1.6;color:var(--case-muted)}.case-responsibilities li::marker{color:#b89ae8}
+.case-description{border-top:1px solid var(--case-line);padding-top:24px;margin-bottom:20px}.case-description h2{font-size:14px;font-weight:600;margin:0 0 12px}.case-description p{color:var(--case-muted);font-size:14px;line-height:1.7;margin:0}
+.case-quote{position:relative;isolation:isolate;margin:8px 0 28px;padding:44px 26px 24px;border-radius:var(--ui-radius-panel);overflow:hidden;
+  background:radial-gradient(120% 90% at 0% 0%,rgba(167,139,250,.26),transparent 60%),linear-gradient(160deg,#211a2e,#1a1524);
+  border:1px solid rgba(201,182,255,.22);box-shadow:0 20px 50px rgba(10,6,20,.35),inset 0 1px 0 rgba(255,255,255,.06);
+  animation:case-quote-in .8s cubic-bezier(.2,.8,.2,1) .2s both}
+.case-quote::before{content:'\201C';position:absolute;z-index:-1;top:-14px;left:16px;font:700 120px/1 Georgia,'Times New Roman',serif;color:#a78bfa;opacity:.55}
+.case-quote blockquote{margin:0}
+.case-quote p{margin:0;font-size:17px;font-weight:500;line-height:1.55;letter-spacing:-.012em;color:var(--case-ink);text-wrap:pretty}
+.case-quote figcaption{display:flex;align-items:center;gap:10px;margin-top:18px;font-size:13px;font-weight:500;color:#cdb3f4}
+.case-quote figcaption::before{content:'';flex:none;width:22px;height:2px;border-radius:2px;background:#a78bfa}
+@keyframes case-quote-in{from{opacity:0;transform:translateY(14px)}}
+@media(prefers-reduced-motion:reduce){.case-quote{animation:none}}
+.case-links{display:flex;gap:24px;flex-wrap:wrap;font-size:13px}.case-links a{border-bottom:1px solid #9c8daf;padding-bottom:8px}
+.case-gallery{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:24px;min-width:0}.case-media{grid-column:span 12;min-width:0;margin:0}.case-media--half{grid-column:span 6}.case-media--portrait{grid-column:span 5}
+.case-media-surface{background:var(--media-tone);border-radius:8px;overflow:hidden}.case-media img{display:block;width:100%;height:auto;max-width:100%}.case-media figcaption{font-size:12px;line-height:1.5;color:var(--case-muted);padding:12px 2px 0;max-width:64ch}
+.case-media--tablet .case-media-surface{padding:clamp(24px,5vw,72px);background:radial-gradient(ellipse at 30% 0%,#d6c8e2,transparent 70%),var(--media-tone)}.case-media--tablet .case-media-frame{padding:11px;border:2px solid #46404e;border-radius:24px;background:#211c29;box-shadow:0 25px 45px #18102135;transform:rotate(-2deg)}.case-media--tablet img{border-radius:13px}
+.case-page a:focus-visible{outline:2px solid #cbb2f1;outline-offset:6px}
+@media(max-width:900px){.case-layout{grid-template-columns:1fr;gap:36px}.case-summary{position:static}.case-highlight{max-width:60ch}.case-facts{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:520px){.case-gallery{gap:18px}.case-media--half,.case-media--portrait{grid-column:span 12}.case-media--portrait .case-media-frame{max-width:340px;margin:auto}.case-facts{grid-template-columns:1fr 1fr}.case-media--tablet .case-media-frame{padding:7px;border-radius:17px}.case-media--tablet img{border-radius:8px}}
+
+.case-media--atmosphere .case-media-surface{padding:clamp(28px,6vw,90px);background:linear-gradient(140deg,#cfbdb0,#eae1d4 55%,#b8c3b3)}
+.case-media--atmosphere .case-media-frame{transform:rotate(1.5deg);box-shadow:0 30px 65px #24202b40;border-radius:8px;overflow:hidden}
+
+/* Phone screens read as small objects on a quiet presentation surface. */
+.case-media--compact{grid-column:span 6}.case-media--compact .case-media-surface{display:grid;place-items:center;padding:30px 24px;min-height:410px;background:radial-gradient(ellipse at 30% 0%,#ffffff85,transparent 80%),var(--media-tone)}
+.case-media--compact .case-media-frame{width:min(100%,170px);padding:6px;border:1px solid #6b657670;background:#211c29;border-radius:23px;box-shadow:0 16px 32px #211c2926}
+.case-media--compact img{width:100%;height:auto;border-radius:17px}.case-media--compact.case-media--tablet .case-media-frame{transform:none}
+@media(max-width:520px){.case-media--compact{grid-column:span 12}.case-media--compact .case-media-surface{min-height:0;padding:28px}.case-media--compact .case-media-frame{width:min(100%,150px)}}
+
+.case-media--scene .case-media-surface{background:none;border-radius:var(--ui-radius)}
+.case-media--flat .case-media-surface{background:none}
+
+/* Header and footer are the site's own (ui.css); the page keeps its gutters. */
+.case-page .ui-footer{padding-inline:0;border-top:1px solid var(--case-line)}
+.case-back{display:flex!important;align-items:center;gap:8px}.case-back .ui-icon{width:15px;height:15px}
+.case-chips{margin:0 0 28px}.case-chips .ui-chip{color:#e1d6ef}
+
+/* Early work: screenshots at their own size, never enlarged. */
+.case-media--natural{grid-column:span 6}.case-media--natural .case-media-surface{background:none;border-radius:0}
+.case-media--natural img{width:auto;max-width:100%;margin:0 auto;border-radius:8px}
+
+/* Closing block: a glass card to get in touch, and the next project. */
+.case-close{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:clamp(16px,2vw,24px);padding:0 0 clamp(56px,7vw,96px)}
+.case-talk{padding:clamp(24px,3.5vw,44px);color:var(--ui-cream)}
+.case-talk .ui-heading{margin-bottom:10px}
+.case-talk p{margin:0 0 26px;font-size:var(--ui-t-body);line-height:1.6;color:var(--case-muted)}
+.case-talk-actions{display:flex;flex-wrap:wrap;gap:10px}
+.case-next{position:relative;display:flex;align-items:flex-end;min-height:220px;padding:20px;border-radius:var(--ui-radius-panel);overflow:hidden;isolation:isolate;border:1px solid var(--case-line);background:#211a2c}
+.case-next img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;transition:transform .7s cubic-bezier(.22,1,.36,1)}
+.case-next img.is-whole{object-fit:contain;padding:16px 16px 84px}
+.case-next::before{content:'';position:absolute;inset:auto 0 0;height:96px;z-index:-1;background:rgba(18,12,30,.5);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--ui-glass-line)}
+.case-next-text{display:grid;gap:4px;min-width:0}.case-next-text span{font-size:var(--ui-t-small);color:var(--case-muted)}
+.case-next-text strong{font-size:var(--ui-t-h3);font-weight:600;letter-spacing:-.02em;overflow-wrap:anywhere}
+.case-next-arrow{width:20px;height:20px;margin:0 0 4px auto;transition:transform .25s}
+.case-next:hover img{transform:scale(1.04)}.case-next:hover .case-next-arrow{transform:translateX(4px)}
+@media(max-width:900px){.case-close{grid-template-columns:1fr}}
+@media(max-width:560px){.case-media--natural{grid-column:span 12}.case-talk-actions .ui-btn{flex:1 1 auto}}
+@media(prefers-reduced-motion:reduce){.case-next img,.case-next-arrow{transition:none;transform:none!important}}
+/* Slide-in motions must never widen the page. */
+.case-page{overflow-x:clip}
+
+/* Stills are visible by default. Only offscreen blocks are armed for a reveal after hydration. */
+.case-media-content{position:relative}
+.case-media--tablet .project-loop{border-radius:13px}
+.case-media--compact .project-loop{border-radius:17px}
+@media(max-width:520px){.case-media--tablet .project-loop{border-radius:8px}}
+@media(prefers-reduced-motion:no-preference){
+  .case-media[data-reveal=shown] .case-media-surface{transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform 1s cubic-bezier(.2,.7,.2,1)}
+  .case-media[data-reveal=pending] .case-media-surface{opacity:0;transform:translateY(32px)}
+}

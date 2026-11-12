@@ -1,0 +1,112 @@
+@import "../../styles/responsive/breakpoints.scss";
+@import "../../styles/index.scss";
+
+.project-cards-single-card {
+	width: 300px;
+	min-height: 550px;
+	display: flex;
+	flex-direction: column;
+	padding: var(--vertical-spacing-blocks);
+	box-sizing: border-box;
+	background: var(--purple-gradient);
+	border-radius: var(--card-border-radius);
+
+	.project-image {
+		position: relative;
+		height: 175px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		.project-cards-image {
+			object-position: center;
+			object-fit: cover;
+			transition: all 0.1s linear;
+
+			@include screenxs {
+				width: 100%;
+			}
+		}
+
+		// &:hover .project-cards-image,
+		// &:focus .project-cards-image {
+		// 	transform: scale(1.05);
+
+		// 	@include screenxs {
+		// 		transform: none;
+		// 	}
+
+		// 	@include screenl {
+		// 		transform: scale(1.05);
+		// 	}
+		// }
+	}
+
+	.descriptions {
+		height: 250px;
+		margin-top: var(--vertical-spacing-blocks);
+
+		.project-cards-description {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+
+			.project-cards-description-title {
+				text-align: start;
+			}
+			.project-cards-description-paragraph {
+				text-align: start;
+			}
+		}
+	}
+
+	.read-more {
+		color: rgb(241, 176, 169);
+		font-weight: 500;
+
+		&::after {
+			content: "";
+			display: block;
+			width: 0;
+			height: 2px;
+			background: rgb(241, 176, 169);
+			transition: width 0.3s;
+		}
+
+		&:hover::after {
+			width: 100%;
+			transition: width 0.3s;
+		}
+	}
+
+	.project-cards-buttons {
+		margin-top: var(--vertical-spacing-blocks);
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		grid-gap: 10px;
+
+		@include screenxs {
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+		}
+
+		@include screens {
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+		}
+
+		@include screenl {
+			justify-content: center;
+		}
+
+		.project-cards-single-button {
+			@include secondarySmallButton;
+		}
+
+		.project-cards-single-button-2 {
+			@include primarySmallButton;
+		}
+	}
+}
