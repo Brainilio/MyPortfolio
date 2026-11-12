@@ -2,26 +2,20 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import projects from '../../../lib/projects';
 import ProjectMedia from '../project-media';
+import { projectGallery } from '../../../lib/project-gallery.mjs';
+import imageSizes from '../../../lib/project-image-sizes.json';
 import StickySummary from '../sticky-summary';
+import Heading from '../../heading';
 import SiteFooter from '../../site-footer';
 import TechChip, { Icon, Roll } from '../../tech-chip';
 import '../project.css';
-
-const MOTIONS = ['rise', 'zoom', 'slide-left', 'parallax', 'tilt', 'slide-right'];
 
 // `projects` already leaves out hidden projects, so they get no page.
 export function generateStaticParams() { return projects.map(project => ({ slug: project.slug })); }
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const project = projects.find(project => project.slug === slug);
-  return { title: `${project?.name || 'Project'} — Brainilio`, description: project?.highlight || project?.shortDescription || undefined };
-}
-
-// Early work is title, tech and its own screenshots, shown whole: no upscaling, no zoom or crop motion.
-function earlyMedia(project) {
-  const images = project.fullImages || [];
-  const all = images.includes(project.previewImage) ? images : [project.previewImage, ...images];
-  return all.filter(Boolean).map((src, i) => ({ type: 'image', src, alt: `${project.name}, screen ${i + 1}`, layout: 'natural', motion: 'rise' }));
+  return { title: project?.name || 'Project', description: project?.highlight || project?.shortDescription || undefined };
 }
 
 export default async function Project({ params }) {
@@ -31,19 +25,14 @@ export default async function Project({ params }) {
   const early = Boolean(project.earlyWork);
   const peers = projects.filter(p => Boolean(p.earlyWork) === early);
   const next = peers[(peers.indexOf(project) + 1) % peers.length];
-  const media = early ? earlyMedia(project) : project.media || [
-    { type: 'image', src: project.previewImage, alt: `${project.name} overview` },
-    ...(project.fullImages || []).map((src, i) => ({ type: 'image', src, alt: `${project.name} screen ${i + 1}`, layout: i % 3 === 0 ? 'wide' : 'half' })),
-  ];
-  // A different order of scroll motions per project, so no two pages move the same way.
-  const motionOffset = [...project.slug].reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % MOTIONS.length;
+  const media = projectGallery(project);
   const intro = !early && (project.highlight || project.shortDescription);
   return <div className="case-page">
     <main className="case-layout">
       <StickySummary>
         <Link className="case-back" href="/projects/"><Icon src="/icons/tech/tabler--arrow-left.svg" />All work</Link>
         {early && <p className="case-era">Early projects &amp; learning</p>}
-        <h1>{project.name}</h1>
+        <Heading size="detail">{project.name}</Heading>
         {intro && <p className="case-highlight">{intro}</p>}
         {!early && <dl className="case-facts">
           {project.dateCreated && <div><dt>Year</dt><dd>{project.dateCreated}</dd></div>}
@@ -56,12 +45,12 @@ export default async function Project({ params }) {
         {!early && project.quote && <figure className="case-quote"><blockquote><p>{project.quote.text}</p></blockquote><figcaption>{project.quote.by}</figcaption></figure>}
       </StickySummary>
       <section className="case-gallery" aria-label={`${project.name} gallery`}>
-        {media.map((item, i) => <ProjectMedia key={`${item.src}-${i}`} item={item} priority={i === 0} motion={MOTIONS[(i + motionOffset) % MOTIONS.length]} />)}
+        {media.map((item, i) => <ProjectMedia key={`${item.src}-${i}`} item={item} size={imageSizes[item.src]} priority={i === 0} />)}
       </section>
     </main>
     <section className="case-close" aria-label="What next">
       <div className="ui-glass case-talk">
-        <h2>Have something in mind?</h2>
+        <Heading as="h2" mark="?">Have something in mind</Heading>
         <p>A project, a role or an idea: I&apos;d like to hear about it.</p>
         <div className="case-talk-actions">
           <Link className="ui-btn" href="/contact/"><Roll>Let&apos;s talk</Roll><Icon src="/icons/tech/tabler--arrow-up-right.svg" /></Link>

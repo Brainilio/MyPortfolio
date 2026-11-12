@@ -1,13 +1,15 @@
 "use client";
 import { eagleHandoff } from "./eagle-handoff";
-import ProjectThumbnail from "../project/project-thumbnail";
-import TechChip, { Icon, Roll } from "../tech-chip";
-import WorkIndex from "./work-cards";
+import { ProjectCard } from "../projects/work-archive";
+import { Icon, Roll } from "../tech-chip";
+import Heading from "../heading";
+import WorkIndex, { WorkTech } from "./work-cards";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { createCloud } from "./island-parts";
+import { createWorkSheet } from "./work-sheet";
 
 // The Work section: one pinned screen, the scroll picking the project (in step with the section pill's counter): the
 // project names huge on the left, the one you're on solid, and its thumbnail loop as a big screen on the right
@@ -20,15 +22,12 @@ import { createCloud } from "./island-parts";
 const EAGLE_UP = 1.15;
 // The clouds: x, y, depth, size, phase.
 const CLOUDS = [[-6, -1, -8, .3, 0], [6.5, 1.6, -10, .36, 1.7], [9, -1.9, -7, .26, 3.1], [-9, 1.9, -12, .34, 4.4], [2.5, -2.3, -9, .28, 2.6], [12, .2, -14, .4, .8]];
-// What a recruiter wants at a glance: its year and kind of work, and the first few tools (all from the project data).
-// (Dates written in capitals in the data are shown in sentence case.)
-const tidy = text => text && text === text.toUpperCase() ? text.charAt(0) + text.slice(1).toLowerCase() : text;
 // The line under the heading.
-const INTRO = "What I've built and worked on most recently, from my own app to a large platform. The rest is on the work page.";
-const metaOf = p => [tidy(p.dateCreated), p.role || p.category].filter(Boolean).join(" · ");
+const INTRO = ["Whether it's helping someone find a restroom when they need one, making giving easier, or creating secure, seamless account experiences, I enjoy building products that solve real problems.", "From everyday conveniences to experiences that support a bigger mission, I care about making technology feel simpler, more useful, and more human."];
 
 export default function WorkShowcase({ work, scene, slot, onReady }) {
-  const root = useRef(null), back = useRef(null), front = useRef(null);
+  const root = useRef(null), back = useRef(null), front = useRef(null), sheetAnchor = useRef(null);
+  const [useSheet] = useState(() => new URLSearchParams(window.location.search).get("work") === "sheet");
   const ready = useRef(onReady); ready.current = onReady;
   const [active, setActive] = useState(0);
   const mouse = useRef({ x: 0, y: 0 });
@@ -44,6 +43,7 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
     } catch { ready.current?.(); return; }
     for (const r of [skyRenderer, eagleRenderer]) { r.setClearColor(0, 0); r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 1.05; }
     skyRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25)); eagleRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    const sheet = sheetAnchor.current ? createWorkSheet(skyRenderer, skyCanvas, sheetAnchor.current, work) : null;
     const reduce = matchMedia("(prefers-reduced-motion: reduce)");
     const camera = new THREE.PerspectiveCamera(30, 1, .1, 100); camera.position.set(0, .35, 9); camera.lookAt(0, .2, 0);
 
@@ -133,7 +133,11 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       const destination = eagleHandoff.target;
       const crossing = !reduce.matches && destination && destination.top > 0 && destination.top < window.innerHeight;
       if (document.hidden) return;
-      if (!visible && !crossing) { eagleRenderer.clear(); return; }
+      if (!visible && !crossing) {
+        sheet?.render(at, { visible: false });
+        eagleRenderer.clear();
+        return;
+      }
       const still = reduce.matches;
       // Its pace: idle, plus however fast you're scrolling, easing back down when you stop.
       const target = still ? 0 : .35 + Math.min(7, Math.abs(vel) * 5);
@@ -196,6 +200,7 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       starUniforms.uFade.value = Math.max(0, 1 - progress / .3) * (.55 + .45 * arriving);
       starUniforms.uTime.value = time; starUniforms.uPixel.value = skyRenderer.getPixelRatio();
       skyRenderer.render(skyScene, camera);
+      sheet?.render(at, { visible, reduced: still, pointer: smoothMouse, speed: vel, now });
       eagleRenderer.render(eagleScene, camera);
     }
     frame = requestAnimationFrame(loop);
@@ -207,9 +212,9 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       clouds.forEach(c => { c.geometry.dispose(); c.material.dispose(); }); starGeometry.dispose(); stars.material.dispose();
       sunTexture.dispose(); sunSprite.material.dispose();
       rig.traverse(o => o.geometry?.dispose()); eagleMaterials.forEach(m => m.dispose());
-      skyRenderer.dispose(); eagleRenderer.dispose();
+      sheet?.dispose(); skyRenderer.dispose(); eagleRenderer.dispose();
     };
-  }, [scene, slot, n]);
+  }, [scene, slot, n, work]);
 
   // Pointer, relative to the pinned screen (-1..1, y up): the clouds shift a little with it.
   const onMove = e => {
@@ -222,21 +227,22 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       <div className="wl-pin" onPointerMove={onMove} onPointerLeave={() => { mouse.current = { x: 0, y: 0 }; }}>
         <canvas className="wl-canvas" ref={back} aria-hidden="true" />
         <canvas className="wl-canvas wl-front" ref={front} aria-hidden="true" />
-        <div className="wl-head">
-          <h2 id="ht-work-title" className="wl-title">Latest work</h2>
-          <p className="wl-intro">{INTRO}</p>
-          <p className="wl-pills">
-            <a className="ui-btn" href="/projects/"><Roll>All work</Roll><Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
-            <a className="ui-btn ui-btn--secondary" href="/journey/"><Roll>Lab</Roll><Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
-          </p>
-        </div>
-        <WorkIndex work={work} active={active} />
+        <WorkIndex work={work} active={active} sheetAnchor={useSheet ? sheetAnchor : undefined} intro={
+          <div className="wl-head">
+            <Heading as="h2" className="wl-title">Latest work</Heading>
+            <div className="wl-intro">{INTRO.map(paragraph => <p key={paragraph}>{paragraph}</p>)}</div>
+            <p className="wl-pills">
+              <a className="ui-btn" href="/projects/"><Roll>All work</Roll><Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
+              <a className="ui-btn ui-btn--secondary" href="/journey/"><Roll>Lab</Roll><Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
+            </p>
+          </div>
+        } />
       </div>
 
       {/* Phones: the heading and the projects as a plain list, scrolling over the sky (the eagle behind them). */}
       <div className="wl-phone-head">
-        <h2 className="wl-title">Latest work</h2>
-        <p className="wl-intro">{INTRO}</p>
+        <Heading as="h2" className="wl-title">Latest work</Heading>
+        <div className="wl-intro">{INTRO.map(paragraph => <p key={paragraph}>{paragraph}</p>)}</div>
         <p className="wl-pills">
           <a className="ui-btn" href="/projects/"><Roll>All work</Roll><Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
           <a className="ui-btn ui-btn--secondary" href="/journey/"><Roll>Lab</Roll><Icon src="/icons/tech/tabler--arrow-right.svg" /></a>
@@ -245,12 +251,7 @@ export default function WorkShowcase({ work, scene, slot, onReady }) {
       <ul className="wl-phone">
         {work.map(p => (
           <li key={p.slug}>
-            <ProjectThumbnail project={p} href={`/project/${p.slug}/`} />
-            <a href={`/project/${p.slug}/`}>
-              <strong>{p.name}</strong>{p.highlight && <span>{p.highlight}</span>}
-              <span>{metaOf(p)}</span>
-              <ul className="wl-tags ui-chips">{p.tags?.slice(0,4).map(tag=><TechChip key={tag} name={tag} />)}</ul>
-            </a>
+            <ProjectCard project={p} tools={p.tags?.length > 0 ? <WorkTech tags={p.tags} label={p.name} /> : null} />
           </li>
         ))}
       </ul>

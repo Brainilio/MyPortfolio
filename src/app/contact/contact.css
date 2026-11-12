@@ -1,15 +1,14 @@
-/* Contact: the coast fixed behind; the intro and the form laid out one of three ways (data-layout, see contact.js). */
-.ct{min-height:100svh;display:flex;flex-direction:column;background:#4f8cc6}
+/* The split Contact card over the fixed coast. */
+.ct{position:relative;overflow-x:clip;--violet:var(--ui-violet);min-height:100svh;display:flex;flex-direction:column;background:#4f8cc6}
 .ct-sky{position:fixed;inset:0;z-index:0;background:linear-gradient(180deg,#4f8cc6 0%,#86b1d8 30%,#c4d7e5 55%,#d4e0e7 100%)}
 .ct-stage{position:fixed;inset:0;z-index:1;pointer-events:none}
 .ct-stage .ht-coast-canvas{position:absolute;inset:0}
 .ct-shell{position:relative;z-index:4;color:#f6f8fb}
-.ct-card{padding:clamp(22px,2.4vw,32px);background:rgba(14,22,40,.88);border-color:rgba(255,255,255,.12);box-shadow:0 24px 60px rgba(8,14,28,.35);color:#f6f8fb}
+.ct-card{padding:clamp(22px,3vw,40px)}
 /* Inside a card, secondary buttons are solid rather than see-through, so they read the same over sea or sky. */
-.ct .ui-btn--secondary{background:#26304a;border-color:rgba(255,255,255,.28);backdrop-filter:none;-webkit-backdrop-filter:none}.ct .ui-btn--secondary:hover{background:#323d5c}
+.ct-shell{--ui-secondary-bg:#26304a;--ui-secondary-hover:#323d5c;--ui-secondary-line:rgba(255,255,255,.28);--ui-secondary-filter:none}
 .ct-col{display:grid;align-content:start;gap:22px;min-width:0}
-.ct-intro h1{display:block;margin:14px 0 0;font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:clamp(36px,3.6vw,54px);line-height:.95;letter-spacing:-.05em}
-.ct-intro h1 span{display:inline;color:var(--violet)}
+.ct-intro .ui-heading{margin-top:14px}
 .ct-lede{margin:12px 0 0;max-width:42ch;font-size:16px;line-height:1.55;color:rgba(246,248,251,.9)}
 .ct-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
 /* What I take on: plain lines with a tinted icon dot, so they read as a list, not as buttons like the form's choices. */
@@ -17,31 +16,12 @@
 .ct-offer li{display:flex;align-items:center;gap:10px;line-height:1.3}
 .ct-offer-icon{display:grid;place-items:center;flex:none;width:28px;height:28px;border-radius:50%;background:rgba(167,139,250,.18)}
 .ct-offer .ui-icon{width:15px;height:15px;color:#c9b6ff}
-.ct-offer-title{margin:0;font-size:14px;font-weight:600}
 .ct-or{margin:0 0 12px;font-size:13px;color:rgba(246,248,251,.78)}
 .ct-form-panel{min-width:0}
 
 /* 1 Split: one card, two columns. */
-[data-layout="1"] .ct-shell{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,3vw,44px);width:min(1000px,calc(100% - 2 * var(--gutter)));margin:clamp(96px,13svh,130px) auto 40px}
-[data-layout="1"] .ct-form-panel{padding-left:clamp(24px,3vw,44px);border-left:1px solid rgba(255,255,255,.1)}
-/* 2 Open: the intro straight on the scene over a dark wash on the left, the form in its own card on the right. */
-[data-layout="2"] .ct-shell{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,440px);align-items:start;gap:clamp(24px,5vw,80px);width:min(1180px,calc(100% - 2 * var(--gutter)));margin:clamp(110px,16svh,160px) auto 40px}
-[data-layout="2"] .ct-sky::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,14,30,.72),rgba(8,14,30,.35) 45%,transparent 70%);z-index:2}
-[data-layout="2"] .ct-stage{z-index:1}[data-layout="2"] .ct-sky{z-index:2;background:none;pointer-events:none}
-[data-layout="2"] .ct-open{text-shadow:0 1px 14px rgba(6,10,24,.5)}
-[data-layout="2"] .ct-open .ct-intro h1{font-size:clamp(44px,5.6vw,84px)}
-[data-layout="2"] .ct-open .ct-offer-icon{background:rgba(10,16,32,.55)}
-/* 3 Docked: one wide card along the bottom, three columns; the coast open above. */
-[data-layout="3"] .ct-shell{display:grid;grid-template-columns:1.1fr .9fr 1.1fr;gap:clamp(20px,2.6vw,40px);width:min(1240px,calc(100% - 2 * var(--gutter)));margin:auto auto 24px}
-[data-layout="3"].ct{padding-top:110px}
-[data-layout="3"] .ct-offer{grid-template-columns:1fr}
-[data-layout="3"] .ct-form-panel{padding-left:clamp(20px,2.6vw,40px);border-left:1px solid rgba(255,255,255,.1)}
-
-/* Layout switcher, bottom centre (for comparing; removed once one is chosen). */
-.ct-switch{position:fixed;z-index:50;left:50%;bottom:16px;transform:translateX(-50%);display:flex;gap:4px;padding:5px;border-radius:999px;background:rgba(14,22,40,.85)}
-.ct-switch button{white-space:nowrap;padding:8px 12px;border:0;border-radius:999px;background:none;color:#f6f8fb;font:inherit;font-size:12px;cursor:pointer}
-.ct-switch button[aria-pressed=true]{background:#f6f8fb;color:#14162a}
-
+.ct-shell{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,3.4vw,48px);width:calc(100% - 2 * var(--content-gutter));margin:clamp(96px,13svh,130px) auto 40px}
+.ct-form-panel{padding-left:clamp(28px,3.4vw,48px);border-left:1px solid rgba(255,255,255,.1)}
 /* The three-step form: progress dashes, a fieldset per step (fading in), choice cards, then Back / Next. */
 .ct-form{display:grid;gap:14px}
 .ct-hidden{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
@@ -52,7 +32,6 @@
 .ct-step legend{padding:0;margin-bottom:12px;font-size:19px;font-weight:650;letter-spacing:-.02em;outline:none}
 @keyframes ct-in{from{opacity:0;transform:translateY(8px)}}
 .ct-choices{display:grid;gap:8px}
-.ct-choices--goals{grid-template-columns:1fr 1fr}
 .ct-choice{position:relative;display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:#1f2a42;cursor:pointer;transition:background .2s,border-color .2s}
 .ct-choice:hover{background:#28354f}
 .ct-choice.is-on{border-color:#c9b6ff;background:#3a2f66}
@@ -60,16 +39,16 @@
 .ct-choice input{position:absolute;opacity:0;pointer-events:none}
 .ct-choice .ui-icon{flex:none;width:20px;height:20px;color:#c9b6ff}
 .ct-choice span{display:grid;gap:2px}.ct-choice b{font-size:15px;font-weight:600}.ct-choice small{font-size:13px;color:rgba(246,248,251,.8)}
-.ct-choices--goals .ct-choice b{font-size:14px;font-weight:500}
 .ct-field{display:grid;gap:6px;font-size:13px;color:rgba(246,248,251,.85)}.ct-field em{font-style:normal;opacity:.75}
-.ct-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.ct-form input:not([type=radio]),.ct-form textarea{width:100%;font:inherit;font-size:15px;color:#fff;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.28);background:#1f2a42;resize:vertical}
+.ct-form input:not([type=radio]),.ct-form textarea{width:100%;font:inherit;font-size:var(--ui-t-body);color:#fff;padding:12px 14px;border-radius:var(--ui-radius);border:1px solid rgba(255,255,255,.28);background:#1f2a42;resize:vertical}
 .ct-form textarea::placeholder{color:rgba(246,248,251,.6)}
 .ct-form input:not([type=radio]):focus,.ct-form textarea:focus{outline:2px solid var(--violet);outline-offset:1px;border-color:transparent}
-.ct-note{margin:-2px 0 0;font-size:13px;color:rgba(246,248,251,.78)}
 .ct-nav{display:flex;justify-content:space-between;gap:10px}.ct-nav .ui-btn:last-child{margin-left:auto}
 .ct-error{margin:0;font-size:13px;color:#ffd6d6}
-.ct-sent{display:flex;align-items:center;gap:12px;padding:18px 0;font-size:16px}.ct-sent p{margin:0}.ct-sent .ui-icon{width:26px;height:26px;color:#9be7b4}
+.ct-step-intro{margin:0;color:rgba(246,248,251,.85);font-size:14px;line-height:1.5}
+.ct-confirmation{justify-items:start;padding:18px 0}
+.ct-confirmation h2,.ct-confirmation p{margin:0}
+.ct-confirmation>.ui-icon{width:26px;height:26px;color:#9be7b4}
 @media(prefers-reduced-motion:reduce){.ct-step{animation:none}}
 .ct-links{display:flex;gap:10px;margin:0;padding:0;list-style:none}
 .ct-links a{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:#26304a;border:1px solid rgba(255,255,255,.22);color:#f6f8fb;transition:background .2s,transform .2s}
@@ -80,11 +59,7 @@
 .ct .ui-footer{margin-top:auto;padding-top:56px;color:#f6f8fb;background:linear-gradient(180deg,rgba(8,14,30,0),rgba(8,14,30,.62) 60%)}
 .ct .ui-footer a:hover,.ct .ui-footer button:hover{color:#c9b6ff}
 @media(max-width:860px){
-  .ct .ct-shell{grid-template-columns:1fr!important;width:auto;margin:84px 16px 80px!important}
+  .ct-shell{grid-template-columns:1fr;width:auto;margin:84px var(--gutter) 80px}
   .ct .ct-form-panel{padding-left:0;border-left:0;padding-top:24px;border-top:1px solid rgba(255,255,255,.1)}
-  [data-layout="2"] .ct-form-panel{padding-top:0;border-top:0}
-  [data-layout="2"] .ct-sky::after{background:linear-gradient(180deg,rgba(8,14,30,.75),rgba(8,14,30,.4) 60%,transparent)}
-  .ct-row,.ct-choices--goals{grid-template-columns:1fr}
 }
 @media(max-width:420px){.ct-offer{grid-template-columns:1fr}}
-[data-layout="3"].ct .ui-footer{margin-top:0}

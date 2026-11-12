@@ -1,31 +1,20 @@
 # Brainilio Portfolio
 
-Modern Next.js App Router portfolio with a layered portrait hero, staggered intro, scroll parallax, Lenis smooth scrolling, and reduced-motion support.
+Next.js portfolio with a scrollable 3D homepage, a project archive and case studies, a contact form, and a Lab of standalone experiments.
 
 ## Run locally
 
-Use Node.js 24 (`nvm use`), then:
+Use the Node version in `.nvmrc`, then run `npm install` and `npm run dev`. Netlify runs `npm run build` and serves the static export in `out/`. To verify a build while the dev server is running, use `NEXT_BUILD_DIR=.next-verify npm run build`.
 
-```sh
-npm install
-npm run dev
-```
+## Content and styles
 
-`npm run build` creates the static website in `out/`. Netlify is configured to build and serve that directory. Preview the export with any static server, for example `python3 -m http.server 3000 --directory out`.
+- `src/app/(home)/` contains the homepage and its scenes.
+- `src/lib/projects.js` holds project copy and media. Project videos loop muted when in view and use still images as fallbacks.
+- `src/app/globals.css` defines the type and page rails; `ui.css` defines shared heading styles and controls; `scenes.css` contains scene framing reused by Home, Contact, and Lab.
+- `docs/prismic.md` explains the homepage copy integration.
+- `public/models/CREDITS.md` documents 3D sources, licenses, and asset preparation.
+- `docs/archive/portfolio-prototypes.css` preserves the older portrait and space-story styles outside the active app.
 
-## Content and assets
+## Before shipping
 
-- `src/app/portfolio.js`: home page, motion, social links, and Mountain Time clock.
-- `src/app/globals.css`: responsive styling and reduced-motion treatment.
-- `src/lib/projects.js`: preserved project archive and case-study content.
-- `public/legacy/projects/`: preserved project imagery.
-- `public/images/portrait-cutout.png`: transparent portrait derived from the supplied photo using built-in imagegen. Prompt: “Remove only the entire background to genuine transparency. Preserve the exact man's identity, face, glasses, hair, expression, skin, black shirt, pose and framing. Clean natural hair edges. No retouching, changed features or added elements.”
-- `public/images/portrait-original.png`: original supplied photo.
-
-The original 2022 React application source, including pre-existing local edits, is preserved in `legacy/src-2022/` for reference; it is not bundled by Next.js. Obsolete CRA, node-sass, React Router, Three.js, and unused dependencies have been removed from the active package manifest.
-
-The homepage uses the existing GitHub address and contact email. Colorado Springs and the Mountain Time clock follow the supplied design. Update these if needed before publication. Existing historical project content is preserved as supplied.
-
-Hero scenery: `public/images/mountain-trees.webp`, generated with built-in imagegen. Prompt: Photorealistic Colorado foothills with blue-gray Rocky Mountain ridgelines, evergreen pines and sunlit golden-green trees along the lower edge; warm near-white sky for typography; muted natural colors, clear landscape texture, no people, buildings or text.
-
-Active checkout: `/Users/brainiliorodrigues/Desktop/MyPortfolio2022`. Original 2022 application source is preserved in `legacy/src-2022/`.
+`npm run check` validates project and Lab slugs, published still and video paths, intrinsic image dimensions, the Iconbuddy manifest assets, and the Netlify contact form declaration. The build runs it automatically. After adding or replacing a still, run `npm run measure:images` with FFmpeg's `ffprobe` installed, then include the updated dimensions file with the change. Netlify submission delivery must be verified on a deployed site.

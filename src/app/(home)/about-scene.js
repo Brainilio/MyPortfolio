@@ -260,7 +260,7 @@ export default function AboutScene({ state, slot = 1, side = "right", onReady })
     const view={w:1,h:1};
     function frame(){
       const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;tall=camera.aspect<.85;view.w=w;view.h=h;
-      if(tall)camera.setViewOffset(w,h,0,h*.14,w,h);else camera.setViewOffset(w,h,(side==="left"?.22:-.22)*w,0,w,h);
+      if(tall)camera.setViewOffset(w,h,0,h*.055,w,h);else camera.setViewOffset(w,h,(side==="left"?.22:-.22)*w,0,w,h);
       camera.updateProjectionMatrix();place();starUniforms.uPixel.value=renderer.getPixelRatio();needsRender=true;
     }
     function place(){

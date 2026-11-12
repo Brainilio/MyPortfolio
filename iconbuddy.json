@@ -96,6 +96,90 @@
     "agile": {
       "source": "https://files.svgcdn.io/tabler/refresh.svg",
       "path": "public/icons/iconbuddy/refresh.svg"
+    },
+    "zustand": {
+      "collection": "devicon-plain",
+      "slug": "zustand",
+      "path": "public/icons/tech/devicon-plain--zustand.svg",
+      "sourceUrl": "https://iconbuddy.com/devicon-plain/zustand",
+      "license": "MIT"
+    },
+    "postgresql": {
+      "collection": "simple-icons",
+      "slug": "postgresql",
+      "path": "public/icons/tech/simple-icons--postgresql.svg",
+      "sourceUrl": "https://iconbuddy.com/simple-icons/postgresql",
+      "license": "CC0 1.0"
+    },
+    "vite": {
+      "collection": "tabler",
+      "slug": "brand-vite",
+      "path": "public/icons/tech/tabler--brand-vite.svg",
+      "sourceUrl": "https://iconbuddy.com/tabler/brand-vite",
+      "license": "MIT"
+    },
+    "git": {
+      "collection": "simple-icons",
+      "slug": "git",
+      "path": "public/icons/tech/simple-icons--git.svg",
+      "sourceUrl": "https://iconbuddy.com/simple-icons/git",
+      "license": "CC0 1.0"
+    },
+    "appsync": {
+      "collection": "logos",
+      "slug": "aws-appsync",
+      "path": "public/icons/tech/logos--aws-appsync.svg",
+      "sourceUrl": "https://iconbuddy.com/logos/aws-appsync",
+      "license": "CC0"
+    },
+    "api-gateway": {
+      "collection": "logos",
+      "slug": "aws-api-gateway",
+      "path": "public/icons/tech/logos--aws-api-gateway.svg",
+      "sourceUrl": "https://iconbuddy.com/logos/aws-api-gateway",
+      "license": "CC0"
+    },
+    "sqs": {
+      "collection": "logos",
+      "slug": "aws-sqs",
+      "path": "public/icons/tech/logos--aws-sqs.svg",
+      "sourceUrl": "https://iconbuddy.com/logos/aws-sqs",
+      "license": "CC0"
+    },
+    "accessibility": {
+      "collection": "tabler",
+      "slug": "accessible",
+      "path": "public/icons/tech/tabler--accessible.svg",
+      "sourceUrl": "https://iconbuddy.com/tabler/accessible",
+      "license": "MIT"
+    },
+    "usability-testing": {
+      "collection": "tabler",
+      "slug": "clipboard-check",
+      "path": "public/icons/tech/tabler--clipboard-check.svg",
+      "sourceUrl": "https://iconbuddy.com/tabler/clipboard-check",
+      "license": "MIT"
+    },
+    "user-journeys": {
+      "collection": "tabler",
+      "slug": "route",
+      "path": "public/icons/tech/tabler--route.svg",
+      "sourceUrl": "https://iconbuddy.com/tabler/route",
+      "license": "MIT"
+    },
+    "code-review": {
+      "collection": "tabler",
+      "slug": "message-code",
+      "path": "public/icons/tech/tabler--message-code.svg",
+      "sourceUrl": "https://iconbuddy.com/tabler/message-code",
+      "license": "MIT"
+    },
+    "main-menu": {
+      "collection": "tabler",
+      "slug": "menu-2",
+      "path": "public/icons/tech/tabler--menu-2.svg",
+      "sourceUrl": "https://iconbuddy.com/tabler/menu-2",
+      "license": "MIT"
     }
   },
   "tech": {
@@ -144,6 +228,11 @@
       "path": "public/icons/tech/simple-icons--graphql.svg",
       "license": "CC0 (Simple Icons)"
     },
+    "logos/aws-appsync": {
+      "source": "https://files.svgcdn.io/logos/aws-appsync.svg",
+      "path": "public/icons/tech/logos--aws-appsync.svg",
+      "license": "CC0 (SVG Logos)"
+    },
     "simple-icons/reactquery": {
       "source": "https://files.svgcdn.io/simple-icons/reactquery.svg",
       "path": "public/icons/tech/simple-icons--reactquery.svg",
@@ -153,6 +242,11 @@
       "source": "https://files.svgcdn.io/tabler/brand-redux.svg",
       "path": "public/icons/tech/tabler--brand-redux.svg",
       "license": "MIT (Tabler)"
+    },
+    "devicon-plain/zustand": {
+      "source": "https://files.svgcdn.io/devicon-plain/zustand.svg",
+      "path": "public/icons/tech/devicon-plain--zustand.svg",
+      "license": "MIT (Devicon)"
     },
     "simple-icons/reactrouter": {
       "source": "https://files.svgcdn.io/simple-icons/reactrouter.svg",
@@ -482,6 +576,51 @@
     "tabler/key": {
       "source": "https://files.svgcdn.io/tabler/key.svg",
       "path": "public/icons/tech/tabler--key.svg",
+      "license": "MIT (Tabler)"
+    },
+    "simple-icons/postgresql": {
+      "source": "https://files.svgcdn.io/simple-icons/postgresql.svg",
+      "path": "public/icons/tech/simple-icons--postgresql.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "logos/aws-api-gateway": {
+      "source": "https://files.svgcdn.io/logos/aws-api-gateway.svg",
+      "path": "public/icons/tech/logos--aws-api-gateway.svg",
+      "license": "CC0 (SVG Logos)"
+    },
+    "logos/aws-sqs": {
+      "source": "https://files.svgcdn.io/logos/aws-sqs.svg",
+      "path": "public/icons/tech/logos--aws-sqs.svg",
+      "license": "CC0 (SVG Logos)"
+    },
+    "simple-icons/git": {
+      "source": "https://files.svgcdn.io/simple-icons/git.svg",
+      "path": "public/icons/tech/simple-icons--git.svg",
+      "license": "CC0 (Simple Icons)"
+    },
+    "tabler/brand-vite": {
+      "source": "https://files.svgcdn.io/tabler/brand-vite.svg",
+      "path": "public/icons/tech/tabler--brand-vite.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/message-code": {
+      "source": "https://files.svgcdn.io/tabler/message-code.svg",
+      "path": "public/icons/tech/tabler--message-code.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/route": {
+      "source": "https://files.svgcdn.io/tabler/route.svg",
+      "path": "public/icons/tech/tabler--route.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/clipboard-check": {
+      "source": "https://files.svgcdn.io/tabler/clipboard-check.svg",
+      "path": "public/icons/tech/tabler--clipboard-check.svg",
+      "license": "MIT (Tabler)"
+    },
+    "tabler/accessible": {
+      "source": "https://files.svgcdn.io/tabler/accessible.svg",
+      "path": "public/icons/tech/tabler--accessible.svg",
       "license": "MIT (Tabler)"
     },
     "tabler/device-mobile": {

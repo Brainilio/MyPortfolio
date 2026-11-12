@@ -1,8 +1,9 @@
 import Link from "next/link";
+import Heading from "../heading";
 import { EXPERIMENTS } from "./experiments";
 import "./lab-grid.css";
 
-export const metadata = { title: "Lab — Brainilio" };
+export const metadata = { title: "Lab" };
 
 // The lab's front page: a grid of everything in it. Each card opens the experiment on its own page.
 export default function LabPage() {
@@ -10,7 +11,7 @@ export default function LabPage() {
     <div className="lab-index">
       <div className="lab-index-top" aria-hidden="true" />
       <main id="main">
-        <h1>Lab<span>.</span></h1>
+        <Heading size="display">Lab</Heading>
         <p className="lab-index-intro">Small experiments: 3D scenes, interface details and animation tricks.</p>
         <ul className="lab-grid">
           {EXPERIMENTS.map(experiment => (

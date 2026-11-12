@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import Heading from "../heading";
 import SpaceAudio from "../space-audio";
 import { CHAPTERS } from "./timeline";
 import { EXPERIMENTS } from "./experiments";
@@ -44,11 +45,11 @@ export default function SpaceExperiment({ slug }) {
       <SpaceAudio src="/audio/space-ambient.mp3" />
 
       <main className="lab-panel" id="main">
-        <h1>{experiment.title}</h1>
+        <Heading size="display">{experiment.title}</Heading>
         <p className="lab-note">{experiment.note}</p>
         <div className="lab-actions">
-          {chapter.scroll && <button type="button" onClick={replay}>Start over</button>}
-          {chapter.id === "contact" && (phase === "" ? <button type="button" onClick={dive}>Dive in</button> : phase === "galaxy" && <button type="button" onClick={resetDive}>Back out</button>)}
+          {chapter.scroll && <button type="button" className="ui-btn ui-btn--secondary ui-btn--compact" onClick={replay}>Start over</button>}
+          {chapter.id === "contact" && (phase === "" ? <button type="button" className="ui-btn ui-btn--secondary ui-btn--compact" onClick={dive}>Dive in</button> : phase === "galaxy" && <button type="button" className="ui-btn ui-btn--secondary ui-btn--compact" onClick={resetDive}>Back out</button>)}
           {chapter.id === "aliens" && <output className="lab-score" ref={score} aria-live="polite" />}
         </div>
       </main>

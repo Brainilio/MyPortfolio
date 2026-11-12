@@ -1,0 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Bitter:wght@600;800&display=swap');
+/* Shared scene frames and palettes for Home, Contact and Lab. */
+.ht-world{position:fixed;inset:0;z-index:2;width:100%;height:100%;display:block;pointer-events:none}
+.ht-canvas{position:absolute;inset:0}
+.ht-prairie-sky,.ht-valley-sky{position:absolute;inset:0;z-index:0}
+.ht-prairie-sky{background:linear-gradient(180deg,#c4875a 0%,#e8b87a 50%,#f2d4a8 100%)}
+.ht-valley-sky{background:linear-gradient(180deg,#e9bfa0 0%,#f3cfaa 40%,#f9dfbd 68%,#f0cba6 100%)}
+.ht-prairie-canvas,.ht-road-canvas,.ht-hike-canvas,.ht-coast-canvas{position:absolute;inset:0}
+.ht-prairie-canvas canvas,.ht-road-canvas canvas,.ht-hike-canvas canvas,.ht-coast-canvas canvas{display:block;width:100%;height:100%}
+.ht-coast-sky{position:absolute;inset:0;z-index:0;background:
+  radial-gradient(38% 14% at 22% 18%,rgba(240,244,247,.85),transparent 70%),radial-gradient(30% 10% at 70% 12%,rgba(232,238,242,.75),transparent 70%),
+  radial-gradient(50% 12% at 55% 30%,rgba(214,224,232,.7),transparent 70%),
+  linear-gradient(180deg,#4f8cc6 0%,#7eacd6 26%,#b4cee2 44%,#d4e0e7 56%,#d4e0e7 100%)}

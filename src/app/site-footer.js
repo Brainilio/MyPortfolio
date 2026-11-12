@@ -14,7 +14,7 @@ export default function SiteFooter() {
     </nav>
     <dialog ref={dialog} className="ui-credits" aria-labelledby="ui-credits-title" onClick={event => { if (event.target === dialog.current) dialog.current.close(); }}>
       <h2 id="ui-credits-title">Credits</h2>
-      <p>The 3D models on this site. These are <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">CC BY 3.0</a>, via Poly Pizza; the rest are CC0 (Quaternius, Kenney) or made in code. No endorsement implied.</p>
+      <p>The 3D models on this site. These are <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">CC BY 3.0</a>, via Poly Pizza; the rest are CC0 (Quaternius, Kenney, CreativeTrio) or made in code. No endorsement implied.</p>
       <ul>{MODEL_CREDITS.map(group => <li key={group.author}>{group.works.map(([title, id], i) => <span key={id}><a href={`https://poly.pizza/m/${id}`} target="_blank" rel="noopener noreferrer">{title}</a>{i < group.works.length - 1 ? ', ' : ''}</span>)} <span>by {group.author}</span></li>)}</ul>
       <p>Icons: Tabler (MIT) and Simple Icons (CC0), via Iconbuddy.</p>
       <form method="dialog"><button className="ui-btn" type="submit">Close</button></form>

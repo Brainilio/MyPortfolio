@@ -1,7 +1,7 @@
 /* Work archive: each card is the thumbnail, then the name with what I did under it and a small stack of tech icons. */
-.wk-page{--wk-bg:#120e19;--wk-surface:#1e1828;--wk-radius:18px;background:var(--wk-bg);color:var(--ui-cream);min-height:100svh;overflow-x:clip}
-.wk-main{width:min(calc(100% - 32px),1180px);margin:0 auto;padding:clamp(120px,14vw,168px) 0 clamp(64px,8vw,110px)}
-.wk-heading{display:block;margin:0 0 clamp(24px,3.5vw,40px);font-size:var(--ui-t-display);font-weight:700;line-height:1;letter-spacing:-.045em}
+.wk-page{--wk-bg:#120e19;--wk-surface:#1e1828;--wk-radius:var(--ui-radius-panel);background:var(--wk-bg);color:var(--ui-cream);min-height:100svh;overflow-x:clip}
+.wk-main{padding:clamp(120px,14vw,168px) var(--content-gutter) clamp(64px,8vw,110px)}
+.wk-heading{margin-bottom:clamp(24px,3.5vw,40px)}
 
 .wk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:clamp(24px,3vw,36px) clamp(16px,2vw,24px)}
 .wk-card{position:relative;border-radius:var(--wk-radius);isolation:isolate}
@@ -21,10 +21,10 @@
 .wk-sr{position:absolute;width:1px;height:1px;margin:0;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 /* Two overlapping round icons and +N for the rest. */
 .wk-stack{display:flex;flex:none;margin:4px 0 0;padding:0;list-style:none}
-.wk-stack li{display:grid;place-items:center;width:36px;height:36px;margin-left:-10px;border-radius:50%;background:#2a2238;border:2px solid var(--wk-bg);color:var(--ui-cream);font-size:12px;font-weight:600}
+.wk-stack li{margin-left:-10px}
+.wk-stack li:not(.ui-tech-overflow){display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:#2a2238;border:2px solid var(--wk-bg);color:var(--ui-cream);font-size:12px;font-weight:600}
 .wk-stack li:first-child{margin-left:0}
 .wk-stack .ui-icon{width:17px;height:17px}
-.wk-stack-more{background:#3a2f66!important}
 @media(prefers-reduced-motion:reduce){.wk-media .motion-thumb :is(img,video){transition:none!important;transform:none!important}}
 
 /* Early projects & learning: closed by default. Their screenshots are shown whole. */

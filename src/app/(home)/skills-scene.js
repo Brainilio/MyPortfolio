@@ -243,6 +243,8 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, onReady })
     function frame() {
       const w = mount.clientWidth, h = mount.clientHeight; if (!w || !h) return;
       camera.aspect = w / h; tall = camera.aspect < .85;
+      if (tall) camera.setViewOffset(w, h, 0, h * .29, w, h);
+      else camera.clearViewOffset();
       if (tall) { restPos.set(.4, 2.6, 30); restAim.set(.4, 1.9, 0); restFov = 36; skyPos.set(.4, 9, 26); skyAim.set(.4, 9.6, 0); skyFov = 30; }
       else { restPos.set(0, 2.3, 18); restAim.set(0, 2.5, 0); restFov = 30; skyPos.set(0, 8, 15); skyAim.set(0, 9.2, 0); skyFov = 24; }
       needsRender = true;
@@ -360,7 +362,8 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, onReady })
       if (live && !wasLive) snap = Math.abs(state.current.progress[slot] * (skills.length - 1) * STEP - drive) > STEP;
       wasLive = live;
       if (!live) return false;
-      if (preference.matches && !needsRender && !snap) return false;
+      const goal = state.current.progress[slot] * (skills.length - 1) * STEP;
+      if (preference.matches && !needsRender && !snap && drive === goal) return false;
       if (!busy && since < 1 / 30 - .002) return false;
       busy = tick(Math.min(since, .1)); since = 0; return true;
     }

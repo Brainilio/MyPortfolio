@@ -387,8 +387,10 @@ export default function IslandScene({ onEvent, active, onReady } = {}) {
     let tall=false;
     function frame(){
       const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;tall=camera.aspect<.85;
-      distance=tall?60:36;scene.fog.near=distance+3;scene.fog.far=distance*2.2+8;aim.set(0,tall?.2:2.2,0);placeCamera();
-      camera.clearViewOffset();camera.updateProjectionMatrix();needsRender=true;
+      const compact=tall&&h<=700;
+      distance=tall?(compact?68:60):36;scene.fog.near=distance+3;scene.fog.far=distance*2.2+8;aim.set(0,tall?.2:2.2,0);placeCamera();
+      if(tall)camera.setViewOffset(w,h,0,h*(compact?.21:.17),w,h);else camera.clearViewOffset();
+      camera.updateProjectionMatrix();needsRender=true;
     }
     // The camera arrives steeper (8° above its resting angle) and eases down to rest over 1.4 s once the loading screen
     // lifts, so it reads as landing on the island.

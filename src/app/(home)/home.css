@@ -1,18 +1,6 @@
-/* Satoshi (Indian Type Foundry, ITF Free Font License) is served by Fontshare's API, so the font files are never
-   redistributed from this repository. */
-@import url('https://api.fontshare.com/v2/css?f[]=satoshi@500,700,900&f[]=satoshi@500i&display=swap');
-/* Park-sign lettering for the road trip (Google Fonts, OFL). */
-@import url('https://fonts.googleapis.com/css2?family=Bitter:wght@600;800&display=swap');
-/* Offset TM (Type Mania) is a paid typeface: used when installed locally; otherwise the display type is Satoshi.
-   (To ship it, add the licensed webfont and a url() source here.) */
-@font-face{font-family:'Offset TM';src:local('Offset TM'),local('OffsetTM');font-display:swap}
 /* Homepage test: one dusk palette, the brand violet, a giant name under a floating island. */
-.ht{overflow-x:clip;--font-display:'Offset TM','Satoshi';--sky-top:#1b1335;--sky-night-top:#1a1040;--sky-night:#2d1b6b;--violet:#a78bfa;--cream:#fbf7ff;--ink:#2a1636;background:var(--sky-top);color:var(--cream)}
+.ht{overflow-x:clip;--sky-top:#1b1335;--sky-night-top:#1a1040;--sky-night:#2d1b6b;--violet:var(--ui-violet);--cream:var(--ui-cream);--ink:#2a1636;background:var(--sky-top);color:var(--cream)}
 body:has(.ht){background:#1b1335}
-/* On very wide screens the header, copy and controls stay within the shared page width (the worlds still fill the screen). */
-/* (The homepage allows a little more width than the rest of the site, so its sections breathe on wide screens.) */
-.ht{--page-max-width:1600px}
-@media(min-width:1300px){.ht{--gutter:max(clamp(24px,6.3vw,100px),calc((100vw - var(--page-max-width)) / 2 + 100px))}}
 /* No visible scrollbar on the homepage (scrolling still works; the section pill shows where you are). */
 html:has(.ht){scrollbar-width:none;background:#1b1335}html:has(.ht)::-webkit-scrollbar{display:none}html:has(.ht) body{background:#1b1335}
 /* Sections are fixed full-screen layers over a tall scroll runway. The page script sets each layer's opacity and
@@ -21,8 +9,6 @@ html:has(.ht){scrollbar-width:none;background:#1b1335}html:has(.ht)::-webkit-scr
 .ht{position:relative}
 /* The skies: fixed behind the page, each fading in as its section arrives (opacity set on scroll). */
 .ht-skies{position:fixed;inset:0;z-index:0;pointer-events:none}
-/* The one WebGL canvas (stage.js): over the sky and the hero name, under the words; the pointer passes through it. */
-.ht-world{position:fixed;inset:0;z-index:2;width:100%;height:100%;display:block;pointer-events:none}
 .ht-sky-live{position:absolute;inset:0;background:linear-gradient(180deg,#1b1335 0%,#33225a 30%,#6e4a8f 55%,#c9849c 80%,#f3b89c 100%)}
 /* A section: the diorama's stage stays pinned while the words scroll past on the other side. */
 .ht-zone{position:relative;min-height:100svh}
@@ -37,12 +23,10 @@ html:has(.ht){scrollbar-width:none;background:#1b1335}html:has(.ht)::-webkit-scr
 .ht-zone[data-side=left] .ht-copy{margin-left:auto;margin-right:var(--gutter)}
 .ht-copy a{pointer-events:auto}
 /* Work and Skills pin their words too (a stretch of scroll per card or sign), so the list stays beside the diorama. */
-.ht-pinned{min-height:calc(100svh + var(--steps) * var(--step,40svh))}
+.ht-pinned{min-height:calc(100svh + var(--steps) * var(--step,40svh) + var(--section-arrival,0px))}
 /* About is a single screen: its words centred in it. */
-.ht-zone.ht-about .ht-copy{box-sizing:border-box;min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:60px 0 0}
+.ht-zone.ht-about .ht-copy{width:min(640px,46vw);box-sizing:border-box;min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:60px 0 0}
 .ht-zone.ht-pinned .ht-copy{position:sticky;top:0;height:100svh;display:flex;flex-direction:column;justify-content:center;padding:60px 0 0}
-.ht-copy h2{margin:0;font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:var(--ui-t-h2);line-height:.95;letter-spacing:-.05em}
-.ht-copy h2 .ht-dot{color:var(--violet)}
 /* Headings write themselves in: each word uncovered left to right, then the full stop pops. */
 .ht-reveal .ht-word,.ht-reveal .ht-dot{display:inline-block;clip-path:inset(-.25em 100% -.25em 0);transition:clip-path .9s cubic-bezier(.76,0,.24,1) calc(var(--w,0) * .08s)}
 .ht-reveal .ht-dot{transform:scale(0);transform-origin:30% 80%;transition:clip-path .9s cubic-bezier(.76,0,.24,1) calc((var(--n) - 1) * .08s + .1s),transform .5s cubic-bezier(.34,1.56,.64,1) calc((var(--n) - 1) * .08s + .1s)}
@@ -52,13 +36,11 @@ html:has(.ht){scrollbar-width:none;background:#1b1335}html:has(.ht)::-webkit-scr
 .ht-sky{position:absolute;inset:0;z-index:0;background:
   radial-gradient(60% 45% at 78% 74%,rgba(255,196,160,.55),transparent 70%),
   linear-gradient(180deg,#1b1335 0%,#33225a 34%,#6e4a8f 60%,#c9849c 82%,#f3b89c 100%)}
-/* An island's hit area inside its stage (the island itself is drawn on the shared canvas). */
-.ht-canvas{position:absolute;inset:0}
 
 /* The name: big, across the top and behind the island (under the canvas), so the peaks rise in front of it. */
 .ht .ht-name{position:absolute;z-index:1;left:0;right:0;top:clamp(96px,15svh,150px);display:block;margin:0;text-align:center;pointer-events:none;
-  font-family:var(--font-display),'Inter',sans-serif;font-weight:900;
-  font-size:clamp(64px,15vw,280px);line-height:.8;letter-spacing:-.06em;color:var(--cream);
+  font-family:var(--font-display);font-weight:900;
+  font-size:clamp(48px,15vw,220px);line-height:.8;letter-spacing:normal;color:var(--cream);
   text-shadow:0 0 80px rgba(255,190,170,.25)}
 
 /* Finish: film grain, a soft vignette and a warm light leak, so the scene reads as one graded image. */
@@ -68,48 +50,24 @@ html:has(.ht){scrollbar-width:none;background:#1b1335}html:has(.ht)::-webkit-scr
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.4 -.2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
 @keyframes ht-grain{0%{transform:translate(0,0)}20%{transform:translate(-4%,3%)}40%{transform:translate(3%,-5%)}60%{transform:translate(-6%,-2%)}80%{transform:translate(5%,4%)}100%{transform:translate(0,0)}}
 
-.ht-header{position:fixed;z-index:20;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:28px var(--gutter);font-size:13px;transition:color .8s ease}
-.ht[data-section=contact] .ht-header{color:#f4f6f8}
-.ht-wordmark{font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:22px;letter-spacing:-.04em}
-.ht-wordmark span{color:var(--violet)}
-.ht-header nav{display:flex;gap:44px}
-.ht-header nav a{position:relative}
-.ht-header nav a:after{content:'';position:absolute;left:0;right:100%;bottom:-5px;height:1px;background:currentColor;transition:right .35s}
-.ht-header nav a:hover:after{right:0}
-.ht-available{display:inline-flex;align-items:center;gap:9px;padding:9px 15px;border:1px solid rgba(251,247,255,.28);border-radius:100px;font-size:12px;backdrop-filter:blur(6px)}
-.ht-available i{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 10px #4ade80}
-
 /* The intro and its buttons sit bottom-left, under the island. */
 .ht-intro{position:absolute;z-index:4;left:var(--gutter);bottom:clamp(36px,7svh,72px);max-width:400px;pointer-events:none;isolation:isolate}
 /* The same soft dusk shade as behind Latest work, so the words read over clouds and the lighter sky low down. */
 .ht-intro::before{content:'';position:absolute;z-index:-1;inset:-160px -240px -120px -220px;background:radial-gradient(closest-side,rgba(42,22,54,.26),rgba(42,22,54,.16) 45%,rgba(42,22,54,.06) 75%,transparent);pointer-events:none}
 .ht-intro a{pointer-events:auto}
-.ht-roles{margin:0;font-family:var(--font-display),'Inter',sans-serif;font-weight:700;font-size:clamp(24px,2.2vw,34px);line-height:1.02;letter-spacing:-.045em}
+.ht-roles{margin:0;font-family:var(--font-display);font-weight:700;font-size:clamp(24px,2.2vw,34px);line-height:1.1;letter-spacing:normal}
 .ht-stack{margin:16px 0 0;font-size:12px;letter-spacing:.08em;color:rgba(251,247,255,.55)}
-.ht-lede{margin:14px 0 0;font-family:var(--font-display),'Inter',sans-serif;font-weight:500;font-size:16px;line-height:1.55;color:#fbf7ff;text-shadow:0 1px 2px rgba(36,18,48,.6),0 0 10px rgba(36,18,48,.45),0 0 22px rgba(36,18,48,.3)}
+.ht-lede{margin:14px 0 0;font-family:var(--font-display);font-weight:500;font-size:16px;line-height:1.55;color:#fbf7ff;text-shadow:0 1px 2px rgba(36,18,48,.6),0 0 10px rgba(36,18,48,.45),0 0 22px rgba(36,18,48,.3)}
 .ht-links{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
-/* Buttons, matching the contact email: a solid primary and a frosted secondary. */
-.ht-button{display:inline-flex;align-items:center;gap:8px;padding:14px 22px;border-radius:12px;background:var(--cream);color:#1d1233;font-weight:600;font-size:15px;pointer-events:auto;
-  box-shadow:0 10px 30px rgba(20,8,40,.28);transition:transform .3s,background .3s,box-shadow .3s}
-.ht-button:hover{transform:translateY(-2px);background:#fff;box-shadow:0 14px 36px rgba(20,8,40,.36)}
-.ht-button-ghost{background:rgba(29,18,51,.42);color:var(--cream);border:1px solid rgba(251,247,255,.4);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-.ht-button-ghost:hover{background:rgba(29,18,51,.6)}
 .ht a:focus-visible{outline:2px solid var(--violet);outline-offset:6px}
 
 /* Work and Skills: sky, a giant translucent title behind the scene, the scene, then the heading. */
-.ht-prairie-sky,.ht-valley-sky{position:absolute;inset:0;z-index:0}
-.ht-prairie-sky{background:linear-gradient(180deg,#c4875a 0%,#e8b87a 50%,#f2d4a8 100%)}
-.ht-valley-sky{background:linear-gradient(180deg,#e9bfa0 0%,#f3cfaa 40%,#f9dfbd 68%,#f0cba6 100%)}
 /* The valley's grade: golden-hour haze, a soft warm wash over everything and slightly lifted, rosy shadows. */
-.ht-prairie-canvas,.ht-road-canvas,.ht-hike-canvas,.ht-coast-canvas{position:absolute;inset:0}
-.ht-prairie-canvas canvas,.ht-road-canvas canvas,.ht-hike-canvas canvas,.ht-coast-canvas canvas{display:block;width:100%;height:100%}
 .ht-list li{color:var(--ink)}
 .ht-list b i{color:#7c5cdb}
 /* On the light skies the words and chrome turn ink. */
-.ht[data-section=work] .ht-header,.ht[data-section=skills] .ht-header{color:var(--ink)}
-.ht[data-section=work] .ht-available,.ht[data-section=skills] .ht-available{border-color:rgba(42,22,54,.25)}
 .ht-work .ht-copy,.ht-skills .ht-copy{color:var(--ink)}
-.ht-work .ht-copy h2 .ht-dot,.ht-skills .ht-copy h2 .ht-dot{color:#7c5cdb}
+.ht-skills .ht-copy{--heading-accent:var(--ui-violet-on-light)}
 .ht-work .ht-copy p.ht-drive,.ht-skills .ht-copy p.ht-drive{color:rgba(42,22,54,.6)}
 .ht-copy p.ht-drive{margin:14px 0 0;font-size:14px;color:rgba(251,247,255,.62)}
 .ht-cards{position:relative;z-index:1}
@@ -152,23 +110,28 @@ html:has(.ht){scrollbar-width:none;background:#1b1335}html:has(.ht)::-webkit-scr
 /* Skills: a plain list beside the diorama; the entry for the wagon's stop lights up. */
 .ht-list{margin:30px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
 .ht-list li{padding:16px 20px;border-radius:16px;background:rgba(255,255,255,.38);border:1px solid rgba(255,255,255,.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:background .5s,transform .5s,box-shadow .5s}
-/* Skills: a warm frosted surface keeps moving scenery from determining text contrast. */
-.ht-skill-story{position:absolute;left:calc(100% + clamp(48px,9vw,160px));top:clamp(104px,15svh,160px);width:min(560px,calc(100vw - 100% - var(--gutter) * 2 - clamp(48px,9vw,160px)));color:var(--ink)}
-/* Frosted glass over the valley: light enough to let the road show through, the ink still crisp. */
-.ht-skill-panel.ui-glass{padding:clamp(22px,2.4vw,34px);border:1px solid rgba(255,255,255,.55);border-radius:22px;
-  background:linear-gradient(135deg,rgba(255,255,255,.42),rgba(255,244,236,.2));backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);
-  box-shadow:0 18px 50px rgba(90,40,30,.16),inset 0 1px 0 rgba(255,255,255,.7)}
+/* The Skills panel stays in place while its copy follows the wagon's selected stop. */
+.ht-skill-story{position:absolute;left:calc(100% + clamp(48px,9vw,160px));top:clamp(104px,15svh,160px);width:min(560px,calc(100vw - 100% - var(--gutter) * 2 - clamp(48px,9vw,160px)));padding:clamp(22px,2.4vw,34px);transition:opacity .28s var(--ui-ease-out)}
+.ht-skill-story[data-visible=false]{opacity:0;pointer-events:none}
+.ht-skill-story-content{position:relative;height:var(--skill-height,auto);overflow:clip;transition:height .24s var(--ui-ease-out)}
+.ht-skill-panel{position:absolute;inset:0 0 auto;opacity:0;visibility:hidden;transition:opacity .18s var(--ui-ease-out),transform .18s var(--ui-ease-out),visibility 0s .18s}
+.ht-skill-panel[data-position="-1"]{transform:translateX(-16px)}
+.ht-skill-panel[data-position="1"]{transform:translateX(16px)}
+.ht-skill-panel[data-active=true]{position:relative;opacity:1;visibility:visible;transform:translateX(0);transition:opacity .25s var(--ui-ease-out),transform .25s var(--ui-ease-out)}
 .ht-skill-panel .ht-skill-lead{margin-top:0}
-@media (prefers-reduced-transparency:reduce){.ht-skill-panel{background:#fbf7ff;backdrop-filter:none;-webkit-backdrop-filter:none}}
-@media (forced-colors:active){.ht-skill-panel{background:Canvas;color:CanvasText;border-color:CanvasText;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}.ht-skill-panel .ht-skill-blurb{color:CanvasText}}
-.ht-skill-lead{margin:14px 0 0;font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:clamp(30px,3.3vw,52px);line-height:1.04;letter-spacing:-.04em;text-wrap:balance}
-.ht-skill-blurb{margin:16px 0 0;max-width:44ch;font-size:clamp(16px,1.25vw,19px);line-height:1.55;color:#49374e;text-wrap:pretty}
+@media(prefers-reduced-motion:reduce){
+  .ht-skill-story,.ht-skill-story-content,.ht-skill-panel,.ht-skill-panel[data-active=true]{transition:none}
+  .ht-skill-panel[data-position]{transform:none}
+}
+@media(forced-colors:active){.ht-skill-story{background:Canvas;color:CanvasText;border-color:CanvasText;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}.ht-skill-panel .ht-skill-blurb{color:CanvasText}}
+.ht-skill-lead{margin:14px 0 0;font-family:var(--font-display);font-weight:900;font-size:clamp(30px,3.3vw,52px);line-height:1.04;letter-spacing:-.04em;text-wrap:balance}
+.ht-skill-blurb{margin:16px 0 0;max-width:44ch;font-size:clamp(16px,1.25vw,19px);line-height:1.55;color:rgba(246,248,251,.9);text-wrap:pretty}
 .ht-list li.is-here{background:rgba(255,255,255,.78);transform:translateX(6px);box-shadow:0 12px 30px rgba(42,22,54,.14)}
 .ht-list a,.ht-list li>b{display:block}
 .ht-list a span,.ht-list li>span{display:block;font-size:13px;color:rgba(42,22,54,.6)}
 .ht-list a span{margin-bottom:4px}
 .ht-list li>span{margin-top:4px}
-.ht-list b{font-family:var(--font-display),'Inter',sans-serif;font-weight:700;font-size:20px;letter-spacing:-.03em}
+.ht-list b{font-family:var(--font-display);font-weight:700;font-size:20px;letter-spacing:-.03em}
 .ht-list b i{font-style:normal;color:#7c5cdb;transition:margin .3s}
 .ht-list a:hover b i{margin-left:6px}
 /* About: night by the campfire. A portrait, the words and a link to the full experience hold on the left while the
@@ -180,53 +143,11 @@ html:has(.ht){scrollbar-width:none;background:#1b1335}html:has(.ht)::-webkit-scr
 .ht-dusk-sky{position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,var(--sky-night) 0%,#6b3fa0 55%,#a0607a 100%)}
 .ht-portrait{display:block;flex:none;width:120px;height:120px;margin:0 0 22px;border-radius:50%;object-fit:cover;background:linear-gradient(135deg,var(--violet),#f4a089);border:2px solid color-mix(in srgb,var(--violet) 40%,transparent);box-shadow:0 12px 30px rgba(10,6,30,.35)}
 .ht-now{font-weight:400;opacity:.7}
-.ht-about .ht-copy>p.ht-drive+p.ht-drive{margin-top:8px}
+.ht-about-text{display:grid;gap:12px;margin-top:16px;color:rgba(251,247,255,.88);font-size:var(--ui-t-body);line-height:1.55}
+.ht-about-text p{margin:0}
 .ht-resume{color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(251,247,255,.35);transition:text-decoration-color .3s}
 .ht-resume:hover{text-decoration-color:currentColor}
 
-/* Contact: Big Sur on a clear late afternoon, a little haze on the horizon. */
-/* Sky: blue overhead, banks of cloud, a pale hazy horizon. */
-.ht-coast-sky{position:absolute;inset:0;z-index:0;background:
-  radial-gradient(38% 14% at 22% 18%,rgba(240,244,247,.85),transparent 70%),radial-gradient(30% 10% at 70% 12%,rgba(232,238,242,.75),transparent 70%),
-  radial-gradient(50% 12% at 55% 30%,rgba(214,224,232,.7),transparent 70%),
-  linear-gradient(180deg,#4f8cc6 0%,#7eacd6 26%,#b4cee2 44%,#d4e0e7 56%,#d4e0e7 100%)}
-/* Grade: a light vignette and a warm glow where the sun sits; the haze lives in the scene's distance. */
-.ht-contact{height:100svh}
-.ht-contact-card{position:absolute;z-index:4;left:var(--gutter);top:clamp(110px,18svh,170px);max-width:430px;padding:28px 30px;border-radius:22px;color:#f4f6f8;
-  background:rgba(28,36,46,.42);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(14px) saturate(1.1);-webkit-backdrop-filter:blur(14px) saturate(1.1);box-shadow:0 20px 50px rgba(10,16,24,.25)}
-.ht-contact-card h2{margin:0;font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:clamp(34px,4vw,60px);line-height:.95;letter-spacing:-.05em}
-.ht-contact-card h2 .ht-dot{color:var(--violet)}
-.ht-contact-card p{margin:16px 0 0;font-size:15px;line-height:1.55;color:rgba(244,246,248,.8)}
-.ht-contact-card{max-height:85svh;overflow-y:auto;scrollbar-width:none}
-/* The form: three quiet glass fields and a violet send button; it fades out for the thank-you. */
-.ht-form{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
-/* (Name and email side by side, so the card stays clear of the credits below it on shorter screens.) */
-.ht-form>:not(input){grid-column:1/-1}
-.ht-form input{min-width:0}
-.ht-form input,.ht-form textarea{width:100%;padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-size:15px;transition:border-color .3s,box-shadow .3s}
-.ht-form textarea{resize:none;height:calc(4lh + 22px)}
-.ht-form input::placeholder,.ht-form textarea::placeholder{color:rgba(255,255,255,.4)}
-.ht-form input:focus,.ht-form textarea:focus{outline:0;border-color:rgba(255,255,255,.4);box-shadow:0 0 0 2px color-mix(in srgb,var(--violet) 35%,transparent)}
-.ht-form button{display:flex;justify-content:center;gap:8px;width:100%;padding:13px 22px;border:0;border-radius:12px;background:#7c5cdb;color:#fff;font:inherit;font-weight:600;font-size:15px;cursor:pointer;transition:transform .3s,background .3s,box-shadow .3s}
-.ht-form button:hover{transform:translateY(-2px);background:#8b6fe6;box-shadow:0 14px 36px rgba(20,8,40,.36)}
-.ht-form button:disabled{opacity:.7;cursor:progress;transform:none}
-.ht-form button:focus-visible{outline:2px solid var(--violet);outline-offset:3px}
-.ht-contact-card p.ht-form-error{margin:2px 0 0;font-size:13px;color:#ffd6d6}
-.ht-contact-card p.ht-form-sent{margin:20px 0 0;padding:18px 0;text-align:center;color:#fff;animation:ht-fade-in .6s ease both}
-@keyframes ht-fade-in{from{opacity:0;transform:translateY(6px)}}
-.ht-contact-card p.ht-contact-or{margin:18px 0 0;font-size:13px;color:rgba(244,246,248,.6)}
-@media(max-height:860px){.ht-form textarea{height:calc(3lh + 22px)}}
-.ht-contact-email{display:inline-flex;gap:8px;margin-top:8px;padding:13px 18px;border-radius:12px;background:#f4f6f8;color:#1d2530;font-weight:600;font-size:15px;transition:transform .3s,background .3s}
-.ht-contact-email:hover{transform:translateY(-2px);background:#fff}
-.ht-contact-links{display:flex;gap:22px;margin:20px 0 0;padding:0;list-style:none;font-size:13px}
-.ht-contact-links a{color:rgba(244,246,248,.85);border-bottom:1px solid rgba(244,246,248,.3)}
-.ht-contact-links a:hover{border-color:currentColor}
-.ht-beam-hint{position:absolute;z-index:4;right:var(--gutter);bottom:104px;max-width:calc(100vw - var(--gutter) * 2 - 454px);text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px;font-size:12px;color:#f4f6f8;text-shadow:0 1px 8px rgba(0,0,0,.35);pointer-events:none}
-.ht-beam-hint b{font-weight:600;letter-spacing:.04em}
-.ht-credits{position:absolute;z-index:4;left:var(--gutter);right:calc(var(--gutter) + 210px);bottom:16px;font-size:10px;line-height:1.5;color:rgba(244,246,248,.7)}
-.ht-credits{text-shadow:0 1px 6px rgba(10,20,30,.55)}
-.ht-credits a{color:inherit;text-decoration:underline;text-decoration-color:rgba(244,246,248,.3)}
-@media(max-height:820px) and (min-width:761px){.ht-form textarea{height:calc(3lh + 22px)}.ht-contact-card{top:clamp(96px,15svh,170px);padding:24px 28px}}
 /* Skills, on wider screens: the heading top left and the stop you're at spelled out top right, both at the same height
    across the content width, with the road trip open beneath them. */
 @media(min-width:761px){
@@ -243,21 +164,8 @@ html:has(.ht){scrollbar-width:none;background:#1b1335}html:has(.ht)::-webkit-scr
   .ht-skill-blurb{font-size:15px;margin-top:10px}
 }
 /* The stop's tools, each with its mark. */
-.ht-skill-tools{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 0;padding:0;list-style:none}
-.ht-skill-tools .ui-chip{font-weight:600;color:var(--ink);background:rgba(255,255,255,.5);border-color:rgba(42,22,54,.1)}
-.ht-skill-tools .ui-icon{color:#7c5cdb;width:16px;height:16px}
-/* Very short screens: a tighter card, the credits moved to the right-hand column above the section menu, the beam
-   hint to the top right, so nothing overlaps. */
-@media(max-height:640px) and (min-width:761px){
-  .ht-contact-card{top:78px;padding:18px 24px;max-height:calc(100svh - 96px)}
-  .ht-contact-card h2{font-size:clamp(28px,3.4vw,44px)}
-  .ht-contact-card p{margin-top:10px;font-size:14px}
-  .ht-form{margin-top:12px;gap:8px}.ht-form textarea{height:calc(2lh + 22px)}.ht-form button{padding:11px 20px}
-  .ht-contact-card p.ht-contact-or{margin-top:10px}.ht-contact-links{margin-top:12px}
-  .ht-credits{left:auto;right:var(--gutter);bottom:96px;width:min(320px,calc(100vw - 454px - var(--gutter) * 3))}
-  .ht-beam-hint{top:84px;bottom:auto}
-}
-
+.ht-skill-tools{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:20px 0 0;padding:0;list-style:none}
+.ht-skill-tools .ui-chip{font-weight:600}
 /* Loading screen: the hero's dusk, a sun rising behind two ridges, the name, a progress line. */
 html.ht-locked{overflow:hidden}
 .ht-loader{position:fixed;z-index:50;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--cream);
@@ -268,7 +176,7 @@ html.ht-locked{overflow:hidden}
 .ht-loader-ridge{position:absolute;left:-10px;right:-10px;bottom:0;height:34px;background:#2a1d4a;clip-path:polygon(0 100%,0 60%,18% 25%,34% 55%,52% 10%,70% 50%,84% 30%,100% 58%,100% 100%)}
 .ht-loader-ridge-2{height:22px;background:#1b1335;clip-path:polygon(0 100%,0 40%,22% 70%,40% 30%,62% 65%,80% 35%,100% 60%,100% 100%)}
 @keyframes ht-rise{from{transform:translateY(10px)}to{transform:translateY(-14px)}}
-.ht-loader-name{font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:30px;letter-spacing:-.05em}
+.ht-loader-name{font-family:var(--font-display);font-weight:900;font-size:30px;letter-spacing:-.05em}
 .ht-loader-name span{color:var(--violet)}
 .ht-loader-line{font-size:14px;color:rgba(251,247,255,.65)}
 .ht-loader-bar{width:160px;height:2px;border-radius:2px;background:rgba(251,247,255,.18);overflow:hidden}
@@ -278,7 +186,7 @@ html.ht-locked{overflow:hidden}
 /* The section pill: where you are, and a menu to jump. */
 .ht-pill{position:fixed;z-index:20;right:var(--gutter);bottom:28px;color:var(--ink);transition:opacity .35s,transform .45s cubic-bezier(.22,1,.36,1)}
 .ht-pill.is-away{opacity:0;transform:translateY(24px);pointer-events:none}
-.ht-pill>button{display:flex;align-items:center;gap:10px;min-width:180px;padding:12px 16px 17px;border:0;border-radius:14px;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);box-shadow:0 10px 30px rgba(42,22,54,.18);font:600 14px/1 'Satoshi','Inter',sans-serif;color:inherit;cursor:pointer}
+.ht-pill>button{display:flex;align-items:center;gap:10px;min-width:180px;padding:12px 16px 17px;border:0;border-radius:14px;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);box-shadow:0 10px 30px rgba(42,22,54,.18);font:600 14px/1 var(--font-display);color:inherit;cursor:pointer}
 .ht-pill>button em{font-style:normal;font-weight:500;color:rgba(42,22,54,.5);font-size:12px}
 .ht-progress{position:fixed;z-index:21;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#a78bfa,#f3b89c);transform:scaleX(var(--progress,0));transform-origin:left;transition:transform .25s ease-out;pointer-events:none}
 @media(prefers-reduced-motion:reduce){.ht-progress{transition:none}}
@@ -289,27 +197,28 @@ html.ht-locked{overflow:hidden}
 .ht-pill-dot{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#a78bfa,#f3b89c)}
 .ht-pill-caret{margin-left:auto;font-size:9px;opacity:.6}
 .ht-pill ul{position:absolute;right:0;bottom:calc(100% + 8px);margin:0;padding:6px;list-style:none;min-width:180px;border-radius:14px;background:rgba(255,255,255,.94);box-shadow:0 10px 30px rgba(42,22,54,.18)}
-.ht-pill ul button{display:block;width:100%;text-align:left;padding:10px 12px;border:0;border-radius:9px;background:none;font:500 14px 'Satoshi','Inter',sans-serif;color:var(--ink);cursor:pointer}
+.ht-pill ul button{display:block;width:100%;text-align:left;padding:10px 12px;border:0;border-radius:9px;background:none;font:500 14px var(--font-display);color:var(--ink);cursor:pointer}
 .ht-pill ul button:hover,.ht-pill ul button[aria-current]{background:rgba(167,139,250,.16)}
 .ht-pill button:focus-visible{outline:2px solid var(--violet);outline-offset:3px}
 .ht-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .ht-sr:focus-within{position:fixed;z-index:10;left:16px;top:16px;width:auto;height:auto;clip:auto;background:#1d1233;padding:16px 22px;border-radius:12px;list-style:none;display:flex;flex-direction:column;gap:8px}
 @media(max-width:760px){
-  .ht-header{padding:20px 20px}
-  .ht-available{display:none}
   .ht-pill{right:16px;bottom:16px}
-  .ht-header nav{display:none}
-  .ht-intro{left:20px;right:20px;bottom:84px;max-width:none}
-  .ht-roles{font-size:24px}
+  .ht .ht-name{font-size:clamp(50px,17vw,124px);top:clamp(90px,13svh,122px)}
+  .ht-intro{left:16px;right:16px;bottom:clamp(76px,12svh,108px);max-width:none;text-align:center}
+  .ht-intro .ht-lede{margin-inline:auto;max-width:38ch}
+  .ht-intro .ht-links{justify-content:center}
+  .ht-roles{font-size:clamp(19px,5.1vw,24px)}
   .ht-stack{margin-top:10px}
     .ht-lede{font-size:14px;margin-top:12px;max-width:320px}
   .ht-links{margin-top:14px}
-  .ht-button{padding:12px 18px;font-size:14px}
   .ht-zone[data-side] .ht-copy{width:auto;margin:-100svh 16px 0!important;padding:58svh 0 30svh}
-  .ht-zone.ht-about .ht-copy{justify-content:flex-end;padding:0 0 84px}
+  .ht-zone.ht-about .ht-copy{justify-content:flex-start;padding:84px 0 88px}
   .ht-copy>p{font-size:14px;margin-top:10px}
   .ht-zone.ht-pinned .ht-copy{justify-content:flex-end;padding:0 0 84px}
-  .ht-skill-story{left:0;right:0;top:76px;width:auto}
+  .ht-skills .ht-copy h2{margin-bottom:12px}
+  .ht-skill-panel .ht-skill-blurb{line-height:1.45}
+  .ht-skill-story{position:relative;inset:auto;width:100%;padding:18px}
   .ht-skill-lead{font-size:24px;margin-top:8px}
   .ht-skill-blurb{font-size:14px;margin-top:8px}
   .ht-copy h2{font-size:32px}
@@ -323,17 +232,9 @@ html.ht-locked{overflow:hidden}
   .ht-shine,.ht-shine.is-right{width:100%;transform:translateY(40px)}
   .ht-shine.is-in{transform:none}
   .ht-copy>p.ht-more{margin-top:12px}
-  .ht-about .ht-copy>p:not(.ht-drive){padding:14px 16px;border-radius:16px;background:rgba(20,14,44,.42);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  .ht-about-text{gap:10px;margin-top:0;font-size:14px;padding:16px;border-radius:var(--ui-radius-panel);background:rgba(20,14,44,.68);border:1px solid var(--ui-glass-line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
   .ht-portrait{width:88px;height:88px;margin:0 auto 14px}
-  .ht-about h2{text-align:center}
-  /* Phones: the card sits at the foot of the screen above the pill; the hint and credits move up over the sky. */
-  .ht-contact-card{left:16px;right:16px;top:auto;bottom:76px;max-width:none;max-height:calc(100svh - 170px);padding:20px}
-  .ht-form{grid-template-columns:1fr}
-  .ht-contact-card h2{font-size:32px}
-  .ht-form{margin-top:14px;gap:8px}
-  .ht-form textarea{height:calc(3lh + 22px)}
-  .ht-beam-hint{right:16px;top:78px;bottom:auto;max-width:none}
-  .ht-credits{left:16px;right:16px;top:118px;bottom:auto;font-size:9px}
+  .ht-about h2{text-align:center;margin-bottom:clamp(156px,29svh,300px)}
   }
 /* The entrance, once the loading screen lifts: the island rises and lands (0.3–1.4 s), the name drops in (0.8–1.6 s),
    then the words and buttons follow one by one (from 1.4 s). With reduced motion it's a short fade, no movement. */
@@ -371,12 +272,8 @@ html.ht-locked{overflow:hidden}
 .wl-pin{position:sticky;top:0;height:100svh;overflow:visible;color:var(--ink)}
 .wl-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
 .wl-front{position:fixed;z-index:3;height:100svh}
-.wl-head{position:absolute;z-index:4;left:var(--gutter);top:clamp(96px,12svh,130px)}
-/* The heading's ink follows the sun (work-showcase.js sets --warm and --rise, 0 → 1): white warming to pale peach,
-   then turning to plum once the sky behind it has brightened. Top to foot it warms, as the project name does. */
-/* (Room round the words for the gradient to paint into: it only fills the box, and with this tight line-height the
-   descenders, the g in "Things", hang below it.) */
-.wl-title{margin:-.12em -.12em -.26em;padding:.12em .12em .26em;font-family:var(--font-display),'Inter',sans-serif;font-size:var(--ui-t-h2);font-weight:900;line-height:.95;letter-spacing:-.05em;color:#fbf7ff}
+.wl-head{position:relative;z-index:4}
+.wl-title{color:var(--ui-cream)}
 .wl-pills{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 0}
 .wl-pills .ui-btn{min-height:44px;font-size:14px}
 .wl-tags{justify-content:center}
@@ -384,7 +281,7 @@ html.ht-locked{overflow:hidden}
 .wl-tags em{font-style:normal;font-size:12px;padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.5);border:1px solid rgba(42,22,54,.1);color:var(--ink)}
 
 .wl-phone,.wl-phone-head{display:none}
-@media (max-width:760px){
+@media (max-width:960px), (max-height:620px){
   .wl{height:auto}
   /* (The pin keeps its full height and the list is pulled up over it, so the pin lets go as the list ends: with a
      negative margin instead it took no room and stayed stuck a whole screen longer, over the Skills section.) */
@@ -392,70 +289,114 @@ html.ht-locked{overflow:hidden}
   .wl-head{display:none}
   .wl-front{z-index:2}
   .wl-phone-head{position:relative;z-index:3;display:block;margin-top:-100svh;padding:96px var(--gutter) 0}
-  .wl-phone{position:relative;z-index:3;display:grid;gap:18px;margin:0;padding:32px var(--gutter) 60px;list-style:none}
-  .wl-phone li{display:grid;gap:6px;padding:10px 10px 14px;border-radius:6px;color:var(--ink);background:rgba(251,247,255,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-  .wl-phone a{display:grid;gap:6px;color:var(--ink);text-decoration:none}
-  .wl-phone img{width:100%;height:auto;border-radius:4px}
-  .wl-phone strong{font-size:20px;padding:4px 4px 0}
-  .wl-phone span{font-size:13px;color:rgba(42,22,54,.7);padding:0 4px}
+  .wl-phone{position:relative;z-index:3;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:32px 20px;margin:0;padding:32px var(--gutter) 88px;list-style:none;color:var(--ink);--wk-radius:var(--ui-radius-panel);--wk-surface:#33225a}
+  .wl-phone .wk-info{flex-wrap:wrap;gap:10px;padding:12px 2px 0}
+  .wl-phone .wk-role{color:var(--ink)}
+  .wl-phone .wk-card:hover .wk-title a{color:var(--ink)}
+  .wl-phone .wc-tech{position:relative;z-index:4;max-width:100%}
 }
 
-/* The hero line: "I build" and a phrase that slides up and away for the next. */
-/* The sliding phrase: the same solid off-white as "I build". */
-.ht-slide{position:relative;display:inline-flex;overflow:hidden;vertical-align:bottom;padding-bottom:.08em;margin-bottom:-.08em;color:#fbf7ff}
-.ht-slide>span{display:inline-block;white-space:nowrap}
 .ht-hero-links .ui-btn,.ht-links .ui-btn{pointer-events:auto}
-.ht-about .ht-links{margin-top:20px}
+.ht-about .ht-links{margin-top:8px}
 .ht-copy>p.ht-now{font-size:14px;opacity:.72}
-/* The end: the sky turning rosy behind a frosted card, the footer under it. */
+/* The closing card and footer at dusk: the cabin clearing fills the section behind them, on the right on wide screens
+   (the card on the left) and above the card on tall ones. */
 .ht-outro{position:relative;z-index:5;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 var(--gutter);color:var(--cream)}
-.ht-outro-card{align-self:center;width:min(620px,100%);margin:auto 0;padding:clamp(26px,3vw,44px);text-align:center;
-  background:linear-gradient(135deg,rgba(60,30,70,.42),rgba(40,20,60,.28))}
-.ht-outro-card h2{margin:14px 0 0;font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:var(--ui-t-h2);line-height:1;letter-spacing:-.05em}
-.ht-outro-card p{margin:14px auto 0;max-width:440px;font-size:var(--ui-t-body);line-height:1.55;color:rgba(251,247,255,.82)}
-.ht-outro-card .ht-links{justify-content:center;margin-top:24px}
-.ht-badge{display:inline-flex;align-items:center;gap:9px;margin:0;padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22)}
-.ht-badge i{width:8px;height:8px;border-radius:50%;background:#5ee39a;box-shadow:0 0 0 4px rgba(94,227,154,.22);animation:ht-ping 2.4s ease-in-out infinite}
-@keyframes ht-ping{50%{box-shadow:0 0 0 7px rgba(94,227,154,0)}}
-.ht-outro .ui-footer{padding-inline:0}
-/* The homepage ends on the light rosy sky: the footer in dark plum there (about 8:1). */
-.ht-outro .ui-footer{color:#3b2342}.ht-outro .ui-footer a:hover,.ht-outro .ui-footer button:hover{color:#1d1233}
-@media(prefers-reduced-motion:reduce){.ht-badge i{animation:none}}
+.ht-outro-scene{position:absolute;inset:0;pointer-events:none}
+.ht-outro-card{position:relative;align-self:flex-start;width:min(540px,44vw);margin:auto 0;padding:clamp(26px,3vw,44px);
+  background:linear-gradient(135deg,rgba(46,24,66,.5),rgba(34,18,56,.36))}
+.ht-outro-card .ui-heading{margin-top:14px}
+.ht-outro-card p{margin:14px 0 0;max-width:440px;font-size:var(--ui-t-body);line-height:1.55;color:rgba(251,247,255,.86)}
+.ht-outro-card .ht-links{margin-top:24px}
+.ht-outro .ui-footer{padding-inline:0;color:#3b2342}
+@media(max-aspect-ratio:9/10){
+  .ht-outro-scene{position:relative;inset:auto;flex:none;height:62svh;margin:0 calc(var(--gutter) * -1)}
+  .ht-outro-card{align-self:center;width:min(620px,100%);margin:0 0 12px;text-align:center}
+  .ht-outro-card p{margin-inline:auto}
+  .ht-outro-card .ht-links{justify-content:center}
+}
+.ht-outro .ui-footer a:hover,.ht-outro .ui-footer button:hover{color:#1d1233}
 
-/* The line under the Work heading. */
-/* The heading and its line stay one solid off-white as the sky lightens behind them: a soft dusk shade feathered in
-   behind that corner, blending into the sky, and a close dark glow round the letters themselves for contrast. */
 .wl-intro{margin:14px 0 0;max-width:40ch;font-size:16px;line-height:1.55;color:#fbf7ff;text-shadow:0 1px 2px rgba(36,18,48,.6),0 0 10px rgba(36,18,48,.45),0 0 22px rgba(36,18,48,.3)}
-.wl-head{isolation:isolate}
+.wl-head,.wl-phone-head{isolation:isolate}
 .wl-head .wl-title{text-shadow:0 2px 24px rgba(36,18,48,.35)}
 .wl-head::before,.wl-phone-head::before{content:'';position:absolute;z-index:-1;inset:-160px -240px -150px -220px;background:radial-gradient(closest-side,rgba(42,22,54,.26),rgba(42,22,54,.16) 45%,rgba(42,22,54,.06) 75%,transparent);pointer-events:none}
-.wl-phone-head{isolation:isolate}
 .wl-phone-head::before{inset:40px -20px -40px}
 
-
-/* The Work index (work-cards.js): the names huge on the left (the one you're on solid, the others faded), its role and
-   tech under them, its thumbnail loop as a big screen on the right. */
-.wc{position:absolute;z-index:4;inset:0;margin:0;padding:0;list-style:none;pointer-events:none}
-.wc li{list-style:none}
-.wc a{pointer-events:auto;color:inherit;text-decoration:none}
-.wc-bigscreen{--fs:clamp(36px,4.7vw,84px);--row:calc(var(--fs) * 1.04);display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.25fr);align-items:center;gap:clamp(24px,3.5vw,60px);padding:clamp(90px,11svh,120px) var(--gutter);color:var(--ink)}
-.wc-bigscreen-index{display:grid;gap:22px;min-width:0;align-self:end;margin-bottom:clamp(20px,6svh,70px)}
+/* The desktop screen stays centered independently of the left column. */
+.wc-bigscreen{position:absolute;z-index:4;inset:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.23fr);grid-template-rows:minmax(0,1fr);align-items:center;gap:clamp(24px,3vw,56px);padding-inline:var(--gutter);color:var(--ink)}
+.wc-bigscreen-index{container-type:inline-size;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:center;gap:clamp(20px,4svh,44px);padding-block:72px 56px}
+.wc-projects{display:grid;gap:14px;min-width:0}
 .wc-names{margin:0;padding:0;list-style:none}
-.wc-names a{display:block;height:var(--row);font-family:var(--font-display),'Inter',sans-serif;font-weight:900;font-size:var(--fs);line-height:1.04;letter-spacing:-.055em;white-space:nowrap;color:var(--ink);opacity:.28;transition:opacity .45s}
+.wc-names a{display:block;width:fit-content;max-width:100%;font-family:var(--font-display);font-weight:900;font-size:clamp(28px,min(11.5cqi,8svh),76px);line-height:1.08;letter-spacing:-.045em;overflow-wrap:anywhere;color:var(--ink);opacity:.28;transition:opacity .45s}
 .wc-names li.is-on a{opacity:1}
-.wc-names a:hover{opacity:.6}
-.wc-active{display:flex;align-items:center;gap:16px;padding-left:4px;animation:wc-rise .5s cubic-bezier(.22,1,.36,1) both}
+.wc-names a:hover,.wc-names a:focus-visible{opacity:.8}
+.wc-active{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;min-width:0;animation:wc-rise .5s cubic-bezier(.22,1,.36,1) both}
 .wc-role{font-size:15px;color:rgba(42,22,54,.72)}
 @keyframes wc-rise{from{opacity:0;transform:translateY(10px)}}
 .wc-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.wc-tech{display:flex;flex:none;margin:0;padding:0;list-style:none}
-.wc-tech li{display:grid;place-items:center;width:38px;height:38px;margin-left:-9px;border-radius:50%;background:#fbf7ff;border:2px solid rgba(255,255,255,.9);box-shadow:0 4px 12px rgba(42,22,54,.15);color:#2a1636;font-size:12px;font-weight:650}
-.wc-tech li:first-child{margin-left:0}.wc-tech .ui-icon{width:18px;height:18px}
-.wc-more{background:#2a1636!important;color:#fbf7ff!important}
+.wc-tech{display:flex;align-items:center;flex-wrap:wrap;row-gap:5px;max-width:100%}
+.wc-tech-icon+.wc-tech-icon,.wc-tech-icon+.wc-more,.wc-tech-extra .wc-tech-icon:first-child{margin-left:-9px}
+.wc-tech .wc-more{position:relative;z-index:1}
+.wc-tech-extra{display:contents}
+.wc-tech-extra[hidden],.ht-skill-tools [hidden]{display:none}
+.wc-tech-icon{display:grid;place-items:center;flex:none;width:34px;height:34px;border:1px solid rgba(60,40,80,.14);border-radius:50%;background:var(--ui-cream);color:var(--ui-ink);box-shadow:0 3px 10px rgba(42,22,54,.13);font-size:11px;font-weight:650}
+.wc-tech-icon .ui-icon{width:17px;height:17px}
+.wc-more,.ht-skill-more{flex:none;border:1px solid var(--tech-count-border,rgba(83,49,149,.4));background:var(--tech-count-bg,#eee4ff);color:var(--tech-count-ink,#4b2a83);cursor:pointer}
+.wc-more:hover,.ht-skill-more:hover{background:var(--tech-count-hover,#e5d5ff)}
+.ht-skill-more{--tech-count-bg:#372853;--tech-count-border:#a78bfa80;--tech-count-ink:#f4ecff;--tech-count-hover:#48336b}
+.wc-more:focus-visible,.ht-skill-more:focus-visible{outline:2px solid var(--ui-violet);outline-offset:2px}
+@media(prefers-reduced-motion:no-preference){
+  .wc-tech-extra .wc-tech-icon,.ht-skill-extra{animation:tech-icon-in .18s var(--ui-ease-out) both;animation-delay:calc(min(var(--reveal-index),6) * 22ms)}
+  .ht-skill-extra-out{animation:tech-icon-out .14s ease-out both;animation-delay:calc(min(var(--reveal-index),6) * 18ms)}
+}
+@keyframes tech-icon-in{from{opacity:0;transform:translateX(-6px) scale(.94)}}
+@keyframes tech-icon-out{to{opacity:0;transform:translateX(-6px) scale(.94)}}
 /* The screen stays put in the middle of the section; projects crossfade on it. */
 .wc-previews{position:relative;aspect-ratio:16/10;width:min(100%,calc((100svh - 330px) * 1.6));justify-self:end;align-self:center}
 .wc-preview{position:absolute;inset:0;transition:opacity .7s ease}
 .wc-preview .motion-thumb{height:100%;aspect-ratio:auto;border-radius:22px;overflow:hidden;box-shadow:0 50px 90px -30px rgba(42,22,54,.55),0 0 0 1px rgba(255,255,255,.4)}
-.wc-preview:not([data-pos="0"]){opacity:0;pointer-events:none}
-@media(max-width:760px){.wc{display:none}}
+.wc-preview:not([data-pos="0"]){opacity:0}
+.wc-preview-link{position:absolute;inset:0;border-radius:var(--ui-radius-panel)}
+@media(max-width:960px),(max-height:620px){.wc{display:none}}
 @media(prefers-reduced-motion:reduce){.wc-names a,.wc-preview{transition:opacity .2s!important}.wc-active{animation:none}}
+
+.ht-hero-headline{display:grid;justify-items:start;gap:4px}
+.ht-hero-headline .ht-roles{display:flex;align-items:baseline;gap:.28em;width:max-content;white-space:nowrap}
+.ht-hero-phrases{display:grid}
+.ht-hero-phrases>span{grid-area:1/1;opacity:0;transition:opacity .4s var(--ui-ease-out)}
+.ht-hero-phrases>span[data-current=true]{opacity:1}
+.ht-hero-headline .ht-roles{pointer-events:auto}
+.ht-hero-headline .ht-roles:focus-visible{outline:2px solid var(--ui-violet);outline-offset:4px}
+.ht-skill-panel[data-lenis-prevent]{pointer-events:auto;max-height:calc(100svh - var(--skills-top,76px) - 72px);overflow:auto}
+.ht-skill-panel:has(.ht-skill-more[aria-expanded=true]){overscroll-behavior-y:contain}
+.ht-skill-panel[data-lenis-prevent] .ht-skill-more:focus-visible{outline-offset:-2px}
+@media(max-width:760px){
+  .ht-hero-headline{justify-items:center}
+  .ht-skill-panel[data-lenis-prevent]{max-height:clamp(170px,48svh,410px)}
+}
+@media(prefers-reduced-motion:reduce){
+  .ht-hero-phrases>span[data-current]{opacity:0;transition:none}
+  .ht-hero-phrases>span:first-child{opacity:1}
+}
+
+@media(max-width:360px){
+  .ht-hero-headline .ht-roles{font-size:17px}
+  .ht-intro .ht-links{gap:8px}
+  .ht-intro .ui-btn{min-height:44px;padding-inline:14px;font-size:14px}
+}
+@media(max-width:760px) and (max-height:700px){
+  .ht-portrait{width:72px;height:72px}
+}
+
+.ht-skill-blurb p,.wl-intro p{margin:0}
+.ht-skill-blurb p+p,.wl-intro p+p{margin-top:.65em}
+@media(min-width:961px) and (min-height:621px){.wl-intro{max-width:54ch;font-size:14px;line-height:1.45}}
+
+/* Leave room for the Work intro above the names on shorter desktop screens. */
+@media(max-height:820px) and (min-width:761px){
+  .wl-title{font-size:clamp(30px,4.9svh,42px)}
+  .wl-pills{margin-top:14px}
+}
+
+.wc-sheet:not([data-sheet-ready=true]){border-radius:20px;background:var(--work-poster) center/cover no-repeat}

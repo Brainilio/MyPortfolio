@@ -1,5 +1,5 @@
 // Every technology shown on the site has an icon. Icons come from Iconbuddy (files.svgcdn.io): Tabler (MIT) first,
-// Simple Icons (CC0) for brands Tabler lacks. They are downloaded into public/icons/tech/<set>--<name>.svg by
+// Simple Icons, Devicon, and SVG Logos for brands Tabler lacks. They are downloaded into public/icons/tech/<set>--<name>.svg by
 // `node scripts/fetch-tech-icons.mjs` and drawn as a CSS mask, so they take the text colour.
 // Keys are matched case-insensitively; add a line here (and run the script) when a new technology appears.
 export const TECH_ICONS = {
@@ -9,9 +9,9 @@ export const TECH_ICONS = {
   "typescript": "tabler/brand-typescript", "tscript": "tabler/brand-typescript", "javascript": "tabler/brand-javascript",
   "node.js": "tabler/brand-nodejs", "nodejs": "tabler/brand-nodejs", "node": "tabler/brand-nodejs",
   "express": "simple-icons/express", "expressjs": "simple-icons/express",
-  "graphql": "simple-icons/graphql", "graphql / appsync": "simple-icons/graphql", "appsync": "simple-icons/graphql",
+  "graphql": "simple-icons/graphql", "graphql / appsync": "simple-icons/graphql", "appsync": "logos/aws-appsync",
   "react query": "simple-icons/reactquery", "tanstack query": "simple-icons/reactquery",
-  "redux": "tabler/brand-redux", "react router": "simple-icons/reactrouter",
+  "redux": "tabler/brand-redux", "zustand": "devicon-plain/zustand", "react router": "simple-icons/reactrouter",
   "aws": "tabler/brand-aws", "aws ec2 & s3": "tabler/brand-aws", "aws lambda": "simple-icons/awslambda", "lambda": "simple-icons/awslambda",
   "cognito": "simple-icons/amazoncognito", "dynamodb": "simple-icons/amazondynamodb", "elasticache": "simple-icons/amazonelasticache", "eas": "simple-icons/expo", "testflight": "tabler/brand-apple", "sst": "simple-icons/sst",
   "redis": "simple-icons/redis", "salesforce": "simple-icons/salesforce", "supabase": "simple-icons/supabase", "firebase": "tabler/brand-firebase",
@@ -22,7 +22,7 @@ export const TECH_ICONS = {
   "stencil": "simple-icons/stencil", "stencil web components": "simple-icons/stencil", "storybook": "simple-icons/storybook", "sass": "simple-icons/sass", "web components": "simple-icons/webcomponentsdotorg", "design systems": "tabler/components",
   "stripe": "tabler/brand-stripe", "apple pay": "simple-icons/applepay", "apple sign-in": "tabler/brand-apple",
   "figma": "tabler/brand-figma", "adobe xd": "tabler/brand-adobe", "adobexd": "tabler/brand-adobe",
-  "python": "tabler/brand-python", "fastapi": "simple-icons/fastapi", "scikit": "simple-icons/scikitlearn", "ml": "tabler/brain",
+  "python": "tabler/brand-python", "fastapi": "simple-icons/fastapi", "scikit": "simple-icons/scikitlearn", "ml": "tabler/brain", "ai": "tabler/brain",
   "php": "tabler/brand-php", "laravel": "tabler/brand-laravel", "java": "tabler/coffee", "android": "tabler/brand-android",
   "material": "simple-icons/mui", "google api": "tabler/brand-google", "google analytics": "tabler/brand-google-analytics",
   "docker": "tabler/brand-docker", "github actions": "tabler/brand-github", "jest": "simple-icons/jest",
@@ -32,6 +32,12 @@ export const TECH_ICONS = {
   "unit testing": "tabler/test-pipe", "oop": "tabler/code", "dpatterns": "tabler/topology-star", "game": "tabler/device-gamepad-2",
   "design patterns": "tabler/topology-star", "materialize": "simple-icons/materialdesign", "machine learning": "tabler/brain", "scikit-learn": "simple-icons/scikitlearn",
   "jwt": "simple-icons/jsonwebtokens", "apollo": "simple-icons/apollographql", "oauth": "tabler/key",
+  "scss": "simple-icons/sass", "ios": "tabler/brand-apple", "postgresql": "simple-icons/postgresql",
+  "api gateway": "logos/aws-api-gateway", "sqs": "logos/aws-sqs",
+  "git": "simple-icons/git", "vite": "tabler/brand-vite",
+  "testing": "tabler/test-pipe", "code review": "tabler/message-code",
+  "design sprints": "tabler/presentation", "user journeys": "tabler/route", "prototyping": "tabler/layout",
+  "usability testing": "tabler/clipboard-check", "accessibility": "tabler/accessible",
   "mobile": "tabler/device-mobile", "agile": "tabler/refresh", "ci/cd": "tabler/git-merge", "lighthouse": "simple-icons/lighthouse", "serverless": "tabler/cloud",
 };
 export const techIcon = name => {

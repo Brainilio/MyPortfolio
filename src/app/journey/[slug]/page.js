@@ -4,7 +4,7 @@ import SpaceExperiment from "../journey";
 import WorldExperiment from "../world";
 
 export function generateStaticParams() { return EXPERIMENTS.map(({ slug }) => ({ slug })); }
-export async function generateMetadata({ params }) { const { slug } = await params; return { title: `${findExperiment(slug)?.title ?? "Experiment"} — Brainilio's lab` }; }
+export async function generateMetadata({ params }) { const { slug } = await params; return { title: findExperiment(slug)?.title ?? "Lab experiment" }; }
 
 export default async function ExperimentPage({ params }) {
   const { slug } = await params;

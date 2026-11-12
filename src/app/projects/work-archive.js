@@ -3,13 +3,14 @@ import Link from 'next/link';
 import ProjectThumbnail from '../project/project-thumbnail';
 import TechChip, { Icon } from '../tech-chip';
 import { techIcon } from '../../lib/tech-icons';
+import './projects.css';
 
 const STACK = 2; // tech icons shown before the +N
 
 // A card: the thumbnail, then the name with what I did under it, and a small stack of tech icons beside it.
 // Screen readers get the full tech list (visually hidden); the stack is decorative.
-function Card({ project }) {
-  const href = `/project/${project.slug}/`, tags = project.tags, iconTags = tags.filter(techIcon);
+export function ProjectCard({ project, tools }) {
+  const href = `/project/${project.slug}/`, tags = project.tags ?? [], iconTags = tools ? [] : tags.filter(techIcon);
   return <article className="wk-card">
     <div className="wk-media"><ProjectThumbnail project={project} /></div>
     <div className="wk-info">
@@ -18,14 +19,15 @@ function Card({ project }) {
         <h3 className="wk-title"><Link href={href}>{project.name}</Link></h3>
         {project.role && <p className="wk-role">{project.role}</p>}
       </div>
-      {tags.length > 0 && <ul className="wk-sr" aria-label="Built with">{tags.map(tag => <TechChip key={tag} name={tag} />)}</ul>}
+      {tools}
+      {!tools && tags.length > 0 && <ul className="wk-sr" aria-label="Built with">{tags.map(tag => <TechChip key={tag} name={tag} />)}</ul>}
       {iconTags.length > 0 && <ul className="wk-stack" aria-hidden="true">{iconTags.slice(0, STACK).map(tag => <li key={tag} title={tag}><Icon src={techIcon(tag)} /></li>)}
-        {iconTags.length > STACK && <li className="wk-stack-more">+{iconTags.length - STACK}</li>}</ul>}
+        {iconTags.length > STACK && <li className="ui-tech-overflow">+{iconTags.length - STACK}</li>}</ul>}
     </div>
   </article>;
 }
 
-const Grid = ({ items }) => <div className="wk-grid">{items.map(project => <Card key={project.slug} project={project} />)}</div>;
+const Grid = ({ items }) => <div className="wk-grid">{items.map(project => <ProjectCard key={project.slug} project={project} />)}</div>;
 
 export default function WorkArchive({ selected, early }) {
   return <div className="wk-archive">

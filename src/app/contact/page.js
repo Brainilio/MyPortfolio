@@ -1,3 +1,3 @@
 import Contact from './contact';
-export const metadata = { title: 'Contact — Brainilio', description: 'Available for freelance projects: mobile apps, web platforms and the cloud behind them.' };
+export const metadata = { title: 'Contact', description: 'Get in touch with Brainilio about a project, contract work, or a full-time role.' };
 export default function ContactPage() { return <Contact />; }

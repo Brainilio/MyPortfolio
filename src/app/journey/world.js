@@ -2,11 +2,11 @@
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import Heading from "../heading";
 import { SKILLS } from "../(home)/content";
 import allProjects from "../../lib/projects";
 import { EXPERIMENTS } from "./experiments";
 import { ScrollIndicator, useScrollPlay } from "./scroll-play";
-import "../(home)/home.css";
 import "./journey.css";
 const PrairieScene = dynamic(() => import("../(home)/prairie-scene"), { ssr: false });
 const RoadTripScene = dynamic(() => import("../(home)/roadtrip-scene"), { ssr: false });
@@ -53,10 +53,10 @@ export default function WorldExperiment({ slug }) {
       {experiment.world === "meadow" && <MeadowStage state={state} />}
 
       <main className="lab-panel" id="main">
-        <h1>{experiment.title}</h1>
+        <Heading size="display">{experiment.title}</Heading>
         <p className="lab-note">{experiment.note}</p>
         <div className="lab-actions">
-          {world.scroll && <button type="button" onClick={() => { play.current.target = 0; }}>Start over</button>}
+          {world.scroll && <button type="button" className="ui-btn ui-btn--secondary ui-btn--compact" onClick={() => { play.current.target = 0; }}>Start over</button>}
           {experiment.world === "hike" && <output className="lab-score lab-altitude">▲ <b ref={altitude}>4,200 ft</b></output>}
           {experiment.world === "lighthouse" && <output className="lab-score" aria-live="polite">Spotted {spotted.length}/4{spotted.length ? `: ${spotted.join(", ")}` : ""}</output>}
         </div>
