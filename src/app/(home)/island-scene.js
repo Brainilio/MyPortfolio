@@ -384,18 +384,19 @@ export default function IslandScene({ onEvent, active, onReady } = {}) {
 
     // Framing: the island centred, a little low, under the name.
     const HERO=new THREE.Vector3(.32,.36,.88).normalize(),aim=new THREE.Vector3(),view=new THREE.Vector3();let distance=36,attitude=0;
-    let tall=false;
+    let tall=false,mobile=false;
     function frame(){
-      const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;tall=camera.aspect<.85;
-      const compact=tall&&h<=700;
-      distance=tall?(compact?68:60):36;scene.fog.near=distance+3;scene.fog.far=distance*2.2+8;aim.set(0,tall?.2:2.2,0);placeCamera();
-      if(tall)camera.setViewOffset(w,h,0,h*(compact?.21:.17),w,h);else camera.clearViewOffset();
+      const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;
+      mobile=matchMedia("(max-width: 760px), (max-width: 960px) and (max-height: 500px)").matches;tall=mobile||camera.aspect<.85;
+      distance=mobile?Math.max(32,34/camera.aspect):tall?60:36;
+      scene.fog.near=distance+3;scene.fog.far=distance*2.2+8;aim.set(0,tall?.2:2.2,0);placeCamera();
+      camera.clearViewOffset();
       camera.updateProjectionMatrix();needsRender=true;
     }
     // The camera arrives steeper (8° above its resting angle) and eases down to rest over 1.4 s once the loading screen
     // lifts, so it reads as landing on the island.
     function placeCamera(){
-      const at=live.current?.current.introAt,k=preference.matches?1:at?THREE.MathUtils.clamp((performance.now()-at)/1400,0,1):0,ease=1-(1-k)**3;
+      const at=live.current?.current.introAt,k=preference.matches||mobile?1:at?THREE.MathUtils.clamp((performance.now()-at)/1400,0,1):0,ease=1-(1-k)**3;
       attitude+=((preference.matches?0:live.current?.current.tilt?.[0]??0)-attitude)*.12;
       camera.position.copy(tilted(HERO,8*(1-ease)+attitude,view)).multiplyScalar(distance);camera.lookAt(aim);
     }

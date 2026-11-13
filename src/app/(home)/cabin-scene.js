@@ -165,7 +165,7 @@ export default function CabinScene() {
     let tall=false;
     function frame(){
       const w=mount.clientWidth,h=mount.clientHeight;if(!w||!h)return;
-      camera.aspect=w/h;tall=camera.aspect<.9;
+      camera.aspect=w/h;tall=matchMedia("(max-width: 760px), (max-width: 960px) and (max-height: 500px)").matches||camera.aspect<.9;
       if(tall)camera.clearViewOffset();else camera.setViewOffset(w,h,-.2*w,h*.02,w,h);
       camera.updateProjectionMatrix();
       camera.position.set(.42,.4,.8).normalize().multiplyScalar(Math.max(24,5.5/(.268*camera.aspect)));camera.lookAt(0,tall?.2:.5,0);

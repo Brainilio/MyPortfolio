@@ -202,7 +202,7 @@ html.ht-locked{overflow:hidden}
 .ht-pill button:focus-visible{outline:2px solid var(--violet);outline-offset:3px}
 .ht-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .ht-sr:focus-within{position:fixed;z-index:10;left:16px;top:16px;width:auto;height:auto;clip:auto;background:#1d1233;padding:16px 22px;border-radius:12px;list-style:none;display:flex;flex-direction:column;gap:8px}
-@media(max-width:760px){
+@media(max-width:760px), (max-width:960px) and (max-height:500px){
   .ht-pill{right:16px;bottom:16px}
   .ht .ht-name{font-size:clamp(50px,17vw,124px);top:clamp(90px,13svh,122px)}
   .ht-intro{left:16px;right:16px;bottom:clamp(76px,12svh,108px);max-width:none;text-align:center}
@@ -371,7 +371,7 @@ html.ht-locked{overflow:hidden}
 .ht-skill-panel[data-lenis-prevent]{pointer-events:auto;max-height:calc(100svh - var(--skills-top,76px) - 72px);overflow:auto}
 .ht-skill-panel:has(.ht-skill-more[aria-expanded=true]){overscroll-behavior-y:contain}
 .ht-skill-panel[data-lenis-prevent] .ht-skill-more:focus-visible{outline-offset:-2px}
-@media(max-width:760px){
+@media(max-width:760px), (max-width:960px) and (max-height:500px){
   .ht-hero-headline{justify-items:center}
   .ht-skill-panel[data-lenis-prevent]{max-height:clamp(170px,48svh,410px)}
 }
@@ -400,3 +400,46 @@ html.ht-locked{overflow:hidden}
 }
 
 .wc-sheet:not([data-sheet-ready=true]){border-radius:20px;background:var(--work-poster) center/cover no-repeat}
+
+.ht-about-intro{display:contents}
+/* Phones use document flow so text and expanded tools determine the section height. */
+@media(max-width:760px), (max-width:960px) and (max-height:500px){
+  .ht-home{display:grid;grid-template-columns:minmax(0,1fr);align-content:start;padding:96px 20px 80px;min-height:100svh}
+  .ht-home .ht-name{position:relative;inset:auto;grid-row:1;font-size:16.5vw;line-height:1;margin:0 -4px}
+  .ht-home .ht-stage{position:relative;top:auto;grid-row:2;height:clamp(260px,82vw,400px);margin:-20px -20px 8px}
+  .ht-home .ht-intro{position:relative;inset:auto;grid-row:3;max-width:100%;min-width:0}
+  .ht-intro .ht-lede{font-size:15px;line-height:1.6;max-width:40ch}
+  .ht-intro .ht-links{gap:10px}
+  .ht-intro .ui-btn{min-height:46px;padding-inline:16px;font-size:14px}
+  .ht-hero-headline .ht-roles{display:block;max-width:100%;width:100%;white-space:normal;font-size:clamp(19px,5.1vw,25px);line-height:1.25;text-wrap:balance}
+  .ht-hero-phrases{display:inline-grid;text-align:left;vertical-align:top}
+  .ht-hero-phrases>span{white-space:normal}
+  .ht-zone.ht-about{display:grid;grid-template-columns:minmax(0,1fr);padding:0 20px 56px}
+  .ht-zone.ht-about .ht-copy{display:contents}
+  .ht-about-intro{display:flex;flex-direction:column;align-items:center;grid-row:1;padding-top:76px}
+  .ht-about h2{margin:0;font-size:32px;text-align:center}
+  .ht-about .ht-stage{position:relative;top:auto;grid-row:2;height:clamp(270px,85vw,390px);margin:0 -20px}
+  .ht-about-text{grid-row:3;padding:22px;gap:16px;font-size:15px;line-height:1.65}
+  .ht-zone.ht-skills{min-height:0}
+  .ht-zone.ht-skills .ht-copy{position:relative;top:auto;height:auto;min-height:0;padding:40svh 0 72px;margin:-100svh 20px 0!important}
+  .ht-skills .ht-copy h2{max-width:none;font-size:clamp(28px,7.3vw,34px);margin-bottom:20px;text-wrap:balance}
+  .ht-skill-story[data-fluid=true]{background:none;border:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;padding:0;opacity:1}
+  .ht-skill-story[data-fluid=true] .ht-skill-story-content{height:auto;overflow:visible;display:grid;gap:28px;transition:none}
+  .ht-skill-story[data-fluid=true] .ht-skill-panel{position:relative;inset:auto;opacity:1;visibility:visible;transform:none;max-height:none;overflow:visible;padding:22px;border-radius:var(--ui-radius-panel);background:rgba(14,22,40,.96);border:1px solid var(--ui-glass-line);box-shadow:0 16px 38px rgba(8,14,28,.2);pointer-events:auto}
+  .ht-skill-story[data-fluid=true] .ht-skill-lead{font-size:26px;line-height:1.12;text-wrap:balance}
+  .ht-skill-story[data-fluid=true] .ht-skill-blurb{font-size:15px;line-height:1.6;margin-top:16px}
+  .ht-skill-tools{gap:8px;margin-top:20px}
+  .ht-pill{display:none}
+  .ht-pill>button{min-width:0;gap:8px;padding:10px 12px 15px;font-size:12px}
+  .ht-pill-dot{width:18px;height:18px;border-radius:6px}
+  .ht-pill>button em{font-size:11px}
+  .ht-outro{padding-inline:20px}
+  .ht-outro-scene{position:relative;inset:auto;flex:none;height:clamp(300px,90vw,420px);margin:0 -20px}
+  .ht-outro-card{align-self:center;width:100%;margin:0 0 24px;padding:24px 20px;text-align:left}
+  .ht-outro-card .ui-heading{font-size:clamp(30px,8vw,38px);line-height:1.1;text-wrap:balance}
+  .ht-outro-card p{font-size:15px;line-height:1.6}
+  .ht-outro-card .ui-availability{font-size:12px;line-height:1.4;padding:8px 10px;width:fit-content;margin:0}
+  .ht-outro-card .ht-links{display:grid;grid-template-columns:1fr;gap:10px;margin-top:22px}
+  .ht-outro-card .ht-links .ui-btn{width:100%}
+  .ht-finish:after{animation:none}
+}

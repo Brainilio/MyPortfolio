@@ -335,7 +335,7 @@ export default function SkillsScene({ state, skills, onCar, slot = 3, onReady })
       // Leaving for the coast: the camera lifts back toward the sky and the land fades out from the bottom up into the
       // sky behind, so the coast rises into open sky rather than meeting a hard edge of desert.
       leave = smooth(1 - box.bottom / Math.max(1, window.innerHeight));
-      const lift = Math.max(arrive, reduced ? 0 : leave * .55);
+      const lift = matchMedia("(max-width: 760px), (max-width: 960px) and (max-height: 500px)").matches ? 0 : Math.max(arrive, reduced ? 0 : leave * .55);
       camera.position.lerpVectors(restPos, skyPos, lift); aim.lerpVectors(restAim, skyAim, lift); camera.lookAt(aim);
       fade.from = 1 - .8 * smooth(leave * 1.6);
       const fov = restFov + (skyFov - restFov) * lift; if (camera.fov !== fov) { camera.fov = fov; camera.updateProjectionMatrix(); }

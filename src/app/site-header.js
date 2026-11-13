@@ -7,7 +7,7 @@ import { Icon, Roll } from './tech-chip';
 // The top navigation on every page (rendered once in the root layout): the wordmark on the left edge, the links in a
 // centred glass pill, "Let's talk" on the right edge. Scrolling down fades it up and away; scrolling up, 3 seconds
 // without scrolling, or tabbing into it brings it back.
-const LINKS = [['/projects/', 'Work'], ['/#about', 'About'], ['/journey/', 'Lab'], ['/contact/', 'Contact']];
+const LINKS = [['/projects/', 'Work'], ['/#about', 'About'], ['/#skills', 'Skills', true], ['/journey/', 'Lab'], ['/contact/', 'Contact']];
 const IDLE_MS = 3000;
 
 export default function SiteHeader() {
@@ -59,9 +59,9 @@ export default function SiteHeader() {
       </button>
     </div>
     <nav ref={nav} id="main-navigation" className="ui-glass" aria-label="Main" data-open={open}>
-      {LINKS.map(([href, label]) => <Link key={href} href={href} onNavigate={event => {
+      {LINKS.map(([href, label, mobileOnly]) => <Link key={href} href={href} className={mobileOnly ? 'ui-mobile-link' : undefined} onNavigate={event => {
         setOpen(false);
-        if (path === '/' && href === '/#about' && !window.dispatchEvent(new Event('portfolio:about', { cancelable: true }))) {
+        if (path === '/' && href.startsWith('/#') && !window.dispatchEvent(new CustomEvent('portfolio:navigate', { cancelable: true, detail: href.slice(2) }))) {
           event.preventDefault();
         }
       }} aria-current={path === href ? 'page' : undefined}>{label}</Link>)}

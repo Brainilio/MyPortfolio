@@ -63,3 +63,10 @@
   .ct .ct-form-panel{padding-left:0;border-left:0;padding-top:24px;border-top:1px solid rgba(255,255,255,.1)}
 }
 @media(max-width:420px){.ct-offer{grid-template-columns:1fr}}
+
+@media(max-width:760px), (max-width:960px) and (max-height:500px){
+  .ct-shell{margin:84px 20px 40px;padding:22px}
+  .ct-intro .ui-availability{font-size:12px;line-height:1.4;padding:8px 10px}
+  .ct-actions .ui-btn{flex:1 1 130px}
+  .ct-intro .ui-heading{font-size:clamp(30px,8vw,38px);text-wrap:balance}
+}

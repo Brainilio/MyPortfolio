@@ -84,6 +84,14 @@ function RevealHeading({ id, text, arrive = 20 }) {
 }
 
 export default function Home({ copy = {} }) {
+  const [mobile, setMobile] = useState(false);
+  useEffect(() => {
+    const query = matchMedia("(max-width: 760px), (max-width: 960px) and (max-height: 500px)");
+    const sync = () => setMobile(query.matches);
+    sync();
+    query.addEventListener("change", sync);
+    return () => query.removeEventListener("change", sync);
+  }, []);
   const [where, setWhere] = useState({ section: 0, stop: 0 }), [menu, setMenu] = useState(false);
   // Shared with the 3D scenes (read every frame): which sections are on screen and how far through each one we are.
   const scene = useRef({ section: 0, live: [0], progress: [0, 0, 0, 0, 0], tilt: [0, 0, 0, 0, 0] });
@@ -91,7 +99,7 @@ export default function Home({ copy = {} }) {
   // The section pill steps aside once the footer comes into view, so it never covers the footer's links.
   const [atFooter, setAtFooter] = useState(false);
   useEffect(() => {
-    const footer = document.querySelector(".ht-outro .ui-footer"); if (!footer) return;
+    const footer = document.querySelector(".ht-outro"); if (!footer) return;
     const seen = new IntersectionObserver(([entry]) => { setAtFooter(entry.isIntersecting); if (entry.isIntersecting) setMenu(false); }, { rootMargin: "0px 0px 40px 0px" });
     seen.observe(footer); return () => seen.disconnect();
   }, []);
@@ -114,7 +122,10 @@ export default function Home({ copy = {} }) {
   }, []);
   const progress = Math.min(1, (loading.fetched / MODELS.length) * .3 + (loading.ready / SECTIONS.length) * .7);
   const loaded = loading.done || progress >= 1;
-  useEffect(() => { document.documentElement.classList.toggle("ht-locked", !loaded); }, [loaded]);
+  useEffect(() => {
+    document.documentElement.classList.toggle("ht-locked", !loaded);
+    return () => document.documentElement.classList.remove("ht-locked");
+  }, [loaded]);
   // The entrance: once the loading screen lifts, the hero island rises into place and its camera lands (see the CSS and
   // island-scene), starting 0.3 s in.
   useEffect(() => { if (loaded) scene.current.introAt = performance.now() + 300; }, [loaded]);
@@ -127,7 +138,12 @@ export default function Home({ copy = {} }) {
     if (!el) return;
     const run = Math.max(0, el.offsetHeight - window.innerHeight);
     const arrival = s === SKILLS_AT && q > 0 ? skillsArrivalDistance(el) : 0;
-    const top = el.offsetTop + arrival + q * Math.max(0, run - arrival);
+    let top = el.offsetTop + arrival + q * Math.max(0, run - arrival);
+    if (s === SKILLS_AT && matchMedia("(max-width: 760px), (max-width: 960px) and (max-height: 500px)").matches) {
+      const cards = el.querySelectorAll(".ht-skill-panel");
+      const card = cards[Math.round(q * (cards.length - 1))];
+      if (card) top = scrollY + card.getBoundingClientRect().top - innerHeight * .36;
+    }
     const lenis = lenisRef.current;
     setMenu(false);
     if (lenis) lenis.scrollTo(top, { duration: 1.4 }); else window.scrollTo({ top, behavior: "auto" });
@@ -135,17 +151,19 @@ export default function Home({ copy = {} }) {
   useEffect(() => { lenisRef.current?.[loaded ? "start" : "stop"](); }, [loaded]);
   const jump = useCallback(s => scrollToSection(s, 0), [scrollToSection]);
   useEffect(() => {
-    const showAbout = event => {
-      if (!loaded) return;
+    const showSection = event => {
+      const target = SECTIONS.findIndex(section => section.id === event.detail);
+      if (!loaded || target < 0) return;
       event.preventDefault();
-      jump(ABOUT);
+      jump(target);
     };
-    window.addEventListener("portfolio:about", showAbout);
-    return () => window.removeEventListener("portfolio:about", showAbout);
+    window.addEventListener("portfolio:navigate", showSection);
+    return () => window.removeEventListener("portfolio:navigate", showSection);
   }, [jump, loaded]);
 
   useEffect(() => {
     let frame = 0, last = "";
+    const mobileQuery = matchMedia("(max-width: 760px), (max-width: 960px) and (max-height: 500px)");
     const update = () => {
       frame = 0;
       const y = window.scrollY, vh = window.innerHeight, middle = y + vh / 2, live = [];
@@ -161,9 +179,18 @@ export default function Home({ copy = {} }) {
         if (middle >= top) dominant = i;
         // How far its island has still to travel in (from below) and has travelled out (above), 0 → 1 a screen each.
         const arriving = i ? clamp((top - y) / vh) : 0, leaving = i < last_ ? clamp((y - (top + height - vh)) / vh) : 0;
-        scene.current.tilt[i] = ARRIVE * arriving - DEPART * leaving;
+        scene.current.tilt[i] = mobileQuery.matches ? 0 : ARRIVE * arriving - DEPART * leaving;
         stops[i] = i ? top + run * .5 : 0;
       });
+      if (mobileQuery.matches) {
+        const cards = [...zones.current[SKILLS_AT].querySelectorAll(".ht-skill-panel")];
+        const target = vh * .5;
+        let selected = 0;
+        for (let i = 0; i < cards.length; i++) {
+          if (cards[i].getBoundingClientRect().top <= target) selected = i;
+        }
+        scene.current.progress[SKILLS_AT] = selected / Math.max(1, cards.length - 1);
+      }
       // The sky: find the two section stops either side of this scroll position and blend between them.
       const end = Math.max(1, document.documentElement.scrollHeight - vh), marks = [...stops.map(v => v / end), 1], p = clamp(y / end);
       let k = 0; while (k < marks.length - 2 && p > marks[k + 1]) k++;
@@ -189,7 +216,7 @@ export default function Home({ copy = {} }) {
     const fromHash = SECTIONS.findIndex(x => `#${x.id}` === location.hash);
     if (fromHash > 0) window.scrollTo(0, zones.current[fromHash]?.offsetTop ?? 0);
     // (Also off with ?debug, so tests can jump straight to a scroll position.)
-    const lenis = matchMedia("(prefers-reduced-motion: reduce)").matches || new URLSearchParams(location.search).has("debug") ? null : new Lenis({ autoRaf: true, lerp: .09, smoothWheel: true });
+    const lenis = mobileQuery.matches || matchMedia("(prefers-reduced-motion: reduce)").matches || new URLSearchParams(location.search).has("debug") ? null : new Lenis({ autoRaf: true, lerp: .09, smoothWheel: true });
     lenisRef.current = lenis;lenis?.stop();
     update();
     // Sections change height as fonts load and the layout settles; keep the measurements fresh.
@@ -229,8 +256,10 @@ export default function Home({ copy = {} }) {
       <section className="ht-zone ht-about" id="about" data-side="right" ref={el => (zones.current[ABOUT] = el)} aria-labelledby="ht-about-title">
         <div className="ht-stage">{built[ABOUT] && <AboutScene state={scene} slot={ABOUT} side="right" onReady={onReady(ABOUT)} />}</div>
         <div className="ht-copy">
+          <div className="ht-about-intro">
           <img className="ht-portrait" src="/me.jpg" alt="Brainilio, smiling, outdoors under a tree" width="120" height="120" loading="lazy" decoding="async" />
           <RevealHeading id="ht-about-title" text={copyText(copy.about_heading, "Around the fire")} />
+          </div>
           <div className="ht-about-text">
             <p>Born in Brazil, raised in the Netherlands, and now living in the United States, I've learned to appreciate different perspectives, cultures, and ways of thinking. That curiosity carries into everything I do.</p>
             <p>I love getting involved early by understanding problems, challenging assumptions, exploring possibilities, and bringing ideas to life. I've helped deliver large-scale digital platforms, shaped engineering foundations, and turned early prototypes into working products.</p>
@@ -259,7 +288,7 @@ export default function Home({ copy = {} }) {
             ))}
           </ol>
           {/* The copy moves past the selected stop inside a fixed panel. */}
-          <SkillStory skills={SKILLS} stop={stop} visible={section === SKILLS_AT} />
+          <SkillStory skills={SKILLS} stop={stop} visible={section === SKILLS_AT} fluid={mobile} />
         </div>
       </section>
 

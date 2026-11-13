@@ -256,19 +256,19 @@ export default function AboutScene({ state, slot = 1, side = "right", onReady })
     }
 
     // Framing: the diorama to one side on wide screens (the words scroll past on the other), centred and further off when tall.
-    let tall=false,lean=new THREE.Vector2(),leanTarget=new THREE.Vector2(),attitude=0;const viewDir=new THREE.Vector3();
+    let mobile=false,tall=false,lean=new THREE.Vector2(),leanTarget=new THREE.Vector2(),attitude=0;const viewDir=new THREE.Vector3();
     const view={w:1,h:1};
     function frame(){
-      const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;tall=camera.aspect<.85;view.w=w;view.h=h;
-      if(tall)camera.setViewOffset(w,h,0,h*.055,w,h);else camera.setViewOffset(w,h,(side==="left"?.22:-.22)*w,0,w,h);
+      const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;mobile=matchMedia("(max-width: 760px), (max-width: 960px) and (max-height: 500px)").matches;tall=mobile||camera.aspect<.85;view.w=w;view.h=h;
+      if(mobile)camera.clearViewOffset();else if(tall)camera.setViewOffset(w,h,0,h*.055,w,h);else camera.setViewOffset(w,h,(side==="left"?.22:-.22)*w,0,w,h);
       camera.updateProjectionMatrix();place();starUniforms.uPixel.value=renderer.getPixelRatio();needsRender=true;
     }
     function place(){
-      const distance=tall?42:21.5;tilted(viewDir.set(.42+lean.x*.06,.4+lean.y*.04,.8).normalize(),attitude,camera.position).multiplyScalar(distance);camera.lookAt(0,tall?-.4:.3,0);
+      const distance=mobile?Math.max(24,25/camera.aspect):tall?42:21.5;tilted(viewDir.set(.42+lean.x*.06,.4+lean.y*.04,.8).normalize(),attitude,camera.position).multiplyScalar(distance);camera.lookAt(0,tall?-.4:.3,0);
     }
     const resize=new ResizeObserver(frame);resize.observe(mount);
     const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;});observer.observe(mount);
-    const onPointer=event=>{leanTarget.set(event.clientX/window.innerWidth*2-1,event.clientY/window.innerHeight*2-1);};
+    const onPointer=event=>{if(event.pointerType==="touch")return;leanTarget.set(event.clientX/window.innerWidth*2-1,event.clientY/window.innerHeight*2-1);};
     window.addEventListener("pointermove",onPointer,{passive:true});
 
     let time=0,needsRender=true,since=0,flow=0;

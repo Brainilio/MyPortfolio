@@ -5,7 +5,7 @@ import TechChip from "../tech-chip";
 
 const VISIBLE_TOOLS = 6;
 
-function SkillCard({ skill, index, active, position }) {
+function SkillCard({ skill, index, active, position, fluid }) {
   const [phase, setPhase] = useState("closed");
   const open = active && phase === "open";
   const closing = active && phase === "closing";
@@ -22,7 +22,7 @@ function SkillCard({ skill, index, active, position }) {
   const toolsId = `skill-tools-${index}`;
 
   return <div className="ht-skill-panel" data-position={position} data-active={active} inert={!active}
-    data-lenis-prevent={active ? "" : undefined}>
+    data-lenis-prevent={active && !fluid ? "" : undefined}>
     <p className="ht-skill-lead" aria-hidden="true">{skill.lead}</p>
     <div className="ht-skill-blurb" aria-hidden="true">
       {skill.blurb.split("\n\n").map(paragraph => <p key={paragraph}>{paragraph}</p>)}
@@ -44,10 +44,14 @@ function SkillCard({ skill, index, active, position }) {
   </div>;
 }
 
-export default function SkillStory({ skills, stop, visible }) {
+export default function SkillStory({ skills, stop, visible, fluid = false }) {
   const content = useRef(null);
   useLayoutEffect(() => {
     const wrapper = content.current;
+    if (fluid) {
+      wrapper.style.removeProperty("--skill-height");
+      return;
+    }
     const panel = wrapper.querySelector("[data-active=true]");
     if (!panel) return;
     const resize = () => wrapper.style.setProperty("--skill-height", `${panel.getBoundingClientRect().height}px`);
@@ -55,13 +59,13 @@ export default function SkillStory({ skills, stop, visible }) {
     const observer = new ResizeObserver(resize);
     observer.observe(panel);
     return () => observer.disconnect();
-  }, [stop, visible]);
+  }, [stop, visible, fluid]);
 
-  return <div className="ht-skill-story ui-glass ui-glass--night" data-visible={visible}>
+  return <div className="ht-skill-story ui-glass ui-glass--night" data-visible={fluid || visible} data-fluid={fluid}>
     <div className="ht-skill-story-content" ref={content}>
       {skills.map((skill, index) => (
         <SkillCard key={skill.title} skill={skill} index={index} position={Math.sign(index - stop)}
-          active={stop === index && visible} />
+          active={fluid || (stop === index && visible)} fluid={fluid} />
       ))}
     </div>
   </div>;
